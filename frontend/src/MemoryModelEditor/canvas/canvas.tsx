@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { CanvasElement, ElementKind } from "../types";
-import PrimitiveBoxCanvas from "./primitiveBoxCanvas/primitveBoxCanvas";
-import PrimitiveEditor from "./primitiveEditor/primitiveEditor";
+import PrimitiveBoxCanvas from "./boxCanvasDisplays/primitveBoxCanvas";
+import PrimitiveEditor from "./boxEditorDisplays/primitiveEditor";
 
 const editorMap: Record<string, React.FC<any>> = {
   primitive: PrimitiveEditor,

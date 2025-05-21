@@ -1,11 +1,11 @@
 import rough from 'roughjs';
 import React, { useEffect, useRef } from "react";
 
-export default function PrimitiveBox() {
+export default function FunctionBox() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-    e.dataTransfer.setData("application/box-type", "primitive");
+    e.dataTransfer.setData("application/box-type", "function");
     e.dataTransfer.effectAllowed = "move";
   };
 
@@ -27,7 +27,7 @@ export default function PrimitiveBox() {
     const mainHeight = 24 * scale;
     const doubleBoxPadding = 3 * scale;  
 
-    // Outer of the double box
+    // Main box
     rc.rectangle(
       mainX - doubleBoxPadding,
       mainY - doubleBoxPadding,
@@ -36,23 +36,16 @@ export default function PrimitiveBox() {
       {
         stroke: "#333",
         strokeWidth: 1,
-        fill: "transparent",
+        fill: "#fdf6e3",
+        fillStyle: "solid",
       }
     );
-
-    // Inner of the double box
-    rc.rectangle(mainX, mainY, mainWidth, mainHeight, {
-      stroke: "#333",
-      strokeWidth: 1,
-      fill: "#fdf6e3",
-      fillStyle: "solid",
-    });
 
     // ID box (top-left) 
     const idBoxWidth = 14 * scale;
     const idBoxHeight = 8 * scale;
-    const idBoxX = mainX; 
-    const idBoxY = mainY;
+    const idBoxX = mainX - 2 * scale - 1;
+    const idBoxY = mainY - 2 * scale - 1; 
 
     rc.rectangle(idBoxX, idBoxY, idBoxWidth, idBoxHeight, {
       stroke: "#555",
@@ -67,27 +60,13 @@ export default function PrimitiveBox() {
     ctx.textBaseline = "middle";
     ctx.fillText("id", idBoxX + idBoxWidth / 2, idBoxY + idBoxHeight / 2);
 
-    // Type box (top-right) 
-    const typeBoxWidth = 14 * scale;
-    const typeBoxHeight = 8 * scale;
-    const typeBoxX = mainX + mainWidth - typeBoxWidth;
-    const typeBoxY = mainY; 
-
-    rc.rectangle(typeBoxX, typeBoxY, typeBoxWidth, typeBoxHeight, {
-      stroke: "#555",
-      strokeWidth: 0.8,
-      fill: "#fff",
-      fillStyle: "solid",
-    });
-
-    ctx.fillText("int", typeBoxX + typeBoxWidth / 2, typeBoxY + typeBoxHeight / 2);
-
-    // Main text 
+    // Main text
     ctx.font = `${12 * scale}px sans-serif`;
     ctx.fillStyle = "#333";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("42", mainX + mainWidth / 2, mainY + mainHeight / 2);
+
   }, []);
 
   return (

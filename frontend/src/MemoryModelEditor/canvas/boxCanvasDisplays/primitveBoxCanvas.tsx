@@ -1,15 +1,17 @@
 import { CanvasElement } from "../../types";
+import { MemoryModel } from "memory-viz";
+import { drawPrimitive } from "memory-viz/memory_model";
 
 type Props = {
   element: CanvasElement;
   openPrimitiveInterface: (el: CanvasElement | null) => void;
-  beginDrag: (id: number) => void; // ← added
+  beginDrag: (id: number) => void;
 };
 
 export default function PrimitiveBoxCanvas({
   element,
   openPrimitiveInterface,
-  beginDrag, // ← added
+  beginDrag,
 }: Props) {
   const { x, y, id, kind } = element;
 
@@ -21,8 +23,8 @@ export default function PrimitiveBoxCanvas({
   return (
     <g
       cursor="pointer"
-      onMouseDown={() => beginDrag(id)} // ← added
-      onDoubleClick={() => openPrimitiveInterface(element)} // click-to-edit is now double-click
+      onMouseDown={() => beginDrag(id)}
+      onDoubleClick={() => openPrimitiveInterface(element)}
     >
       <rect
         x={x - halfW}

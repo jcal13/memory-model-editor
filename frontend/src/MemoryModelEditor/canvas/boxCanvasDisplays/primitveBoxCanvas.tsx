@@ -3,11 +3,13 @@ import { CanvasElement } from "../../types";
 type Props = {
   element: CanvasElement;
   openPrimitiveInterface: (el: CanvasElement | null) => void;
+  beginDrag: (id: number) => void; // ← added
 };
 
 export default function PrimitiveBoxCanvas({
   element,
   openPrimitiveInterface,
+  beginDrag, // ← added
 }: Props) {
   const { x, y, id, kind } = element;
 
@@ -17,7 +19,11 @@ export default function PrimitiveBoxCanvas({
   const halfH = h / 2;
 
   return (
-    <g cursor="pointer" onClick={() => openPrimitiveInterface(element)}>
+    <g
+      cursor="pointer"
+      onMouseDown={() => beginDrag(id)} // ← added
+      onDoubleClick={() => openPrimitiveInterface(element)} // click-to-edit is now double-click
+    >
       <rect
         x={x - halfW}
         y={y - halfH}
@@ -51,7 +57,7 @@ export default function PrimitiveBoxCanvas({
 
       <text
         x={x - halfW / 2}
-        y={y - halfH / 2 + 4} // slight vertical tweak
+        y={y - halfH / 2 + 4}
         fontSize="10"
         textAnchor="middle"
         dominantBaseline="middle"

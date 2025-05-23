@@ -1,4 +1,4 @@
-import PrimitiveBox from "./primitiveBox/primitveBox";
+import PrimitiveBox from "./boxes/primitveBox";
 
 export default function Palette() {
   return (

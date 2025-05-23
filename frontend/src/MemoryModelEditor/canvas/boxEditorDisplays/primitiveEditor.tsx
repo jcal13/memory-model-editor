@@ -10,6 +10,7 @@ interface Props {
 export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
   const [dataType, setDataType] = useState(element.kind.type);
   const [value, setValue] = useState(element.kind.value);
+
   useEffect(() => {
     setDataType(element.kind.type);
     setValue(element.kind.value);
@@ -27,37 +28,24 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
         return isFloat(value);
       case "bool":
         return isBool(value);
-      case "str":
       default:
         return true;
     }
   };
 
-  const isValid = validByType();
-  const handleSave = () =>
-    onSave({
-      name: "primitive",
-      type: dataType,
-      value,
-    });
+  const handleSave = () => onSave({ name: "primitive", type: dataType, value });
 
   const handleTypeChange = (newType: typeof dataType) => {
     setDataType(newType);
-    if (newType === "bool") {
-      setValue("true");
-    } else if (newType === "int" && !isInt(value)) {
-      setValue("0");
-    } else if (newType === "float" && !isFloat(value)) {
-      setValue("0.0");
-    }
+    if (newType === "bool") setValue("true");
+    if (newType === "int" && !isInt(value)) setValue("0");
+    if (newType === "float" && !isFloat(value)) setValue("0.0");
   };
 
   return (
     <div
+      className="drag-handle"
       style={{
-        position: "absolute",
-        top: 20,
-        right: 20,
         zIndex: 1000,
         background: "#fff",
         border: "1px solid #888",
@@ -68,33 +56,41 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
     >
       <div
         style={{
-          border: "1px solid #888",
-          background: "#f5f5f5",
-          display: "inline-block",
-          padding: "2px 6px",
-          fontSize: "0.8rem",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
           marginBottom: 8,
         }}
       >
-        {element.id}
-      </div>
+        <div
+          style={{
+            border: "1px solid #888",
+            background: "#f5f5f5",
+            padding: "2px 6px",
+            fontSize: "0.8rem",
+          }}
+        >
+          {element.id}
+        </div>
 
-      <select
-        style={{ width: "100%", marginBottom: 8, padding: 4 }}
-        value={dataType}
-        onChange={(e) => handleTypeChange(e.target.value as typeof dataType)}
-      >
-        <option value="int">int</option>
-        <option value="float">float</option>
-        <option value="str">str</option>
-        <option value="bool">bool</option>
-      </select>
+        <select
+          style={{ padding: 4 }}
+          value={dataType}
+          onChange={(e) => handleTypeChange(e.target.value as typeof dataType)}
+        >
+          <option value="int">int</option>
+          <option value="float">float</option>
+          <option value="str">str</option>
+          <option value="bool">bool</option>
+        </select>
+      </div>
 
       {dataType === "bool" ? (
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "center",
+            gap: 16,
             marginBottom: 8,
           }}
         >
@@ -116,26 +112,36 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
           </label>
         </div>
       ) : (
-        <input
-          style={{
-            width: "100%",
-            marginBottom: 8,
-            padding: 4,
-            boxSizing: "border-box",
-          }}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder="value"
-        />
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <div
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => setValue(e.currentTarget.innerText)}
+            style={{
+              width: "80%",
+              minHeight: 24,
+              padding: 4,
+              boxSizing: "border-box",
+              textAlign: "center",
+              overflowWrap: "break-word",
+              whiteSpace: "pre-wrap",
+              border: "1px solid #ccc",
+              outline: "none",
+            }}
+          >
+            {value}
+          </div>
+        </div>
       )}
 
-      <button onClick={handleSave} disabled={!isValid}>
+      <button onClick={handleSave} disabled={!validByType()}>
         Save
       </button>
       <button onClick={onCancel} style={{ marginLeft: 4 }}>
         Cancel
       </button>
-      {!isValid && (
+
+      {!validByType() && (
         <div style={{ color: "red", marginTop: 6, fontSize: "0.8rem" }}>
           Invalid {dataType} value
         </div>

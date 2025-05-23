@@ -1,6 +1,4 @@
 import { CanvasElement } from "../../types";
-import { MemoryModel } from "memory-viz";
-import { drawPrimitive } from "memory-viz/memory_model";
 
 type Props = {
   element: CanvasElement;

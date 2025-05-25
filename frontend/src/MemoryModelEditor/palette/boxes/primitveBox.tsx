@@ -1,5 +1,5 @@
 import rough from 'roughjs';
-import React, { useEffect, useRef } from "react";
+import React, { memo, useEffect, useRef } from "react";
 
 export default function PrimitiveBox() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -80,14 +80,14 @@ export default function PrimitiveBox() {
       fillStyle: "solid",
     });
 
-    ctx.fillText("int", typeBoxX + typeBoxWidth / 2, typeBoxY + typeBoxHeight / 2);
+    ctx.fillText("", typeBoxX + typeBoxWidth / 2, typeBoxY + typeBoxHeight / 2);
 
     // Main text 
     ctx.font = `${12 * scale}px sans-serif`;
     ctx.fillStyle = "#333";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("42", mainX + mainWidth / 2, mainY + mainHeight / 2);
+    ctx.fillText("", mainX + mainWidth / 2, mainY + mainHeight / 2);
   }, []);
 
   return (

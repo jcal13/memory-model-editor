@@ -5,7 +5,7 @@ export default function SetBox() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-    e.dataTransfer.setData("application/box-type", "list");
+    e.dataTransfer.setData("application/box-type", "set");
     e.dataTransfer.effectAllowed = "move";
   };
 

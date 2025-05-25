@@ -65,7 +65,7 @@ export default function FunctionBox() {
     ctx.fillStyle = "#333";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("42", mainX + mainWidth / 2, mainY + mainHeight / 2);
+    ctx.fillText("", mainX + mainWidth / 2, mainY + mainHeight / 2);
 
   }, []);
 

@@ -5,7 +5,7 @@ export default function DictBox() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-    e.dataTransfer.setData("application/box-type", "set");
+    e.dataTransfer.setData("application/box-type", "dict");
     e.dataTransfer.effectAllowed = "move";
   };
 

@@ -4,10 +4,10 @@ import React, { useEffect, useRef } from "react";
 
 type Props = {
   element: CanvasElement;
-  openPrimitiveInterface: (el: CanvasElement | null) => void;
+  openFunctionInterface: (el: CanvasElement | null) => void;
 };
 
-export default function PrimitiveBoxCanvas({ element, openPrimitiveInterface }: Props) {
+export default function FunctionBoxCanvas({ element, openFunctionInterface }: Props) {
   const gRef = useRef<SVGGElement>(null);
   const roughSvg = useRef<ReturnType<typeof rough.svg> | null>(null);
 
@@ -33,24 +33,15 @@ export default function PrimitiveBoxCanvas({ element, openPrimitiveInterface }: 
       mainY - doubleBoxPadding,
       mainWidth + 2 * doubleBoxPadding,
       mainHeight + 2 * doubleBoxPadding,
-      { stroke: "#333", strokeWidth: 1, fill: "transparent" }
+      { stroke: "#333", strokeWidth: 1, fill: "#fdf6e3", fillStyle: "solid" }
     );
 
-    const innerRect = rc.rectangle(mainX, mainY, mainWidth, mainHeight, {
-      stroke: "#333",
-      strokeWidth: 1,
-      fill: "#fdf6e3",
-      fillStyle: "solid",
-    });
+    const idBoxWidth = 14 * scale;
+    const idBoxHeight = 8 * scale;
+    const idBoxX = mainX - 2 * scale - 1;
+    const idBoxY = mainY - 2 * scale - 1; 
 
-    const idBox = rc.rectangle(mainX, mainY, 14 * scale, 8 * scale, {
-      stroke: "#555",
-      strokeWidth: 0.8,
-      fill: "#fff",
-      fillStyle: "solid",
-    });
-
-    const typeBox = rc.rectangle(mainX + mainWidth - 14 * scale, mainY, 14 * scale, 8 * scale, {
+    const idBox = rc.rectangle(idBoxX, idBoxY, idBoxWidth, idBoxHeight, {
       stroke: "#555",
       strokeWidth: 0.8,
       fill: "#fff",
@@ -58,16 +49,14 @@ export default function PrimitiveBoxCanvas({ element, openPrimitiveInterface }: 
     });
 
     gRef.current.appendChild(outerRect);
-    gRef.current.appendChild(innerRect);
     gRef.current.appendChild(idBox);
-    gRef.current.appendChild(typeBox);
   }, [element]);
 
   return (
     <g
       ref={gRef}
       transform={`translate(${element.x - 75}, ${element.y - 50})`}
-      onClick={() => openPrimitiveInterface(element)}
+      onClick={() => openFunctionInterface(element)}
       style={{ cursor: "pointer" }}
     />
   );

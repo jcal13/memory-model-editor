@@ -1,21 +1,36 @@
 import React, { useEffect, useRef } from "react";
 import MemoryViz from "memory-viz";
+// import type { MemoryModel } from "memory-viz";
 
 export default function PrimitiveBox() {
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    e.dataTransfer.setData("application/box-type", "primitive");
+    e.dataTransfer.effectAllowed = "move";
+  };
+
   useEffect(() => {
     const { MemoryModel } = MemoryViz;
-    const model = new MemoryModel({ browser: true, roughjs_config: {
-    options: {
-      fillStyle: "solid", // no scribble fill
-    },
-  } });
-
-    model.drawPrimitive(100, 100, "int", 42, 99, {
-      box_container: {fill:"white", fillStyle: "none"},
+    const model = new MemoryModel({
+      obj_min_width: 150,
+      obj_min_height: 90,
+      prop_min_width: 50,
+      prop_min_height: 40,
+      double_rect_sep: 10,
+      font_size: 18,
+      browser: true,
+      roughjs_config: {
+        options: {
+          fillStyle: "solid",
+        },
+      },
     });
+    // const model = props.model;
 
+    model.drawPrimitive(10, 10, "", 0, "", {
+      box_container: { fill: "white", fillStyle: "none" },
+    });
 
     if (containerRef.current) {
       containerRef.current.innerHTML = "";
@@ -25,8 +40,17 @@ export default function PrimitiveBox() {
 
   return (
     <div
+      draggable
+      onDragStart={handleDragStart}
       ref={containerRef}
-      style={{ width: "500px", height: "300px", border: "1px solid red" }}
-    />
+      style={{
+        width: "200px",
+        height: "125px",
+        cursor: "grab",
+        // display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    ></div>
   );
 }

@@ -4,7 +4,12 @@ export type CanvasElement = {
   x: number;
   y: number;
 };
-export type ElementKind = PrimitiveValue | FunctionValue | ListValue | SetValue | DictValue;
+export type ElementKind =
+  | PrimitiveValue
+  | FunctionValue
+  | ListValue
+  | SetValue
+  | DictValue;
 
 type PrimitiveValue = {
   name: "primitive";

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import MemoryViz from "memory-viz";
-// import type { MemoryModel } from "memory-viz";
 
 export default function DictBox() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -13,8 +12,8 @@ export default function DictBox() {
   useEffect(() => {
     const { MemoryModel } = MemoryViz;
     const model = new MemoryModel({
-      obj_min_width: 160,
-      obj_min_height: 150,
+      obj_min_width: 190,
+      obj_min_height: 200,
       prop_min_width: 60,
       prop_min_height: 40,
       double_rect_sep: 10,
@@ -26,21 +25,22 @@ export default function DictBox() {
         },
       },
     });
-    // const model = props.model;
 
-    model.drawDict(
-      10,
-      10,
-      0,
-      {},
-      {
-        box_container: { fill: "white", fillStyle: "none" },
-      }
-    );
-
+    model.drawDict(0, 0, 0, {}, {
+      box_container: { fill: "#fdf6e3", fillStyle: "solid" },
+      box_id: { fill: "#fff", fillStyle: "solid" },
+      box_type: { fill: "#fff", fillStyle: "solid" },
+    });
+    
     if (containerRef.current) {
       containerRef.current.innerHTML = "";
       containerRef.current.appendChild(model.svg);
+
+      const bbox = model.svg.getBBox();
+      model.svg.setAttribute("width", `${bbox.width}`);
+      model.svg.setAttribute("height", `${bbox.height}`);
+      containerRef.current.style.width = `${bbox.width}px`;
+      containerRef.current.style.height = `${bbox.height}px`;
     }
   }, []);
 
@@ -50,12 +50,7 @@ export default function DictBox() {
       onDragStart={handleDragStart}
       ref={containerRef}
       style={{
-        width: "200px",
-        height: "125px",
         cursor: "grab",
-        // display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
       }}
     ></div>
   );

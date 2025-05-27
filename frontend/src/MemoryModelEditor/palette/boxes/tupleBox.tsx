@@ -1,18 +1,18 @@
 import React, { useEffect, useRef } from "react";
 import MemoryViz from "memory-viz";
 
-export default function ListBox() {
+export default function TupleBox() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-    e.dataTransfer.setData("application/box-type", "list");
+    e.dataTransfer.setData("application/box-type", "tuple");
     e.dataTransfer.effectAllowed = "move";
   };
 
   useEffect(() => {
     const { MemoryModel } = MemoryViz;
     const model = new MemoryModel({
-      obj_min_width: 190,
+      obj_min_width: 170,
       obj_min_height: 70,
       prop_min_width: 60,
       prop_min_height: 40,
@@ -26,7 +26,7 @@ export default function ListBox() {
       },
     });
 
-    model.drawSequence(0, 0, "list", 0, [], true, {
+    model.drawSequence(0, 0, "tuple", 0, [], true, {
       box_container: { fill: "#fdf6e3", fillStyle: "solid" },
       box_id: { fill: "#fff", fillStyle: "solid" },
       box_type: { fill: "#fff", fillStyle: "solid" },

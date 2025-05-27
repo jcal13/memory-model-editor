@@ -7,7 +7,7 @@ import SetBoxCanvas from "./boxCanvasDisplays/setBoxCanvas";
 import DictBoxCanvas from "./boxCanvasDisplays/dictBoxCanvas";
 import PrimitiveEditor from "./boxEditorDisplays/primitiveEditor";
 import FunctionEditor from "./boxEditorDisplays/functionEditor"; // new
-// import ListEditor from "./boxEditorDisplays/listEditor";
+import TupleBoxCanvas from "./boxCanvasDisplays/tupleBoxCanvas";
 
 const editorMap: Record<string, React.FC<any>> = {
   primitive: PrimitiveEditor,
@@ -49,6 +49,13 @@ export default function Canvas({ elements, setElements }: Props) {
         type: "int",
         value: "null",
       } 
+    } else if (payload === "tuple") {
+        newKind = {
+          name: "tuple",
+          type: "int",
+          value: "null",
+          items: [],
+      }
     } else if (payload === "set") {
       newKind = {
         name: "set",
@@ -116,6 +123,14 @@ export default function Canvas({ elements, setElements }: Props) {
             case "list":
               return (
                 <ListBoxCanvas
+                  key={el.id}
+                  element={el}
+                  openListInterface={() => setSelected(el)}
+                />
+              );
+            case "tuple":
+              return (
+                <TupleBoxCanvas
                   key={el.id}
                   element={el}
                   openListInterface={() => setSelected(el)}

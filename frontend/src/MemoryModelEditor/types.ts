@@ -8,6 +8,7 @@ export type ElementKind =
   | PrimitiveValue
   | FunctionValue
   | ListValue
+  | TupleValue
   | SetValue
   | DictValue;
 
@@ -27,6 +28,13 @@ type ListValue = {
   name: "list";
   type: "int" | "str" | "bool" | "float";
   value: "null" | string;
+};
+
+type TupleValue = {
+  name: "tuple";
+  type: "int" | "str" | "bool" | "float";
+  value: "null" | string;
+  items: Array<PrimitiveValue | FunctionValue | ListValue | SetValue | DictValue>;
 };
 
 type SetValue = {

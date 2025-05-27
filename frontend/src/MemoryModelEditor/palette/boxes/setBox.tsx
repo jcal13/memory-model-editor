@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import MemoryViz from "memory-viz";
-// import type { MemoryModel } from "memory-viz";
 
 export default function SetBox() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -13,7 +12,7 @@ export default function SetBox() {
   useEffect(() => {
     const { MemoryModel } = MemoryViz;
     const model = new MemoryModel({
-      obj_min_width: 170,
+      obj_min_width: 203,
       obj_min_height: 90,
       prop_min_width: 60,
       prop_min_height: 40,
@@ -26,15 +25,22 @@ export default function SetBox() {
         },
       },
     });
-    // const model = props.model;
 
-    model.drawSet(10, 10, 0, [], {
-      box_container: { fill: "white", fillStyle: "none" },
+    model.drawSet(0, 0, 0, [], {
+      box_container: { fill: "#fdf6e3", fillStyle: "solid" },
+      box_id: { fill: "#fff", fillStyle: "solid" },
+      box_type: { fill: "#fff", fillStyle: "solid" },
     });
 
     if (containerRef.current) {
       containerRef.current.innerHTML = "";
       containerRef.current.appendChild(model.svg);
+
+      const bbox = model.svg.getBBox();
+      model.svg.setAttribute("width", `${bbox.width}`);
+      model.svg.setAttribute("height", `${bbox.height}`);
+      containerRef.current.style.width = `${bbox.width}px`;
+      containerRef.current.style.height = `${bbox.height}px`;
     }
   }, []);
 
@@ -44,12 +50,7 @@ export default function SetBox() {
       onDragStart={handleDragStart}
       ref={containerRef}
       style={{
-        width: "200px",
-        height: "125px",
         cursor: "grab",
-        // display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
       }}
     ></div>
   );

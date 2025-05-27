@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import MemoryViz from "memory-viz";
-// import type { MemoryModel } from "memory-viz";
 
 export default function FunctionBox() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -13,7 +12,7 @@ export default function FunctionBox() {
   useEffect(() => {
     const { MemoryModel } = MemoryViz;
     const model = new MemoryModel({
-      obj_min_width: 150,
+      obj_min_width: 190,
       obj_min_height: 90,
       prop_min_width: 50,
       prop_min_height: 40,
@@ -26,16 +25,26 @@ export default function FunctionBox() {
         },
       },
     });
-    // const model = props.model;
 
-    model.drawClass(10, 10, "__main__", 0, {}, true, {
-      box_container: { fill: "white", fillStyle: "none" },
+    model.drawClass(0, 0, "__main__", 0, {}, true, {
+      box_container: { fill: "#fdf6e3", fillStyle: "solid" },
+      box_id: { fill: "#fff", fillStyle: "solid" },
+      box_type: { fill: "#fff", fillStyle: "solid" },
+      
     });
 
     if (containerRef.current) {
       containerRef.current.innerHTML = "";
       containerRef.current.appendChild(model.svg);
+
+      const bbox = model.svg.getBBox();
+      model.svg.setAttribute("width", `${bbox.width}`);
+      model.svg.setAttribute("height", `${bbox.height}`);
+      containerRef.current.style.width = `${bbox.width}px`;
+      containerRef.current.style.height = `${bbox.height}px`;
     }
+
+
   }, []);
 
   return (
@@ -44,12 +53,7 @@ export default function FunctionBox() {
       onDragStart={handleDragStart}
       ref={containerRef}
       style={{
-        width: "200px",
-        height: "125px",
         cursor: "grab",
-        // display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
       }}
     ></div>
   );

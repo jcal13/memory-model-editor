@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import MemoryViz from "memory-viz";
-// import type { MemoryModel } from "memory-viz";
 
 export default function PrimitiveBox() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -13,7 +12,7 @@ export default function PrimitiveBox() {
   useEffect(() => {
     const { MemoryModel } = MemoryViz;
     const model = new MemoryModel({
-      obj_min_width: 150,
+      obj_min_width: 170,
       obj_min_height: 90,
       prop_min_width: 50,
       prop_min_height: 40,
@@ -26,15 +25,22 @@ export default function PrimitiveBox() {
         },
       },
     });
-    // const model = props.model;
 
-    model.drawPrimitive(10, 10, "", 0, "", {
-      box_container: { fill: "white", fillStyle: "none" },
+    model.drawPrimitive(0, 0, "None", 0, "", {
+      box_container: { fill: "#fdf6e3", fillStyle: "solid" },
+      box_id: { fill: "#fff", fillStyle: "solid" },
+      box_type: { fill: "#fff", fillStyle: "solid" },
     });
 
     if (containerRef.current) {
       containerRef.current.innerHTML = "";
       containerRef.current.appendChild(model.svg);
+
+      const bbox = model.svg.getBBox();
+      model.svg.setAttribute("width", `${bbox.width}`);
+      model.svg.setAttribute("height", `${bbox.height}`);
+      containerRef.current.style.width = `${bbox.width}px`;
+      containerRef.current.style.height = `${bbox.height}px`;
     }
   }, []);
 
@@ -44,13 +50,8 @@ export default function PrimitiveBox() {
       onDragStart={handleDragStart}
       ref={containerRef}
       style={{
-        width: "200px",
-        height: "125px",
-        cursor: "grab",
-        // display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
+      cursor: "grab",
+    }}
     ></div>
   );
 }

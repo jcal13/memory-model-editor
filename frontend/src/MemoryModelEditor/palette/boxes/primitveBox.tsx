@@ -1,109 +1,32 @@
-import rough from 'roughjs';
-import React, { memo, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
+import MemoryViz from "memory-viz";
 
 export default function PrimitiveBox() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-    e.dataTransfer.setData("application/box-type", "primitive");
-    e.dataTransfer.effectAllowed = "move";
-  };
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const { MemoryModel } = MemoryViz;
+    const model = new MemoryModel({ browser: true, roughjs_config: {
+    options: {
+      fillStyle: "solid", // no scribble fill
+    },
+  } });
 
-    const rc = rough.canvas(canvas);
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const scale = 2;
-
-    const mainX = 10 * scale;
-    const mainY = 10 * scale;
-    const mainWidth = 60 * scale;
-    const mainHeight = 24 * scale;
-    const doubleBoxPadding = 3 * scale;  
-
-    // Outer of the double box
-    rc.rectangle(
-      mainX - doubleBoxPadding,
-      mainY - doubleBoxPadding,
-      mainWidth + 2 * doubleBoxPadding,
-      mainHeight + 2 * doubleBoxPadding,
-      {
-        stroke: "#333",
-        strokeWidth: 1,
-        fill: "transparent",
-      }
-    );
-
-    // Inner of the double box
-    rc.rectangle(mainX, mainY, mainWidth, mainHeight, {
-      stroke: "#333",
-      strokeWidth: 1,
-      fill: "#fdf6e3",
-      fillStyle: "solid",
+    model.drawPrimitive(100, 100, "int", 42, 99, {
+      box_container: {fill:"white", fillStyle: "none"},
     });
 
-    // ID box (top-left) 
-    const idBoxWidth = 14 * scale;
-    const idBoxHeight = 8 * scale;
-    const idBoxX = mainX; 
-    const idBoxY = mainY;
 
-    rc.rectangle(idBoxX, idBoxY, idBoxWidth, idBoxHeight, {
-      stroke: "#555",
-      strokeWidth: 0.8,
-      fill: "#fff",
-      fillStyle: "solid",
-    });
-
-    ctx.font = `${7 * scale}px sans-serif`;
-    ctx.fillStyle = "#000";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("id", idBoxX + idBoxWidth / 2, idBoxY + idBoxHeight / 2);
-
-    // Type box (top-right) 
-    const typeBoxWidth = 14 * scale;
-    const typeBoxHeight = 8 * scale;
-    const typeBoxX = mainX + mainWidth - typeBoxWidth;
-    const typeBoxY = mainY; 
-
-    rc.rectangle(typeBoxX, typeBoxY, typeBoxWidth, typeBoxHeight, {
-      stroke: "#555",
-      strokeWidth: 0.8,
-      fill: "#fff",
-      fillStyle: "solid",
-    });
-
-    ctx.fillText("", typeBoxX + typeBoxWidth / 2, typeBoxY + typeBoxHeight / 2);
-
-    // Main text 
-    ctx.font = `${12 * scale}px sans-serif`;
-    ctx.fillStyle = "#333";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("", mainX + mainWidth / 2, mainY + mainHeight / 2);
+    if (containerRef.current) {
+      containerRef.current.innerHTML = "";
+      containerRef.current.appendChild(model.svg);
+    }
   }, []);
 
   return (
     <div
-      draggable
-      onDragStart={handleDragStart}
-      style={{
-        width: 160,
-        height: 80,
-        cursor: "grab",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <canvas ref={canvasRef} width={160} height={80} />
-    </div>
+      ref={containerRef}
+      style={{ width: "500px", height: "300px", border: "1px solid red" }}
+    />
   );
 }

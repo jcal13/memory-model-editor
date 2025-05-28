@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import EditorModule from "./editorModule";
 
+/**
+ * Props for the PrimitiveEditor component.
+ */
 type Props = {
   element: {
     id: string;
@@ -10,23 +13,44 @@ type Props = {
       value: string;
     };
   };
-  onSave: (data: { name: "primitive"; type: "int" | "float" | "str" | "bool"; value: string }) => void;
+  /**
+   * Called when the user confirms their changes.
+   */
+  onSave: (data: {
+    name: "primitive";
+    type: "int" | "float" | "str" | "bool";
+    value: string;
+  }) => void;
+
+  /**
+   * Called when the user cancels editing.
+   */
   onCancel: () => void;
 };
 
+/**
+ * PrimitiveEditor allows users to configure a single primitive value
+ * such as an integer, float, string, or boolean. It dynamically validates
+ * and formats input based on the selected type.
+ */
 export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
   const [dataType, setDataType] = useState(element.kind.type);
   const [value, setValue] = useState(element.kind.value);
 
+  // Update editor state when a new element is selected
   useEffect(() => {
     setDataType(element.kind.type);
     setValue(element.kind.value);
   }, [element]);
 
+  // Validation helpers
   const isInt = (v: string) => /^-?\d+$/.test(v);
   const isFloat = (v: string) => /^-?\d+(\.\d+)?$/.test(v);
   const isBool = (v: string) => v === "true" || v === "false";
 
+  /**
+   * Validates the current value according to the selected type.
+   */
   const validByType = () => {
     switch (dataType) {
       case "int":
@@ -43,6 +67,9 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
 
   const isValid = validByType();
 
+  /**
+   * Handles saving the primitive element's data.
+   */
   const handleSave = () => {
     onSave({
       name: "primitive",
@@ -51,6 +78,10 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
     });
   };
 
+  /**
+   * Updates the type and sets default values accordingly.
+   * @param newType - The newly selected data type
+   */
   const handleTypeChange = (newType: typeof dataType) => {
     setDataType(newType);
     if (newType === "bool") {
@@ -64,6 +95,7 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
 
   return (
     <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel}>
+      {/* Type selector dropdown */}
       <select
         value={dataType}
         onChange={(e) => handleTypeChange(e.target.value as typeof dataType)}
@@ -75,6 +107,7 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
         <option value="bool">bool</option>
       </select>
 
+      {/* Render boolean selection as radio buttons */}
       {dataType === "bool" ? (
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
           <label>
@@ -95,6 +128,7 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
           </label>
         </div>
       ) : (
+        // Render input field for int, float, and str
         <input
           style={{
             width: "100%",
@@ -108,6 +142,7 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
         />
       )}
 
+      {/* Show error if value is invalid */}
       {!isValid && (
         <div style={{ color: "red", fontSize: "0.8rem", marginTop: 4 }}>
           Invalid {dataType} value

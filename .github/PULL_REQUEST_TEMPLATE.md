@@ -39,11 +39,9 @@ Before opening your pull request:
 - [ ] I have updated the project documentation, if applicable.
     - This is **required** for new features.
 - [ ] If this is my first contribution, I have added myself to the [list of contributors](https://github.com/jcal13/memory-model-editor/blob/dev/frontend/package.json).
-- [ ] I have updated the project Changelog (this is required for all changes).
 
 After opening your pull request:
 
-- [ ] I have verified that the CI tests have passed.
 - [ ] I have [requested a review](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) from a project maintainer.
 
 ## Questions and Comments

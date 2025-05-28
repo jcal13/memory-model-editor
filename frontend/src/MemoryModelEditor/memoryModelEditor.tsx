@@ -1,22 +1,44 @@
 import { useState } from "react";
 import Canvas from "./canvas/canvas";
 import Palette from "./palette/palette";
-import { MemoryVizObject, CanvasElement } from "./types";
+import { CanvasElement } from "./types";
 
 export default function MemoryModelEditor() {
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [jsonView, setJsonView] = useState<string>("");
 
   const showJson = () => {
-    const objs: MemoryVizObject[] = elements.map((el) => {
-      const { id, kind } = el;
-      let typedVal: string | number | boolean = kind.value;
+    const objs = elements.map(({ id, kind }) => {
+      const base = { id, name: kind.name, type: kind.type };
 
-      if (kind.type === "int") typedVal = parseInt(kind.value, 10);
-      if (kind.type === "float") typedVal = parseFloat(kind.value);
-      if (kind.type === "bool") typedVal = kind.value === "true";
+      switch (kind.name) {
+        case "primitive": {
+          let parsed: string | number | boolean = kind.value;
+          if (kind.type === "int") parsed = parseInt(kind.value, 10);
+          else if (kind.type === "float") parsed = parseFloat(kind.value);
+          else if (kind.type === "bool") parsed = kind.value === "true";
+          return { ...base, value: parsed };
+        }
 
-      return { id, type: kind.type, value: typedVal };
+        case "list":
+        case "tuple":
+        case "set":
+          return { ...base, value: kind.value }; 
+
+        case "dict":
+          return { ...base, value: kind.value }; 
+
+        case "function":
+          return {
+            ...base,
+            functionName: kind.functionName,
+            params: kind.params,
+            value: null,
+          };
+
+        default:
+          return { ...base, value: null };
+      }
     });
 
     setJsonView(JSON.stringify(objs, null, 2));

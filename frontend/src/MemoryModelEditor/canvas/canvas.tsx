@@ -1,20 +1,27 @@
 import React, { useState } from "react";
 import { CanvasElement, ElementKind } from "../types";
+
 import PrimitiveBoxCanvas from "./boxCanvasDisplays/primitveBoxCanvas";
-import FunctionBoxCanvas from "./boxCanvasDisplays/functionBoxCanvas"; // new
+import FunctionBoxCanvas from "./boxCanvasDisplays/functionBoxCanvas";
 import ListBoxCanvas from "./boxCanvasDisplays/listBoxCanvas";
 import SetBoxCanvas from "./boxCanvasDisplays/setBoxCanvas";
 import DictBoxCanvas from "./boxCanvasDisplays/dictBoxCanvas";
-import PrimitiveEditor from "./boxEditorDisplays/primitiveEditor";
-import FunctionEditor from "./boxEditorDisplays/functionEditor"; // new
 import TupleBoxCanvas from "./boxCanvasDisplays/tupleBoxCanvas";
 
-const editorMap: Record<string, React.FC<any>> = {
+import PrimitiveEditor from "./boxEditorDisplays/primitiveEditor";
+import FunctionEditor from "./boxEditorDisplays/functionEditor";
+import ListEditor from "./boxEditorDisplays/listEditor";
+import SetEditor from "./boxEditorDisplays/setEditor";
+import DictEditor from "./boxEditorDisplays/dictEditor";
+import TupleEditor from "./boxEditorDisplays/tupleEditor";
+
+const editorMap: Record<ElementKind["name"], React.FC<any>> = {
   primitive: PrimitiveEditor,
-  function: FunctionEditor, 
-  list: FunctionEditor,
-  set: FunctionEditor,
-  dict: FunctionEditor,
+  function: FunctionEditor,
+  list: ListEditor,
+  tuple: TupleEditor,
+  set: SetEditor,
+  dict: DictEditor,
 };
 
 interface Props {
@@ -27,51 +34,56 @@ export default function Canvas({ elements, setElements }: Props) {
 
   const handleDrop = (e: React.DragEvent<SVGSVGElement>) => {
     e.preventDefault();
-
     const payload = e.dataTransfer.getData("application/box-type");
     let newKind: ElementKind;
 
-    if (payload === "primitive") {
-      newKind = {
-        name: "primitive",
-        type: "int",
-        value: "null",
-      };
-    } else if (payload === "function") {
-      newKind = {
-        name: "function",
-        type: "int",
-        value: "null",
-      };
-    } else if (payload === "list") {
-      newKind = {
-        name: "list",
-        type: "int",
-        value: "null",
-      } 
-    } else if (payload === "tuple") {
+    switch (payload) {
+      case "primitive":
+        newKind = {
+          name: "primitive",
+          type: "int",
+          value: "0",
+        };
+        break;
+      case "function":
+        newKind = {
+          name: "function",
+          type: "function",
+          value: null,
+          functionName: "myFunction",
+          params: [],
+        };
+        break;
+      case "list":
+        newKind = {
+          name: "list",
+          type: "list",
+          value: [],
+        };
+        break;
+      case "tuple":
         newKind = {
           name: "tuple",
-          type: "int",
-          value: "null",
-          items: [],
-      }
-    } else if (payload === "set") {
-      newKind = {
-        name: "set",
-        type: "int",
-        value: "null",
-      };
-    } else if (payload === "dict") {
-      newKind = {
-        name: "dict",
-        type: "int",
-        value: "null",
-        keyType: "int",
-        keyValue: "null",
-      };
-    } else {
-      return;
+          type: "tuple",
+          value: [],
+        };
+        break;
+      case "set":
+        newKind = {
+          name: "set",
+          type: "set",
+          value: [],
+        };
+        break;
+      case "dict":
+        newKind = {
+          name: "dict",
+          type: "dict",
+          value: {},
+        };
+        break;
+      default:
+        return;
     }
 
     const svg = e.currentTarget;
@@ -160,9 +172,9 @@ export default function Canvas({ elements, setElements }: Props) {
 
       {selected &&
         (() => {
-          const Edit = editorMap[selected.kind.name];
+          const Editor = editorMap[selected.kind.name];
           return (
-            <Edit
+            <Editor
               element={selected}
               onSave={saveElement}
               onCancel={() => setSelected(null)}

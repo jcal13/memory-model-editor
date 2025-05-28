@@ -1,15 +1,23 @@
 import { useState, useEffect } from "react";
-import { CanvasElement, ElementKind } from "../../types";
+import EditorModule from "./editorModule";
 
-interface Props {
-  element: CanvasElement;
-  onSave: (updatedKind: ElementKind) => void;
+type Props = {
+  element: {
+    id: string;
+    kind: {
+      name: "primitive";
+      type: "int" | "float" | "str" | "bool";
+      value: string;
+    };
+  };
+  onSave: (data: { name: "primitive"; type: "int" | "float" | "str" | "bool"; value: string }) => void;
   onCancel: () => void;
-}
+};
 
 export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
   const [dataType, setDataType] = useState(element.kind.type);
   const [value, setValue] = useState(element.kind.value);
+
   useEffect(() => {
     setDataType(element.kind.type);
     setValue(element.kind.value);
@@ -34,12 +42,14 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
   };
 
   const isValid = validByType();
-  const handleSave = () =>
+
+  const handleSave = () => {
     onSave({
       name: "primitive",
       type: dataType,
-      value,
+      value: value ?? "",
     });
+  };
 
   const handleTypeChange = (newType: typeof dataType) => {
     setDataType(newType);
@@ -53,36 +63,11 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
   };
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        top: 20,
-        right: 20,
-        zIndex: 1000,
-        background: "#fff",
-        border: "1px solid #888",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-        padding: 12,
-        width: 230,
-      }}
-    >
-      <div
-        style={{
-          border: "1px solid #888",
-          background: "#f5f5f5",
-          display: "inline-block",
-          padding: "2px 6px",
-          fontSize: "0.8rem",
-          marginBottom: 8,
-        }}
-      >
-        {element.id}
-      </div>
-
+    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel}>
       <select
-        style={{ width: "100%", marginBottom: 8, padding: 4 }}
         value={dataType}
         onChange={(e) => handleTypeChange(e.target.value as typeof dataType)}
+        style={{ width: "100%", marginBottom: 8, padding: 4 }}
       >
         <option value="int">int</option>
         <option value="float">float</option>
@@ -91,19 +76,13 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
       </select>
 
       {dataType === "bool" ? (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: 8,
-          }}
-        >
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
           <label>
             <input
               type="radio"
               checked={value === "true"}
               onChange={() => setValue("true")}
-            />
+            />{" "}
             true
           </label>
           <label>
@@ -111,7 +90,7 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
               type="radio"
               checked={value === "false"}
               onChange={() => setValue("false")}
-            />
+            />{" "}
             false
           </label>
         </div>
@@ -129,17 +108,11 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
         />
       )}
 
-      <button onClick={handleSave} disabled={!isValid}>
-        Save
-      </button>
-      <button onClick={onCancel} style={{ marginLeft: 4 }}>
-        Cancel
-      </button>
       {!isValid && (
-        <div style={{ color: "red", marginTop: 6, fontSize: "0.8rem" }}>
+        <div style={{ color: "red", fontSize: "0.8rem", marginTop: 4 }}>
           Invalid {dataType} value
         </div>
       )}
-    </div>
+    </EditorModule>
   );
 }

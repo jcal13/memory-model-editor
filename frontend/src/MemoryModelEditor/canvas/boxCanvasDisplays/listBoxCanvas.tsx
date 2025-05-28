@@ -2,6 +2,8 @@ import { CanvasElement } from "../../types";
 import rough from "roughjs/bin/rough";
 import React, { useEffect, useRef } from "react";
 
+// replace this entire file with code from issue #4
+
 type Props = {
   element: CanvasElement;
   openListInterface: (el: CanvasElement | null) => void;

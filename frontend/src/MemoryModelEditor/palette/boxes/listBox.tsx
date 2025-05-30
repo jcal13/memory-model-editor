@@ -1,20 +1,20 @@
 import React, { useEffect, useRef } from "react";
 import MemoryViz from "memory-viz";
 
-export default function PrimitiveBox() {
+export default function ListBox() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-    e.dataTransfer.setData("application/box-type", "primitive");
+    e.dataTransfer.setData("application/box-type", "list");
     e.dataTransfer.effectAllowed = "move";
   };
 
   useEffect(() => {
     const { MemoryModel } = MemoryViz;
     const model = new MemoryModel({
-      obj_min_width: 170,
-      obj_min_height: 90,
-      prop_min_width: 50,
+      obj_min_width: 190,
+      obj_min_height: 70,
+      prop_min_width: 60,
       prop_min_height: 40,
       double_rect_sep: 10,
       font_size: 18,
@@ -26,7 +26,7 @@ export default function PrimitiveBox() {
       },
     });
 
-    model.drawPrimitive(0, 0, "None", 0, "", {
+    model.drawSequence(0, 0, "list", 0, [], true, {
       box_container: { fill: "#fdf6e3", fillStyle: "solid" },
       box_id: { fill: "#fff", fillStyle: "solid" },
       box_type: { fill: "#fff", fillStyle: "solid" },
@@ -50,8 +50,8 @@ export default function PrimitiveBox() {
       onDragStart={handleDragStart}
       ref={containerRef}
       style={{
-      cursor: "grab",
-    }}
+        cursor: "grab",
+      }}
     ></div>
   );
 }

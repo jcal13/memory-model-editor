@@ -1,10 +1,27 @@
 import React, { useState } from "react";
 import { CanvasElement, ElementKind } from "../types";
-import PrimitiveBoxCanvas from "./boxCanvasDisplays/primitveBoxCanvas";
-import PrimitiveEditor from "./boxEditorDisplays/primitiveEditor";
 
-const editorMap: Record<string, React.FC<any>> = {
+import PrimitiveBoxCanvas from "./boxCanvasDisplays/primitveBoxCanvas";
+import FunctionBoxCanvas from "./boxCanvasDisplays/functionBoxCanvas";
+import ListBoxCanvas from "./boxCanvasDisplays/listBoxCanvas";
+import SetBoxCanvas from "./boxCanvasDisplays/setBoxCanvas";
+import DictBoxCanvas from "./boxCanvasDisplays/dictBoxCanvas";
+import TupleBoxCanvas from "./boxCanvasDisplays/tupleBoxCanvas";
+
+import PrimitiveEditor from "./boxEditorDisplays/primitiveEditor";
+import FunctionEditor from "./boxEditorDisplays/functionEditor";
+import ListEditor from "./boxEditorDisplays/listEditor";
+import SetEditor from "./boxEditorDisplays/setEditor";
+import DictEditor from "./boxEditorDisplays/dictEditor";
+import TupleEditor from "./boxEditorDisplays/tupleEditor";
+
+const editorMap: Record<ElementKind["name"], React.FC<any>> = {
   primitive: PrimitiveEditor,
+  function: FunctionEditor,
+  list: ListEditor,
+  tuple: TupleEditor,
+  set: SetEditor,
+  dict: DictEditor,
 };
 
 interface Props {
@@ -17,27 +34,64 @@ export default function Canvas({ elements, setElements }: Props) {
 
   const handleDrop = (e: React.DragEvent<SVGSVGElement>) => {
     e.preventDefault();
-
     const payload = e.dataTransfer.getData("application/box-type");
     let newKind: ElementKind;
-    if (payload === "primitive") {
-      newKind = {
-        name: "primitive",
-        type: "int",
-        value: "null",
-      };
-    } else {
-      return;
+
+    switch (payload) {
+      case "primitive":
+        newKind = {
+          name: "primitive",
+          type: "int",
+          value: "0",
+        };
+        break;
+      case "function":
+        newKind = {
+          name: "function",
+          type: "function",
+          value: null,
+          functionName: "myFunction",
+          params: [],
+        };
+        break;
+      case "list":
+        newKind = {
+          name: "list",
+          type: "list",
+          value: [],
+        };
+        break;
+      case "tuple":
+        newKind = {
+          name: "tuple",
+          type: "tuple",
+          value: [],
+        };
+        break;
+      case "set":
+        newKind = {
+          name: "set",
+          type: "set",
+          value: [],
+        };
+        break;
+      case "dict":
+        newKind = {
+          name: "dict",
+          type: "dict",
+          value: {},
+        };
+        break;
+      default:
+        return;
     }
 
-    // find location on svg to place
     const svg = e.currentTarget;
     const pt = svg.createSVGPoint();
     pt.x = e.clientX;
     pt.y = e.clientY;
     const { x, y } = pt.matrixTransform(svg.getScreenCTM()!.inverse());
 
-    // update elements
     setElements((prev) => [...prev, { id: prev.length, kind: newKind, x, y }]);
   };
 
@@ -60,22 +114,67 @@ export default function Canvas({ elements, setElements }: Props) {
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
       >
-        {elements.map((el) =>
-          el.kind.name === "primitive" ? (
-            <PrimitiveBoxCanvas
-              key={el.id}
-              element={el}
-              openPrimitiveInterface={() => setSelected(el)}
-            />
-          ) : null
-        )}
+        {elements.map((el) => {
+          switch (el.kind.name) {
+            case "primitive":
+              return (
+                <PrimitiveBoxCanvas
+                  key={el.id}
+                  element={el}
+                  openPrimitiveInterface={() => setSelected(el)}
+                />
+              );
+            case "function":
+              return (
+                <FunctionBoxCanvas
+                  key={el.id}
+                  element={el}
+                  openFunctionInterface={() => setSelected(el)}
+                />
+              );
+            case "list":
+              return (
+                <ListBoxCanvas
+                  key={el.id}
+                  element={el}
+                  openListInterface={() => setSelected(el)}
+                />
+              );
+            case "tuple":
+              return (
+                <TupleBoxCanvas
+                  key={el.id}
+                  element={el}
+                  openListInterface={() => setSelected(el)}
+                />
+              );
+            case "set":
+              return (
+                <SetBoxCanvas
+                  key={el.id}
+                  element={el}
+                  openSetInterface={() => setSelected(el)}
+                />
+              );
+            case "dict":
+              return (
+                <DictBoxCanvas
+                  key={el.id}
+                  element={el}
+                  openDictInterface={() => setSelected(el)}
+                />
+              );
+            default:
+              return null;
+          }
+        })}
       </svg>
 
       {selected &&
         (() => {
-          const Edit = editorMap[selected.kind.name];
+          const Editor = editorMap[selected.kind.name];
           return (
-            <Edit
+            <Editor
               element={selected}
               onSave={saveElement}
               onCancel={() => setSelected(null)}

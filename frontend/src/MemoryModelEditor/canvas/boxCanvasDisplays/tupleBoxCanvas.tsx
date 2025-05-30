@@ -6,10 +6,10 @@ import React, { useEffect, useRef } from "react";
 
 type Props = {
   element: CanvasElement;
-  openPrimitiveInterface: (el: CanvasElement | null) => void;
+  openListInterface: (el: CanvasElement | null) => void;
 };
 
-export default function PrimitiveBoxCanvas({ element, openPrimitiveInterface }: Props) {
+export default function TupleBoxCanvas({ element, openListInterface: openListInterface }: Props) {
   const gRef = useRef<SVGGElement>(null);
   const roughSvg = useRef<ReturnType<typeof rough.svg> | null>(null);
 
@@ -35,41 +35,63 @@ export default function PrimitiveBoxCanvas({ element, openPrimitiveInterface }: 
       mainY - doubleBoxPadding,
       mainWidth + 2 * doubleBoxPadding,
       mainHeight + 2 * doubleBoxPadding,
-      { stroke: "#333", strokeWidth: 1, fill: "transparent" }
+      { stroke: "#333", strokeWidth: 1, fill: "#fdf6e3", fillStyle: "solid" }
     );
 
-    const innerRect = rc.rectangle(mainX, mainY, mainWidth, mainHeight, {
-      stroke: "#333",
-      strokeWidth: 1,
-      fill: "#fdf6e3",
-      fillStyle: "solid",
-    });
+    const idBoxWidth = 14 * scale;
+    const idBoxHeight = 8 * scale;
+    const idBoxX = mainX - 2 * scale - 1;
+    const idBoxY = mainY - 2 * scale - 1; 
 
-    const idBox = rc.rectangle(mainX, mainY, 14 * scale, 8 * scale, {
+    const idBox = rc.rectangle(idBoxX, idBoxY, idBoxWidth, idBoxHeight, {
       stroke: "#555",
       strokeWidth: 0.8,
       fill: "#fff",
       fillStyle: "solid",
     });
 
-    const typeBox = rc.rectangle(mainX + mainWidth - 14 * scale, mainY, 14 * scale, 8 * scale, {
+    // Type box (top-right)
+    const typeBoxWidth = 14 * scale;
+    const typeBoxHeight = 8 * scale;
+    const typeBoxX = mainX + mainWidth + 2 * scale - typeBoxWidth + 1;
+    const typeBoxY = mainY - 2 * scale - 1;
+
+    const typeBox = rc.rectangle(typeBoxX, typeBoxY, typeBoxWidth, typeBoxHeight, {
       stroke: "#555",
       strokeWidth: 0.8,
       fill: "#fff",
       fillStyle: "solid",
     });
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const squareSize = 10 * scale;
+    const gap = 2 * scale;
+    // const totalWidth = 3 * squareSize + 2 * gap;
+
+    const mainText = document.createElementNS(svgNS, "text");
+
+    const textX = mainX + (mainWidth) / 2;
+    const textY = mainY + (mainHeight) / 2 + 10;
+
+    mainText.setAttribute("x", textX.toString());
+    mainText.setAttribute("y", textY.toString());
+    mainText.setAttribute("text-anchor", "middle");
+    mainText.setAttribute("font-family", "sans-serif");
+    mainText.setAttribute("font-size", (squareSize).toString());
+    mainText.setAttribute("fill", "#333");
+    mainText.textContent = "[]";
 
     gRef.current.appendChild(outerRect);
-    gRef.current.appendChild(innerRect);
     gRef.current.appendChild(idBox);
     gRef.current.appendChild(typeBox);
+    gRef.current.appendChild(mainText);
   }, [element]);
 
   return (
     <g
       ref={gRef}
       transform={`translate(${element.x - 75}, ${element.y - 50})`}
-      onClick={() => openPrimitiveInterface(element)}
+      onClick={() => openListInterface(element)}
       style={{ cursor: "pointer" }}
     />
   );

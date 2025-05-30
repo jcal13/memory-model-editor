@@ -7,41 +7,126 @@ export default function MemoryModelEditor() {
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [jsonView, setJsonView] = useState<string>("");
 
-  const showJson = () => {
-    const objs = elements.map(({ id, kind }) => {
-      const base = { id, name: kind.name, type: kind.type };
+  type FrameEntry = {
+    type: ".frame";
+    name: string;
+    id: null;
+    value: Record<string, number>;
+  };
 
-      switch (kind.name) {
-        case "primitive": {
-          let parsed: string | number | boolean = kind.value;
-          if (kind.type === "int") parsed = parseInt(kind.value, 10);
-          else if (kind.type === "float") parsed = parseFloat(kind.value);
-          else if (kind.type === "bool") parsed = kind.value === "true";
-          return { ...base, value: parsed };
+  type ValueEntry = {
+    type: string;
+    id: number;
+    value: any;
+    name?: string;
+  };
+
+  const showJson = (): void => {
+    const idMap: Map<number, number> = new Map();
+    let nextId: number = 1;
+
+    const getOrAssignId = (elementId: number): number => {
+      if (!idMap.has(elementId)) {
+        idMap.set(elementId, nextId++);
+      }
+      return idMap.get(elementId)!;
+    };
+
+    const jsonData: FrameEntry[] = [];
+    const valueEntries: ValueEntry[] = [];
+
+    // Step 1: Add a .frame per function
+    elements.forEach(({ id, kind }) => {
+      if (kind.name === "function") {
+        const frameValue: Record<string, number> = {};
+        for (const param of kind.params || []) {
+          if (param.targetId !== null) {
+            frameValue[param.name] = getOrAssignId(param.targetId);
+          }
         }
-
-        case "list":
-        case "tuple":
-        case "set":
-          return { ...base, value: kind.value }; 
-
-        case "dict":
-          return { ...base, value: kind.value }; 
-
-        case "function":
-          return {
-            ...base,
-            functionName: kind.functionName,
-            params: kind.params,
-            value: null,
-          };
-
-        default:
-          return { ...base, value: null };
+        jsonData.push({
+          type: ".frame",
+          name: kind.functionName || `func${id}`,
+          id: null,
+          value: frameValue
+        });
       }
     });
 
-    setJsonView(JSON.stringify(objs, null, 2));
+    // Step 2: Fallback global frame for non-function elements
+    const globalFrameValue: Record<string, number> = {};
+    elements.forEach(({ id, kind }) => {
+      if (kind.name !== "function") {
+        globalFrameValue[`var${id}`] = getOrAssignId(id);
+      }
+    });
+
+      jsonData.push({
+        type: ".frame",
+        name: "_main_",
+        id: null,
+        value: globalFrameValue
+      });
+    
+
+    // Step 3: Process each element to create value entries
+    elements.forEach(({ id, kind }) => {
+      const assignedId: number = getOrAssignId(id);
+
+      if (kind.name === "primitive") {
+        let parsed: string | number | boolean = kind.value;
+        if (kind.type === "int") parsed = parseInt(kind.value, 10);
+        else if (kind.type === "float") parsed = parseFloat(kind.value);
+        else if (kind.type === "bool") parsed = kind.value === "true";
+
+        valueEntries.push({
+          type: kind.type,
+          id: assignedId,
+          value: parsed
+        });
+
+      } else if (["list", "tuple", "set"].includes(kind.name)) {
+        const children: number[] = Array.isArray(kind.value) ? kind.value.map((childId: number) => getOrAssignId(childId)) : [];
+        valueEntries.push({
+          type: kind.type,
+          id: assignedId,
+          value: children
+        });
+
+      } else if (kind.name === "dict") {
+        const dict: Record<number, number> = {};
+        for (const [k, v] of Object.entries(kind.value || {})) {
+          if (v !== null) {
+            dict[getOrAssignId(parseInt(String(k)))] = getOrAssignId(typeof v === "number" ? v : parseInt(String(v)));
+
+          }
+        }
+        valueEntries.push({
+          type: "dict",
+          id: assignedId,
+          value: dict
+        });
+
+      } else if (kind.name === "function") {
+        valueEntries.push({
+          type: ".class",
+          name: kind.functionName || "function",
+          id: assignedId,
+          value: {}
+        });
+
+      } else {
+        valueEntries.push({
+          type: kind.type,
+          id: assignedId,
+          value: null
+        });
+      }
+    });
+
+    // Final output
+    const snapshot: (FrameEntry | ValueEntry)[] = [...jsonData, ...valueEntries];
+    setJsonView(JSON.stringify(snapshot, null, 2));
   };
 
   return (

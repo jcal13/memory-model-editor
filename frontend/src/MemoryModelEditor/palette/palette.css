@@ -5,6 +5,7 @@
   height: 100vh;
   overflow-y: auto;
   box-sizing: border-box;
+  position: fixed;
 }
 
 .palette-title {

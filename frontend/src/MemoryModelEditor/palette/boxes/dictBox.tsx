@@ -26,21 +26,28 @@ export default function DictBox() {
       },
     });
 
-    model.drawDict(0, 0, 0, {}, {
-      box_container: { fill: "#fdf6e3", fillStyle: "solid" },
-      box_id: { fill: "#fff", fillStyle: "solid" },
-      box_type: { fill: "#fff", fillStyle: "solid" },
-    });
-    
+    model.drawDict(
+      5,
+      5,
+      0,
+      {},
+      {
+        box_container: { fill: "#fdf6e3", fillStyle: "solid" },
+        box_id: { fill: "#fff", fillStyle: "solid" },
+        box_type: { fill: "#fff", fillStyle: "solid" },
+      }
+    );
+
     if (containerRef.current) {
       containerRef.current.innerHTML = "";
       containerRef.current.appendChild(model.svg);
 
       const bbox = model.svg.getBBox();
-      model.svg.setAttribute("width", `${bbox.width}`);
-      model.svg.setAttribute("height", `${bbox.height}`);
-      containerRef.current.style.width = `${bbox.width}px`;
-      containerRef.current.style.height = `${bbox.height}px`;
+      const padding = 5;
+      model.svg.setAttribute("width", `${bbox.width + padding}`);
+      model.svg.setAttribute("height", `${bbox.height + padding}`);
+      containerRef.current.style.width = `${bbox.width + padding}px`;
+      containerRef.current.style.height = `${bbox.height + padding}px`;
     }
   }, []);
 

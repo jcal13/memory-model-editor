@@ -26,7 +26,7 @@ export default function PrimitiveBox() {
       },
     });
 
-    model.drawPrimitive(0, 0, "None", 0, "", {
+    model.drawPrimitive(15, 15, "None", 0, "", {
       box_container: { fill: "#fdf6e3", fillStyle: "solid" },
       box_id: { fill: "#fff", fillStyle: "solid" },
       box_type: { fill: "#fff", fillStyle: "solid" },
@@ -37,10 +37,11 @@ export default function PrimitiveBox() {
       containerRef.current.appendChild(model.svg);
 
       const bbox = model.svg.getBBox();
-      model.svg.setAttribute("width", `${bbox.width}`);
-      model.svg.setAttribute("height", `${bbox.height}`);
-      containerRef.current.style.width = `${bbox.width}px`;
-      containerRef.current.style.height = `${bbox.height}px`;
+      const padding = 5;
+      model.svg.setAttribute("width", `${bbox.width + padding}`);
+      model.svg.setAttribute("height", `${bbox.height + padding}`);
+      containerRef.current.style.width = `${bbox.width + padding}px`;
+      containerRef.current.style.height = `${bbox.height + padding}px`;
     }
   }, []);
 
@@ -50,8 +51,10 @@ export default function PrimitiveBox() {
       onDragStart={handleDragStart}
       ref={containerRef}
       style={{
-      cursor: "grab",
-    }}
+        cursor: "grab",
+        overflow: "visible",
+        display: "inline-block",
+      }}
     ></div>
   );
 }

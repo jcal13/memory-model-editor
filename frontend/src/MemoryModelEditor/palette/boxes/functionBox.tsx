@@ -26,11 +26,10 @@ export default function FunctionBox() {
       },
     });
 
-    model.drawClass(0, 0, "__main__", 0, {}, true, {
+    model.drawClass(5, 5, "__main__", 0, {}, true, {
       box_container: { fill: "#fdf6e3", fillStyle: "solid" },
       box_id: { fill: "#fff", fillStyle: "solid" },
       box_type: { fill: "#fff", fillStyle: "solid" },
-      
     });
 
     if (containerRef.current) {
@@ -38,13 +37,12 @@ export default function FunctionBox() {
       containerRef.current.appendChild(model.svg);
 
       const bbox = model.svg.getBBox();
-      model.svg.setAttribute("width", `${bbox.width}`);
-      model.svg.setAttribute("height", `${bbox.height}`);
-      containerRef.current.style.width = `${bbox.width}px`;
-      containerRef.current.style.height = `${bbox.height}px`;
+      const padding = 5;
+      model.svg.setAttribute("width", `${bbox.width + padding}`);
+      model.svg.setAttribute("height", `${bbox.height + padding}`);
+      containerRef.current.style.width = `${bbox.width + padding}px`;
+      containerRef.current.style.height = `${bbox.height + padding}px`;
     }
-
-
   }, []);
 
   return (

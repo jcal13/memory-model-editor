@@ -95,59 +95,106 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
 
   return (
     <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel}>
-      {/* Type selector dropdown */}
-      <select
-        value={dataType}
-        onChange={(e) => handleTypeChange(e.target.value as typeof dataType)}
-        style={{ width: "100%", marginBottom: 8, padding: 4 }}
+      {/* Top row: ID on the left, type dropdown on the right */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 8,
+        }}
       >
-        <option value="int">int</option>
-        <option value="float">float</option>
-        <option value="str">str</option>
-        <option value="bool">bool</option>
-      </select>
 
-      {/* Render boolean selection as radio buttons */}
-      {dataType === "bool" ? (
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-          <label>
-            <input
-              type="radio"
-              checked={value === "true"}
-              onChange={() => setValue("true")}
-            />{" "}
-            true
-          </label>
-          <label>
-            <input
-              type="radio"
-              checked={value === "false"}
-              onChange={() => setValue("false")}
-            />{" "}
-            false
-          </label>
-        </div>
-      ) : (
-        // Render input field for int, float, and str
-        <input
+        {/* Type selector dropdown in top-right */}
+        <select
+          value={dataType}
+          onChange={(e) =>
+            handleTypeChange(e.target.value as typeof dataType)
+          }
           style={{
-            width: "100%",
-            marginBottom: 8,
             padding: 4,
-            boxSizing: "border-box",
+            fontSize: "0.9rem",
           }}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder="value"
-        />
-      )}
+        >
+          <option value="int">int</option>
+          <option value="float">float</option>
+          <option value="str">str</option>
+          <option value="bool">bool</option>
+        </select>
+      </div>
 
-      {/* Show error if value is invalid */}
-      {!isValid && (
-        <div style={{ color: "red", fontSize: "0.8rem", marginTop: 4 }}>
-          Invalid {dataType} value
-        </div>
-      )}
+      {/* Centered input or boolean radio buttons */}
+      <div style={{ textAlign: "center", marginBottom: 8 }}>
+        {dataType === "bool" ? (
+          <div
+            style={{
+              display: "inline-flex",
+              gap: "1rem",
+              alignItems: "center",
+            }}
+          >
+            <label>
+              <input
+                type="radio"
+                checked={value === "true"}
+                onChange={() => setValue("true")}
+                style={{ marginRight: 4 }}
+              />
+              true
+            </label>
+            <label>
+              <input
+                type="radio"
+                checked={value === "false"}
+                onChange={() => setValue("false")}
+                style={{ marginRight: 4 }}
+              />
+              false
+            </label>
+          </div>
+        ) : (
+          <input
+            style={{
+              width: "80%",
+              padding: 4,
+              boxSizing: "border-box",
+            }}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="value"
+          />
+        )}
+
+        {/* Show error if value is invalid */}
+        {!isValid && (
+          <div
+            style={{
+              color: "red",
+              fontSize: "0.8rem",
+              marginTop: 4,
+            }}
+          >
+            Invalid {dataType} value
+          </div>
+        )}
+      </div>
+
+      {/* Bottom-right Remove button */}
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <button
+          style={{
+            padding: "4px 8px",
+            fontSize: "0.9rem",
+            backgroundColor: "#f44336",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+          }}
+          onClick={onCancel /* or call a separate remove handler if available */}
+        >
+          Remove
+        </button>
+      </div>
     </EditorModule>
   );
 }

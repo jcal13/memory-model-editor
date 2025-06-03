@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 interface Props {
   id: number;
@@ -8,8 +8,25 @@ interface Props {
 }
 
 export default function EditorModule({ id, onSave, onCancel, children }: Props) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        onSave();
+        onCancel();
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [onSave, onCancel]);
+
   return (
     <div
+      ref={wrapperRef}
       className="drag-handle"
       style={{
         position: "absolute",
@@ -37,13 +54,6 @@ export default function EditorModule({ id, onSave, onCancel, children }: Props) 
       </div>
 
       {children}
-
-      <div style={{ marginTop: 8 }}>
-        <button onClick={onSave}>Save</button>
-        <button onClick={onCancel} style={{ marginLeft: 4 }}>
-          Cancel
-        </button>
-      </div>
     </div>
   );
 }

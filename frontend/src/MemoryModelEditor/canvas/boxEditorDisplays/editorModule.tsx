@@ -10,6 +10,7 @@ interface Props {
 export default function EditorModule({ id, onSave, onCancel, children }: Props) {
   return (
     <div
+      className="drag-handle"
       style={{
         position: "absolute",
         top: 20,

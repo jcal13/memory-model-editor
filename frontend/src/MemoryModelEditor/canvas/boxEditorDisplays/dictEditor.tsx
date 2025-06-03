@@ -25,6 +25,7 @@ type Props = {
    * Callback when the user cancels editing.
    */
   onCancel: () => void;
+  onRemove: () => void;
 };
 
 /**
@@ -33,7 +34,7 @@ type Props = {
  *
  * Allows users to dynamically add, edit, or remove entries in the dictionary.
  */
-export default function DictEditor({ element, onSave, onCancel }: Props) {
+export default function DictEditor({ element, onSave, onCancel, onRemove }: Props) {
   /**
    * Internal state to manage dictionary entries as [key, id] tuples.
    */
@@ -78,7 +79,7 @@ export default function DictEditor({ element, onSave, onCancel }: Props) {
   };
 
   return (
-    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel}>
+    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel} onRemove={onRemove}>
       {entries.map(([key, id], i) => (
         <div key={i} style={{ display: "flex", gap: 4, marginBottom: 4 }}>
           <input

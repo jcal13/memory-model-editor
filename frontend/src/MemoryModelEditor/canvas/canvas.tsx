@@ -87,6 +87,12 @@ export default function Canvas({ elements, setElements }: Props) {
     setSelected(null);
   };
 
+  const removeElement = () => {
+    if (!selected) return;
+    setElements((prev) => prev.filter((el) => el.id !== selected.id));
+    setSelected(null);
+  };
+
   return (
     <>
       <svg
@@ -174,6 +180,7 @@ export default function Canvas({ elements, setElements }: Props) {
                   element={selected}
                   onSave={saveElement}
                   onCancel={() => setSelected(null)}
+                  onRemove={removeElement}
                 />
               );
             })()}

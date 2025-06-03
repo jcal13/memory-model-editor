@@ -2,14 +2,17 @@ import React, { useEffect, useRef } from "react";
 
 interface Props {
   id: number;
-  onSave: () => void;
-  onCancel: () => void;
+  onSave: () => void;    // Persist edits when closing normally
+  onCancel: () => void;   // Close editor without deleting
+  onRemove: () => void;  // Permanently delete the box
   children: React.ReactNode;
 }
 
-export default function EditorModule({ id, onSave, onCancel, children }: Props) {
+// Autosaves on outside‑click, and provides a bottom‑right "Remove" button to delete the box.
+export default function EditorModule({ id, onSave, onCancel, onRemove, children }: Props) {
   const wrapperRef = useRef<HTMLDivElement>(null);
 
+  // Close & autosave when clicking outside the editor.
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
@@ -19,9 +22,7 @@ export default function EditorModule({ id, onSave, onCancel, children }: Props) 
     }
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onSave, onCancel]);
 
   return (
@@ -52,8 +53,26 @@ export default function EditorModule({ id, onSave, onCancel, children }: Props) 
       >
         ID: {id}
       </div>
-
       {children}
+
+      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
+        <button
+          style={{
+            padding: "4px 8px",
+            fontSize: "0.9rem",
+            backgroundColor: "#f44336",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+          }}
+          onClick={() => {
+            onSave();
+            onRemove();
+          }}
+        >
+          Remove
+        </button>
+      </div>
     </div>
   );
 }

@@ -26,6 +26,7 @@ type Props = {
    * Called when the user cancels editing.
    */
   onCancel: () => void;
+  onRemove: () => void;
 };
 
 /**
@@ -33,7 +34,7 @@ type Props = {
  * such as an integer, float, string, or boolean. It dynamically validates
  * and formats input based on the selected type.
  */
-export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
+export default function PrimitiveEditor({ element, onSave, onCancel, onRemove }: Props) {
   const [dataType, setDataType] = useState(element.kind.type);
   const [value, setValue] = useState(element.kind.value);
 
@@ -94,7 +95,7 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
   };
 
   return (
-    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel}>
+    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel} onRemove={onRemove}>
       {/* Top row: ID on the left, type dropdown on the right */}
       <div
         style={{
@@ -104,7 +105,6 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
           marginBottom: 8,
         }}
       >
-
         {/* Type selector dropdown in top-right */}
         <select
           value={dataType}
@@ -177,23 +177,6 @@ export default function PrimitiveEditor({ element, onSave, onCancel }: Props) {
             Invalid {dataType} value
           </div>
         )}
-      </div>
-
-      {/* Bottom-right Remove button */}
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <button
-          style={{
-            padding: "4px 8px",
-            fontSize: "0.9rem",
-            backgroundColor: "#f44336",
-            color: "white",
-            border: "none",
-            cursor: "pointer",
-          }}
-          onClick={onCancel /* or call a separate remove handler if available */}
-        >
-          Remove
-        </button>
       </div>
     </EditorModule>
   );

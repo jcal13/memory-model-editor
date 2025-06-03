@@ -18,6 +18,7 @@ test("adds and saves function name and parameters", () => {
       }}
       onSave={onSave}
       onCancel={() => {}}
+      onRemove={() => {}}
     />
   );
 

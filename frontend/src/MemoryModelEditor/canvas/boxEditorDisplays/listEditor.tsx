@@ -22,13 +22,14 @@ type Props = {
    * Called when the user cancels editing.
    */
   onCancel: () => void;
+  onRemove: () => void;
 };
 
 /**
  * ListEditor allows editing of list-like structures (list or tuple).
  * Users can modify the array of target object IDs, add new items, or remove existing ones.
  */
-export default function ListEditor({ element, onSave, onCancel }: Props) {
+export default function ListEditor({ element, onSave, onCancel, onRemove }: Props) {
   // Initialize the state from the passed-in value
   const [items, setItems] = useState<number[]>(element.kind.value || []);
 
@@ -67,7 +68,7 @@ export default function ListEditor({ element, onSave, onCancel }: Props) {
   };
 
   return (
-    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel}>
+    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel} onRemove={onRemove}>
       {/* Render each item in the list as an editable number input */}
       {items.map((id, i) => (
         <div key={i} style={{ display: "flex", marginBottom: 4 }}>

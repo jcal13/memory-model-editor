@@ -22,13 +22,14 @@ type Props = {
    * Callback when the user cancels editing.
    */
   onCancel: () => void;
+  onRemove: () => void;
 };
 
 /**
  * SetEditor is a form UI for editing a "set" type element in the memory model.
  * The user can add or remove references to other elements via their ID numbers.
  */
-export default function SetEditor({ element, onSave, onCancel }: Props) {
+export default function SetEditor({ element, onSave, onCancel, onRemove }: Props) {
   // Initialize state with existing value or an empty array
   const [items, setItems] = useState<number[]>(element.kind.value || []);
 
@@ -63,7 +64,7 @@ export default function SetEditor({ element, onSave, onCancel }: Props) {
   };
 
   return (
-    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel}>
+    <EditorModule id={Number(element.id)} onSave={handleSave} onRemove={onRemove} onCancel={onCancel}>
       {/* Render input for each set item */}
       {items.map((id, i) => (
         <div key={i} style={{ display: "flex", marginBottom: 4 }}>

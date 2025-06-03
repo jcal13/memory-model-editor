@@ -10,6 +10,7 @@ test("saves valid int primitive", () => {
       element={{ id: "1", kind: { name: "primitive", type: "int", value: "42" } }}
       onSave={onSave}
       onCancel={onCancel}
+      onRemove={() => {}}
     />
   );
 

@@ -38,6 +38,7 @@ type Props = {
    * Called when the user cancels editing.
    */
   onCancel: () => void;
+  onRemove: () => void;
 };
 
 /**
@@ -45,7 +46,7 @@ type Props = {
  * Each parameter includes a name and a reference to a target ID.
  * The user can add, remove, and update these parameters dynamically.
  */
-export default function FunctionEditor({ element, onSave, onCancel }: Props) {
+export default function FunctionEditor({ element, onSave, onCancel, onRemove }: Props) {
   const [name, setName] = useState(element.kind.functionName || "");
   const [params, setParams] = useState<Param[]>(element.kind.params || []);
 
@@ -90,7 +91,7 @@ export default function FunctionEditor({ element, onSave, onCancel }: Props) {
   };
 
   return (
-    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel}>
+    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel} onRemove={onRemove}>
       {/* Function name input */}
       <input
         placeholder="Function name"

@@ -16,6 +16,7 @@ test("adds and saves dictionary entries", () => {
       }}
       onSave={onSave}
       onCancel={() => {}}
+      onRemove={() => {}}
     />
   );
 

@@ -22,13 +22,14 @@ type Props = {
    * Called when the user cancels editing.
    */
   onCancel: () => void;
+  onRemove: () => void;
 };
 
 /**
  * TupleEditor allows users to modify the elements of a tuple in a memory model.
  * Each item in the tuple is a reference to another object (by its ID).
  */
-export default function TupleEditor({ element, onSave, onCancel }: Props) {
+export default function TupleEditor({ element, onSave, onCancel, onRemove }: Props) {
   // Initialize state from the given tuple value (defaulting to an empty array)
   const [items, setItems] = useState<number[]>(element.kind.value || []);
 
@@ -63,7 +64,7 @@ export default function TupleEditor({ element, onSave, onCancel }: Props) {
   };
 
   return (
-    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel}>
+    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel} onRemove={onRemove}>
       {/* Render a row for each item in the tuple */}
       {items.map((id, i) => (
         <div key={i} style={{ display: "flex", marginBottom: 4 }}>

@@ -10,7 +10,7 @@ type Props = {
     kind: {
       name: string; // should be "dict"
       type: string; // should be "dict"
-      value: Record<string, number | null>; // key-value pairs where value is an ID or null
+      value: Record<number, number | null>; // key-value pairs: id -> id | null
     };
   };
   /**
@@ -19,7 +19,7 @@ type Props = {
   onSave: (data: {
     name: string;
     type: string;
-    value: Record<string, number | null>;
+    value: Record<number, number | null>;
   }) => void;
   /**
    * Callback when the user cancels editing.
@@ -28,71 +28,75 @@ type Props = {
 };
 
 /**
- * A form-based editor for a dictionary object, where keys are strings and
- * values are references to other object IDs (or null).
- *
- * Allows users to dynamically add, edit, or remove entries in the dictionary.
+ * A form-based editor for a dictionary object, where keys and values are both
+ * object IDs (numbers). Keys must be valid numbers and unique.
  */
 export default function DictEditor({ element, onSave, onCancel }: Props) {
   /**
-   * Internal state to manage dictionary entries as [key, id] tuples.
+   * Internal state to manage dictionary entries as [keyID, valueID] pairs.
    */
-  const [entries, setEntries] = useState(
-    Object.entries(element.kind.value || {})
+  const [entries, setEntries] = useState<[number, number | null][]>(
+    Object.entries(element.kind.value || {}).map(([k, v]) => [Number(k), v])
   );
 
   /**
    * Updates a specific dictionary entry at the given index.
-   * @param index - The index of the entry to update.
-   * @param key - The new key string.
-   * @param id - The new target ID (or null).
    */
-  const updateEntry = (index: number, key: string, id: number | null) => {
+  const updateEntry = (index: number, key: number, value: number | null) => {
     const updated = [...entries];
-    updated[index] = [key, id];
+    updated[index] = [key, value];
     setEntries(updated);
   };
 
   /**
    * Adds a new empty entry to the dictionary.
    */
-  const addEntry = () => setEntries([...entries, ["", null]]);
+  const addEntry = () => setEntries([...entries, [0, null]]);
 
   /**
    * Removes an entry from the dictionary at the given index.
-   * @param index - The index of the entry to remove.
    */
   const removeEntry = (index: number) =>
     setEntries(entries.filter((_, i) => i !== index));
 
   /**
-   * Handles the save action, preparing the output dictionary object.
-   * Filters out entries with blank keys.
+   * Handles saving: filters duplicates and blank keys.
    */
   const handleSave = () => {
-    const output: Record<string, number | null> = {};
+    const output: Record<number, number | null> = {};
     for (const [k, v] of entries) {
-      if (k.trim()) output[k] = v;
+      if (!isNaN(k)) output[k] = v;
     }
     onSave({ name: "dict", type: "dict", value: output });
   };
 
   return (
-    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel}>
-      {entries.map(([key, id], i) => (
+    <EditorModule
+      id={Number(element.id)}
+      onSave={handleSave}
+      onCancel={onCancel}
+    >
+      {entries.map(([key, val], i) => (
         <div key={i} style={{ display: "flex", gap: 4, marginBottom: 4 }}>
           <input
+            type="number"
             value={key}
-            onChange={(e) => updateEntry(i, e.target.value, id)}
-            placeholder="key"
-            style={{ flex: 1 }}
+            onChange={(e) => updateEntry(i, Number(e.target.value), val)}
+            placeholder="key id"
+            style={{ width: 80 }}
           />
           <input
             type="number"
-            value={id ?? ""}
-            onChange={(e) => updateEntry(i, key, Number(e.target.value))}
-            style={{ width: 60 }}
-            placeholder="id"
+            value={val ?? ""}
+            onChange={(e) =>
+              updateEntry(
+                i,
+                key,
+                e.target.value ? Number(e.target.value) : null
+              )
+            }
+            placeholder="value id"
+            style={{ width: 80 }}
           />
           <button onClick={() => removeEntry(i)}>×</button>
         </div>

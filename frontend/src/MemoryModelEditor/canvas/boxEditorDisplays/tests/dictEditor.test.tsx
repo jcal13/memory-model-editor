@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import DictEditor from "../dictEditor";
 
-test("adds and saves dictionary entries", () => {
+test("adds and saves dictionary entries with numeric keys and values", () => {
   const onSave = jest.fn();
 
   render(
@@ -23,11 +23,11 @@ test("adds and saves dictionary entries", () => {
   // Click "+ Add" to create a new entry
   fireEvent.click(screen.getByText("+ Add"));
 
-  // Change key and id inputs
-  fireEvent.change(screen.getByPlaceholderText("key"), {
-    target: { value: "a" },
+  // Change key and value inputs
+  fireEvent.change(screen.getByPlaceholderText("key id"), {
+    target: { value: "1" },
   });
-  fireEvent.change(screen.getByPlaceholderText("id"), {
+  fireEvent.change(screen.getByPlaceholderText("value id"), {
     target: { value: "9" },
   });
 
@@ -37,6 +37,6 @@ test("adds and saves dictionary entries", () => {
   expect(onSave).toHaveBeenCalledWith({
     name: "dict",
     type: "dict",
-    value: { a: 9 },
+    value: { 1: 9 },
   });
 });

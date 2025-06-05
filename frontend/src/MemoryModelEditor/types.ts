@@ -15,31 +15,31 @@ type FunctionKind = {
   type: "function";
   value: null;
   functionName: string;
-  params: { name: string; targetId: number | null }[]; 
+  params: { name: string; targetId: number | null }[];
 };
 
 export interface ListKind {
   name: "list";
   type: "list";
-  value: number[]; 
+  value: number[];
 }
 
 export interface TupleKind {
   name: "tuple";
   type: "tuple";
-  value: number[]; 
+  value: number[];
 }
 
 export interface SetKind {
   name: "set";
   type: "set";
-  value: number[]; 
+  value: number[];
 }
 
 export interface DictKind {
   name: "dict";
   type: "dict";
-  value: Record<string, number | null>; 
+  value: Record<number, number | null>;
 }
 
 export type ElementKind =

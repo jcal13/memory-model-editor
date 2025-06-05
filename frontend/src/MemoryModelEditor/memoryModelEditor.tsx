@@ -41,7 +41,7 @@ export default function MemoryModelEditor() {
         const frameValue: Record<string, number> = {};
         for (const param of kind.params || []) {
           if (param.targetId !== null) {
-            frameValue[param.name] = getOrAssignId(param.targetId);
+            frameValue[param.name] = param.targetId;
           }
         }
         jsonData.push({
@@ -53,25 +53,10 @@ export default function MemoryModelEditor() {
       }
     });
 
-    // Step 2: Fallback global frame for non-function elements
-    const globalFrameValue: Record<string, number> = {};
-    elements.forEach(({ id, kind }) => {
-      if (kind.name !== "function") {
-        globalFrameValue[`var${id}`] = getOrAssignId(id);
-      }
-    });
 
-      jsonData.push({
-        type: ".frame",
-        name: "_main_",
-        id: null,
-        value: globalFrameValue
-      });
     
-
-    // Step 3: Process each element to create value entries
     elements.forEach(({ id, kind }) => {
-      const assignedId: number = getOrAssignId(id);
+      const assignedId: number = id;
 
       if (kind.name === "primitive") {
         let parsed: string | number | boolean = kind.value;
@@ -85,46 +70,15 @@ export default function MemoryModelEditor() {
           value: parsed
         });
 
-      } else if (["list", "tuple", "set"].includes(kind.name)) {
-        const children: number[] = Array.isArray(kind.value) ? kind.value.map((childId: number) => getOrAssignId(childId)) : [];
+      } else if (["list", "tuple", "set", "dict"].includes(kind.name)) {
         valueEntries.push({
           type: kind.type,
           id: assignedId,
-          value: children
-        });
-
-      } else if (kind.name === "dict") {
-        const dict: Record<number, number> = {};
-        for (const [k, v] of Object.entries(kind.value || {})) {
-          if (v !== null) {
-            dict[getOrAssignId(parseInt(String(k)))] = getOrAssignId(typeof v === "number" ? v : parseInt(String(v)));
-
-          }
-        }
-        valueEntries.push({
-          type: "dict",
-          id: assignedId,
-          value: dict
-        });
-
-      } else if (kind.name === "function") {
-        valueEntries.push({
-          type: ".class",
-          name: kind.functionName || "function",
-          id: assignedId,
-          value: {}
-        });
-
-      } else {
-        valueEntries.push({
-          type: kind.type,
-          id: assignedId,
-          value: null
+          value: kind.value
         });
       }
     });
 
-    // Final output
     const snapshot: (FrameEntry | ValueEntry)[] = [...jsonData, ...valueEntries];
     setJsonView(JSON.stringify(snapshot, null, 2));
   };
@@ -148,10 +102,32 @@ export default function MemoryModelEditor() {
             position: "absolute",
             top: 8,
             right: 8,
-            padding: "4px 8px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px", 
           }}
         >
           Show JSON
+        </button>
+
+        <button
+          onClick={() => {
+          const blob = new Blob([jsonView], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = "data.json";
+          link.click();
+          URL.revokeObjectURL(url);
+          }}
+          style={{
+          position: "absolute",
+          top: 50,
+          right: 8,
+          padding: "4px 8px",
+          }}
+        >
+        Download JSON
         </button>
 
         {jsonView && (

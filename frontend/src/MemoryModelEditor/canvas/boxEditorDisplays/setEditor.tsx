@@ -1,85 +1,112 @@
 import { useState } from "react";
 import EditorModule from "./editorModule";
 
-/**
- * Props for the SetEditor component.
- */
 type Props = {
   element: {
     id: string;
-    kind: {
-      name: string;      // Should be "set"
-      type: string;      // Should be "set"
-      value: number[];   // Array of object IDs the set refers to
-    };
+    kind: { name: string; type: string; value: number[] };
   };
-  /**
-   * Callback when the user confirms the edits.
-   */
   onSave: (data: { name: string; type: string; value: number[] }) => void;
-
-  /**
-   * Callback when the user cancels editing.
-   */
   onCancel: () => void;
   onRemove: () => void;
 };
 
-/**
- * SetEditor is a form UI for editing a "set" type element in the memory model.
- * The user can add or remove references to other elements via their ID numbers.
- */
-export default function SetEditor({ element, onSave, onCancel, onRemove }: Props) {
-  // Initialize state with existing value or an empty array
+export default function SetEditor({
+  element,
+  onSave,
+  onCancel,
+  onRemove,
+}: Props) {
   const [items, setItems] = useState<number[]>(element.kind.value || []);
 
-  /**
-   * Updates a specific item (reference ID) at the given index.
-   */
-  const updateItem = (index: number, newId: number) => {
-    const updated = [...items];
-    updated[index] = newId;
-    setItems(updated);
+  const addItem    = () => setItems([...items, 0]);        // default 0
+  const removeItem = (idx: number) =>
+    setItems(items.filter((_, i) => i !== idx));
+
+  const handleSave = () =>
+    onSave({ name: element.kind.name, type: element.kind.type, value: items });
+
+  const pill: React.CSSProperties = {
+    width: 80,
+    height: 60,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    fontSize: "1.6rem",
+    background: "#f5f5f5",
+    border: "1px solid #888",
+    borderRadius: 4,
+    position: "relative",
+    cursor: "pointer",
   };
 
-  /**
-   * Adds a new item with a default value (0).
-   */
-  const addItem = () => setItems([...items, 0]);
+  const closeBtn: React.CSSProperties = {
+    position: "absolute",
+    top: -6,
+    right: -6,
+    width: 22,
+    height: 22,
+    background: "#f44336",
+    border: "none",
+    borderRadius: 4,
+    color: "#fff",
+    fontSize: "0.9rem",
+    cursor: "pointer",
+    transition: "background-color 0.25s ease",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  };
 
-  /**
-   * Removes the item at the specified index.
-   */
-  const removeItem = (index: number) => setItems(items.filter((_, i) => i !== index));
-
-  /**
-   * Handles the save action by passing the updated set data to the parent.
-   */
-  const handleSave = () => {
-    onSave({
-      name: element.kind.name,
-      type: element.kind.type,
-      value: items,
-    });
+  const addButton: React.CSSProperties = {
+    padding: "6px 14px",
+    fontSize: "0.9rem",
+    background: "#f5f5f5",
+    border: "1px solid #888",
+    borderRadius: 4,
+    cursor: "pointer",
   };
 
   return (
-    <EditorModule id={Number(element.id)} onSave={handleSave} onRemove={onRemove} onCancel={onCancel}>
-      {/* Render input for each set item */}
-      {items.map((id, i) => (
-        <div key={i} style={{ display: "flex", marginBottom: 4 }}>
-          <input
-            type="number"
-            value={id}
-            onChange={(e) => updateItem(i, Number(e.target.value))}
-            style={{ flex: 1 }}
-          />
-          <button onClick={() => removeItem(i)}>×</button>
-        </div>
-      ))}
+    <EditorModule
+      id={Number(element.id)}
+      typeLabel="set"
+      onSave={handleSave}
+      onCancel={onCancel}
+      onRemove={onRemove}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "nowrap",
+          gap: 16,
+          marginBottom: 24,
+        }}
+      >
+        {items.map((_, idx) => (
+          <div key={idx} style={pill}>
+            +
+            <button
+              onClick={() => removeItem(idx)}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = "#d32f2f")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "#f44336")
+              }
+              style={closeBtn}
+            >
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
 
-      {/* Add new set item */}
-      <button onClick={addItem}>+ Add</button>
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <button onClick={addItem} style={addButton}>
+          + Add Element
+        </button>
+      </div>
     </EditorModule>
   );
 }

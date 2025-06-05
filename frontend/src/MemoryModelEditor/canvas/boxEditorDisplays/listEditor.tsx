@@ -1,89 +1,113 @@
 import { useState } from "react";
 import EditorModule from "./editorModule";
 
-/**
- * Props expected by the ListEditor component.
- */
 type Props = {
   element: {
-    id: string; // Unique ID of the list element
-    kind: {
-      name: string; // Either "list" or "tuple"
-      type: string; // Data type, typically "list" or "tuple"
-      value: number[]; // Array of object IDs referenced by the list/tuple
-    };
+    id: string;
+    kind: { name: string; type: string; value: any[] };
   };
-  /**
-   * Called when the user saves their edits. Passes updated list/tuple data.
-   */
-  onSave: (data: { name: string; type: string; value: number[] }) => void;
-
-  /**
-   * Called when the user cancels editing.
-   */
+  onSave: (data: { name: string; type: string; value: any[] }) => void;
   onCancel: () => void;
   onRemove: () => void;
 };
 
-/**
- * ListEditor allows editing of list-like structures (list or tuple).
- * Users can modify the array of target object IDs, add new items, or remove existing ones.
- */
-export default function ListEditor({ element, onSave, onCancel, onRemove }: Props) {
-  // Initialize the state from the passed-in value
-  const [items, setItems] = useState<number[]>(element.kind.value || []);
+export default function ListEditor({
+  element,
+  onSave,
+  onCancel,
+  onRemove,
+}: Props) {
+  const [items, setItems] = useState<any[]>(element.kind.value || []);
 
-  /**
-   * Update the value at a specific index in the list.
-   * @param index - Index of the item to update
-   * @param newId - New ID to replace the current value at that index
-   */
-  const updateItem = (index: number, newId: number) => {
-    const updated = [...items];
-    updated[index] = newId;
-    setItems(updated);
+  const addItem    = () => setItems([...items, null]);
+  const removeItem = (idx: number) =>
+    setItems(items.filter((_, i) => i !== idx));
+
+  const handleSave = () =>
+    onSave({ name: element.kind.name, type: element.kind.type, value: items });
+
+  const pill: React.CSSProperties = {
+    width: 80,
+    height: 60,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    fontSize: "1.6rem",
+    background: "#f5f5f5",
+    border: "1px solid #888",
+    borderRadius: 4,
+    position: "relative",
+    cursor: "pointer",
   };
 
-  /**
-   * Append a new item (default value 0) to the end of the list.
-   */
-  const addItem = () => setItems([...items, 0]);
+  const closeBase: React.CSSProperties = {
+    position: "absolute",
+    top: -6,
+    right: -6,
+    width: 22,
+    height: 22,
+    background: "#f44336",
+    border: "none",
+    borderRadius: 4,
+    color: "#fff",
+    fontSize: "0.9rem",
+    cursor: "pointer",
+    transition: "background-color 0.25s ease",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  };
 
-  /**
-   * Remove the item at a specific index.
-   * @param index - Index of the item to remove
-   */
-  const removeItem = (index: number) =>
-    setItems(items.filter((_, i) => i !== index));
-
-  /**
-   * Trigger the onSave callback with the current updated list.
-   */
-  const handleSave = () => {
-    onSave({
-      name: element.kind.name, // Preserves original name ("list" or "tuple")
-      type: element.kind.type,
-      value: items,
-    });
+  const addBtn: React.CSSProperties = {
+    padding: "6px 14px",
+    fontSize: "0.9rem",
+    background: "#f5f5f5",
+    border: "1px solid #888",
+    borderRadius: 4,
+    cursor: "pointer",
   };
 
   return (
-    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel} onRemove={onRemove}>
-      {/* Render each item in the list as an editable number input */}
-      {items.map((id, i) => (
-        <div key={i} style={{ display: "flex", marginBottom: 4 }}>
-          <input
-            type="number"
-            value={id}
-            onChange={(e) => updateItem(i, Number(e.target.value))}
-            style={{ flex: 1 }}
-          />
-          <button onClick={() => removeItem(i)}>×</button>
-        </div>
-      ))}
+    <EditorModule
+      id={Number(element.id)}
+      typeLabel="list"
+      onSave={handleSave}
+      onCancel={onCancel}
+      onRemove={onRemove}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 16,
+          justifyContent: "flex-start",
+          marginBottom: 24,
+        }}
+      >
+        {items.map((_, idx) => (
+          <div key={idx} style={pill}>
+            +
+            <button
+              onClick={() => removeItem(idx)}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = "#d32f2f")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "#f44336")
+              }
+              style={closeBase}
+            >
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
 
-      {/* Button to add a new item */}
-      <button onClick={addItem}>+ Add</button>
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <button onClick={addItem} style={addBtn}>
+          + Add Element
+        </button>
+      </div>
     </EditorModule>
   );
 }

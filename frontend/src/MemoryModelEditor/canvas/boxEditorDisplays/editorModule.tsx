@@ -1,73 +1,104 @@
 import React, { useEffect, useRef } from "react";
 
 interface Props {
-  id: number;
-  onSave: () => void;    // Persist edits when closing normally
-  onCancel: () => void;   // Close editor without deleting
-  onRemove: () => void;  // Permanently delete the box
-  children: React.ReactNode;
+  id: number | string;
+  typeLabel?: string;
+  onSave: () => void;
+  onCancel: () => void;
+  onRemove: () => void;
+  children: React.ReactNode;  
 }
 
-// Autosaves on outside‑click, and provides a bottom‑right "Remove" button to delete the box.
-export default function EditorModule({ id, onSave, onCancel, onRemove, children }: Props) {
-  const wrapperRef = useRef<HTMLDivElement>(null);
+export default function EditorModule({
+  id,
+  typeLabel,
+  onSave,
+  onCancel,
+  onRemove,
+  children,
+}: Props) {
+  const wrapRef = useRef<HTMLDivElement>(null);
 
-  // Close & autosave when clicking outside the editor.
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+    const outside = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
         onSave();
         onCancel();
       }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    };
+    document.addEventListener("mousedown", outside);
+    return () => document.removeEventListener("mousedown", outside);
   }, [onSave, onCancel]);
+
+
+  const pill: React.CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    padding: "6px 12px",
+    fontSize: "0.9rem",
+    background: "#f5f5f5",
+    border: "1px solid #888",
+    borderRadius: 4,
+    whiteSpace: "nowrap",
+    lineHeight: 1.2,
+  };
+
 
   return (
     <div
-      ref={wrapperRef}
+      ref={wrapRef}
       className="drag-handle"
       style={{
         position: "absolute",
         top: 20,
-        right: 20,
-        zIndex: 1000,
+        left: 20,
+        width: "max-content",   
+        minWidth: 320,          
+        maxWidth: "90vw",       
         background: "#fff",
         border: "1px solid #888",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-        padding: 12,
-        width: 250,
+        borderRadius: 6,
+        boxShadow: "0 3px 12px rgba(0,0,0,0.15)",
+        zIndex: 1000,
+        display: "flex",
+        flexDirection: "column",
+        gap: 24,
       }}
     >
+
       <div
         style={{
-          border: "1px solid #888",
-          background: "#f5f5f5",
-          display: "inline-block",
-          padding: "2px 6px",
-          fontSize: "0.8rem",
-          marginBottom: 8,
+          display: "flex",
+          justifyContent: typeLabel ? "space-between" : "flex-start",
+          alignItems: "center",
+          padding: 10,
+          borderTopLeftRadius: 6,
+          borderTopRightRadius: 6,
         }}
       >
-        ID: {id}
+        <span style={pill}>ID&nbsp;{id}</span>
+        {typeLabel && <span style={pill}>{typeLabel}</span>}
       </div>
-      {children}
 
-      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
+      <div style={{ padding: "0 24px" }}>{children}</div>
+
+      <div style={{ padding: "0 24px 24px", display: "flex", justifyContent: "flex-end" }}>
         <button
-          style={{
-            padding: "4px 8px",
-            fontSize: "0.9rem",
-            backgroundColor: "#f44336",
-            color: "white",
-            border: "none",
-            cursor: "pointer",
-          }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#d32f2f")}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#f44336")}
           onClick={() => {
             onSave();
             onRemove();
+          }}
+          style={{
+            background: "#f44336",
+            color: "#fff",
+            border: "none",
+            padding: "4px 6px",
+            fontSize: "0.8rem",
+            borderRadius: 4,
+            cursor: "pointer",
+            transition: "background-color 0.25s ease",
           }}
         >
           Remove

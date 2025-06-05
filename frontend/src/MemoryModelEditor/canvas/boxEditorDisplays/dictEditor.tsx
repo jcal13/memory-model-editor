@@ -1,104 +1,106 @@
 import { useState } from "react";
 import EditorModule from "./editorModule";
 
-/**
- * Props for the DictEditor component.
- */
 type Props = {
   element: {
     id: string;
     kind: {
-      name: string; // should be "dict"
-      type: string; // should be "dict"
-      value: Record<string, number | null>; // key-value pairs where value is an ID or null
+      name: string;          
+      type: string;         
+      value: Record<string, number | null>;
     };
   };
-  /**
-   * Callback when the user saves their changes.
-   */
-  onSave: (data: {
-    name: string;
-    type: string;
-    value: Record<string, number | null>;
-  }) => void;
-  /**
-   * Callback when the user cancels editing.
-   */
+  onSave: (data: { name: string; type: string; value: Record<string, number | null> }) => void;
   onCancel: () => void;
   onRemove: () => void;
 };
 
-/**
- * A form-based editor for a dictionary object, where keys are strings and
- * values are references to other object IDs (or null).
- *
- * Allows users to dynamically add, edit, or remove entries in the dictionary.
- */
 export default function DictEditor({ element, onSave, onCancel, onRemove }: Props) {
-  /**
-   * Internal state to manage dictionary entries as [key, id] tuples.
-   */
-  const [entries, setEntries] = useState(
-    Object.entries(element.kind.value || {})
-  );
+  const [entries, setEntries] = useState(Object.entries(element.kind.value || {}));
 
-  /**
-   * Updates a specific dictionary entry at the given index.
-   * @param index - The index of the entry to update.
-   * @param key - The new key string.
-   * @param id - The new target ID (or null).
-   */
-  const updateEntry = (index: number, key: string, id: number | null) => {
-    const updated = [...entries];
-    updated[index] = [key, id];
-    setEntries(updated);
+  const addEntry    = () => setEntries([...entries, ["", null]]);
+  const removeEntry = (idx: number) => setEntries(entries.filter((_, i) => i !== idx));
+
+  const handleSave = () => {
+    const out: Record<string, number | null> = {};
+    for (const [k, v] of entries) if (k.trim()) out[k] = v;
+    onSave({ name: "dict", type: "dict", value: out });
   };
 
-  /**
-   * Adds a new empty entry to the dictionary.
-   */
-  const addEntry = () => setEntries([...entries, ["", null]]);
+  const pill: React.CSSProperties = {
+    width: 100,
+    height: 70,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    fontSize: "1.8rem",
+    background: "#f5f5f5",
+    border: "1px solid #888",
+    borderRadius: 4,
+    cursor: "pointer",
+    position: "relative",
+  };
 
-  /**
-   * Removes an entry from the dictionary at the given index.
-   * @param index - The index of the entry to remove.
-   */
-  const removeEntry = (index: number) =>
-    setEntries(entries.filter((_, i) => i !== index));
+  const closeBtn: React.CSSProperties = {
+    position: "absolute",
+    top: -6,
+    right: -6,
+    width: 22,
+    height: 22,
+    background: "#f44336",
+    border: "none",
+    borderRadius: 4,
+    color: "#fff",
+    fontSize: "0.9rem",
+    cursor: "pointer",
+    transition: "background-color 0.25s ease",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  };
 
-  /**
-   * Handles the save action, preparing the output dictionary object.
-   * Filters out entries with blank keys.
-   */
-  const handleSave = () => {
-    const output: Record<string, number | null> = {};
-    for (const [k, v] of entries) {
-      if (k.trim()) output[k] = v;
-    }
-    onSave({ name: "dict", type: "dict", value: output });
+  const addPairBtn: React.CSSProperties = {
+    padding: "10px 26px",
+    fontSize: "1.1rem",
+    background: "#f5f5f5",
+    border: "1px solid #888",
+    borderRadius: 4,
+    cursor: "pointer",
   };
 
   return (
-    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel} onRemove={onRemove}>
-      {entries.map(([key, id], i) => (
-        <div key={i} style={{ display: "flex", gap: 4, marginBottom: 4 }}>
-          <input
-            value={key}
-            onChange={(e) => updateEntry(i, e.target.value, id)}
-            placeholder="key"
-            style={{ flex: 1 }}
-          />
-          <input
-            type="number"
-            value={id ?? ""}
-            onChange={(e) => updateEntry(i, key, Number(e.target.value))}
-            style={{ width: 60 }}
-            placeholder="id"
-          />
-          <button onClick={() => removeEntry(i)}>×</button>
-        </div>
-      ))}
-      <button onClick={addEntry}>+ Add</button>
+    <EditorModule
+      id={Number(element.id)}
+      typeLabel="dict"
+      onSave={handleSave}
+      onCancel={onCancel}
+      onRemove={onRemove}
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: 24, marginBottom: 32 }}>
+        {entries.map(([key, val], idx) => (
+          <div key={idx} style={{ display: "flex", alignItems: "center", gap: 24 }}>
+            <button style={pill}>+</button>
+            <span style={{ fontSize: "2rem" }}>:</span>
+            <div style={{ position: "relative" }}>
+              <button style={pill}>+</button>
+              <button
+                onClick={() => removeEntry(idx)}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#d32f2f")}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#f44336")}
+                style={closeBtn}
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <button onClick={addEntry} style={addPairBtn}>
+          Add Pair
+        </button>
+      </div>
     </EditorModule>
   );
 }

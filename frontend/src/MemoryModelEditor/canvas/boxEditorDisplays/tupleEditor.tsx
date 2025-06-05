@@ -1,85 +1,112 @@
 import { useState } from "react";
 import EditorModule from "./editorModule";
 
-/**
- * Props for the TupleEditor component.
- */
 type Props = {
   element: {
     id: string;
-    kind: {
-      name: string;     // Should be "tuple"
-      type: string;     // Should be "tuple"
-      value: number[];  // Ordered list of referenced object IDs
-    };
+    kind: { name: string; type: string; value: number[] };
   };
-  /**
-   * Called when the user saves their changes to the tuple.
-   */
   onSave: (data: { name: string; type: string; value: number[] }) => void;
-
-  /**
-   * Called when the user cancels editing.
-   */
   onCancel: () => void;
   onRemove: () => void;
 };
 
-/**
- * TupleEditor allows users to modify the elements of a tuple in a memory model.
- * Each item in the tuple is a reference to another object (by its ID).
- */
-export default function TupleEditor({ element, onSave, onCancel, onRemove }: Props) {
-  // Initialize state from the given tuple value (defaulting to an empty array)
+export default function TupleEditor({
+  element,
+  onSave,
+  onCancel,
+  onRemove,
+}: Props) {
   const [items, setItems] = useState<number[]>(element.kind.value || []);
 
-  /**
-   * Updates a specific item in the tuple by index.
-   */
-  const updateItem = (index: number, newId: number) => {
-    const updated = [...items];
-    updated[index] = newId;
-    setItems(updated);
+  const addItem    = () => setItems([...items, 0]);
+  const removeItem = (idx: number) =>
+    setItems(items.filter((_, i) => i !== idx));
+
+  const handleSave = () =>
+    onSave({ name: element.kind.name, type: element.kind.type, value: items });
+
+  const pill: React.CSSProperties = {
+    width: 80,
+    height: 60,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    fontSize: "1.6rem",
+    background: "#f5f5f5",
+    border: "1px solid #888",
+    borderRadius: 4,
+    position: "relative",
+    cursor: "pointer",
   };
 
-  /**
-   * Adds a new default item (0) to the end of the tuple.
-   */
-  const addItem = () => setItems([...items, 0]);
+  const closeBtn: React.CSSProperties = {
+    position: "absolute",
+    top: -6,
+    right: -6,
+    width: 22,
+    height: 22,
+    background: "#f44336",
+    border: "none",
+    borderRadius: 4,
+    color: "#fff",
+    fontSize: "0.9rem",
+    cursor: "pointer",
+    transition: "background-color 0.25s ease",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  };
 
-  /**
-   * Removes the item at the specified index.
-   */
-  const removeItem = (index: number) => setItems(items.filter((_, i) => i !== index));
-
-  /**
-   * Saves the edited tuple back to the parent component.
-   */
-  const handleSave = () => {
-    onSave({
-      name: element.kind.name,
-      type: element.kind.type,
-      value: items,
-    });
+  const addButton: React.CSSProperties = {
+    padding: "6px 14px",
+    fontSize: "0.9rem",
+    background: "#f5f5f5",
+    border: "1px solid #888",
+    borderRadius: 4,
+    cursor: "pointer",
   };
 
   return (
-    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel} onRemove={onRemove}>
-      {/* Render a row for each item in the tuple */}
-      {items.map((id, i) => (
-        <div key={i} style={{ display: "flex", marginBottom: 4 }}>
-          <input
-            type="number"
-            value={id}
-            onChange={(e) => updateItem(i, Number(e.target.value))}
-            style={{ flex: 1 }}
-          />
-          <button onClick={() => removeItem(i)}>×</button>
-        </div>
-      ))}
-      
-      {/* Button to add a new item */}
-      <button onClick={addItem}>+ Add</button>
+    <EditorModule
+      id={Number(element.id)}
+      typeLabel="tuple"
+      onSave={handleSave}
+      onCancel={onCancel}
+      onRemove={onRemove}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "nowrap",
+          gap: 16,
+          marginBottom: 24,
+        }}
+      >
+        {items.map((_, idx) => (
+          <div key={idx} style={pill}>
+            +
+            <button
+              onClick={() => removeItem(idx)}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = "#d32f2f")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "#f44336")
+              }
+              style={closeBtn}
+            >
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <button onClick={addItem} style={addButton}>
+          + Add Element
+        </button>
+      </div>
     </EditorModule>
   );
 }

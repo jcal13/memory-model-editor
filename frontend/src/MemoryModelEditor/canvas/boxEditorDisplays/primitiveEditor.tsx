@@ -1,120 +1,108 @@
-import { useState, useEffect } from "react";
-import EditorModule from "./editorModule";
+import React, { useState, useEffect, useRef } from "react";
 
-/**
- * Props for the PrimitiveEditor component.
- */
-type Props = {
-  element: {
-    id: string;
-    kind: {
-      name: "primitive";
-      type: "int" | "float" | "str" | "bool";
-      value: string;
-    };
-  };
-  /**
-   * Called when the user confirms their changes.
-   */
-  onSave: (data: {
-    name: "primitive";
-    type: "int" | "float" | "str" | "bool";
-    value: string;
-  }) => void;
+type PrimitiveType = "int" | "float" | "str" | "bool";
 
-  /**
-   * Called when the user cancels editing.
-   */
+interface PrimitiveKind {
+  name: "primitive";
+  type: PrimitiveType;
+  value: string;
+}
+
+interface Props {
+  element: { id: string; kind: PrimitiveKind };
+  onSave: (kind: PrimitiveKind) => void;
   onCancel: () => void;
   onRemove: () => void;
-};
+}
 
-/**
- * PrimitiveEditor allows users to configure a single primitive value
- * such as an integer, float, string, or boolean. It dynamically validates
- * and formats input based on the selected type.
- */
-export default function PrimitiveEditor({ element, onSave, onCancel, onRemove }: Props) {
-  const [dataType, setDataType] = useState(element.kind.type);
-  const [value, setValue] = useState(element.kind.value);
+export default function PrimitiveEditor({
+  element,
+  onSave,
+  onCancel,
+  onRemove,
+}: Props) {
+  const [dataType, setDataType] = useState<PrimitiveType>(element.kind.type);
+  const [value, setValue]       = useState(element.kind.value);
+  const [hoverRemove, setHoverRemove] = useState(false);
+  const wrapRef                 = useRef<HTMLDivElement>(null);
 
-  // Update editor state when a new element is selected
   useEffect(() => {
-    setDataType(element.kind.type);
-    setValue(element.kind.value);
-  }, [element]);
+    const outside = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        handleSave();
+        onCancel();
+      }
+    };
+    document.addEventListener("mousedown", outside);
+    return () => document.removeEventListener("mousedown", outside);
+  }, [onSave, onCancel]);
 
-  // Validation helpers
-  const isInt = (v: string) => /^-?\d+$/.test(v);
-  const isFloat = (v: string) => /^-?\d+(\.\d+)?$/.test(v);
-  const isBool = (v: string) => v === "true" || v === "false";
 
-  /**
-   * Validates the current value according to the selected type.
-   */
-  const validByType = () => {
-    switch (dataType) {
-      case "int":
-        return isInt(value);
-      case "float":
-        return isFloat(value);
-      case "bool":
-        return isBool(value);
-      case "str":
-      default:
-        return true;
-    }
+  const int   = (v: string) => /^-?\d+$/.test(v);
+  const float = (v: string) => /^-?\d+(\.\d+)?$/.test(v);
+  const bool  = (v: string) => v === "true" || v === "false";
+  const isValid = () =>
+    dataType === "int"   ? int(value)   :
+    dataType === "float" ? float(value) :
+    dataType === "bool"  ? bool(value)  :
+    true;
+
+  const handleSave  = () => onSave({ name: "primitive", type: dataType, value });
+  const changeType  = (t: PrimitiveType) => {
+    setDataType(t);
+    if      (t === "bool")  setValue("true");
+    else if (t === "int"   && !int(value))   setValue("0");
+    else if (t === "float" && !float(value)) setValue("0.0");
   };
 
-  const isValid = validByType();
-
-  /**
-   * Handles saving the primitive element's data.
-   */
-  const handleSave = () => {
-    onSave({
-      name: "primitive",
-      type: dataType,
-      value: value ?? "",
-    });
-  };
-
-  /**
-   * Updates the type and sets default values accordingly.
-   * @param newType - The newly selected data type
-   */
-  const handleTypeChange = (newType: typeof dataType) => {
-    setDataType(newType);
-    if (newType === "bool") {
-      setValue("true");
-    } else if (newType === "int" && !isInt(value)) {
-      setValue("0");
-    } else if (newType === "float" && !isFloat(value)) {
-      setValue("0.0");
-    }
+  const pill: React.CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    padding: "6px 12px",
+    fontSize: "0.9rem",
+    background: "#f5f5f5",
+    border: "1px solid #888",
+    borderRadius: 4,
+    whiteSpace: "nowrap",
+    lineHeight: 1.2,
   };
 
   return (
-    <EditorModule id={Number(element.id)} onSave={handleSave} onCancel={onCancel} onRemove={onRemove}>
-      {/* Top row: ID on the left, type dropdown on the right */}
+    <div
+      ref={wrapRef}
+      className="drag-handle"
+      style={{
+        position: "absolute",
+        top: 20,
+        right: 20,
+        width: 320,
+        height: 320,                
+        background: "#fff",
+        border:   "1px solid #888",
+        borderRadius: 6,
+        boxShadow: "0 3px 12px rgba(0,0,0,0.15)",
+        zIndex: 1000,
+        display: "flex",            
+        flexDirection: "column",
+        justifyContent: "space-between", 
+      }}
+    >
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: 8,
+          padding: 10,
+          borderTopLeftRadius: 6,
+          borderTopRightRadius: 6,
         }}
       >
-        {/* Type selector dropdown in top-right */}
+        <span style={pill}>ID&nbsp;{element.id}</span>
+
         <select
           value={dataType}
-          onChange={(e) =>
-            handleTypeChange(e.target.value as typeof dataType)
-          }
-          style={{
-            padding: 4,
-            fontSize: "0.9rem",
-          }}
+          onChange={(e) => changeType(e.target.value as PrimitiveType)}
+          style={{ ...pill, cursor: "pointer", appearance: "none" }}
         >
           <option value="int">int</option>
           <option value="float">float</option>
@@ -123,61 +111,66 @@ export default function PrimitiveEditor({ element, onSave, onCancel, onRemove }:
         </select>
       </div>
 
-      {/* Centered input or boolean radio buttons */}
-      <div style={{ textAlign: "center", marginBottom: 8 }}>
+      <div style={{ padding: "0 24px" }}>
         {dataType === "bool" ? (
-          <div
-            style={{
-              display: "inline-flex",
-              gap: "1rem",
-              alignItems: "center",
-            }}
-          >
-            <label>
-              <input
-                type="radio"
-                checked={value === "true"}
-                onChange={() => setValue("true")}
-                style={{ marginRight: 4 }}
-              />
-              true
-            </label>
-            <label>
-              <input
-                type="radio"
-                checked={value === "false"}
-                onChange={() => setValue("false")}
-                style={{ marginRight: 4 }}
-              />
-              false
-            </label>
+          <div style={{ display: "flex", gap: 24, justifyContent: "center" }}>
+            {["true", "false"].map((opt) => (
+              <label key={opt} style={{ fontSize: "1rem" }}>
+                <input
+                  type="radio"
+                  checked={value === opt}
+                  onChange={() => setValue(opt)}
+                  style={{ marginRight: 6 }}
+                />
+                {opt}
+              </label>
+            ))}
           </div>
         ) : (
           <input
-            style={{
-              width: "80%",
-              padding: 4,
-              boxSizing: "border-box",
-            }}
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="value"
+            style={{
+              width: "100%",
+              padding: 10,
+              borderRadius: 4,
+              border: "1px solid #ccc",
+              boxSizing: "border-box",
+              fontSize: "1rem",
+            }}
           />
         )}
 
-        {/* Show error if value is invalid */}
-        {!isValid && (
-          <div
-            style={{
-              color: "red",
-              fontSize: "0.8rem",
-              marginTop: 4,
-            }}
-          >
-            Invalid {dataType} value
+        {!isValid() && (
+          <div style={{ color: "red", fontSize: "0.85rem", marginTop: 8, textAlign: "center" }}>
+            Invalid&nbsp;{dataType}&nbsp;value
           </div>
         )}
       </div>
-    </EditorModule>
+
+      <div style={{ padding: 24, display: "flex", justifyContent: "flex-end" }}>
+        <button
+          onMouseEnter={() => setHoverRemove(true)}
+          onMouseLeave={() => setHoverRemove(false)}
+          onClick={() => {
+            handleSave();
+            onRemove();
+          }}
+          style={{
+            background: hoverRemove ? "#d32f2f" : "#f44336",
+            color: "#fff",
+            border: "none",
+            padding: "4px 6px",
+            fontSize: "0.8rem",
+            borderRadius: 4,
+            cursor: "pointer",
+            transition: "background-color 0.25s ease",
+          }}
+        >
+          Remove
+        </button>
+      </div>
+    </div>
   );
 }

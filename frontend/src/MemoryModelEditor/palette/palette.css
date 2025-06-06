@@ -1,0 +1,21 @@
+.palette-container {
+  padding: 0 20px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  height: 100vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.palette-title {
+  text-align: center;
+  font-size: 20px;
+  margin: 25px 0 0 0;
+}
+
+.palette-boxes {
+  padding: 20px 5px 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

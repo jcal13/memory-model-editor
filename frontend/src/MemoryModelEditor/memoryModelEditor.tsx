@@ -23,10 +23,10 @@ export default function MemoryModelEditor() {
         case "list":
         case "tuple":
         case "set":
-          return { ...base, value: kind.value }; 
+          return { ...base, value: kind.value };
 
         case "dict":
-          return { ...base, value: kind.value }; 
+          return { ...base, value: kind.value };
 
         case "function":
           return {
@@ -48,22 +48,40 @@ export default function MemoryModelEditor() {
     <div
       style={{
         display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "flex-start",
+        height: "100vh",
+        overflow: "hidden",
       }}
     >
-      <Palette />
+      <div
+        style={{
+          flex: 1,
+          borderRight: "1px solid #ddd",
+          overflowY: "auto",
+        }}
+      >
+        <Palette />
+      </div>
 
-      <div style={{ flex: 1, position: "relative" }}>
-        <Canvas elements={elements} setElements={setElements} />
+      <div
+        style={{
+          flex: 2,
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div style={{ flex: 1, position: "relative" }}>
+          <Canvas elements={elements} setElements={setElements} />
+        </div>
 
         <button
           onClick={showJson}
           style={{
             position: "absolute",
-            top: 8,
+            bottom: 8,
             right: 8,
             padding: "4px 8px",
+            zIndex: 10,
           }}
         >
           Show JSON
@@ -91,6 +109,20 @@ export default function MemoryModelEditor() {
             {jsonView}
           </pre>
         )}
+      </div>
+
+      <div
+        style={{
+          flex: 1,
+          borderLeft: "1px solid #ddd",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#888",
+          fontStyle: "italic",
+        }}
+      >
+        Placeholder
       </div>
     </div>
   );

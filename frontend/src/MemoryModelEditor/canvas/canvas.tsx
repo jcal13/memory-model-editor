@@ -1,3 +1,4 @@
+// canvas.tsx
 import React, { useState } from "react";
 import { CanvasElement, ElementKind } from "../types";
 
@@ -108,9 +109,7 @@ export default function Canvas({ elements, setElements }: Props) {
   return (
     <>
       <svg
-        width={800}
-        height={600}
-        style={{ border: "1px solid #000" }}
+        style={{ border: "1px solid #000", width: "100%", height: "100%" }}
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
       >

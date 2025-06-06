@@ -41,7 +41,7 @@ export default function Canvas({ elements, setElements }: Props) {
 
     switch (payload) {
       case "primitive":
-        newKind = { name: "primitive", type: "int", value: "0" };
+        newKind = { name: "primitive", type: "none", value: "none" };
         break;
       case "function":
         newKind = {

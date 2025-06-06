@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
-type PrimitiveType = "int" | "float" | "str" | "bool";
+type PrimitiveType = "none" | "int" | "float" | "str" | "bool";
 
 interface PrimitiveKind {
   name: "primitive";
@@ -55,6 +55,7 @@ export default function PrimitiveEditor({
   const int = (v: string) => /^-?\d+$/.test(v);
   const float = (v: string) => /^-?\d+(\.\d+)?$/.test(v);
   const bool = (v: string) => v === "true" || v === "false";
+
   const isValid = () =>
     dataType === "int"
       ? int(value)
@@ -70,9 +71,15 @@ export default function PrimitiveEditor({
 
   const changeType = (t: PrimitiveType) => {
     setDataType(t);
-    if (t === "bool") setValue("true");
-    else if (t === "int" && !int(value)) setValue("0");
-    else if (t === "float" && !float(value)) setValue("0.0");
+    if (t === "bool") {
+      setValue("true");
+    } else if (t === "int" && !int(value)) {
+      setValue("0");
+    } else if (t === "float" && !float(value)) {
+      setValue("0.0");
+    } else if (t === "none") {
+      setValue("");
+    }
   };
 
   const pill: React.CSSProperties = {
@@ -124,6 +131,7 @@ export default function PrimitiveEditor({
           onChange={(e) => changeType(e.target.value as PrimitiveType)}
           style={{ ...pill, cursor: "pointer", appearance: "none" }}
         >
+          <option value="none">none</option>
           <option value="int">int</option>
           <option value="float">float</option>
           <option value="str">str</option>
@@ -131,7 +139,7 @@ export default function PrimitiveEditor({
         </select>
       </div>
 
-      <div style={{ padding: "0 24px" }}>
+      <div style={{ padding: "0 24px", textAlign: "center" }}>
         {dataType === "bool" ? (
           <div style={{ display: "flex", gap: 24, justifyContent: "center" }}>
             {["true", "false"].map((opt) => (
@@ -146,6 +154,8 @@ export default function PrimitiveEditor({
               </label>
             ))}
           </div>
+        ) : dataType === "none" ? (
+          <div style={{ fontSize: "1rem", color: "#666" }}>none</div>
         ) : (
           <input
             value={value}

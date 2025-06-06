@@ -18,6 +18,17 @@ export default function MemoryModelEditor() {
       <Palette />
       <div style={{ flex: 1, position: "relative" }}>
         <Canvas elements={elements} setElements={setElements} />
+
+        {/* <button
+          onClick={showJson}
+          style={{
+            position: "absolute", top: 8, right: 8,
+            display: "flex", flexDirection: "column", gap: "8px",
+          }}
+        >
+          Show JSON
+        </button> */}
+
         {jsonView && (
           <pre style={{
             position: "fixed", bottom: "40px", right: "8px",

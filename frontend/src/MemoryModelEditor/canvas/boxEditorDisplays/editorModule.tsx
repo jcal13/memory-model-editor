@@ -23,7 +23,6 @@ export default function EditorModule({
     const outside = (e: MouseEvent) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
         onSave();
-        onCancel();
       }
     };
     document.addEventListener("mousedown", outside);

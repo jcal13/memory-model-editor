@@ -29,7 +29,7 @@ export default function FunctionEditor({
   useEffect(() => {
     const outside = (e: MouseEvent) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
-        handleSave(); onCancel();
+        handleSave();
       }
     };
     document.addEventListener("mousedown", outside);

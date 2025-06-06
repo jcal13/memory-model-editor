@@ -78,6 +78,7 @@ export default function Canvas({ elements, setElements }: Props) {
   };
 
   const saveElement = (updatedKind: ElementKind) => {
+    console.log(updatedKind)
     if (!selected) return;
     setElements((prev) =>
       prev.map((el) =>

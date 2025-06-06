@@ -24,7 +24,9 @@ export default function ListEditor({
     setItems(items.filter((_, i) => i !== idx));
 
   const handleSave = () =>
-    onSave({ name: element.kind.name, type: element.kind.type, value: items });
+    {
+      onSave({ name: element.kind.name, type: element.kind.type, value: items });
+    }
 
   const pill: React.CSSProperties = {
     width: 80,

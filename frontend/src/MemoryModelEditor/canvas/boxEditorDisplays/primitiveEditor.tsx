@@ -22,36 +22,56 @@ export default function PrimitiveEditor({
   onRemove,
 }: Props) {
   const [dataType, setDataType] = useState<PrimitiveType>(element.kind.type);
-  const [value, setValue]       = useState(element.kind.value);
+  const [value, setValue] = useState(element.kind.value);
   const [hoverRemove, setHoverRemove] = useState(false);
-  const wrapRef                 = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const dataTypeRef = useRef<PrimitiveType>(dataType);
+  const valueRef = useRef<string>(value);
+
+  useEffect(() => {
+    dataTypeRef.current = dataType;
+  }, [dataType]);
+
+  useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
 
   useEffect(() => {
     const outside = (e: MouseEvent) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
-        handleSave();
-        onCancel();
+        onSave({
+          name: element.kind.name,
+          type: dataTypeRef.current,
+          value: valueRef.current,
+        });
       }
     };
     document.addEventListener("mousedown", outside);
-    return () => document.removeEventListener("mousedown", outside);
-  }, [onSave, onCancel]);
+    return () => {
+      document.removeEventListener("mousedown", outside);
+    };
+  }, [onSave, element.kind.name]);
 
-
-  const int   = (v: string) => /^-?\d+$/.test(v);
+  const int = (v: string) => /^-?\d+$/.test(v);
   const float = (v: string) => /^-?\d+(\.\d+)?$/.test(v);
-  const bool  = (v: string) => v === "true" || v === "false";
+  const bool = (v: string) => v === "true" || v === "false";
   const isValid = () =>
-    dataType === "int"   ? int(value)   :
-    dataType === "float" ? float(value) :
-    dataType === "bool"  ? bool(value)  :
-    true;
+    dataType === "int"
+      ? int(value)
+      : dataType === "float"
+      ? float(value)
+      : dataType === "bool"
+      ? bool(value)
+      : true;
 
-  const handleSave  = () => onSave({ name: "primitive", type: dataType, value });
-  const changeType  = (t: PrimitiveType) => {
+  const handleSave = () => {
+    onSave({ name: element.kind.name, type: dataType, value });
+  };
+
+  const changeType = (t: PrimitiveType) => {
     setDataType(t);
-    if      (t === "bool")  setValue("true");
-    else if (t === "int"   && !int(value))   setValue("0");
+    if (t === "bool") setValue("true");
+    else if (t === "int" && !int(value)) setValue("0");
     else if (t === "float" && !float(value)) setValue("0.0");
   };
 
@@ -76,15 +96,15 @@ export default function PrimitiveEditor({
         top: 20,
         right: 20,
         width: 320,
-        height: 320,                
+        height: 320,
         background: "#fff",
-        border:   "1px solid #888",
+        border: "1px solid #888",
         borderRadius: 6,
         boxShadow: "0 3px 12px rgba(0,0,0,0.15)",
         zIndex: 1000,
-        display: "flex",            
+        display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between", 
+        justifyContent: "space-between",
       }}
     >
       <div
@@ -143,7 +163,14 @@ export default function PrimitiveEditor({
         )}
 
         {!isValid() && (
-          <div style={{ color: "red", fontSize: "0.85rem", marginTop: 8, textAlign: "center" }}>
+          <div
+            style={{
+              color: "red",
+              fontSize: "0.85rem",
+              marginTop: 8,
+              textAlign: "center",
+            }}
+          >
             Invalid&nbsp;{dataType}&nbsp;value
           </div>
         )}

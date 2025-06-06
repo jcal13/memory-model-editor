@@ -18,24 +18,6 @@ export default function MemoryModelEditor() {
       <Palette />
       <div style={{ flex: 1, position: "relative" }}>
         <Canvas elements={elements} setElements={setElements} />
-
-        <button
-          onClick={() => {
-            const blob = new Blob([jsonView], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = "data.json";
-            link.click();
-            URL.revokeObjectURL(url);
-          }}
-          style={{
-            position: "absolute", top: 50, right: 8, padding: "4px 8px",
-          }}
-        >
-          Download JSON
-        </button>
-
         {jsonView && (
           <pre style={{
             position: "fixed", bottom: "40px", right: "8px",

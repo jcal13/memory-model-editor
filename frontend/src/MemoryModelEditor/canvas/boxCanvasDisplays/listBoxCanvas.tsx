@@ -42,7 +42,6 @@ export default function ListBoxCanvas({ element, openListInterface }: Props) {
       kind.value, 
       false,
       {
-        box_container: { fill: "#fdf6e3", fillStyle: "solid" },
         box_id: { fill: "#fff", fillStyle: "solid" },
         box_type: { fill: "#fff", fillStyle: "solid" },
       }

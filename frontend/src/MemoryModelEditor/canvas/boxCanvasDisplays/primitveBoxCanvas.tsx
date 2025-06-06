@@ -39,7 +39,6 @@ export default function PrimitiveBoxCanvas({ element, openPrimitiveInterface }: 
       element.id,
       kind.value,
       {
-        box_container: { fill: "#fdf6e3", fillStyle: "solid" },
         box_id: { fill: "#fff", fillStyle: "solid" },
         box_type: { fill: "#fff", fillStyle: "solid" },
         text_value: { fill: "#000" },
@@ -69,7 +68,7 @@ export default function PrimitiveBoxCanvas({ element, openPrimitiveInterface }: 
       ref={gRef}
       onClick={() => openPrimitiveInterface(element)}
       style={{
-        cursor: "cursor",
+        cursor: "pointer",
         overflow: "visible",
         display: "inline-block",
       }}    />

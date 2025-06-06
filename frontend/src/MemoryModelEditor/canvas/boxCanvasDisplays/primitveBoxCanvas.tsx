@@ -1,8 +1,6 @@
 import { CanvasElement } from "../../types";
-import rough from "roughjs/bin/rough";
+import MemoryViz from "memory-viz";
 import React, { useEffect, useRef } from "react";
-
-// replace this entire file with code from issue #4
 
 type Props = {
   element: CanvasElement;
@@ -11,66 +9,69 @@ type Props = {
 
 export default function PrimitiveBoxCanvas({ element, openPrimitiveInterface }: Props) {
   const gRef = useRef<SVGGElement>(null);
-  const roughSvg = useRef<ReturnType<typeof rough.svg> | null>(null);
 
   useEffect(() => {
-    if (!roughSvg.current) {
-      const tempSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      roughSvg.current = rough.svg(tempSvg);
-    }
-    if (!gRef.current || !roughSvg.current) return;
+    if (!gRef.current) return;
 
-    gRef.current.innerHTML = ""; // Clear previous drawing
-    const rc = roughSvg.current;
+    const { MemoryModel } = MemoryViz;
+    const kind = element.kind;
+    if (kind.name !== "primitive") return;
 
-    const scale = 2;
-    const mainX = 10 * scale;
-    const mainY = 10 * scale;
-    const mainWidth = 60 * scale;
-    const mainHeight = 24 * scale;
-    const doubleBoxPadding = 3 * scale;
+    const model = new MemoryModel({
+      obj_min_width: 150,
+      obj_min_height: 67.5,
+      prop_min_width: 37.5,
+      prop_min_height: 25,
+      double_rect_sep: 10,
+      font_size: 14,
+      browser: true,
+      roughjs_config: {
+        options: {
+          fillStyle: "solid",
+        },
+      },
+    });
 
-    const outerRect = rc.rectangle(
-      mainX - doubleBoxPadding,
-      mainY - doubleBoxPadding,
-      mainWidth + 2 * doubleBoxPadding,
-      mainHeight + 2 * doubleBoxPadding,
-      { stroke: "#333", strokeWidth: 1, fill: "transparent" }
+    model.drawPrimitive(
+      15,
+      15,
+      kind.type,
+      element.id,
+      kind.value,
+      {
+        box_container: { fill: "#fdf6e3", fillStyle: "solid" },
+        box_id: { fill: "#fff", fillStyle: "solid" },
+        box_type: { fill: "#fff", fillStyle: "solid" },
+        text_value: { fill: "#000" },
+      }
     );
+    if(gRef.current)
+    {
+    gRef.current.innerHTML = "";
+    gRef.current.appendChild(model.svg);
 
-    const innerRect = rc.rectangle(mainX, mainY, mainWidth, mainHeight, {
-      stroke: "#333",
-      strokeWidth: 1,
-      fill: "#fdf6e3",
-      fillStyle: "solid",
-    });
+    const bbox = model.svg.getBBox();
+    const padding = 15;
+    model.svg.setAttribute("width", `${bbox.width + padding}`);
+    model.svg.setAttribute("height", `${bbox.height + padding}`);
+    gRef.current.setAttribute(
+      "transform",
+      `translate(${element.x - bbox.width / 2}, ${element.y - bbox.height / 2})`
+    );
+    gRef.current.style.width = `${bbox.width + padding}px`;
+    gRef.current.style.height = `${bbox.height + padding}px`;
+    }
 
-    const idBox = rc.rectangle(mainX, mainY, 14 * scale, 8 * scale, {
-      stroke: "#555",
-      strokeWidth: 0.8,
-      fill: "#fff",
-      fillStyle: "solid",
-    });
-
-    const typeBox = rc.rectangle(mainX + mainWidth - 14 * scale, mainY, 14 * scale, 8 * scale, {
-      stroke: "#555",
-      strokeWidth: 0.8,
-      fill: "#fff",
-      fillStyle: "solid",
-    });
-
-    gRef.current.appendChild(outerRect);
-    gRef.current.appendChild(innerRect);
-    gRef.current.appendChild(idBox);
-    gRef.current.appendChild(typeBox);
   }, [element]);
 
   return (
     <g
       ref={gRef}
-      transform={`translate(${element.x - 75}, ${element.y - 50})`}
       onClick={() => openPrimitiveInterface(element)}
-      style={{ cursor: "pointer" }}
-    />
+      style={{
+        cursor: "cursor",
+        overflow: "visible",
+        display: "inline-block",
+      }}    />
   );
 }

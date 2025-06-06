@@ -16,6 +16,7 @@ test("adds and saves dictionary entries with numeric keys and values", () => {
       }}
       onSave={onSave}
       onCancel={() => {}}
+      onRemove={() => {}}
     />
   );
 

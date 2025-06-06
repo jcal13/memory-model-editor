@@ -16,6 +16,7 @@ test("adds and saves tuple of object ids", () => {
       }}
       onSave={onSave}
       onCancel={() => {}}
+      onRemove={() => {}}
     />
   );
 

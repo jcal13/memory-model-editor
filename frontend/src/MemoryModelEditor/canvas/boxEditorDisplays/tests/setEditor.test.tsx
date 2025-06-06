@@ -16,6 +16,7 @@ test("adds and saves set of object ids", () => {
       }}
       onSave={onSave}
       onCancel={() => {}}
+      onRemove={() => {}}
     />
   );
 

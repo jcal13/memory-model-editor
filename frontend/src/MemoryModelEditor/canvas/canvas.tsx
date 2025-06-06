@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import Draggable from "react-draggable";
 import { CanvasElement, ElementKind } from "../types";
 
 import PrimitiveBoxCanvas from "./boxCanvasDisplays/primitveBoxCanvas";
@@ -31,6 +32,7 @@ interface Props {
 
 export default function Canvas({ elements, setElements }: Props) {
   const [selected, setSelected] = useState<CanvasElement | null>(null);
+  const dragRef = useRef<HTMLDivElement>(null);
 
   const handleDrop = (e: React.DragEvent<SVGSVGElement>) => {
     e.preventDefault();
@@ -39,11 +41,7 @@ export default function Canvas({ elements, setElements }: Props) {
 
     switch (payload) {
       case "primitive":
-        newKind = {
-          name: "primitive",
-          type: "int",
-          value: "0",
-        };
+        newKind = { name: "primitive", type: "none", value: "none" };
         break;
       case "function":
         newKind = {
@@ -55,32 +53,16 @@ export default function Canvas({ elements, setElements }: Props) {
         };
         break;
       case "list":
-        newKind = {
-          name: "list",
-          type: "list",
-          value: [],
-        };
+        newKind = { name: "list", type: "list", value: [] };
         break;
       case "tuple":
-        newKind = {
-          name: "tuple",
-          type: "tuple",
-          value: [],
-        };
+        newKind = { name: "tuple", type: "tuple", value: [] };
         break;
       case "set":
-        newKind = {
-          name: "set",
-          type: "set",
-          value: [],
-        };
+        newKind = { name: "set", type: "set", value: [] };
         break;
       case "dict":
-        newKind = {
-          name: "dict",
-          type: "dict",
-          value: {},
-        };
+        newKind = { name: "dict", type: "dict", value: {} };
         break;
       default:
         return;
@@ -96,12 +78,19 @@ export default function Canvas({ elements, setElements }: Props) {
   };
 
   const saveElement = (updatedKind: ElementKind) => {
+    console.log(updatedKind)
     if (!selected) return;
     setElements((prev) =>
       prev.map((el) =>
         el.id === selected.id ? { ...el, kind: updatedKind } : el
       )
     );
+    setSelected(null);
+  };
+
+  const removeElement = () => {
+    if (!selected) return;
+    setElements((prev) => prev.filter((el) => el.id !== selected.id));
     setSelected(null);
   };
 
@@ -170,17 +159,35 @@ export default function Canvas({ elements, setElements }: Props) {
         })}
       </svg>
 
-      {selected &&
-        (() => {
-          const Editor = editorMap[selected.kind.name];
-          return (
-            <Editor
-              element={selected}
-              onSave={saveElement}
-              onCancel={() => setSelected(null)}
-            />
-          );
-        })()}
+      {selected && (
+        <Draggable
+          nodeRef={dragRef as React.RefObject<HTMLElement>}
+          handle=".drag-handle"
+          defaultPosition={{ x: 400, y: 80 }}
+        >
+          <div
+            ref={dragRef}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              backgroundColor: "white",
+            }}
+          >
+            {(() => {
+              const Editor = editorMap[selected.kind.name];
+              return (
+                <Editor
+                  element={selected}
+                  onSave={saveElement}
+                  onCancel={() => setSelected(null)}
+                  onRemove={removeElement}
+                />
+              );
+            })()}
+          </div>
+        </Draggable>
+      )}
     </>
   );
 }

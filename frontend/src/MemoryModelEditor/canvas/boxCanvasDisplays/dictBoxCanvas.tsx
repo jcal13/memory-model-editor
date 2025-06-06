@@ -36,10 +36,11 @@ export default function DictBoxCanvas({ element, openDictInterface }: Props) {
       5,
       5,
       element.id,
-      kind.value,
+      kind.value, // Record<string, number | null>
       {
+  
         "text_value" : {"font-style" : "italic"},
-        'box_id': {fill: 'white', fillStyle: "dots"}}
+      'box_id': {fill: 'white', fillStyle: "dots"}}
     );
 
     gRef.current.innerHTML = "";

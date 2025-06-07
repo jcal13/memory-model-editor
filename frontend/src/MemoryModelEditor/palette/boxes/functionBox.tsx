@@ -27,7 +27,6 @@ export default function FunctionBox() {
     });
 
     model.drawClass(5, 5, "__main__", 0, {}, true, {
-      box_container: { fill: "#fdf6e3", fillStyle: "solid" },
       box_id: { fill: "#fff", fillStyle: "solid" },
       box_type: { fill: "#fff", fillStyle: "solid" },
     });

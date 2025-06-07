@@ -1,3 +1,4 @@
+// canvas.tsx
 import React, { useState, useRef, useEffect } from "react";
 import Draggable from "react-draggable";
 import { CanvasElement, ElementKind } from "../types";
@@ -32,27 +33,33 @@ interface Props {
 
 export default function Canvas({ elements, setElements }: Props) {
   const [selected, setSelected] = useState<CanvasElement | null>(null);
-
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [viewBox, setViewBox] = useState<string>("0 0 0 0");
 
-  // Initialize viewBox on mount based on the SVG's rendered size
-  useEffect(() => {
+  // Update viewBox on mount and whenever SVG size changes
+ useEffect(() => {
     const svg = svgRef.current;
-    if (svg) {
-      const { width, height } = svg.getBoundingClientRect();
+    if (!svg) return;
+
+    const recalc = () => {
+     const { width, height } = svg.getBoundingClientRect();
       setViewBox(`0 0 ${width} ${height}`);
-    }
+    };
+
+    recalc();
+    window.addEventListener("resize", recalc);
+    return () => {
+      window.removeEventListener("resize", recalc);
+    };
   }, []);
 
-  // Centralized position updater
   const makePositionUpdater = (id: number) => (x: number, y: number) => {
     setElements(prev =>
       prev.map(el => (el.id === id ? { ...el, x, y } : el))
     );
   };
-  const dragRef = useRef<HTMLDivElement>(null);
 
+  const dragRef = useRef<HTMLDivElement>(null);
 
   const handleDrop = (e: React.DragEvent<SVGSVGElement>) => {
     e.preventDefault();
@@ -64,7 +71,13 @@ export default function Canvas({ elements, setElements }: Props) {
         newKind = { name: "primitive", type: "none", value: "none" };
         break;
       case "function":
-        newKind = { name: "function", type: "function", value: null, functionName: "myFunction", params: [] };
+        newKind = {
+          name: "function",
+          type: "function",
+          value: null,
+          functionName: "myFunction",
+          params: [],
+        };
         break;
       case "list":
         newKind = { name: "list", type: "list", value: [] };
@@ -82,32 +95,27 @@ export default function Canvas({ elements, setElements }: Props) {
         return;
     }
 
-    const svg = svgRef.current!;
-    const pt = svg.createSVGPoint();
+    const pt = svgRef.current!.createSVGPoint();
     pt.x = e.clientX;
     pt.y = e.clientY;
-    const coords = pt.matrixTransform(svg.getScreenCTM()!.inverse());
+    const coords = pt.matrixTransform(svgRef.current!.getScreenCTM()!.inverse());
 
     setElements(prev => [
       ...prev,
-      { id: prev.length, kind: newKind, x: coords.x, y: coords.y }
+      { id: prev.length, kind: newKind, x: coords.x, y: coords.y },
     ]);
   };
 
   const saveElement = (updatedKind: ElementKind) => {
-    console.log(updatedKind)
     if (!selected) return;
     setElements(prev =>
-      prev.map(el =>
-        el.id === selected.id ? { ...el, kind: updatedKind } : el
-      )
+      prev.map(el => (el.id === selected.id ? { ...el, kind: updatedKind } : el))
     );
     setSelected(null);
   };
-
   const removeElement = () => {
     if (!selected) return;
-    setElements((prev) => prev.filter((el) => el.id !== selected.id));
+    setElements(prev => prev.filter(el => el.id !== selected.id));
     setSelected(null);
   };
 
@@ -117,7 +125,7 @@ export default function Canvas({ elements, setElements }: Props) {
         ref={svgRef}
         viewBox={viewBox}
         preserveAspectRatio="xMinYMin meet"
-        style={{ border: "1px solid #000", width: "100%", height: "100%" }}
+        style={{ border: "1px solid #000", width: "100%", height: "99%" }}
         onDragOver={e => e.preventDefault()}
         onDrop={handleDrop}
       >

@@ -64,8 +64,8 @@ describe("buildJSONFromElements", () => {
           name: "dict",
           type: "dict",
           value: {
-            a: 9,
-            b: null,
+            0: 9,
+            1: null,
           },
         },
       },

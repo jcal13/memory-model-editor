@@ -41,7 +41,7 @@ export default function Canvas({ elements, setElements }: Props) {
 
     switch (payload) {
       case "primitive":
-        newKind = { name: "primitive", type: "none", value: "none" };
+        newKind = { name: "primitive", type: "None", value: "None" };
         break;
       case "function":
         newKind = {
@@ -78,7 +78,7 @@ export default function Canvas({ elements, setElements }: Props) {
   };
 
   const saveElement = (updatedKind: ElementKind) => {
-    console.log(updatedKind)
+    console.log(updatedKind);
     if (!selected) return;
     setElements((prev) =>
       prev.map((el) =>

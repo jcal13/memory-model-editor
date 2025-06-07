@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
-type PrimitiveType = "none" | "int" | "float" | "str" | "bool";
+type PrimitiveType = "None" | "int" | "float" | "str" | "bool";
 
 interface PrimitiveKind {
   name: "primitive";
@@ -77,7 +77,7 @@ export default function PrimitiveEditor({
       setValue("0");
     } else if (t === "float" && !float(value)) {
       setValue("0.0");
-    } else if (t === "none") {
+    } else if (t === "None") {
       setValue("");
     }
   };
@@ -129,9 +129,14 @@ export default function PrimitiveEditor({
         <select
           value={dataType}
           onChange={(e) => changeType(e.target.value as PrimitiveType)}
-          style={{ ...pill, cursor: "pointer", appearance: "none" }}
+          style={{
+            ...pill,
+            cursor: "pointer",
+            appearance: "none",
+            textAlign: "center",
+          }}
         >
-          <option value="none">none</option>
+          <option value="None">None</option>
           <option value="int">int</option>
           <option value="float">float</option>
           <option value="str">str</option>
@@ -154,8 +159,8 @@ export default function PrimitiveEditor({
               </label>
             ))}
           </div>
-        ) : dataType === "none" ? (
-          <div style={{ fontSize: "1rem", color: "#666" }}>none</div>
+        ) : dataType === "None" ? (
+          <div style={{ fontSize: "1rem", color: "#666" }}>None</div>
         ) : (
           <input
             value={value}
@@ -198,14 +203,14 @@ export default function PrimitiveEditor({
             background: hoverRemove ? "#d32f2f" : "#f44336",
             color: "#fff",
             border: "none",
-            padding: "4px 6px",
-            fontSize: "0.8rem",
+            padding: "6px 10px",
+            fontSize: "0.9rem",
             borderRadius: 4,
             cursor: "pointer",
             transition: "background-color 0.25s ease",
           }}
         >
-          Remove
+          Remove Box
         </button>
       </div>
     </div>

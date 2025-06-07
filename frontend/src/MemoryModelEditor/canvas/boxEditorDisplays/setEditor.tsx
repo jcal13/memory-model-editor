@@ -19,7 +19,7 @@ export default function SetEditor({
 }: Props) {
   const [items, setItems] = useState<number[]>(element.kind.value || []);
 
-  const addItem    = () => setItems([...items, 0]);        // default 0
+  const addItem = () => setItems([...items, 0]); // default 0
   const removeItem = (idx: number) =>
     setItems(items.filter((_, i) => i !== idx));
 
@@ -85,7 +85,7 @@ export default function SetEditor({
       >
         {items.map((_, idx) => (
           <div key={idx} style={pill}>
-            +
+            <p style={{ opacity: 0.5 }}>+</p>
             <button
               onClick={() => removeItem(idx)}
               onMouseEnter={(e) =>
@@ -102,7 +102,9 @@ export default function SetEditor({
         ))}
       </div>
 
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      <div
+        style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}
+      >
         <button onClick={addItem} style={addButton}>
           + Add Element
         </button>

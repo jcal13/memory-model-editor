@@ -5,21 +5,33 @@ type Props = {
   element: {
     id: string;
     kind: {
-      name: string;          
-      type: string;         
+      name: string;
+      type: string;
       value: Record<string, number | null>;
     };
   };
-  onSave: (data: { name: string; type: string; value: Record<string, number | null> }) => void;
+  onSave: (data: {
+    name: string;
+    type: string;
+    value: Record<string, number | null>;
+  }) => void;
   onCancel: () => void;
   onRemove: () => void;
 };
 
-export default function DictEditor({ element, onSave, onCancel, onRemove }: Props) {
-  const [entries, setEntries] = useState(Object.entries(element.kind.value || {}));
+export default function DictEditor({
+  element,
+  onSave,
+  onCancel,
+  onRemove,
+}: Props) {
+  const [entries, setEntries] = useState(
+    Object.entries(element.kind.value || {})
+  );
 
-  const addEntry    = () => setEntries([...entries, ["", null]]);
-  const removeEntry = (idx: number) => setEntries(entries.filter((_, i) => i !== idx));
+  const addEntry = () => setEntries([...entries, ["", null]]);
+  const removeEntry = (idx: number) =>
+    setEntries(entries.filter((_, i) => i !== idx));
 
   const handleSave = () => {
     const out: Record<string, number | null> = {};
@@ -67,7 +79,6 @@ export default function DictEditor({ element, onSave, onCancel, onRemove }: Prop
     borderRadius: 4,
     cursor: "pointer",
   };
-
   return (
     <EditorModule
       id={Number(element.id)}
@@ -76,17 +87,37 @@ export default function DictEditor({ element, onSave, onCancel, onRemove }: Prop
       onCancel={onCancel}
       onRemove={onRemove}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 24, marginBottom: 32 }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 24,
+          marginBottom: 32,
+        }}
+      >
         {entries.map(([key, val], idx) => (
-          <div key={idx} style={{ display: "flex", alignItems: "center", gap: 24 }}>
-            <button style={pill}>+</button>
+          <div
+            key={idx}
+            style={{ display: "flex", alignItems: "center", gap: 24 }}
+          >
+            <button style={pill}>
+              {" "}
+              <p style={{ opacity: 0.5 }}>+</p>
+            </button>
             <span style={{ fontSize: "2rem" }}>:</span>
             <div style={{ position: "relative" }}>
-              <button style={pill}>+</button>
+              <button style={pill}>
+                {" "}
+                <p style={{ opacity: 0.5 }}>+</p>
+              </button>
               <button
                 onClick={() => removeEntry(idx)}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#d32f2f")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#f44336")}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#d32f2f")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#f44336")
+                }
                 style={closeBtn}
               >
                 ×
@@ -96,7 +127,9 @@ export default function DictEditor({ element, onSave, onCancel, onRemove }: Prop
         ))}
       </div>
 
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      <div
+        style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}
+      >
         <button onClick={addEntry} style={addPairBtn}>
           Add Pair
         </button>

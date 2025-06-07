@@ -6,7 +6,7 @@ interface Props {
   onSave: () => void;
   onCancel: () => void;
   onRemove: () => void;
-  children: React.ReactNode;  
+  children: React.ReactNode;
 }
 
 export default function EditorModule({
@@ -29,7 +29,6 @@ export default function EditorModule({
     return () => document.removeEventListener("mousedown", outside);
   }, [onSave, onCancel]);
 
-
   const pill: React.CSSProperties = {
     display: "inline-flex",
     alignItems: "center",
@@ -42,7 +41,6 @@ export default function EditorModule({
     lineHeight: 1.2,
   };
 
-
   return (
     <div
       ref={wrapRef}
@@ -51,9 +49,9 @@ export default function EditorModule({
         position: "absolute",
         top: 20,
         left: 20,
-        width: "max-content",   
-        minWidth: 320,          
-        maxWidth: "90vw",       
+        width: "max-content",
+        minWidth: 320,
+        maxWidth: "90vw",
         background: "#fff",
         border: "1px solid #888",
         borderRadius: 6,
@@ -64,7 +62,6 @@ export default function EditorModule({
         gap: 24,
       }}
     >
-
       <div
         style={{
           display: "flex",
@@ -81,10 +78,20 @@ export default function EditorModule({
 
       <div style={{ padding: "0 24px" }}>{children}</div>
 
-      <div style={{ padding: "0 24px 24px", display: "flex", justifyContent: "flex-end" }}>
+      <div
+        style={{
+          padding: "0 24px 24px",
+          display: "flex",
+          justifyContent: "flex-end",
+        }}
+      >
         <button
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#d32f2f")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#f44336")}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.backgroundColor = "#d32f2f")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.backgroundColor = "#f44336")
+          }
           onClick={() => {
             onSave();
             onRemove();
@@ -93,14 +100,14 @@ export default function EditorModule({
             background: "#f44336",
             color: "#fff",
             border: "none",
-            padding: "4px 6px",
-            fontSize: "0.8rem",
+            padding: "6px 10px",
+            fontSize: "0.9rem",
             borderRadius: 4,
             cursor: "pointer",
             transition: "background-color 0.25s ease",
           }}
         >
-          Remove
+          Remove Box
         </button>
       </div>
     </div>

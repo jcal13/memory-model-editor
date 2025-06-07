@@ -19,14 +19,13 @@ export default function ListEditor({
 }: Props) {
   const [items, setItems] = useState<any[]>(element.kind.value || []);
 
-  const addItem    = () => setItems([...items, null]);
+  const addItem = () => setItems([...items, null]);
   const removeItem = (idx: number) =>
     setItems(items.filter((_, i) => i !== idx));
 
-  const handleSave = () =>
-    {
-      onSave({ name: element.kind.name, type: element.kind.type, value: items });
-    }
+  const handleSave = () => {
+    onSave({ name: element.kind.name, type: element.kind.type, value: items });
+  };
 
   const pill: React.CSSProperties = {
     width: 80,
@@ -88,7 +87,7 @@ export default function ListEditor({
       >
         {items.map((_, idx) => (
           <div key={idx} style={pill}>
-            +
+            <p style={{ opacity: 0.5 }}>+</p>
             <button
               onClick={() => removeItem(idx)}
               onMouseEnter={(e) =>
@@ -105,7 +104,9 @@ export default function ListEditor({
         ))}
       </div>
 
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      <div
+        style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}
+      >
         <button onClick={addItem} style={addBtn}>
           + Add Element
         </button>

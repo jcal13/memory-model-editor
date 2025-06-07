@@ -74,7 +74,7 @@ export default function Canvas({ elements, setElements }: Props) {
     pt.y = e.clientY;
     const { x, y } = pt.matrixTransform(svg.getScreenCTM()!.inverse());
 
-    setElements((prev) => [...prev, { id: prev.length, kind: newKind, x, y }]);
+    setElements((prev) => [...prev, { id: NaN, kind: newKind, x, y }]);
   };
 
   const saveElement = (updatedKind: ElementKind) => {

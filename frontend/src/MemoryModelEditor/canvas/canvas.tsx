@@ -100,7 +100,6 @@ export default function Canvas({ elements, setElements }: Props) {
     pt.y = e.clientY;
     const coords = pt.matrixTransform(svgRef.current!.getScreenCTM()!.inverse());
 
-<<<<<<< HEAD
     setElements(prev => [
       ...prev,
       { id: prev.length, kind: newKind, x: coords.x, y: coords.y },
@@ -108,13 +107,6 @@ export default function Canvas({ elements, setElements }: Props) {
   };
 
   const saveElement = (updatedKind: ElementKind) => {
-=======
-    setElements((prev) => [...prev, { id: NaN, kind: newKind, x, y }]);
-  };
-
-  const saveElement = (updatedKind: ElementKind) => {
-    console.log(updatedKind);
->>>>>>> 34684764ff393850ccb9cfade1f519a4cb0c5801
     if (!selected) return;
     setElements(prev =>
       prev.map(el => (el.id === selected.id ? { ...el, kind: updatedKind } : el))

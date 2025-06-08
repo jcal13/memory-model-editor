@@ -1,10 +1,4 @@
-import PrimitiveBox from "./boxes/PrimitveBox";
-import FunctionBox from "./boxes/FunctionBox";
-import ListBox from "./boxes/ListBox";
-import TupleBox from "./boxes/TupleBox";
-import SetBox from "./boxes/SetBox";
-import DictBox from "./boxes/DictBox";
-
+import PaletteBox from "./PaletteBox";
 import "./Palette.css";
 
 export default function Palette() {
@@ -12,12 +6,9 @@ export default function Palette() {
     <div className="palette-container">
       <h3 className="palette-title">Palette</h3>
       <div className="palette-boxes">
-        <FunctionBox />
-        <PrimitiveBox />
-        <ListBox />
-        <TupleBox />
-        <SetBox />
-        <DictBox />
+        {["function", "primitive", "list", "tuple", "set", "dict"].map((type) => (
+          <PaletteBox key={type} boxType={type as any} />
+        ))}
       </div>
     </div>
   );

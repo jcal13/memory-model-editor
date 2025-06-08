@@ -1,5 +1,5 @@
 import { buildJSONFromElements } from "./jsonBuilder";
-import { CanvasElement } from "../types";
+import { CanvasElement } from "../shared/types";
 
 describe("buildJSONFromElements", () => {
   it("handles a primitive int", () => {

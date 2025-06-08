@@ -1,4 +1,4 @@
-export type PrimitiveType = "none" | "int" | "float" | "str" | "bool";
+export type PrimitiveType = "None" | "int" | "float" | "str" | "bool";
 export type CollectionType = "list" | "tuple" | "set" | "dict";
 export type SpecialType = "function";
 
@@ -51,7 +51,7 @@ export type ElementKind =
   | DictKind;
 
 export interface CanvasElement {
-  id: number;
+  id: number | string;
   x: number;
   y: number;
   kind: ElementKind;

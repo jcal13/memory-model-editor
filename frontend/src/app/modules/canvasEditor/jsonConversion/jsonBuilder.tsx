@@ -1,4 +1,4 @@
-import { CanvasElement } from "../types";
+import { CanvasElement } from "../shared/types";
 
 type FrameEntry = {
   type: ".frame";
@@ -14,7 +14,9 @@ type ValueEntry = {
   name?: string;
 };
 
-export function buildJSONFromElements(elements: CanvasElement[]): (FrameEntry | ValueEntry)[] {
+export function buildJSONFromElements(
+  elements: CanvasElement[]
+): (FrameEntry | ValueEntry)[] {
   const idMap: Map<number, number> = new Map();
   let nextId: number = 1;
 
@@ -30,6 +32,11 @@ export function buildJSONFromElements(elements: CanvasElement[]): (FrameEntry | 
 
   // Step 1: Add .frame entries for functions
   elements.forEach(({ id, kind }) => {
+    if (typeof id !== "number") {
+      console.warn(`Skipping function with non-numeric id: ${id}`);
+      return;
+    }
+
     if (kind.name === "function") {
       const frameValue: Record<string, number> = {};
       for (const param of kind.params || []) {
@@ -41,14 +48,17 @@ export function buildJSONFromElements(elements: CanvasElement[]): (FrameEntry | 
         type: ".frame",
         name: kind.functionName || `func${id}`,
         id: null,
-        value: frameValue
+        value: frameValue,
       });
     }
   });
 
   // Step 2: Add value entries for everything else
   elements.forEach(({ id, kind }) => {
-    const assignedId = id;
+    if (typeof id !== "number") {
+      console.warn(`Skipping value with non-numeric id: ${id}`);
+      return;
+    }
 
     if (kind.name === "primitive") {
       let parsed: string | number | boolean = kind.value;
@@ -58,14 +68,13 @@ export function buildJSONFromElements(elements: CanvasElement[]): (FrameEntry | 
 
       valueEntries.push({
         type: kind.type,
-        id: assignedId,
+        id,
         value: parsed,
       });
-
     } else if (["list", "tuple", "set", "dict"].includes(kind.name)) {
       valueEntries.push({
         type: kind.type,
-        id: assignedId,
+        id,
         value: kind.value,
       });
     }

@@ -1,32 +1,30 @@
 import { useState } from "react";
-import EditorModule from "./editorModule";
+import EditorModule from "./EditorModule";
 
 type Props = {
   element: {
     id: string;
-    kind: { name: string; type: string; value: any[] };
+    kind: { name: string; type: string; value: number[] };
   };
-  onSave: (data: { name: string; type: string; value: any[] }) => void;
+  onSave: (data: { name: string; type: string; value: number[] }) => void;
   onCancel: () => void;
   onRemove: () => void;
 };
 
-export default function ListEditor({
+export default function SetEditor({
   element,
   onSave,
   onCancel,
   onRemove,
 }: Props) {
-  const [items, setItems] = useState<any[]>(element.kind.value || []);
+  const [items, setItems] = useState<number[]>(element.kind.value || []);
 
-  const addItem    = () => setItems([...items, null]);
+  const addItem    = () => setItems([...items, 0]);        // default 0
   const removeItem = (idx: number) =>
     setItems(items.filter((_, i) => i !== idx));
 
   const handleSave = () =>
-    {
-      onSave({ name: element.kind.name, type: element.kind.type, value: items });
-    }
+    onSave({ name: element.kind.name, type: element.kind.type, value: items });
 
   const pill: React.CSSProperties = {
     width: 80,
@@ -42,7 +40,7 @@ export default function ListEditor({
     cursor: "pointer",
   };
 
-  const closeBase: React.CSSProperties = {
+  const closeBtn: React.CSSProperties = {
     position: "absolute",
     top: -6,
     right: -6,
@@ -60,7 +58,7 @@ export default function ListEditor({
     alignItems: "center",
   };
 
-  const addBtn: React.CSSProperties = {
+  const addButton: React.CSSProperties = {
     padding: "6px 14px",
     fontSize: "0.9rem",
     background: "#f5f5f5",
@@ -72,7 +70,7 @@ export default function ListEditor({
   return (
     <EditorModule
       id={Number(element.id)}
-      typeLabel="list"
+      typeLabel="set"
       onSave={handleSave}
       onCancel={onCancel}
       onRemove={onRemove}
@@ -80,9 +78,8 @@ export default function ListEditor({
       <div
         style={{
           display: "flex",
-          flexWrap: "wrap",
+          flexWrap: "nowrap",
           gap: 16,
-          justifyContent: "flex-start",
           marginBottom: 24,
         }}
       >
@@ -97,7 +94,7 @@ export default function ListEditor({
               onMouseLeave={(e) =>
                 (e.currentTarget.style.backgroundColor = "#f44336")
               }
-              style={closeBase}
+              style={closeBtn}
             >
               ×
             </button>
@@ -106,7 +103,7 @@ export default function ListEditor({
       </div>
 
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <button onClick={addItem} style={addBtn}>
+        <button onClick={addItem} style={addButton}>
           + Add Element
         </button>
       </div>

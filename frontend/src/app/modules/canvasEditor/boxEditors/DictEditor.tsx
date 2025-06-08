@@ -1,5 +1,5 @@
 import { useState } from "react";
-import EditorModule from "./editorModule";
+import EditorModule from "./EditorModule";
 
 type Props = {
   element: {

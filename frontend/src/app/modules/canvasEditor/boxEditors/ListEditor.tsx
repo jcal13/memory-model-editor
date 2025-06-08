@@ -1,30 +1,32 @@
 import { useState } from "react";
-import EditorModule from "./editorModule";
+import EditorModule from "./EditorModule";
 
 type Props = {
   element: {
     id: string;
-    kind: { name: string; type: string; value: number[] };
+    kind: { name: string; type: string; value: any[] };
   };
-  onSave: (data: { name: string; type: string; value: number[] }) => void;
+  onSave: (data: { name: string; type: string; value: any[] }) => void;
   onCancel: () => void;
   onRemove: () => void;
 };
 
-export default function TupleEditor({
+export default function ListEditor({
   element,
   onSave,
   onCancel,
   onRemove,
 }: Props) {
-  const [items, setItems] = useState<number[]>(element.kind.value || []);
+  const [items, setItems] = useState<any[]>(element.kind.value || []);
 
-  const addItem    = () => setItems([...items, 0]);
+  const addItem    = () => setItems([...items, null]);
   const removeItem = (idx: number) =>
     setItems(items.filter((_, i) => i !== idx));
 
   const handleSave = () =>
-    onSave({ name: element.kind.name, type: element.kind.type, value: items });
+    {
+      onSave({ name: element.kind.name, type: element.kind.type, value: items });
+    }
 
   const pill: React.CSSProperties = {
     width: 80,
@@ -40,7 +42,7 @@ export default function TupleEditor({
     cursor: "pointer",
   };
 
-  const closeBtn: React.CSSProperties = {
+  const closeBase: React.CSSProperties = {
     position: "absolute",
     top: -6,
     right: -6,
@@ -58,7 +60,7 @@ export default function TupleEditor({
     alignItems: "center",
   };
 
-  const addButton: React.CSSProperties = {
+  const addBtn: React.CSSProperties = {
     padding: "6px 14px",
     fontSize: "0.9rem",
     background: "#f5f5f5",
@@ -70,7 +72,7 @@ export default function TupleEditor({
   return (
     <EditorModule
       id={Number(element.id)}
-      typeLabel="tuple"
+      typeLabel="list"
       onSave={handleSave}
       onCancel={onCancel}
       onRemove={onRemove}
@@ -78,8 +80,9 @@ export default function TupleEditor({
       <div
         style={{
           display: "flex",
-          flexWrap: "nowrap",
+          flexWrap: "wrap",
           gap: 16,
+          justifyContent: "flex-start",
           marginBottom: 24,
         }}
       >
@@ -94,7 +97,7 @@ export default function TupleEditor({
               onMouseLeave={(e) =>
                 (e.currentTarget.style.backgroundColor = "#f44336")
               }
-              style={closeBtn}
+              style={closeBase}
             >
               ×
             </button>
@@ -103,7 +106,7 @@ export default function TupleEditor({
       </div>
 
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <button onClick={addItem} style={addButton}>
+        <button onClick={addItem} style={addBtn}>
           + Add Element
         </button>
       </div>

@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import Draggable from "react-draggable";
 import { CanvasElement, ElementKind } from "../shared/types";
-
 import CanvasBox from "./CanvasBox";
 
 import PrimitiveEditor from "../boxEditors/PrimitiveEditor";

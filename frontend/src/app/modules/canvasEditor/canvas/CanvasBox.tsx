@@ -1,18 +1,8 @@
 import React, { useEffect, useRef } from "react";
-import { CanvasElement } from "../shared/types";
+import { BoxProps } from "./BoxProps";
 import { createBoxRenderer } from "./BoxRenderer";
 
-export interface BoxProps {
-  element: CanvasElement;
-  openInterface: (element: CanvasElement) => void;
-  updatePosition: (x: number, y: number) => void;
-}
-
-export default function CanvasBox({
-  element,
-  openInterface,
-  updatePosition,
-}: BoxProps) {
+export default function CanvasBox({ element, openInterface, updatePosition }: BoxProps) {
   const gRef = useRef<SVGGElement>(null);
   const isDragging = useRef(false);
   const start = useRef({ x: 0, y: 0 });
@@ -23,8 +13,7 @@ export default function CanvasBox({
     if (!gRef.current) return;
 
     const svgElement = createBoxRenderer(element);
-    const padding = 12; 
-
+    const padding = 12;
     gRef.current.innerHTML = "";
     gRef.current.appendChild(svgElement);
 
@@ -37,10 +26,7 @@ export default function CanvasBox({
     svgElement.setAttribute("height", `${height}`);
 
     halfSize.current = { w: width / 2, h: height / 2 };
-    gRef.current.setAttribute(
-      "transform",
-      `translate(${element.x - halfSize.current.w}, ${element.y - halfSize.current.h})`
-    );
+    gRef.current.setAttribute("transform", `translate(${element.x - halfSize.current.w}, ${element.y - halfSize.current.h})`);
 
     const overlay = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     overlay.setAttribute("x", `-${padding}`);
@@ -56,7 +42,7 @@ export default function CanvasBox({
       openInterface(element);
     });
 
-    svgElement.appendChild(overlay); 
+    svgElement.appendChild(overlay);
   }, [element]);
 
   const getSvgPoint = (e: MouseEvent | React.MouseEvent) => {
@@ -89,7 +75,6 @@ export default function CanvasBox({
 
     const newX = clamp(origin.current.x + dx, vb.x + w, vb.x + vb.width - w);
     const newY = clamp(origin.current.y + dy, vb.y + h, vb.y + vb.height - h);
-
     updatePosition(newX, newY);
   };
 

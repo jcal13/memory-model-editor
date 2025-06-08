@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { CanvasElement } from "../types";
-import { createBoxRenderer } from "./types/BoxRenderer";
+import { CanvasElement } from "../shared/types";
+import { createBoxRenderer } from "./BoxRenderer";
 
 export interface BoxProps {
   element: CanvasElement;
@@ -23,7 +23,7 @@ export default function CanvasBox({
     if (!gRef.current) return;
 
     const svgElement = createBoxRenderer(element);
-    const padding = 14; // Increased padding to avoid box clipping
+    const padding = 14; 
 
     gRef.current.innerHTML = "";
     gRef.current.appendChild(svgElement);

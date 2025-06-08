@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import Canvas from "./canvas/canvas";
-import Palette from "./palette/palette";
-import { CanvasElement } from "./types";
+import Canvas from "./canvas/Canvas";
+import Palette from "./palette/Palette";
+import { CanvasElement } from "./shared/types";
 import { buildJSONFromElements } from "./jsonConversion/jsonBuilder";
 
 export default function MemoryModelEditor() {

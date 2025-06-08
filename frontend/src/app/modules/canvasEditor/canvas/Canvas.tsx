@@ -1,16 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
 import Draggable from "react-draggable";
-import { CanvasElement, ElementKind } from "../types";
+import { CanvasElement, ElementKind } from "../shared/types";
 
-import CanvasBox from "./canvasBox";
-import { BoxProps } from "./types/BoxProps";
+import CanvasBox from "./CanvasBox";
 
-import PrimitiveEditor from "./boxEditorDisplays/primitiveEditor";
-import FunctionEditor from "./boxEditorDisplays/functionEditor";
-import ListEditor from "./boxEditorDisplays/listEditor";
-import SetEditor from "./boxEditorDisplays/setEditor";
-import DictEditor from "./boxEditorDisplays/dictEditor";
-import TupleEditor from "./boxEditorDisplays/tupleEditor";
+import PrimitiveEditor from "../boxEditors/PrimitiveEditor";
+import FunctionEditor from "../boxEditors/FunctionEditor";
+import ListEditor from "../boxEditors/ListEditor";
+import SetEditor from "../boxEditors/SetEditor";
+import DictEditor from "../boxEditors/DictEditor";
+import TupleEditor from "../boxEditors/TupleEditor";
 
 const editorMap: Record<ElementKind["name"], React.FC<any>> = {
   primitive: PrimitiveEditor,

@@ -1,5 +1,5 @@
 import MemoryViz from "memory-viz";
-import { CanvasElement } from "../../types";
+import { CanvasElement } from "../shared/types";
 
 export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
   const { MemoryModel } = MemoryViz;
@@ -12,7 +12,6 @@ export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
     values = Object.values(kind.value).map((v: any) => (typeof v === "number" ? v : Number(v))).filter(v => !isNaN(v));
   }
 
-  // Default configuration
   const config = {
     obj_min_width: 190,
     obj_min_height: 90,
@@ -24,7 +23,6 @@ export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
     roughjs_config: { options: { fillStyle: "solid" } },
   };
 
-  // Adjust obj_min_height based on type and content
   switch (kind.name) {
     case "primitive":
     case "function":

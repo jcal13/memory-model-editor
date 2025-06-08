@@ -1,10 +1,11 @@
-import PrimitiveBox from "./boxes/primitveBox";
-import FunctionBox from "./boxes/functionBox";
-import ListBox from "./boxes/listBox";
-import SetBox from "./boxes/setBox";
-import DictBox from "./boxes/dictBox";
-import TupleBox from "./boxes/tupleBox";
-import "./palette.css";
+import PrimitiveBox from "./boxes/PrimitveBox";
+import FunctionBox from "./boxes/FunctionBox";
+import ListBox from "./boxes/ListBox";
+import TupleBox from "./boxes/TupleBox";
+import SetBox from "./boxes/SetBox";
+import DictBox from "./boxes/DictBox";
+
+import "./Palette.css";
 
 export default function Palette() {
   return (

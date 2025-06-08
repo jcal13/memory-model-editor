@@ -1,5 +1,5 @@
 import { useState } from "react";
-import EditorModule from "./editorModule";
+import EditorModule from "./EditorModule";
 
 type Props = {
   element: {
@@ -11,7 +11,7 @@ type Props = {
   onRemove: () => void;
 };
 
-export default function SetEditor({
+export default function TupleEditor({
   element,
   onSave,
   onCancel,
@@ -19,7 +19,7 @@ export default function SetEditor({
 }: Props) {
   const [items, setItems] = useState<number[]>(element.kind.value || []);
 
-  const addItem    = () => setItems([...items, 0]);        // default 0
+  const addItem    = () => setItems([...items, 0]);
   const removeItem = (idx: number) =>
     setItems(items.filter((_, i) => i !== idx));
 
@@ -70,7 +70,7 @@ export default function SetEditor({
   return (
     <EditorModule
       id={Number(element.id)}
-      typeLabel="set"
+      typeLabel="tuple"
       onSave={handleSave}
       onCancel={onCancel}
       onRemove={onRemove}

@@ -1,4 +1,4 @@
-import { CanvasElement } from "../types";
+import { CanvasElement } from "../shared/types";
 
 type FrameEntry = {
   type: ".frame";

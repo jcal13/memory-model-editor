@@ -18,9 +18,7 @@ describe("buildJSONFromElements", () => {
 
     const result = buildJSONFromElements(elements);
 
-    expect(result).toEqual([
-      { type: "int", id: 1, value: 42 },
-    ]);
+    expect(result).toEqual([{ type: "int", id: 1, value: 42 }]);
   });
 
   it("handles a function with one param", () => {
@@ -64,8 +62,8 @@ describe("buildJSONFromElements", () => {
           name: "dict",
           type: "dict",
           value: {
-            0: 9,
-            1: null,
+            1: 9,
+            2: null,
           },
         },
       },
@@ -78,8 +76,8 @@ describe("buildJSONFromElements", () => {
         type: "dict",
         id: 3,
         value: {
-          a: 9,
-          b: null,
+          1: 9,
+          2: null,
         },
       },
     ]);

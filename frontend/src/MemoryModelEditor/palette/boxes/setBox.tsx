@@ -27,7 +27,6 @@ export default function SetBox() {
     });
 
     model.drawSet(5, 5, 0, [], {
-      box_container: { fill: "#fdf6e3", fillStyle: "solid" },
       box_id: { fill: "#fff", fillStyle: "solid" },
       box_type: { fill: "#fff", fillStyle: "solid" },
     });

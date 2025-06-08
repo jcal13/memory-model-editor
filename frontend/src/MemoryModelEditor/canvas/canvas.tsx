@@ -1,14 +1,9 @@
-// canvas.tsx
 import React, { useState, useRef, useEffect } from "react";
 import Draggable from "react-draggable";
 import { CanvasElement, ElementKind } from "../types";
 
-import PrimitiveBoxCanvas from "./boxCanvasDisplays/primitveBoxCanvas";
-import FunctionBoxCanvas from "./boxCanvasDisplays/functionBoxCanvas";
-import ListBoxCanvas from "./boxCanvasDisplays/listBoxCanvas";
-import SetBoxCanvas from "./boxCanvasDisplays/setBoxCanvas";
-import DictBoxCanvas from "./boxCanvasDisplays/dictBoxCanvas";
-import TupleBoxCanvas from "./boxCanvasDisplays/tupleBoxCanvas";
+import CanvasBox from "./canvasBox";
+import { BoxProps } from "./types/BoxProps";
 
 import PrimitiveEditor from "./boxEditorDisplays/primitiveEditor";
 import FunctionEditor from "./boxEditorDisplays/functionEditor";
@@ -36,21 +31,18 @@ export default function Canvas({ elements, setElements }: Props) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [viewBox, setViewBox] = useState<string>("0 0 0 0");
 
-  // Update viewBox on mount and whenever SVG size changes
- useEffect(() => {
+  useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
 
     const recalc = () => {
-     const { width, height } = svg.getBoundingClientRect();
+      const { width, height } = svg.getBoundingClientRect();
       setViewBox(`0 0 ${width} ${height}`);
     };
 
     recalc();
     window.addEventListener("resize", recalc);
-    return () => {
-      window.removeEventListener("resize", recalc);
-    };
+    return () => window.removeEventListener("resize", recalc);
   }, []);
 
   const makePositionUpdater = (id: number) => (x: number, y: number) => {
@@ -113,6 +105,7 @@ export default function Canvas({ elements, setElements }: Props) {
     );
     setSelected(null);
   };
+
   const removeElement = () => {
     if (!selected) return;
     setElements(prev => prev.filter(el => el.id !== selected.id));
@@ -130,67 +123,14 @@ export default function Canvas({ elements, setElements }: Props) {
         onDrop={handleDrop}
       >
         <g>
-          {elements.map(el => {
-            const updater = makePositionUpdater(Number(el.id));
-            switch (el.kind.name) {
-              case "primitive":
-                return (
-                  <PrimitiveBoxCanvas
-                    key={el.id}
-                    element={el}
-                    openPrimitiveInterface={() => setSelected(el)}
-                    updatePosition={updater}
-                  />
-                );
-              case "function":
-                return (
-                  <FunctionBoxCanvas
-                    key={el.id}
-                    element={el}
-                    openFunctionInterface={() => setSelected(el)}
-                    updatePosition={updater}
-                  />
-                );
-              case "list":
-                return (
-                  <ListBoxCanvas
-                    key={el.id}
-                    element={el}
-                    openListInterface={() => setSelected(el)}
-                    updatePosition={updater}
-                  />
-                );
-              case "tuple":
-                return (
-                  <TupleBoxCanvas
-                    key={el.id}
-                    element={el}
-                    openListInterface={() => setSelected(el)}
-                    updatePosition={updater}
-                  />
-                );
-              case "set":
-                return (
-                  <SetBoxCanvas
-                    key={el.id}
-                    element={el}
-                    openSetInterface={() => setSelected(el)}
-                    updatePosition={updater}
-                  />
-                );
-              case "dict":
-                return (
-                  <DictBoxCanvas
-                    key={el.id}
-                    element={el}
-                    openDictInterface={() => setSelected(el)}
-                    updatePosition={updater}
-                  />
-                );
-              default:
-                return null;
-            }
-          })}
+          {elements.map(el => (
+            <CanvasBox
+              key={el.id}
+              element={el}
+              openInterface={() => setSelected(el)}
+              updatePosition={makePositionUpdater(Number(el.id))}
+            />
+          ))}
         </g>
       </svg>
 

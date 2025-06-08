@@ -1,0 +1,98 @@
+import MemoryViz from "memory-viz";
+import { CanvasElement } from "../../types";
+
+export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
+  const { MemoryModel } = MemoryViz;
+  const kind: any = element.kind;
+  let values: number[] = [];
+
+  if (Array.isArray(kind.value)) {
+    values = kind.value.map((v: any) => (typeof v === "number" ? v : Number(v))).filter((v: any) => !isNaN(v));
+  } else if (kind.value && typeof kind.value === "object") {
+    values = Object.values(kind.value).map((v: any) => (typeof v === "number" ? v : Number(v))).filter(v => !isNaN(v));
+  }
+
+  // Default configuration
+  const config = {
+    obj_min_width: 190,
+    obj_min_height: 90,
+    prop_min_width: 60,
+    prop_min_height: 40,
+    double_rect_sep: 10,
+    font_size: 18,
+    browser: true,
+    roughjs_config: { options: { fillStyle: "solid" } },
+  };
+
+  // Adjust obj_min_height based on type and content
+  switch (kind.name) {
+    case "primitive":
+    case "function":
+      config.obj_min_height = 90;
+      break;
+    case "dict":
+      config.obj_min_height = 200;
+      break;
+    case "list":
+    case "set":
+    case "tuple":
+      config.obj_min_height = values.length > 0 ? 140 : 100;
+      break;
+  }
+
+  const model = new MemoryModel(config);
+
+  const style = {
+    box_id: { fill: "#fff", fillStyle: "solid" },
+    box_type: { fill: "#fff", fillStyle: "solid" },
+  };
+
+  switch (kind.name) {
+    case "primitive": {
+      const primitiveType = kind.type === "None" || kind.value === null ? "None" : kind.type;
+      const primitiveValue =
+        typeof kind.value === "string" || typeof kind.value === "number" || typeof kind.value === "boolean"
+          ? kind.value
+          : "";
+      model.drawPrimitive(0, 0, primitiveType, Number(element.id), primitiveValue, style);
+      break;
+    }
+    case "function": {
+      const props: Record<string, number | null> = {};
+      if ("params" in kind && Array.isArray(kind.params)) {
+        kind.params.forEach((p: { name: string; targetId: number | null }) => {
+          props[p.name] = p.targetId;
+        });
+      }
+      model.drawClass(0, 0, kind.name, Number(element.id), props, true, {
+        box_id: { fill: "#fff", fillStyle: "solid" },
+        box_type: { fill: "#fff", fillStyle: "solid" },
+      });
+      break;
+    }
+    case "dict": {
+      const dictValue = typeof kind.value === "object" && kind.value !== null ? kind.value : {};
+      model.drawDict(0, 0, Number(element.id), dictValue, {
+        box_id: { fill: "white", fillStyle: "dots" },
+      });
+      break;
+    }
+    case "list":
+    case "tuple":
+    case "set": {
+      const showIndices = values.length > 0;
+      model.drawSequence(
+        0,
+        0,
+        kind.name,
+        Number(element.id),
+        values,
+        showIndices,
+        style
+      );
+      break;
+    }
+  }
+
+  return model.svg;
+}

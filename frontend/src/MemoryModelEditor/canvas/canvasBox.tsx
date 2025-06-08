@@ -1,18 +1,18 @@
 import React, { useEffect, useRef } from "react";
-import MemoryViz from "memory-viz";
-import { CanvasElement } from "../../types";
+import { CanvasElement } from "../types";
+import { createBoxRenderer } from "./types/BoxRenderer";
 
-type Props = {
+export interface BoxProps {
   element: CanvasElement;
-  openDictInterface: (el: CanvasElement | null) => void;
+  openInterface: (element: CanvasElement) => void;
   updatePosition: (x: number, y: number) => void;
-};
+}
 
-export default function DictBoxCanvas({
+export default function CanvasBox({
   element,
-  openDictInterface,
+  openInterface,
   updatePosition,
-}: Props) {
+}: BoxProps) {
   const gRef = useRef<SVGGElement>(null);
   const isDragging = useRef(false);
   const start = useRef({ x: 0, y: 0 });
@@ -20,65 +20,30 @@ export default function DictBoxCanvas({
   const halfSize = useRef({ w: 0, h: 0 });
 
   useEffect(() => {
-    if (!gRef.current || element.kind.name !== "dict") return;
+    if (!gRef.current) return;
 
-    const model = createDictBox(element);
-    const padding = 10;
+    const svgElement = createBoxRenderer(element);
+    const padding = 14; // Increased padding to avoid box clipping
 
     gRef.current.innerHTML = "";
-    gRef.current.appendChild(model.svg);
+    gRef.current.appendChild(svgElement);
 
-    const bbox = model.svg.getBBox();
+    const bbox = svgElement.getBBox();
     const width = bbox.width + padding * 2;
     const height = bbox.height + padding * 2;
 
-    model.svg.setAttribute("viewBox", `-${padding} -${padding} ${width} ${height}`);
-    model.svg.setAttribute("width", `${width}`);
-    model.svg.setAttribute("height", `${height}`);
+    svgElement.setAttribute("viewBox", `-${padding} -${padding} ${width} ${height}`);
+    svgElement.setAttribute("width", `${width}`);
+    svgElement.setAttribute("height", `${height}`);
 
     halfSize.current = { w: width / 2, h: height / 2 };
-
     gRef.current.setAttribute(
       "transform",
       `translate(${element.x - halfSize.current.w}, ${element.y - halfSize.current.h})`
     );
 
-    setupOverlay(model.svg, width, height, padding);
-  }, [
-    element.x,
-    element.y,
-    element.id,
-    element.kind.name,
-    JSON.stringify(element.kind.value), // ensures re-render when dict contents change
-  ]);
-
-  const createDictBox = (element: CanvasElement) => {
-    const { MemoryModel } = MemoryViz;
-    const kind = element.kind;
-
-    const model = new MemoryModel({
-      obj_min_width: 190,
-      obj_min_height: 200,
-      prop_min_width: 60,
-      prop_min_height: 40,
-      double_rect_sep: 10,
-      font_size: 18,
-      browser: true,
-      roughjs_config: {
-        options: {
-          fillStyle: "solid",
-        },
-      },
-    });
-
-    const dictValue = typeof kind.value === "object" && kind.value !== null ? kind.value : {};
-
-    model.drawDict(0, 0, Number(element.id), dictValue, {
-      box_id: { fill: "white", fillStyle: "dots" },
-    });
-
-    return model;
-  };
+    setupOverlay(svgElement, width, height, padding);
+  }, [element]);
 
   const setupOverlay = (
     svg: SVGSVGElement,
@@ -97,7 +62,7 @@ export default function DictBoxCanvas({
     overlay.addEventListener("mousedown", onMouseDown as any);
     overlay.addEventListener("click", (e) => {
       e.stopPropagation();
-      openDictInterface(element);
+      openInterface(element);
     });
 
     svg.insertBefore(overlay, svg.firstChild);

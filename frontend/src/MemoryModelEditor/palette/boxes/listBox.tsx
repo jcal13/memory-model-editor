@@ -27,7 +27,6 @@ export default function ListBox() {
     });
 
     model.drawSequence(5, 5, "list", 0, [], true, {
-      box_container: { fill: "#fdf6e3", fillStyle: "solid" },
       box_id: { fill: "#fff", fillStyle: "solid" },
       box_type: { fill: "#fff", fillStyle: "solid" },
     });

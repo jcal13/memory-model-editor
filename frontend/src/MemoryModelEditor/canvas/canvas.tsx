@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+// canvas.tsx
+import React, { useState, useRef, useEffect } from "react";
+import Draggable from "react-draggable";
 import { CanvasElement, ElementKind } from "../types";
 
 import PrimitiveBoxCanvas from "./boxCanvasDisplays/primitveBoxCanvas";
@@ -31,6 +33,33 @@ interface Props {
 
 export default function Canvas({ elements, setElements }: Props) {
   const [selected, setSelected] = useState<CanvasElement | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const [viewBox, setViewBox] = useState<string>("0 0 0 0");
+
+  // Update viewBox on mount and whenever SVG size changes
+ useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+
+    const recalc = () => {
+     const { width, height } = svg.getBoundingClientRect();
+      setViewBox(`0 0 ${width} ${height}`);
+    };
+
+    recalc();
+    window.addEventListener("resize", recalc);
+    return () => {
+      window.removeEventListener("resize", recalc);
+    };
+  }, []);
+
+  const makePositionUpdater = (id: number) => (x: number, y: number) => {
+    setElements(prev =>
+      prev.map(el => (el.id === id ? { ...el, x, y } : el))
+    );
+  };
+
+  const dragRef = useRef<HTMLDivElement>(null);
 
   const handleDrop = (e: React.DragEvent<SVGSVGElement>) => {
     e.preventDefault();
@@ -39,11 +68,7 @@ export default function Canvas({ elements, setElements }: Props) {
 
     switch (payload) {
       case "primitive":
-        newKind = {
-          name: "primitive",
-          type: "int",
-          value: "0",
-        };
+        newKind = { name: "primitive", type: "none", value: "none" };
         break;
       case "function":
         newKind = {
@@ -55,132 +80,149 @@ export default function Canvas({ elements, setElements }: Props) {
         };
         break;
       case "list":
-        newKind = {
-          name: "list",
-          type: "list",
-          value: [],
-        };
+        newKind = { name: "list", type: "list", value: [] };
         break;
       case "tuple":
-        newKind = {
-          name: "tuple",
-          type: "tuple",
-          value: [],
-        };
+        newKind = { name: "tuple", type: "tuple", value: [] };
         break;
       case "set":
-        newKind = {
-          name: "set",
-          type: "set",
-          value: [],
-        };
+        newKind = { name: "set", type: "set", value: [] };
         break;
       case "dict":
-        newKind = {
-          name: "dict",
-          type: "dict",
-          value: {},
-        };
+        newKind = { name: "dict", type: "dict", value: {} };
         break;
       default:
         return;
     }
 
-    const svg = e.currentTarget;
-    const pt = svg.createSVGPoint();
+    const pt = svgRef.current!.createSVGPoint();
     pt.x = e.clientX;
     pt.y = e.clientY;
-    const { x, y } = pt.matrixTransform(svg.getScreenCTM()!.inverse());
+    const coords = pt.matrixTransform(svgRef.current!.getScreenCTM()!.inverse());
 
-    setElements((prev) => [...prev, { id: prev.length, kind: newKind, x, y }]);
+    setElements(prev => [
+      ...prev,
+      { id: prev.length, kind: newKind, x: coords.x, y: coords.y },
+    ]);
   };
 
   const saveElement = (updatedKind: ElementKind) => {
     if (!selected) return;
-    setElements((prev) =>
-      prev.map((el) =>
-        el.id === selected.id ? { ...el, kind: updatedKind } : el
-      )
+    setElements(prev =>
+      prev.map(el => (el.id === selected.id ? { ...el, kind: updatedKind } : el))
     );
+    setSelected(null);
+  };
+  const removeElement = () => {
+    if (!selected) return;
+    setElements(prev => prev.filter(el => el.id !== selected.id));
     setSelected(null);
   };
 
   return (
     <>
       <svg
-        width={800}
-        height={600}
-        style={{ border: "1px solid #000" }}
-        onDragOver={(e) => e.preventDefault()}
+        ref={svgRef}
+        viewBox={viewBox}
+        preserveAspectRatio="xMinYMin meet"
+        style={{ border: "1px solid #000", width: "100%", height: "99%" }}
+        onDragOver={e => e.preventDefault()}
         onDrop={handleDrop}
       >
-        {elements.map((el) => {
-          switch (el.kind.name) {
-            case "primitive":
-              return (
-                <PrimitiveBoxCanvas
-                  key={el.id}
-                  element={el}
-                  openPrimitiveInterface={() => setSelected(el)}
-                />
-              );
-            case "function":
-              return (
-                <FunctionBoxCanvas
-                  key={el.id}
-                  element={el}
-                  openFunctionInterface={() => setSelected(el)}
-                />
-              );
-            case "list":
-              return (
-                <ListBoxCanvas
-                  key={el.id}
-                  element={el}
-                  openListInterface={() => setSelected(el)}
-                />
-              );
-            case "tuple":
-              return (
-                <TupleBoxCanvas
-                  key={el.id}
-                  element={el}
-                  openListInterface={() => setSelected(el)}
-                />
-              );
-            case "set":
-              return (
-                <SetBoxCanvas
-                  key={el.id}
-                  element={el}
-                  openSetInterface={() => setSelected(el)}
-                />
-              );
-            case "dict":
-              return (
-                <DictBoxCanvas
-                  key={el.id}
-                  element={el}
-                  openDictInterface={() => setSelected(el)}
-                />
-              );
-            default:
-              return null;
-          }
-        })}
+        <g>
+          {elements.map(el => {
+            const updater = makePositionUpdater(el.id);
+            switch (el.kind.name) {
+              case "primitive":
+                return (
+                  <PrimitiveBoxCanvas
+                    key={el.id}
+                    element={el}
+                    openPrimitiveInterface={() => setSelected(el)}
+                    updatePosition={updater}
+                  />
+                );
+              case "function":
+                return (
+                  <FunctionBoxCanvas
+                    key={el.id}
+                    element={el}
+                    openFunctionInterface={() => setSelected(el)}
+                    updatePosition={updater}
+                  />
+                );
+              case "list":
+                return (
+                  <ListBoxCanvas
+                    key={el.id}
+                    element={el}
+                    openListInterface={() => setSelected(el)}
+                    updatePosition={updater}
+                  />
+                );
+              case "tuple":
+                return (
+                  <TupleBoxCanvas
+                    key={el.id}
+                    element={el}
+                    openListInterface={() => setSelected(el)}
+                    updatePosition={updater}
+                  />
+                );
+              case "set":
+                return (
+                  <SetBoxCanvas
+                    key={el.id}
+                    element={el}
+                    openSetInterface={() => setSelected(el)}
+                    updatePosition={updater}
+                  />
+                );
+              case "dict":
+                return (
+                  <DictBoxCanvas
+                    key={el.id}
+                    element={el}
+                    openDictInterface={() => setSelected(el)}
+                    updatePosition={updater}
+                  />
+                );
+              default:
+                return null;
+            }
+          })}
+        </g>
       </svg>
 
-      {selected &&
-        (() => {
-          const Editor = editorMap[selected.kind.name];
-          return (
-            <Editor
-              element={selected}
-              onSave={saveElement}
-              onCancel={() => setSelected(null)}
-            />
-          );
-        })()}
+      {selected && (
+        <Draggable
+          nodeRef={dragRef as React.RefObject<HTMLElement>}
+          handle=".drag-handle"
+          defaultPosition={{ x: 400, y: 80 }}
+        >
+          <div
+            ref={dragRef}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              backgroundColor: "white",
+            }}
+          >
+            {(() => {
+              const Editor = editorMap[selected.kind.name];
+              return (
+                <Editor
+                  element={selected}
+                  onSave={saveElement}
+                  onCancel={() => setSelected(null)}
+                  onRemove={removeElement}
+                />
+              );
+            })()}
+          </div>
+        </Draggable>
+      )}
     </>
   );
 }

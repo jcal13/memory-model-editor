@@ -22,41 +22,13 @@ export default function ListBoxCanvas({
   useEffect(() => {
     if (!gRef.current || element.kind.name !== "list") return;
 
-    const { MemoryModel } = MemoryViz;
-
-    const model = new MemoryModel({
-      obj_min_width: 170,
-      obj_min_height: 95,
-      prop_min_width: 60,
-      prop_min_height: 30,
-      double_rect_sep: 10,
-      font_size: 14,
-      browser: true,
-      roughjs_config: {
-        options: {
-          fillStyle: "solid",
-        },
-      },
-    });
-
-    model.drawSequence(
-      0,
-      0,
-      "list",
-      element.id,
-      element.kind.value,
-      false,
-      {
-        box_id: { fill: "#fff", fillStyle: "solid" },
-        box_type: { fill: "#fff", fillStyle: "solid" },
-      }
-    );
+    const model = createListBox(element);
+    const padding = 10;
 
     gRef.current.innerHTML = "";
     gRef.current.appendChild(model.svg);
 
     const bbox = model.svg.getBBox();
-    const padding = 10;
     const width = bbox.width + padding * 2;
     const height = bbox.height + padding * 2;
 
@@ -65,12 +37,66 @@ export default function ListBoxCanvas({
     model.svg.setAttribute("height", `${height}`);
 
     halfSize.current = { w: width / 2, h: height / 2 };
-
     gRef.current.setAttribute(
       "transform",
       `translate(${element.x - halfSize.current.w}, ${element.y - halfSize.current.h})`
     );
 
+    setupOverlay(model.svg, width, height, padding);
+  }, [element]);
+
+  const createListBox = (element: CanvasElement) => {
+    const { MemoryModel } = MemoryViz;
+    const kind = element.kind;
+
+    let values: number[] = [];
+    if (Array.isArray(kind.value)) {
+      values = kind.value
+        .map((v: any) => (typeof v === "number" ? v : Number(v)))
+        .filter((v) => typeof v === "number" && !isNaN(v));
+    } else if (kind.value && typeof kind.value === "object") {
+      values = Object.values(kind.value)
+        .map((v: any) => (typeof v === "number" ? v : Number(v)))
+        .filter((v) => typeof v === "number" && !isNaN(v));
+    }
+
+    const model = new MemoryModel({
+      obj_min_width: 190,
+      obj_min_height: values.length > 0 ? 140 : 100,
+      prop_min_width: 60,
+      prop_min_height: 40,
+      double_rect_sep: 10,
+      font_size: 18,
+      browser: true,
+      roughjs_config: {
+        options: {
+          fillStyle: "solid",
+        },
+      },
+    });
+
+  model.drawSequence(
+    0,
+    0,
+    "list",
+    Number(element.id),
+    values,
+    values.length > 0, 
+    {
+      box_id: { fill: "#fff", fillStyle: "solid" },
+      box_type: { fill: "#fff", fillStyle: "solid" },
+    }
+  );
+
+    return model;
+  };
+
+  const setupOverlay = (
+    svg: SVGSVGElement,
+    width: number,
+    height: number,
+    padding: number
+  ) => {
     const overlay = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     overlay.setAttribute("x", `-${padding}`);
     overlay.setAttribute("y", `-${padding}`);
@@ -85,8 +111,8 @@ export default function ListBoxCanvas({
       openListInterface(element);
     });
 
-    model.svg.insertBefore(overlay, model.svg.firstChild);
-  }, [element]);
+    svg.insertBefore(overlay, svg.firstChild);
+  };
 
   const getSvgPoint = (e: MouseEvent | React.MouseEvent) => {
     const svg = gRef.current!.ownerSVGElement!;

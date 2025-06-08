@@ -22,16 +22,51 @@ export default function TupleBoxCanvas({
   useEffect(() => {
     if (!gRef.current || element.kind.name !== "tuple") return;
 
+    const model = createTupleBox(element);
+    const padding = 10;
+
+    gRef.current.innerHTML = "";
+    gRef.current.appendChild(model.svg);
+
+    const bbox = model.svg.getBBox();
+    const width = bbox.width + padding * 2;
+    const height = bbox.height + padding * 2;
+
+    model.svg.setAttribute("viewBox", `-${padding} -${padding} ${width} ${height}`);
+    model.svg.setAttribute("width", `${width}`);
+    model.svg.setAttribute("height", `${height}`);
+
+    halfSize.current = { w: width / 2, h: height / 2 };
+    gRef.current.setAttribute(
+      "transform",
+      `translate(${element.x - halfSize.current.w}, ${element.y - halfSize.current.h})`
+    );
+
+    setupOverlay(model.svg, width, height, padding);
+  }, [element]);
+
+  const createTupleBox = (element: CanvasElement) => {
     const { MemoryModel } = MemoryViz;
     const kind = element.kind;
 
+    let values: number[] = [];
+    if (Array.isArray(kind.value)) {
+      values = kind.value
+        .map((v: any) => (typeof v === "number" ? v : Number(v)))
+        .filter((v) => typeof v === "number" && !isNaN(v));
+    } else if (kind.value && typeof kind.value === "object") {
+      values = Object.values(kind.value)
+        .map((v: any) => (typeof v === "number" ? v : Number(v)))
+        .filter((v) => typeof v === "number" && !isNaN(v));
+    }
+
     const model = new MemoryModel({
       obj_min_width: 170,
-      obj_min_height: 95,
-      prop_min_width: 50,
-      prop_min_height: 30,
+      obj_min_height: values.length > 0 ? 140 : 100,
+      prop_min_width: 60,
+      prop_min_height: 40,
       double_rect_sep: 10,
-      font_size: 14,
+      font_size: 18,
       browser: true,
       roughjs_config: {
         options: {
@@ -44,34 +79,24 @@ export default function TupleBoxCanvas({
       0,
       0,
       "tuple",
-      element.id,
-      kind.value,
-      false,
+      Number(element.id),
+      values,
+      values.length > 0, // show indices if elements exist
       {
         box_id: { fill: "#fff", fillStyle: "solid" },
         box_type: { fill: "#fff", fillStyle: "solid" },
       }
     );
 
-    gRef.current.innerHTML = "";
-    gRef.current.appendChild(model.svg);
+    return model;
+  };
 
-    const bbox = model.svg.getBBox();
-    const padding = 10;
-    const width = bbox.width + padding * 2;
-    const height = bbox.height + padding * 2;
-
-    halfSize.current = { w: width / 2, h: height / 2 };
-
-    model.svg.setAttribute("viewBox", `-${padding} -${padding} ${width} ${height}`);
-    model.svg.setAttribute("width", `${width}`);
-    model.svg.setAttribute("height", `${height}`);
-
-    gRef.current.setAttribute(
-      "transform",
-      `translate(${element.x - halfSize.current.w}, ${element.y - halfSize.current.h})`
-    );
-
+  const setupOverlay = (
+    svg: SVGSVGElement,
+    width: number,
+    height: number,
+    padding: number
+  ) => {
     const overlay = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     overlay.setAttribute("x", `-${padding}`);
     overlay.setAttribute("y", `-${padding}`);
@@ -86,16 +111,16 @@ export default function TupleBoxCanvas({
       openListInterface(element);
     });
 
-    model.svg.insertBefore(overlay, model.svg.firstChild);
-  }, [element]);
+    svg.insertBefore(overlay, svg.firstChild);
+  };
 
-  function getSvgPoint(e: MouseEvent | React.MouseEvent) {
+  const getSvgPoint = (e: MouseEvent | React.MouseEvent) => {
     const svg = gRef.current!.ownerSVGElement!;
     const pt = svg.createSVGPoint();
     pt.x = e.clientX;
     pt.y = e.clientY;
     return pt.matrixTransform(svg.getScreenCTM()!.inverse());
-  }
+  };
 
   const onMouseDown = (e: MouseEvent | React.MouseEvent) => {
     e.stopPropagation();

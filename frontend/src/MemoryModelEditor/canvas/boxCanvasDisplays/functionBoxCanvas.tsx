@@ -23,11 +23,12 @@ export default function FunctionBoxCanvas({
     if (!gRef.current || element.kind.name !== "function") return;
 
     const model = createFunctionBox(element);
+    const padding = 10;
+
     gRef.current.innerHTML = "";
     gRef.current.appendChild(model.svg);
 
     const bbox = model.svg.getBBox();
-    const padding = 10;
     const width = bbox.width + padding * 2;
     const height = bbox.height + padding * 2;
 
@@ -36,12 +37,50 @@ export default function FunctionBoxCanvas({
     model.svg.setAttribute("height", `${height}`);
 
     halfSize.current = { w: width / 2, h: height / 2 };
-
     gRef.current.setAttribute(
       "transform",
       `translate(${element.x - halfSize.current.w}, ${element.y - halfSize.current.h})`
     );
 
+    setupOverlay(model.svg, width, height, padding);
+  }, [element]);
+
+  const createFunctionBox = (element: CanvasElement) => {
+    const { MemoryModel } = MemoryViz;
+    const kind = element.kind;
+
+    const model = new MemoryModel({
+      obj_min_width: 190,
+      obj_min_height: 90,
+      prop_min_width: 50,
+      prop_min_height: 40,
+      double_rect_sep: 10,
+      font_size: 18,
+      browser: true,
+      roughjs_config: { options: { fillStyle: "solid" } },
+    });
+
+    const props: Record<string, number | null> = {};
+    if ("params" in kind && Array.isArray(kind.params)) {
+      kind.params.forEach((p) => {
+        props[p.name] = p.targetId;
+      });
+    }
+
+    model.drawClass(0, 0, kind.name, Number(element.id), props, true, {
+      box_id: { fill: "#fff", fillStyle: "solid" },
+      box_type: { fill: "#fff", fillStyle: "solid" },
+    });
+
+    return model;
+  };
+
+  const setupOverlay = (
+    svg: SVGSVGElement,
+    width: number,
+    height: number,
+    padding: number
+  ) => {
     const overlay = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     overlay.setAttribute("x", `-${padding}`);
     overlay.setAttribute("y", `-${padding}`);
@@ -56,39 +95,7 @@ export default function FunctionBoxCanvas({
       openFunctionInterface(element);
     });
 
-    model.svg.insertBefore(overlay, model.svg.firstChild);
-  }, [element]);
-
-  const createFunctionBox = (element: CanvasElement) => {
-    const { MemoryModel } = MemoryViz;
-    const kind = element.kind;
-
-    if (kind.name !== "function") {
-      throw new Error("Invalid kind for FunctionBoxCanvas");
-    }
-
-    const model = new MemoryModel({
-      obj_min_width: 190,
-      obj_min_height: 90,
-      prop_min_width: 50,
-      prop_min_height: 40,
-      double_rect_sep: 10,
-      font_size: 18,
-      browser: true,
-      roughjs_config: { options: { fillStyle: "solid" } },
-    });
-
-    const props: Record<string, number | null> = {};
-    kind.params.forEach((p) => {
-      props[p.name] = p.targetId;
-    });
-
-    model.drawClass(0, 0, kind.functionName, element.id, props, true, {
-      box_id: { fill: "#fff", fillStyle: "solid" },
-      box_type: { fill: "#fff", fillStyle: "solid" },
-    });
-
-    return model;
+    svg.insertBefore(overlay, svg.firstChild);
   };
 
   const getSvgPoint = (e: MouseEvent | React.MouseEvent) => {
@@ -131,8 +138,8 @@ export default function FunctionBoxCanvas({
     window.removeEventListener("mouseup", onMouseUp);
   };
 
-  const clamp = (value: number, min: number, max: number) =>
-    Math.min(Math.max(value, min), max);
+  const clamp = (val: number, min: number, max: number) =>
+    Math.min(Math.max(val, min), max);
 
   return <g ref={gRef} />;
 }

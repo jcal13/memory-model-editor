@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
-type PrimitiveType = "none" | "int" | "float" | "str" | "bool";
+type PrimitiveType = "None" | "int" | "float" | "str" | "bool";
 
 interface PrimitiveKind {
   name: "primitive";
@@ -77,8 +77,8 @@ export default function PrimitiveEditor({
       setValue("0");
     } else if (t === "float" && !float(value)) {
       setValue("0.0");
-    } else if (t === "none") {
-      setValue("");
+    } else if (t === "None") {
+      setValue("None");
     }
   };
 
@@ -131,7 +131,7 @@ export default function PrimitiveEditor({
           onChange={(e) => changeType(e.target.value as PrimitiveType)}
           style={{ ...pill, cursor: "pointer", appearance: "none" }}
         >
-          <option value="none">none</option>
+          <option value="None">None</option>
           <option value="int">int</option>
           <option value="float">float</option>
           <option value="str">str</option>
@@ -154,8 +154,8 @@ export default function PrimitiveEditor({
               </label>
             ))}
           </div>
-        ) : dataType === "none" ? (
-          <div style={{ fontSize: "1rem", color: "#666" }}>none</div>
+        ) : dataType === "None" ? (
+          <div style={{ fontSize: "1rem", color: "#666" }}>None</div>
         ) : (
           <input
             value={value}

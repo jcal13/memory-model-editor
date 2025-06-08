@@ -68,7 +68,7 @@ export default function Canvas({ elements, setElements }: Props) {
 
     switch (payload) {
       case "primitive":
-        newKind = { name: "primitive", type: "none", value: "none" };
+        newKind = { name: "primitive", type: "None", value: "None" };
         break;
       case "function":
         newKind = {
@@ -131,7 +131,7 @@ export default function Canvas({ elements, setElements }: Props) {
       >
         <g>
           {elements.map(el => {
-            const updater = makePositionUpdater(el.id);
+            const updater = makePositionUpdater(Number(el.id));
             switch (el.kind.name) {
               case "primitive":
                 return (

@@ -22,56 +22,77 @@ export default function PrimitiveBoxCanvas({
   useEffect(() => {
     if (!gRef.current || element.kind.name !== "primitive") return;
 
-    const { MemoryModel } = MemoryViz;
-    const kind = element.kind;
-
-    const model = new MemoryModel({
-      obj_min_width: 150,
-      obj_min_height: 67.5,
-      prop_min_width: 37.5,
-      prop_min_height: 25,
-      double_rect_sep: 10,
-      font_size: 14,
-      browser: true,
-      roughjs_config: {
-        options: {
-          fillStyle: "solid",
-        },
-      },
-    });
-
-    model.drawPrimitive(
-      0,
-      0,
-      kind.type,
-      element.id,
-      kind.value,
-      {
-        box_id: { fill: "#fff", fillStyle: "solid" },
-        box_type: { fill: "#fff", fillStyle: "solid" },
-        text_value: { fill: "#000" },
-      }
-    );
+    const model = createPrimitiveBox(element);
+    const padding = 16;
+    const extraBuffer = 8;
 
     gRef.current.innerHTML = "";
     gRef.current.appendChild(model.svg);
 
     const bbox = model.svg.getBBox();
-    const padding = 10;
-    const width = bbox.width + padding * 2;
-    const height = bbox.height + padding * 2;
+    const width = Math.ceil(bbox.width + padding * 2 + extraBuffer);
+    const height = Math.ceil(bbox.height + padding * 2 + extraBuffer);
 
     model.svg.setAttribute("viewBox", `-${padding} -${padding} ${width} ${height}`);
     model.svg.setAttribute("width", `${width}`);
     model.svg.setAttribute("height", `${height}`);
 
     halfSize.current = { w: width / 2, h: height / 2 };
-
     gRef.current.setAttribute(
       "transform",
       `translate(${element.x - halfSize.current.w}, ${element.y - halfSize.current.h})`
     );
 
+    setupOverlay(model.svg, width, height, padding);
+  }, [element]);
+
+  const createPrimitiveBox = (element: CanvasElement) => {
+    const { MemoryModel } = MemoryViz;
+    const kind = element.kind;
+
+    const model = new MemoryModel({
+      obj_min_width: 190,
+      obj_min_height: 90,
+      prop_min_width: 50,
+      prop_min_height: 40,
+      double_rect_sep: 10,
+      font_size: 18,
+      browser: true,
+      roughjs_config: { options: { fillStyle: "solid" } },
+    });
+
+    const primitiveType =
+      kind.type === "None" || kind.value === null ? "None" : kind.type;
+
+    const primitiveValue =
+      typeof kind.value === "string" ||
+      typeof kind.value === "number" ||
+      typeof kind.value === "boolean" ||
+      kind.value === null
+        ? kind.value
+        : "";
+
+    model.drawPrimitive(
+      0,
+      0,
+      primitiveType,
+      Number(element.id),
+      primitiveValue,
+      {
+        box_id: { fill: "#fff", fillStyle: "solid" },
+        box_type: { fill: "#fff", fillStyle: "solid" },
+      }
+    );
+
+    return model;
+  };
+
+  const setupOverlay = (
+    svg: SVGSVGElement,
+    width: number,
+    height: number,
+    padding: number
+  ) => {
     const overlay = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     overlay.setAttribute("x", `-${padding}`);
     overlay.setAttribute("y", `-${padding}`);
@@ -86,8 +107,8 @@ export default function PrimitiveBoxCanvas({
       openPrimitiveInterface(element);
     });
 
-    model.svg.insertBefore(overlay, model.svg.firstChild);
-  }, [element]);
+    svg.insertBefore(overlay, svg.firstChild);
+  };
 
   const getSvgPoint = (e: MouseEvent | React.MouseEvent) => {
     const svg = gRef.current!.ownerSVGElement!;

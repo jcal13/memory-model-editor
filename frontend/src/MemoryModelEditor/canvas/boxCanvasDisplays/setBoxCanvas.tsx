@@ -22,16 +22,51 @@ export default function SetBoxCanvas({
   useEffect(() => {
     if (!gRef.current || element.kind.name !== "set") return;
 
+    const model = createSetBox(element);
+    const padding = 10;
+
+    gRef.current.innerHTML = "";
+    gRef.current.appendChild(model.svg);
+
+    const bbox = model.svg.getBBox();
+    const width = bbox.width + padding * 2;
+    const height = bbox.height + padding * 2;
+
+    model.svg.setAttribute("viewBox", `-${padding} -${padding} ${width} ${height}`);
+    model.svg.setAttribute("width", `${width}`);
+    model.svg.setAttribute("height", `${height}`);
+
+    halfSize.current = { w: width / 2, h: height / 2 };
+    gRef.current.setAttribute(
+      "transform",
+      `translate(${element.x - halfSize.current.w}, ${element.y - halfSize.current.h})`
+    );
+
+    setupOverlay(model.svg, width, height, padding);
+  }, [element]);
+
+  const createSetBox = (element: CanvasElement) => {
     const { MemoryModel } = MemoryViz;
     const kind = element.kind;
 
+    let values: number[] = [];
+    if (Array.isArray(kind.value)) {
+      values = kind.value
+        .map((v: any) => (typeof v === "number" ? v : Number(v)))
+        .filter((v) => typeof v === "number" && !isNaN(v));
+    } else if (kind.value && typeof kind.value === "object") {
+      values = Object.values(kind.value)
+        .map((v: any) => (typeof v === "number" ? v : Number(v)))
+        .filter((v) => typeof v === "number" && !isNaN(v));
+    }
+
     const model = new MemoryModel({
-      obj_min_width: 150,
-      obj_min_height: 105,
-      prop_min_width: 50,
+      obj_min_width: 203,
+      obj_min_height: values.length > 0 ? 140 : 90,
+      prop_min_width: 60,
       prop_min_height: 40,
       double_rect_sep: 10,
-      font_size: 14,
+      font_size: 18,
       browser: true,
       roughjs_config: {
         options: {
@@ -43,33 +78,23 @@ export default function SetBoxCanvas({
     model.drawSet(
       0,
       0,
-      element.id,
-      kind.value,
+      Number(element.id),
+      values,
       {
         box_id: { fill: "#fff", fillStyle: "solid" },
         box_type: { fill: "#fff", fillStyle: "solid" },
       }
     );
 
-    gRef.current.innerHTML = "";
-    gRef.current.appendChild(model.svg);
+    return model;
+  };
 
-    const bbox = model.svg.getBBox();
-    const padding = 10;
-    const width = bbox.width + padding * 2;
-    const height = bbox.height + padding * 2;
-
-    model.svg.setAttribute("viewBox", `-${padding} -${padding} ${width} ${height}`);
-    model.svg.setAttribute("width", `${width}`);
-    model.svg.setAttribute("height", `${height}`);
-
-    halfSize.current = { w: width / 2, h: height / 2 };
-
-    gRef.current.setAttribute(
-      "transform",
-      `translate(${element.x - halfSize.current.w}, ${element.y - halfSize.current.h})`
-    );
-
+  const setupOverlay = (
+    svg: SVGSVGElement,
+    width: number,
+    height: number,
+    padding: number
+  ) => {
     const overlay = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     overlay.setAttribute("x", `-${padding}`);
     overlay.setAttribute("y", `-${padding}`);
@@ -84,16 +109,16 @@ export default function SetBoxCanvas({
       openSetInterface(element);
     });
 
-    model.svg.insertBefore(overlay, model.svg.firstChild);
-  }, [element]);
+    svg.insertBefore(overlay, svg.firstChild);
+  };
 
-  function getSvgPoint(e: MouseEvent | React.MouseEvent) {
+  const getSvgPoint = (e: MouseEvent | React.MouseEvent) => {
     const svg = gRef.current!.ownerSVGElement!;
     const pt = svg.createSVGPoint();
     pt.x = e.clientX;
     pt.y = e.clientY;
     return pt.matrixTransform(svg.getScreenCTM()!.inverse());
-  }
+  };
 
   const onMouseDown = (e: MouseEvent | React.MouseEvent) => {
     e.stopPropagation();

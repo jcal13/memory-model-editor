@@ -1,6 +1,6 @@
-import { CanvasElement } from "../../types";
-import MemoryViz from "memory-viz";
 import React, { useEffect, useRef } from "react";
+import MemoryViz from "memory-viz";
+import { CanvasElement } from "../../types";
 
 type Props = {
   element: CanvasElement;
@@ -8,7 +8,11 @@ type Props = {
   updatePosition: (x: number, y: number) => void;
 };
 
-export default function DictBoxCanvas({ element, openDictInterface, updatePosition }: Props) {
+export default function DictBoxCanvas({
+  element,
+  openDictInterface,
+  updatePosition,
+}: Props) {
   const gRef = useRef<SVGGElement>(null);
   const isDragging = useRef(false);
   const start = useRef({ x: 0, y: 0 });
@@ -18,16 +22,47 @@ export default function DictBoxCanvas({ element, openDictInterface, updatePositi
   useEffect(() => {
     if (!gRef.current || element.kind.name !== "dict") return;
 
+    const model = createDictBox(element);
+    const padding = 10;
+
+    gRef.current.innerHTML = "";
+    gRef.current.appendChild(model.svg);
+
+    const bbox = model.svg.getBBox();
+    const width = bbox.width + padding * 2;
+    const height = bbox.height + padding * 2;
+
+    model.svg.setAttribute("viewBox", `-${padding} -${padding} ${width} ${height}`);
+    model.svg.setAttribute("width", `${width}`);
+    model.svg.setAttribute("height", `${height}`);
+
+    halfSize.current = { w: width / 2, h: height / 2 };
+
+    gRef.current.setAttribute(
+      "transform",
+      `translate(${element.x - halfSize.current.w}, ${element.y - halfSize.current.h})`
+    );
+
+    setupOverlay(model.svg, width, height, padding);
+  }, [
+    element.x,
+    element.y,
+    element.id,
+    element.kind.name,
+    JSON.stringify(element.kind.value), // ensures re-render when dict contents change
+  ]);
+
+  const createDictBox = (element: CanvasElement) => {
     const { MemoryModel } = MemoryViz;
     const kind = element.kind;
 
     const model = new MemoryModel({
-      obj_min_width: 150,
+      obj_min_width: 190,
       obj_min_height: 200,
-      prop_min_width: 40,
-      prop_min_height: 30,
+      prop_min_width: 60,
+      prop_min_height: 40,
       double_rect_sep: 10,
-      font_size: 12,
+      font_size: 18,
       browser: true,
       roughjs_config: {
         options: {
@@ -36,23 +71,21 @@ export default function DictBoxCanvas({ element, openDictInterface, updatePositi
       },
     });
 
-    model.drawDict(5, 5, element.id, kind.value, {
-      text_value: { "font-style": "italic" },
+    const dictValue = typeof kind.value === "object" && kind.value !== null ? kind.value : {};
+
+    model.drawDict(0, 0, Number(element.id), dictValue, {
       box_id: { fill: "white", fillStyle: "dots" },
     });
 
-    const svg = model.svg;
-    const bbox = svg.getBBox();
-    const padding = 10;
-    const width = bbox.width + padding * 2;
-    const height = bbox.height + padding * 2;
+    return model;
+  };
 
-    svg.setAttribute("viewBox", `-${padding} -${padding} ${width} ${height}`);
-    svg.setAttribute("width", `${width}`);
-    svg.setAttribute("height", `${height}`);
-
-    halfSize.current = { w: width / 2, h: height / 2 };
-
+  const setupOverlay = (
+    svg: SVGSVGElement,
+    width: number,
+    height: number,
+    padding: number
+  ) => {
     const overlay = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     overlay.setAttribute("x", `-${padding}`);
     overlay.setAttribute("y", `-${padding}`);
@@ -68,15 +101,7 @@ export default function DictBoxCanvas({ element, openDictInterface, updatePositi
     });
 
     svg.insertBefore(overlay, svg.firstChild);
-
-    gRef.current.innerHTML = "";
-    gRef.current.appendChild(svg);
-
-    gRef.current.setAttribute(
-      "transform",
-      `translate(${element.x - halfSize.current.w}, ${element.y - halfSize.current.h})`
-    );
-  }, [element]);
+  };
 
   const getSvgPoint = (e: MouseEvent | React.MouseEvent) => {
     const svg = gRef.current!.ownerSVGElement!;
@@ -118,8 +143,8 @@ export default function DictBoxCanvas({ element, openDictInterface, updatePositi
     window.removeEventListener("mouseup", onMouseUp);
   };
 
-  const clamp = (value: number, min: number, max: number) =>
-    Math.min(Math.max(value, min), max);
+  const clamp = (val: number, min: number, max: number) =>
+    Math.min(Math.max(val, min), max);
 
   return <g ref={gRef} />;
 }

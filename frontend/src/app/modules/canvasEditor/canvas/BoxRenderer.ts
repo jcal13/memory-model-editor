@@ -7,9 +7,13 @@ export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
   let values: number[] = [];
 
   if (Array.isArray(kind.value)) {
-    values = kind.value.map((v: any) => (typeof v === "number" ? v : Number(v))).filter((v: any) => !isNaN(v));
+    values = kind.value
+      .map((v: any) => (typeof v === "number" ? v : Number(v)))
+      .filter((v: any) => !isNaN(v));
   } else if (kind.value && typeof kind.value === "object") {
-    values = Object.values(kind.value).map((v: any) => (typeof v === "number" ? v : Number(v))).filter(v => !isNaN(v));
+    values = Object.values(kind.value)
+      .map((v: any) => (typeof v === "number" ? v : Number(v)))
+      .filter((v) => !isNaN(v));
   }
 
   const config = {
@@ -32,9 +36,11 @@ export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
       config.obj_min_height = 200;
       break;
     case "list":
-    case "set":
     case "tuple":
       config.obj_min_height = values.length > 0 ? 140 : 100;
+      break;
+    case "set":
+      config.obj_min_height = values.length > 0 ? 140 : 90;
       break;
   }
 
@@ -43,6 +49,7 @@ export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
   const style = {
     box_id: { fill: "#fff", fillStyle: "solid" },
     box_type: { fill: "#fff", fillStyle: "solid" },
+    box_container: { fill: "#fff", fillStyle: "solid" }, 
   };
 
   switch (kind.name) {
@@ -62,32 +69,22 @@ export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
           props[p.name] = p.targetId;
         });
       }
-      model.drawClass(0, 0, kind.name, Number(element.id), props, true, {
-        box_id: { fill: "#fff", fillStyle: "solid" },
-        box_type: { fill: "#fff", fillStyle: "solid" },
-      });
+      model.drawClass(0, 0, kind.functionName, Number(element.id), props, true, style);
       break;
     }
     case "dict": {
       const dictValue = typeof kind.value === "object" && kind.value !== null ? kind.value : {};
-      model.drawDict(0, 0, Number(element.id), dictValue, {
-        box_id: { fill: "white", fillStyle: "dots" },
-      });
+      model.drawDict(0, 0, Number(element.id), dictValue, style);
       break;
     }
     case "list":
-    case "tuple":
-    case "set": {
+    case "tuple": {
       const showIndices = values.length > 0;
-      model.drawSequence(
-        0,
-        0,
-        kind.name,
-        Number(element.id),
-        values,
-        showIndices,
-        style
-      );
+      model.drawSequence(0, 0, kind.name, Number(element.id), values, showIndices, style);
+      break;
+    }
+    case "set": {
+      model.drawSet(0, 0, Number(element.id), values, style);
       break;
     }
   }

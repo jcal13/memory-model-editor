@@ -23,7 +23,7 @@ export default function CanvasBox({
     if (!gRef.current) return;
 
     const svgElement = createBoxRenderer(element);
-    const padding = 14; 
+    const padding = 12; 
 
     gRef.current.innerHTML = "";
     gRef.current.appendChild(svgElement);
@@ -42,15 +42,6 @@ export default function CanvasBox({
       `translate(${element.x - halfSize.current.w}, ${element.y - halfSize.current.h})`
     );
 
-    setupOverlay(svgElement, width, height, padding);
-  }, [element]);
-
-  const setupOverlay = (
-    svg: SVGSVGElement,
-    width: number,
-    height: number,
-    padding: number
-  ) => {
     const overlay = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     overlay.setAttribute("x", `-${padding}`);
     overlay.setAttribute("y", `-${padding}`);
@@ -65,8 +56,8 @@ export default function CanvasBox({
       openInterface(element);
     });
 
-    svg.insertBefore(overlay, svg.firstChild);
-  };
+    svgElement.appendChild(overlay); 
+  }, [element]);
 
   const getSvgPoint = (e: MouseEvent | React.MouseEvent) => {
     const svg = gRef.current!.ownerSVGElement!;

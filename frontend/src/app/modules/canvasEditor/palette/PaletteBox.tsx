@@ -14,6 +14,11 @@ export default function PaletteBox({ boxType }: Props) {
     if (containerRef.current) {
       containerRef.current.innerHTML = "";
       containerRef.current.appendChild(svg);
+      
+      const padding = 5;  
+      const bbox = svg.getBBox();
+      containerRef.current.style.width = `${bbox.width + padding}px`;
+      containerRef.current.style.height = `${bbox.height + padding}px`;
     }
   }, [boxType]);
 

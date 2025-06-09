@@ -10,7 +10,7 @@ export default function PaletteBox({ boxType }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const svg = createBoxRenderer(boxType, true);
+    const svg = createBoxRenderer(boxType);
     if (containerRef.current) {
       containerRef.current.innerHTML = "";
       containerRef.current.appendChild(svg);

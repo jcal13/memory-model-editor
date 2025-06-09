@@ -1,7 +1,7 @@
 import MemoryViz from "memory-viz";
 import { BoxConfigs } from "./BoxConfigs";
 
-export function createBoxRenderer(kindName: keyof typeof BoxConfigs, forPalette = false): SVGSVGElement {
+export function createBoxRenderer(kindName: keyof typeof BoxConfigs): SVGSVGElement {
   const { MemoryModel } = MemoryViz;
   const config = BoxConfigs[kindName];
 
@@ -21,13 +21,12 @@ export function createBoxRenderer(kindName: keyof typeof BoxConfigs, forPalette 
   const svg = model.svg;
 
   requestAnimationFrame(() => {
-    const padding = forPalette ? 5 : 12;
+    const padding = 5;
 
     try {
       const bbox = svg.getBBox();
       svg.setAttribute("width", `${bbox.width + padding}`);
       svg.setAttribute("height", `${bbox.height + padding}`);
-      svg.setAttribute("viewBox", `0 0 ${bbox.width + padding} ${bbox.height + padding}`);
     } catch (e) {
       console.warn(`getBBox failed for ${kindName}`, e);
     }

@@ -1,17 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
 import Draggable from "react-draggable";
-import { CanvasElement, ElementKind } from "../shared/types";
+import { CanvasElement, BoxType } from "../shared/types";
 import CanvasBox from "./CanvasBox";
 
-import PrimitiveEditor from "../boxEditors/PrimitiveEditor";
 import FunctionEditor from "../boxEditors/FunctionEditor";
 import ListEditor from "../boxEditors/ListEditor";
 import SetEditor from "../boxEditors/SetEditor";
 import DictEditor from "../boxEditors/DictEditor";
 import TupleEditor from "../boxEditors/TupleEditor";
 
-const editorMap: Record<ElementKind["name"], React.FC<any>> = {
-  primitive: PrimitiveEditor,
+import BoxEditor from "../boxEditors/BoxEditor";
+
+const editorMap: Record<BoxType["name"], React.FC<any>> = {
+  primitive: BoxEditor,
   function: FunctionEditor,
   list: ListEditor,
   tuple: TupleEditor,
@@ -44,8 +45,8 @@ export default function Canvas({ elements, setElements }: Props) {
   }, []);
 
   const makePositionUpdater = (id: number) => (x: number, y: number) => {
-    setElements(prev =>
-      prev.map(el => (el.id === id ? { ...el, x, y } : el))
+    setElements((prev) =>
+      prev.map((el) => (el.id === id ? { ...el, x, y } : el))
     );
   };
 
@@ -54,7 +55,7 @@ export default function Canvas({ elements, setElements }: Props) {
   const handleDrop = (e: React.DragEvent<SVGSVGElement>) => {
     e.preventDefault();
     const payload = e.dataTransfer.getData("application/box-type");
-    let newKind: ElementKind;
+    let newKind: BoxType;
 
     switch (payload) {
       case "primitive":
@@ -88,25 +89,29 @@ export default function Canvas({ elements, setElements }: Props) {
     const pt = svgRef.current!.createSVGPoint();
     pt.x = e.clientX;
     pt.y = e.clientY;
-    const coords = pt.matrixTransform(svgRef.current!.getScreenCTM()!.inverse());
+    const coords = pt.matrixTransform(
+      svgRef.current!.getScreenCTM()!.inverse()
+    );
 
-    setElements(prev => [
+    setElements((prev) => [
       ...prev,
       { id: prev.length, kind: newKind, x: coords.x, y: coords.y },
     ]);
   };
 
-  const saveElement = (updatedKind: ElementKind) => {
+  const saveElement = (updatedKind: BoxType) => {
     if (!selected) return;
-    setElements(prev =>
-      prev.map(el => (el.id === selected.id ? { ...el, kind: updatedKind } : el))
+    setElements((prev) =>
+      prev.map((el) =>
+        el.id === selected.id ? { ...el, kind: updatedKind } : el
+      )
     );
     setSelected(null);
   };
 
   const removeElement = () => {
     if (!selected) return;
-    setElements(prev => prev.filter(el => el.id !== selected.id));
+    setElements((prev) => prev.filter((el) => el.id !== selected.id));
     setSelected(null);
   };
 
@@ -117,11 +122,11 @@ export default function Canvas({ elements, setElements }: Props) {
         viewBox={viewBox}
         preserveAspectRatio="xMinYMin meet"
         style={{ border: "1px solid #000", width: "100%", height: "99%" }}
-        onDragOver={e => e.preventDefault()}
+        onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
       >
         <g>
-          {elements.map(el => (
+          {elements.map((el) => (
             <CanvasBox
               key={el.id}
               element={el}
@@ -151,9 +156,8 @@ export default function Canvas({ elements, setElements }: Props) {
               const Editor = editorMap[selected.kind.name];
               return (
                 <Editor
-                  element={selected}
+                  metadata={selected}
                   onSave={saveElement}
-                  onCancel={() => setSelected(null)}
                   onRemove={removeElement}
                 />
               );

@@ -1,13 +1,20 @@
 import { useRef } from "react";
 import { PrimitiveType } from "../../shared/types";
 
-export const useRefs = (dataType: any, contentValue: any) => {
+export const useGlobalRefs = () => {
   const moduleRef = useRef<HTMLDivElement>(null);
+  return moduleRef;
+};
+
+export const usePrimitiveRefs = (dataType: any, contentValue: any) => {
   const dataTypeRef = useRef<PrimitiveType>(dataType);
   const contentValueRef = useRef<string>(contentValue);
   return {
-    moduleRef,
     dataTypeRef,
     contentValueRef,
   };
 };
+
+// export const useFunctionRefs = () => {
+
+// }

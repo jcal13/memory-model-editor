@@ -1,7 +1,7 @@
 import { PrimitiveKind } from "../../../shared/types";
 
 interface Props {
-  element: { id: string; kind: PrimitiveKind };
+  element: any;
   onSave: (kind: PrimitiveKind) => void;
   onRemove: () => void;
   dataType: any;

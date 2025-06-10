@@ -4,7 +4,7 @@ import { header } from "../../styles/boxEditorStyles";
 import { PrimitiveKind, PrimitiveType } from "../../../shared/types";
 
 interface Props {
-  element: { id: string; kind: PrimitiveKind };
+  element: any;
   dataType: PrimitiveType;
   setDataType: React.Dispatch<React.SetStateAction<PrimitiveType>>;
   value: string;

@@ -3,7 +3,6 @@ import Draggable from "react-draggable";
 import { CanvasElement, BoxType } from "../shared/types";
 import CanvasBox from "./CanvasBox";
 
-import FunctionEditor from "../boxEditors/FunctionEditor";
 import ListEditor from "../boxEditors/ListEditor";
 import SetEditor from "../boxEditors/SetEditor";
 import DictEditor from "../boxEditors/DictEditor";
@@ -13,7 +12,7 @@ import BoxEditor from "../boxEditors/BoxEditor";
 
 const editorMap: Record<BoxType["name"], React.FC<any>> = {
   primitive: BoxEditor,
-  function: FunctionEditor,
+  function: BoxEditor,
   list: ListEditor,
   tuple: TupleEditor,
   set: SetEditor,

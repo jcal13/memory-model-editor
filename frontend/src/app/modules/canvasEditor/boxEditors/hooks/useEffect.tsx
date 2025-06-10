@@ -18,16 +18,28 @@ export const useModule = (
   dataTypeRef: any,
   contentValueRef: any,
   onSave: any,
-  element: any
+  element: any,
+  functionName?: any,
+  params?: any
 ) => {
   useEffect(() => {
     const outside = (e: MouseEvent) => {
       if (moduleRef.current && !moduleRef.current.contains(e.target as Node)) {
-        onSave({
-          name: element.kind.name,
-          type: dataTypeRef.current,
-          value: contentValueRef.current,
-        });
+        if (element.kind.name === "primitive") {
+          onSave({
+            name: element.kind.name,
+            type: dataTypeRef.current,
+            value: contentValueRef.current,
+          });
+        } else if (element.kind.name === "function") {
+          onSave({
+            name: "function",
+            type: "function",
+            value: null,
+            functionName: functionName,
+            params,
+          });
+        }
       }
     };
     document.addEventListener("mousedown", outside);

@@ -11,6 +11,8 @@ export type BoxType =
 
 export type ValueType = PrimitiveType | CollectionType | SpecialType;
 
+export type FunctionParams = { name: string; targetId: number | null };
+
 export interface PrimitiveKind {
   name: "primitive";
   type: PrimitiveType;
@@ -22,7 +24,7 @@ type FunctionKind = {
   type: "function";
   value: null;
   functionName: string;
-  params: { name: string; targetId: number | null }[];
+  params: FunctionParams[];
 };
 
 export interface ListKind {
@@ -57,7 +59,7 @@ export interface CanvasElement {
 }
 
 export interface BoxEditorType {
-  metadata: { id: string; kind: PrimitiveKind };
-  onSave: (kind: PrimitiveKind) => void;
+  metadata: { id: string; kind: BoxType };
+  onSave: (kind: BoxType) => void;
   onRemove: () => void;
 }

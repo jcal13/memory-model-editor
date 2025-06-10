@@ -1,18 +1,38 @@
 import { module } from "../styles/boxEditorStyles";
 import RemoveButton from "./buttonDisplays/RemoveButton";
 import PrimitiveContent from "./contentDisplays/PrimitiveContent";
+import FunctionContent from "./contentDisplays/FunctionContent";
 import Header from "./headerDisplays/Header";
 import { useDataType, useContentValue, useModule } from "../hooks/useEffect";
-import { useGlobalStates, usePrimitiveStates } from "../hooks/useState";
+import {
+  useGlobalStates,
+  usePrimitiveStates,
+  useFunctionStates,
+} from "../hooks/useState";
 import { BoxEditorType } from "../../shared/types";
-import { useRefs } from "../hooks/useRef";
+import { usePrimitiveRefs, useGlobalRefs } from "../hooks/useRef";
 
 const BoxEditorModule = ({ metadata, onSave, onRemove }: BoxEditorType) => {
   const { hoverRemove, setHoverRemove } = useGlobalStates();
-  const { dataType, setDataType, contentValue, setContentValue } =
-    usePrimitiveStates(metadata);
+  const moduleRef = useGlobalRefs();
+  let dataType,
+    setDataType,
+    contentValue,
+    setContentValue,
+    functionName,
+    setFunctionName,
+    functionParams,
+    setFunctionParams;
 
-  const { moduleRef, dataTypeRef, contentValueRef } = useRefs(
+  // if (metadata.kind.name == "primitive") {
+  [dataType, setDataType, contentValue, setContentValue] =
+    usePrimitiveStates(metadata);
+  // } else if (metadata.kind.name === "function") {
+  [functionName, setFunctionName, functionParams, setFunctionParams] =
+    useFunctionStates(metadata);
+  // }
+
+  const { dataTypeRef, contentValueRef } = usePrimitiveRefs(
     dataType,
     contentValue
   );
@@ -31,11 +51,20 @@ const BoxEditorModule = ({ metadata, onSave, onRemove }: BoxEditorType) => {
         setValue={setContentValue}
       />
 
-      <PrimitiveContent
-        dataType={dataType}
-        value={contentValue}
-        setValue={setContentValue}
-      />
+      {metadata.kind.name === "primitive" ? (
+        <PrimitiveContent
+          dataType={dataType}
+          value={contentValue}
+          setValue={setContentValue}
+        />
+      ) : null}
+
+      {metadata.kind.name === "function" ? (
+        <FunctionContent
+          functionParams={functionParams}
+          setParams={setFunctionParams}
+        />
+      ) : null}
 
       <RemoveButton
         element={metadata}

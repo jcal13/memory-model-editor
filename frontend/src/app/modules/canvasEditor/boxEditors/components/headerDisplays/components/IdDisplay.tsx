@@ -1,5 +1,5 @@
-import { pill } from "../../styles/boxEditorStyles";
-import { PrimitiveKind } from "../../../shared/types";
+import { pill } from "../../../styles/boxEditorStyles";
+import { PrimitiveKind } from "../../../../shared/types";
 
 interface Props {
   element: { id: string; kind: PrimitiveKind };

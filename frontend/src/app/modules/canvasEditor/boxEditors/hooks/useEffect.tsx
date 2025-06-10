@@ -1,50 +1,55 @@
 import { useEffect } from "react";
 
-// save the set data type to the UI
-export const useDataType = (dataTypeRef: any, dataType: any) => {
-  useEffect(() => {
-    dataTypeRef.current = dataType;
-  }, [dataType]);
-};
-
-export const useContentValue = (contentValueRef: any, contentValue: any) => {
-  useEffect(() => {
-    contentValueRef.current = contentValue;
-  }, [contentValue]);
-};
-
 export const useModule = (
   moduleRef: any,
-  dataTypeRef: any,
-  contentValueRef: any,
-  onSave: any,
+  onSave: (data: any) => void,
   element: any,
-  functionName?: any,
-  params?: any
+  dataType?: string,
+  contentValue?: string,
+  functionName?: string,
+  params?: any[],
+  collectionItems?: any
 ) => {
   useEffect(() => {
-    const outside = (e: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent) => {
       if (moduleRef.current && !moduleRef.current.contains(e.target as Node)) {
-        if (element.kind.name === "primitive") {
+        const kind = element.kind.name;
+
+        if (kind === "primitive") {
           onSave({
-            name: element.kind.name,
-            type: dataTypeRef.current,
-            value: contentValueRef.current,
+            name: kind,
+            type: dataType,
+            value: contentValue,
           });
-        } else if (element.kind.name === "function") {
+        } else if (kind === "function") {
           onSave({
-            name: "function",
+            name: kind,
             type: "function",
             value: null,
-            functionName: functionName,
+            functionName,
             params,
+          });
+        } else {
+          onSave({
+            name: kind,
+            type: element.kind.type,
+            value: collectionItems,
           });
         }
       }
     };
-    document.addEventListener("mousedown", outside);
+
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", outside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [onSave, element.kind.name]);
+  }, [
+    onSave,
+    element.kind.name,
+    dataType,
+    contentValue,
+    functionName,
+    params,
+    collectionItems,
+  ]);
 };

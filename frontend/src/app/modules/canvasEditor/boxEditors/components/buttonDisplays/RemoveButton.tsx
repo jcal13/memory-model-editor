@@ -1,13 +1,22 @@
 import { PrimitiveKind } from "../../../shared/types";
 
 interface Props {
-  element: any;
-  onSave: (kind: PrimitiveKind) => void;
+  element: {
+    id: string;
+    kind: {
+      name: string;
+      type?: string;
+    };
+  };
+  onSave: (params: any) => void;
   onRemove: () => void;
-  dataType: any;
+  dataType: string;
   value: string;
   hoverRemove: boolean;
   setHoverRemove: React.Dispatch<React.SetStateAction<boolean>>;
+  functionName?: string;
+  functionParams?: any[];
+  items: any;
 }
 
 const RemoveButton = ({
@@ -18,9 +27,32 @@ const RemoveButton = ({
   value,
   hoverRemove,
   setHoverRemove,
+  functionName,
+  functionParams,
+  items,
 }: Props) => {
-  const handleSave = () => {
-    onSave({ name: element.kind.name, type: dataType, value });
+  const kind = element.kind.name;
+
+  const saveParams =
+    kind === "primitive"
+      ? { name: kind, type: dataType, value }
+      : kind === "function"
+      ? {
+          name: kind,
+          type: "function",
+          value: null,
+          functionName,
+          functionParams,
+        }
+      : {
+          name: kind,
+          type: element.kind.type,
+          value: items,
+        };
+
+  const handleClick = () => {
+    onSave(saveParams);
+    onRemove();
   };
 
   return (
@@ -28,12 +60,9 @@ const RemoveButton = ({
       <button
         onMouseEnter={() => setHoverRemove(true)}
         onMouseLeave={() => setHoverRemove(false)}
-        onClick={() => {
-          handleSave();
-          onRemove();
-        }}
+        onClick={handleClick}
         style={{
-          background: hoverRemove ? "#d32f2f" : "#f44336",
+          backgroundColor: hoverRemove ? "#d32f2f" : "#f44336",
           color: "#fff",
           border: "none",
           padding: "4px 6px",

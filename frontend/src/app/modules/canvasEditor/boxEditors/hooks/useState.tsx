@@ -24,3 +24,17 @@ export const useFunctionStates = (element: any) => {
   );
   return [functionName, setFunctionName, functionParams, setFunctionParams];
 };
+
+export const useCollectionSingleStates = (element: any) => {
+  const [collectionItems, setCollectionItems] = useState<any[]>(
+    element.kind.value || []
+  );
+  return [collectionItems, setCollectionItems];
+};
+
+export const useCollectionPairsStates = (element: any) => {
+  const [collectionPairs, setCollectionPairs] = useState(
+    Object.entries(element.kind.value || {})
+  );
+  return [collectionPairs, setCollectionPairs];
+};

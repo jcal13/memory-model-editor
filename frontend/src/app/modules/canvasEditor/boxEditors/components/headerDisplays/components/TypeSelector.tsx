@@ -1,4 +1,4 @@
-import { pill } from "../../styles/boxEditorStyles";
+import { pill } from "../../../styles/boxEditorStyles";
 
 type PrimitiveType = "None" | "int" | "float" | "str" | "bool";
 
@@ -6,7 +6,7 @@ interface Props {
   dataType: PrimitiveType;
   setDataType: React.Dispatch<React.SetStateAction<PrimitiveType>>;
   value: string;
-  setValue: React.Dispatch<React.SetStateAction<string>>;
+  setValue: any;
 }
 
 const TypeSelector = ({ dataType, setDataType, value, setValue }: Props) => {

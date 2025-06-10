@@ -1,4 +1,8 @@
-import { pillBase, closeButton } from "../../styles/boxEditorStyles";
+import {
+  pillBase,
+  closeButton,
+  functionModule,
+} from "../../styles/boxEditorStyles";
 
 interface Props {
   functionParams: any;
@@ -17,7 +21,7 @@ const FunctionContent = ({ functionParams, setParams }: Props) => {
       )
     );
   return (
-    <>
+    <div>
       <div
         style={{
           display: "flex",
@@ -85,7 +89,7 @@ const FunctionContent = ({ functionParams, setParams }: Props) => {
           + Add Variable
         </button>
       </div>
-    </>
+    </div>
   );
 };
 

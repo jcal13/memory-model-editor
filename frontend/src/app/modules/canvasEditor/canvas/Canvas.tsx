@@ -3,20 +3,15 @@ import Draggable from "react-draggable";
 import { CanvasElement, BoxType } from "../shared/types";
 import CanvasBox from "./CanvasBox";
 
-import ListEditor from "../boxEditors/ListEditor";
-import SetEditor from "../boxEditors/SetEditor";
-import DictEditor from "../boxEditors/DictEditor";
-import TupleEditor from "../boxEditors/TupleEditor";
-
 import BoxEditor from "../boxEditors/BoxEditor";
 
 const editorMap: Record<BoxType["name"], React.FC<any>> = {
   primitive: BoxEditor,
   function: BoxEditor,
-  list: ListEditor,
-  tuple: TupleEditor,
-  set: SetEditor,
-  dict: DictEditor,
+  list: BoxEditor,
+  tuple: BoxEditor,
+  set: BoxEditor,
+  dict: BoxEditor,
 };
 
 interface Props {
@@ -107,6 +102,25 @@ export default function Canvas({ elements, setElements }: Props) {
     );
     setSelected(null);
   };
+
+  // const saveFunction = (kind: BoxType) => {
+  //   if (!selected) return;
+  //   setElements((prev) =>
+  //     prev.map((el) =>
+  //       el.id === selected.id
+  //         ? {
+  //             ...el,
+  //             kind: {
+  //               name: "function",
+  //               type: "function",
+  //               value: null,
+  //               functionName: (kind as any).functionName ?? "myFunction",
+  //               params: (kind as any).params ?? [],
+  //             },
+  //           }
+  //         : el
+  //     )
+  //   );
 
   const removeElement = () => {
     if (!selected) return;

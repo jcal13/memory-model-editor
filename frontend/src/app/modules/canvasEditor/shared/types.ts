@@ -1,8 +1,17 @@
 export type PrimitiveType = "None" | "int" | "float" | "str" | "bool";
 export type CollectionType = "list" | "tuple" | "set" | "dict";
 export type SpecialType = "function";
+export type BoxType =
+  | PrimitiveKind
+  | FunctionKind
+  | ListKind
+  | TupleKind
+  | SetKind
+  | DictKind;
 
 export type ValueType = PrimitiveType | CollectionType | SpecialType;
+
+export type FunctionParams = { name: string; targetId: number | null };
 
 export interface PrimitiveKind {
   name: "primitive";
@@ -15,7 +24,7 @@ type FunctionKind = {
   type: "function";
   value: null;
   functionName: string;
-  params: { name: string; targetId: number | null }[];
+  params: FunctionParams[];
 };
 
 export interface ListKind {
@@ -42,17 +51,15 @@ export interface DictKind {
   value: Record<number, number | null>;
 }
 
-export type ElementKind =
-  | PrimitiveKind
-  | FunctionKind
-  | ListKind
-  | TupleKind
-  | SetKind
-  | DictKind;
-
 export interface CanvasElement {
   id: number | string;
   x: number;
   y: number;
-  kind: ElementKind;
+  kind: BoxType;
+}
+
+export interface BoxEditorType {
+  metadata: { id: string; kind: BoxType };
+  onSave: (kind: BoxType) => void;
+  onRemove: () => void;
 }

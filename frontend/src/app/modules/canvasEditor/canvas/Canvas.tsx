@@ -1,22 +1,22 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import Draggable from "react-draggable";
-import { CanvasElement, ElementKind } from "../shared/types";
-import CanvasBox from "./CanvasBox";
+import { CanvasElement, BoxType } from "../shared/types";
+import CanvasBox from "./components/CanvasBox";
+import BoxEditor from "../boxEditors/BoxEditor";
+import { useCanvasResize } from "./hooks/useEffect";
+import { useCanvasRefs } from "./hooks/useRef";
+import styles from "./styles/Canvas.module.css";
 
-import PrimitiveEditor from "../boxEditors/PrimitiveEditor";
-import FunctionEditor from "../boxEditors/FunctionEditor";
-import ListEditor from "../boxEditors/ListEditor";
-import SetEditor from "../boxEditors/SetEditor";
-import DictEditor from "../boxEditors/DictEditor";
-import TupleEditor from "../boxEditors/TupleEditor";
-
-const editorMap: Record<ElementKind["name"], React.FC<any>> = {
-  primitive: PrimitiveEditor,
-  function: FunctionEditor,
-  list: ListEditor,
-  tuple: TupleEditor,
-  set: SetEditor,
-  dict: DictEditor,
+/* =======================================
+   === Box Editor Mapping by Type Name ===
+======================================= */
+const editorMap: Record<BoxType["name"], React.FC<any>> = {
+  primitive: BoxEditor,
+  function: BoxEditor,
+  list: BoxEditor,
+  tuple: BoxEditor,
+  set: BoxEditor,
+  dict: BoxEditor,
 };
 
 interface Props {
@@ -24,37 +24,29 @@ interface Props {
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
 }
 
+/* =======================================
+   === Main Canvas Component ===
+======================================= */
 export default function Canvas({ elements, setElements }: Props) {
   const [selected, setSelected] = useState<CanvasElement | null>(null);
-  const svgRef = useRef<SVGSVGElement | null>(null);
+  const { svgRef, dragRef } = useCanvasRefs();
   const [viewBox, setViewBox] = useState<string>("0 0 0 0");
 
-  useEffect(() => {
-    const svg = svgRef.current;
-    if (!svg) return;
+  useCanvasResize(svgRef, setViewBox);
 
-    const recalc = () => {
-      const { width, height } = svg.getBoundingClientRect();
-      setViewBox(`0 0 ${width} ${height}`);
+  /* === Utility: Creates updater function for a specific box ID === */
+  const makePositionUpdater =
+    (id: string | number) => (x: number, y: number) => {
+      setElements((prev) =>
+        prev.map((el) => (el.id === id ? { ...el, x, y } : el))
+      );
     };
 
-    recalc();
-    window.addEventListener("resize", recalc);
-    return () => window.removeEventListener("resize", recalc);
-  }, []);
-
-  const makePositionUpdater = (id: number) => (x: number, y: number) => {
-    setElements(prev =>
-      prev.map(el => (el.id === id ? { ...el, x, y } : el))
-    );
-  };
-
-  const dragRef = useRef<HTMLDivElement>(null);
-
+  /* === Handle Drag & Drop Creation of New Elements === */
   const handleDrop = (e: React.DragEvent<SVGSVGElement>) => {
     e.preventDefault();
     const payload = e.dataTransfer.getData("application/box-type");
-    let newKind: ElementKind;
+    let newKind: BoxType;
 
     switch (payload) {
       case "primitive":
@@ -88,72 +80,77 @@ export default function Canvas({ elements, setElements }: Props) {
     const pt = svgRef.current!.createSVGPoint();
     pt.x = e.clientX;
     pt.y = e.clientY;
-    const coords = pt.matrixTransform(svgRef.current!.getScreenCTM()!.inverse());
+    const coords = pt.matrixTransform(
+      svgRef.current!.getScreenCTM()!.inverse()
+    );
 
-    setElements(prev => [
+    setElements((prev) => [
       ...prev,
       { id: prev.length, kind: newKind, x: coords.x, y: coords.y },
     ]);
   };
 
-  const saveElement = (updatedKind: ElementKind) => {
+  /* === Update element after editor save === */
+  const saveElement = (updatedKind: BoxType) => {
     if (!selected) return;
-    setElements(prev =>
-      prev.map(el => (el.id === selected.id ? { ...el, kind: updatedKind } : el))
+    setElements((prev) =>
+      prev.map((el) =>
+        el.id === selected.id ? { ...el, kind: updatedKind } : el
+      )
     );
     setSelected(null);
   };
 
+  /* === Remove element from canvas === */
   const removeElement = () => {
     if (!selected) return;
-    setElements(prev => prev.filter(el => el.id !== selected.id));
+    setElements((prev) => prev.filter((el) => el.id !== selected.id));
     setSelected(null);
   };
 
+  /* === Render === */
   return (
     <>
-      <svg
-        ref={svgRef}
-        viewBox={viewBox}
-        preserveAspectRatio="xMinYMin meet"
-        style={{ border: "1px solid #000", width: "100%", height: "99%" }}
-        onDragOver={e => e.preventDefault()}
-        onDrop={handleDrop}
-      >
-        <g>
-          {elements.map(el => (
-            <CanvasBox
-              key={el.id}
-              element={el}
-              openInterface={() => setSelected(el)}
-              updatePosition={makePositionUpdater(Number(el.id))}
-            />
-          ))}
-        </g>
-      </svg>
+      {/* === SVG Canvas === */}
+      <div className={styles.canvasWrapper}>
+        <svg
+          ref={svgRef}
+          viewBox={viewBox}
+          preserveAspectRatio="xMinYMin meet"
+          className={styles.canvas}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={handleDrop}
+        >
+          <g>
+            {elements.map((el) => (
+              <CanvasBox
+                key={el.id}
+                element={el}
+                openInterface={() => setSelected(el)}
+                updatePosition={makePositionUpdater(el.id)}
+              />
+            ))}
+          </g>
+        </svg>
+      </div>
 
+      {/* === Floating Box Editor Panel === */}
       {selected && (
         <Draggable
           nodeRef={dragRef as React.RefObject<HTMLElement>}
           handle=".drag-handle"
-          defaultPosition={{ x: 400, y: 80 }}
+          defaultPosition={{
+            x: typeof window !== "undefined" ? window.innerWidth / 4 : 0,
+            y: typeof window !== "undefined" ? window.innerHeight / 4 : 0,
+          }}
         >
-          <div
-            ref={dragRef}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              backgroundColor: "white",
-            }}
-          >
+          <div ref={dragRef} className={styles.editorContainer}>
             {(() => {
               const Editor = editorMap[selected.kind.name];
               return (
                 <Editor
-                  element={selected}
+                  metadata={selected}
                   onSave={saveElement}
-                  onCancel={() => setSelected(null)}
                   onRemove={removeElement}
                 />
               );

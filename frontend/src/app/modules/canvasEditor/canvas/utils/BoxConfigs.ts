@@ -1,28 +1,57 @@
+/**
+ * Shared SVG style used by BoxRenderer for all box types.
+ */
 const style = {
   box_id: { fill: "#fff", fillStyle: "solid" },
   box_type: { fill: "#fff", fillStyle: "solid" },
   box_container: { fill: "#fff", fillStyle: "solid" },
 };
 
+/**
+ * Extracts numeric values from an element's `kind.value`.
+ * - Handles arrays (list, tuple, set)
+ * - Handles objects (dict)
+ * - Ignores NaN results
+ *
+ * @param kind - The kind object containing a `value` field
+ * @returns Array of numeric values
+ */
 const getValues = (kind: any): number[] => {
   if (Array.isArray(kind.value)) {
+    // List / tuple / set values
     return kind.value.map((v: any) => +v).filter((v: number) => !isNaN(v));
   } else if (kind.value && typeof kind.value === "object") {
-    return Object.values(kind.value).map((v: any) => +v).filter((v) => !isNaN(v));
+    // Dict values
+    return Object.values(kind.value)
+      .map((v: any) => +v)
+      .filter((v) => !isNaN(v));
   }
   return [];
 };
 
+/* ==========================================================
+ * BoxConfigs: Configuration map for every supported box type
+ * Each entry includes:
+ *  - draw(...)      Render logic for the box
+ *  - getHeight(...) Height (or dynamic height) in pixels
+ *  - getMinWidth()  Minimum width in pixels
+ * ========================================================== */
 export const BoxConfigs = {
+  /* ---------- Primitive Box ---------- */
   primitive: {
     draw: (model: any, kind: any, id: number) => {
-      const type = kind.type === "None" || kind.value === null ? "None" : kind.type;
-      const value = ["string", "number", "boolean"].includes(typeof kind.value) ? kind.value : "";
+      const type =
+        kind.type === "None" || kind.value === null ? "None" : kind.type;
+      const value = ["string", "number", "boolean"].includes(typeof kind.value)
+        ? kind.value
+        : "";
       model.drawPrimitive(0, 0, type, id, value, style);
     },
     getHeight: () => 90,
     getMinWidth: () => 170,
   },
+
+  /* ---------- Function Box ---------- */
   function: {
     draw: (model: any, kind: any, id: number) => {
       const props: Record<string, number | null> = {};
@@ -32,6 +61,8 @@ export const BoxConfigs = {
     getHeight: () => 90,
     getMinWidth: () => 190,
   },
+
+  /* ---------- List Box ---------- */
   list: {
     draw: (model: any, kind: any, id: number) => {
       const vals = getValues(kind);
@@ -40,6 +71,8 @@ export const BoxConfigs = {
     getHeight: (kind: any) => (getValues(kind).length > 0 ? 140 : 100),
     getMinWidth: () => 190,
   },
+
+  /* ---------- Tuple Box ---------- */
   tuple: {
     draw: (model: any, kind: any, id: number) => {
       const vals = getValues(kind);
@@ -48,6 +81,8 @@ export const BoxConfigs = {
     getHeight: (kind: any) => (getValues(kind).length > 0 ? 140 : 100),
     getMinWidth: () => 170,
   },
+
+  /* ---------- Set Box ---------- */
   set: {
     draw: (model: any, kind: any, id: number) => {
       const vals = getValues(kind);
@@ -56,9 +91,14 @@ export const BoxConfigs = {
     getHeight: (kind: any) => (getValues(kind).length > 0 ? 140 : 90),
     getMinWidth: () => 203,
   },
+
+  /* ---------- Dict Box ---------- */
   dict: {
     draw: (model: any, kind: any, id: number) => {
-      const dict = typeof kind.value === "object" && !Array.isArray(kind.value) ? kind.value : {};
+      const dict =
+        typeof kind.value === "object" && !Array.isArray(kind.value)
+          ? kind.value
+          : {};
       model.drawDict(0, 0, id, dict, style);
     },
     getHeight: () => 200,

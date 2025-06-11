@@ -1,4 +1,7 @@
-/* === Box Layout === */
+/* =======================================
+   === Box Editor Layout & Structure ===
+======================================= */
+
 .boxEditorModule {
   width: max-content;
   min-width: 340px;
@@ -14,7 +17,10 @@
   z-index: 1000;
 }
 
-/* === Header & Type === */
+/* =======================================
+   === Header Section ===
+======================================= */
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -22,6 +28,7 @@
   width: 100%;
 }
 
+/* === ID Display === */
 .moduleIdBox {
   font-size: 0.95rem;
   font-weight: 500;
@@ -40,6 +47,7 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
 }
 
+/* === Type Selector / Display === */
 .typeSelector {
   font-size: 0.95rem;
   padding: 10px 12px;
@@ -63,7 +71,10 @@
   border-radius: 8px;
 }
 
-/* === Inputs === */
+/* =======================================
+   === Input Fields ===
+======================================= */
+
 .functionNameInput,
 .variableNameBox,
 .primitiveValueContainer {
@@ -77,7 +88,10 @@
   color: #111827;
 }
 
-/* === Buttons === */
+/* =======================================
+   === Buttons ===
+======================================= */
+
 .addButton,
 .removeButton {
   padding: 10px 26px;
@@ -90,6 +104,7 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
+/* Add Button */
 .addButton {
   background-color: #10b981;
   color: white;
@@ -99,6 +114,7 @@
   background-color: #059669;
 }
 
+/* Remove Button */
 .removeButton {
   background-color: #ef4444;
   color: white;
@@ -109,6 +125,7 @@
   background-color: #dc2626;
 }
 
+/* Floating Remove Icons (×) */
 .removeItem,
 .collectionRemoveId {
   position: absolute;
@@ -135,7 +152,10 @@
   transform: scale(1.05);
 }
 
-/* === Layout Containers === */
+/* =======================================
+   === Layout Containers ===
+======================================= */
+
 .contentContainer,
 .ItemContainer,
 .removeButtonContainer {
@@ -148,6 +168,10 @@
   display: flex;
   gap: 16px;
 }
+
+/* =======================================
+   === Collection Layout ===
+======================================= */
 
 .collectionIdContainer {
   display: flex;
@@ -177,7 +201,10 @@
   color: #374151;
 }
 
-/* === ID Boxes === */
+/* =======================================
+   === ID Boxes (Function / Collection) ===
+======================================= */
+
 .functionIdBox,
 .collectionIdBox {
   position: relative;
@@ -207,7 +234,10 @@
   opacity: 0.7;
 }
 
-/* === Primitive Types === */
+/* =======================================
+   === Primitive Type Content ===
+======================================= */
+
 .primitiveBoolContainer {
   display: flex;
   align-items: center;

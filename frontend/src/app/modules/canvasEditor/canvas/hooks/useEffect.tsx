@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { createBoxRenderer } from "../utils/BoxRenderer";
 
-// Syncs a ref with the current dataType value
+/**
+ * Syncs the given ref with the current `dataType` state on every change.
+ */
 export const useDataType = (
   dataTypeRef: React.MutableRefObject<any>,
   dataType: any
@@ -11,7 +13,9 @@ export const useDataType = (
   }, [dataType]);
 };
 
-// Syncs a ref with the current contentValue value
+/**
+ * Syncs the given ref with the current `contentValue` state on every change.
+ */
 export const useContentValue = (
   contentValueRef: React.MutableRefObject<any>,
   contentValue: any
@@ -21,7 +25,10 @@ export const useContentValue = (
   }, [contentValue]);
 };
 
-// Resizes the SVG viewBox to match its container
+/**
+ * Sets and updates the SVG viewBox based on container size.
+ * Automatically adjusts on window resize.
+ */
 export const useCanvasResize = (
   svgRef: any,
   setViewBox: (vb: string) => void
@@ -41,7 +48,10 @@ export const useCanvasResize = (
   }, [svgRef, setViewBox]);
 };
 
-// Handles dragging behavior for a canvas box
+// =========================
+// Draggable Canvas Box Hook
+// =========================
+
 interface DraggableParams {
   gRef: any;
   element: any;
@@ -53,6 +63,9 @@ interface DraggableParams {
   updatePosition: (x: number, y: number) => void;
 }
 
+/**
+ * Enables drag interaction and overlay click handling for a <g> SVG box.
+ */
 export const useDraggableBox = ({
   gRef,
   element,
@@ -63,6 +76,7 @@ export const useDraggableBox = ({
   origin,
   updatePosition,
 }: DraggableParams) => {
+  // Converts mouse coordinates to SVG coordinates
   const getSvgPoint = (e: MouseEvent | React.MouseEvent) => {
     const svg = gRef.current!.ownerSVGElement!;
     const pt = svg.createSVGPoint();
@@ -71,6 +85,7 @@ export const useDraggableBox = ({
     return pt.matrixTransform(svg.getScreenCTM()!.inverse());
   };
 
+  // Handles starting a drag
   const onMouseDown = (e: MouseEvent | React.MouseEvent) => {
     e.stopPropagation();
     isDragging.current = true;
@@ -81,6 +96,7 @@ export const useDraggableBox = ({
     window.addEventListener("mouseup", onMouseUp);
   };
 
+  // Handles dragging movement
   const onMouseMove = (e: MouseEvent) => {
     if (!isDragging.current) return;
     const pt = getSvgPoint(e);
@@ -99,20 +115,24 @@ export const useDraggableBox = ({
     updatePosition(newX, newY);
   };
 
+  // Ends dragging
   const onMouseUp = () => {
     isDragging.current = false;
     window.removeEventListener("mousemove", onMouseMove);
     window.removeEventListener("mouseup", onMouseUp);
   };
 
+  // Initialize box render and overlay
   useEffect(() => {
     if (!gRef.current) return;
 
+    // Render SVG element
     const svgElement = createBoxRenderer(element);
     const padding = 12;
     gRef.current.innerHTML = "";
     gRef.current.appendChild(svgElement);
 
+    // Calculate dimensions
     const bbox = svgElement.getBBox();
     const width = bbox.width + padding * 2;
     const height = bbox.height + padding * 2;
@@ -125,6 +145,7 @@ export const useDraggableBox = ({
     svgElement.setAttribute("height", `${height}`);
 
     halfSize.current = { w: width / 2, h: height / 2 };
+
     gRef.current.setAttribute(
       "transform",
       `translate(${element.x - halfSize.current.w}, ${
@@ -132,6 +153,7 @@ export const useDraggableBox = ({
       })`
     );
 
+    // Transparent overlay for dragging and clicking
     const overlay = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "rect"

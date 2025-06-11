@@ -1,4 +1,9 @@
-/* === Canvas Wrapper === */
+/* ========================
+ * Canvas Outer Wrapper
+ * ========================
+ * Centers the canvas horizontally, aligns it to the top,
+ * and applies page-wide padding and background.
+ */
 .canvasWrapper {
   display: flex;
   justify-content: center;
@@ -9,7 +14,11 @@
   background-color: #f3f4f6;
 }
 
-/* === Canvas === */
+/* ========================
+ * Main SVG Canvas Styling
+ * ========================
+ * Gives the canvas full area, rounded edges, and a subtle shadow.
+ */
 .canvas {
   width: 100%;
   height: 100%;
@@ -19,7 +28,12 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* === Floating Editor Panel === */
+/* ===================================
+ * Floating Box Editor (Overlay Panel)
+ * ===================================
+ * Absolute positioning for placing the editor directly
+ * on top of the canvas from the top-left corner.
+ */
 .editorContainer {
   position: absolute;
   top: 0;

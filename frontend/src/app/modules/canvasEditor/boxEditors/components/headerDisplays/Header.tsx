@@ -5,15 +5,23 @@ import CollectionHeader from "./CollectionHeader";
 import { PrimitiveType } from "../../../shared/types";
 
 interface Props {
-  element: any;
-  dataType: PrimitiveType;
-  setDataType: React.Dispatch<React.SetStateAction<PrimitiveType>>;
-  value: string;
-  setValue: React.Dispatch<React.SetStateAction<string>>;
-  functionName: string;
-  setFunctionName: React.Dispatch<React.SetStateAction<string>>;
+  element: any; // The memory element being edited, includes its id and kind
+  dataType: PrimitiveType; // Current primitive type selected (if applicable)
+  setDataType: React.Dispatch<React.SetStateAction<PrimitiveType>>; // Function to update the primitive type
+  value: string; // Current value for primitive types
+  setValue: React.Dispatch<React.SetStateAction<string>>; // Function to update the value
+  functionName: string; // Name of the function (if the element is a function)
+  setFunctionName: React.Dispatch<React.SetStateAction<string>>; // Function to update the function name
 }
 
+/**
+ * Header renders the top section of a box editor, dynamically displaying the
+ * appropriate controls depending on the type of the memory element.
+ *
+ * - For "primitive" types, it shows an ID + type selector and value.
+ * - For "function" types, it shows an editable function name.
+ * - For collection types ("list", "set", "tuple", "dict"), it shows the ID and type.
+ */
 const Header = ({
   element,
   dataType,

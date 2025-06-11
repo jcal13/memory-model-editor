@@ -1,17 +1,33 @@
 import styles from "../../../styles/BoxEditorStyles.module.css";
 
+/**
+ * Props for the CollectionItem component.
+ */
 interface Props {
-  mode: "single" | "pair";
-  items: any[];
-  setItems: React.Dispatch<React.SetStateAction<any[]>>;
+  mode: "single" | "pair"; // Determines if the collection consists of single elements or key-value pairs
+  items: any[]; // Current array of collection items (e.g., list items or dict pairs)
+  setItems: React.Dispatch<React.SetStateAction<any[]>>; // State setter to update the collection
 }
 
+/**
+ * CollectionItem displays a list of editable items in either "single" or "pair" mode.
+ * - "single": renders a list of individual value boxes (e.g., list, tuple, set)
+ * - "pair": renders key-value pairs (e.g., dict), with a ":" separator between key and value
+ *
+ * Each item includes a "×" button to remove the item from the list.
+ */
 const CollectionItem = ({ mode, items, setItems }: Props) => {
+  /**
+   * Removes an item at the given index from the collection.
+   * @param idx - Index of the item to remove
+   */
   const removeItem = (idx: number) =>
     setItems(items.filter((_, i) => i !== idx));
 
+  // Don't render anything if the collection is empty
   if (items.length === 0) return null;
 
+  // Render collection for "single" mode
   if (mode === "single") {
     return (
       <div className={styles.collectionIdContainer}>
@@ -30,6 +46,7 @@ const CollectionItem = ({ mode, items, setItems }: Props) => {
     );
   }
 
+  // Render collection for "pair" mode
   return (
     <div className={styles.collectionPairsContainer}>
       {items.map((_, idx) => (

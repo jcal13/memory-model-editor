@@ -13,10 +13,24 @@ import {
 import { BoxEditorType } from "../../shared/types";
 import { useGlobalRefs } from "../hooks/useRef";
 
+/**
+ * BoxEditorModule renders the full editable UI for a memory box,
+ * including its header, content section, and remove button.
+ * It handles multiple kinds of memory elements: primitive, function, list, tuple, set, and dict.
+ *
+ * Props:
+ * - metadata: the element's structure, including id, kind, and content
+ * - onSave: function to call with the updated box data
+ * - onRemove: function to call to remove the box from the canvas
+ */
 const BoxEditorModule = ({ metadata, onSave, onRemove }: BoxEditorType) => {
+  // Shared hover state for remove button
   const { hoverRemove, setHoverRemove } = useGlobalStates();
+
+  // Ref to the entire module, used for drag/close handling
   const moduleRef = useGlobalRefs();
 
+  // State hooks for different box types
   const [dataType, setDataType, contentValue, setContentValue] =
     usePrimitiveStates(metadata);
   const [functionName, setFunctionName, functionParams, setFunctionParams] =
@@ -26,6 +40,7 @@ const BoxEditorModule = ({ metadata, onSave, onRemove }: BoxEditorType) => {
   const [collectionPairs, setCollectionPairs] =
     useCollectionPairsStates(metadata);
 
+  // Hook to sync the module and apply save logic when clicking outside
   useModule(
     moduleRef,
     onSave,
@@ -39,6 +54,7 @@ const BoxEditorModule = ({ metadata, onSave, onRemove }: BoxEditorType) => {
 
   return (
     <div ref={moduleRef} className={`drag-handle ${styles.boxEditorModule}`}>
+      {/* Top section: displays type-specific headers (id, selector, name) */}
       <Header
         element={metadata}
         dataType={dataType}
@@ -49,6 +65,7 @@ const BoxEditorModule = ({ metadata, onSave, onRemove }: BoxEditorType) => {
         setFunctionName={setFunctionName}
       />
 
+      {/* Middle section: displays the input or editable content for the box */}
       <Content
         metadata={metadata}
         dataType={dataType}
@@ -62,6 +79,7 @@ const BoxEditorModule = ({ metadata, onSave, onRemove }: BoxEditorType) => {
         setCollectionPairs={setCollectionPairs}
       />
 
+      {/* Bottom section: shows the remove button */}
       <RemoveButton
         element={metadata}
         onSave={onSave}

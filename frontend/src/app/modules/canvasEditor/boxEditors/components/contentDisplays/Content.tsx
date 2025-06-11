@@ -2,19 +2,31 @@ import PrimitiveContent from "./PrimitiveContent";
 import FunctionContent from "./FunctionContent";
 import CollectionContent from "./CollectionContent";
 
+/**
+ * Props for the Content component.
+ */
 interface Props {
-  metadata: any;
-  dataType: any;
-  value: string;
-  setValue: any;
-  functionParams: any;
-  setFunctionParams: any;
-  collectionItems: any;
-  setCollectionItems: any;
-  collectionPairs: any;
-  setCollectionPairs: any;
+  metadata: any; // The full metadata of the current box, including its kind
+  dataType: any; // The selected data type (used for primitive types)
+  value: string; // The value for primitive types
+  setValue: any; // Setter for primitive value
+  functionParams: any; // Parameter list for function boxes
+  setFunctionParams: any; // Setter for function parameters
+  collectionItems: any; // List/set/tuple items
+  setCollectionItems: any; // Setter for collection items
+  collectionPairs: any; // Key-value pairs for dicts
+  setCollectionPairs: any; // Setter for dict pairs
 }
 
+/**
+ * Content is a dynamic renderer that determines which specific editor
+ * component to show based on the type (`kind`) of the box.
+ *
+ * - Renders `PrimitiveContent` for primitive boxes.
+ * - Renders `FunctionContent` for function boxes.
+ * - Renders `CollectionContent` for lists, sets, and tuples (mode: "single").
+ * - Renders `CollectionContent` for dicts (mode: "pair").
+ */
 const Content = ({
   metadata,
   dataType,

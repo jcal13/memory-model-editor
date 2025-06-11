@@ -1,15 +1,33 @@
 import styles from "../../styles/BoxEditorStyles.module.css";
 
+/**
+ * Props for the FunctionContent component.
+ */
 interface Props {
-  functionParams: any;
-  setParams: any;
+  functionParams: any; // Array of parameter objects for the function
+  setParams: any; // Setter to update the list of parameters
 }
 
+/**
+ * FunctionContent renders editable fields for function parameters.
+ *
+ * Each parameter consists of:
+ * - A `name` input box for variable name
+ * - A visual placeholder for the parameter's target ID
+ * - A remove button to delete the parameter
+ *
+ * The component also provides an "Add Variable" button to append a new parameter.
+ */
 const FunctionContent = ({ functionParams, setParams }: Props) => {
+  // Add a new empty parameter to the list
   const addParam = () =>
     setParams([...functionParams, { name: "", targetId: null }]);
+
+  // Remove a parameter at a given index
   const removeParam = (i: number) =>
     setParams(functionParams.filter((_: any, idx: any) => idx !== i));
+
+  // Update the name of a parameter at a given index
   const changeName = (i: number, val: string) =>
     setParams(
       functionParams.map((p: any, idx: any) =>

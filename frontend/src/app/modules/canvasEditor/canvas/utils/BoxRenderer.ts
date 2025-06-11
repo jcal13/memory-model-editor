@@ -2,12 +2,19 @@ import MemoryViz from "memory-viz";
 import { CanvasElement } from "../../shared/types";
 import { BoxConfigs } from "./BoxConfigs";
 
+/* ==============================================
+   === SVG Renderer for Memory Model Elements ===
+============================================== */
+
 export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
   const { MemoryModel } = MemoryViz;
   const kind = element.kind;
   const kindName = kind.name;
 
+  // === Retrieve draw + sizing handlers for this element type
   const handler = BoxConfigs[kindName];
+
+  // === Configure MemoryViz rendering options
   const config = {
     obj_min_width: handler?.getMinWidth?.() ?? 190,
     obj_min_height: handler?.getHeight?.(kind) ?? 90,
@@ -19,8 +26,10 @@ export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
     roughjs_config: { options: { fillStyle: "solid" } },
   };
 
+  // === Create the MemoryViz model and draw the element
   const model = new MemoryModel(config);
   handler?.draw?.(model, kind, Number(element.id));
 
+  // === Return the generated SVG node
   return model.svg;
 }

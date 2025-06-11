@@ -1,12 +1,20 @@
+/* =======================================
+   === Palette Wrapper & Background =====
+======================================= */
+
 .paletteWrapper {
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding: 16px 10px;
-  height: 100vh;
+  height: 100vh; /* full viewport height */
+  background-color: #f3f4f6; /* soft gray background */
   box-sizing: border-box;
-  background-color: #f3f4f6;
 }
+
+/* =======================================
+   === Palette Container (Sidebar Card) ==
+======================================= */
 
 .paletteContainer {
   width: 100%;
@@ -17,10 +25,34 @@
   background-color: #fafafa;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
+
+  /* Scrollbar (hidden until scroll) */
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #d1d5db transparent; /* Firefox track / thumb */
 }
+
+.paletteContainer::-webkit-scrollbar {
+  width: 8px; /* Chrome / Edge scrollbar width */
+}
+
+.paletteContainer::-webkit-scrollbar-track {
+  background: transparent; /* Track color */
+}
+
+.paletteContainer::-webkit-scrollbar-thumb {
+  background: #d1d5db; /* Thumb color */
+  border-radius: 4px;
+  visibility: hidden; /* Hide until hover */
+}
+
+.paletteContainer:hover::-webkit-scrollbar-thumb {
+  visibility: visible; /* Show thumb on hover */
+}
+
+/* =======================================
+   === Palette Title =====================
+======================================= */
 
 .paletteTitle {
   text-align: center;
@@ -33,9 +65,13 @@
   padding-bottom: 8px;
 }
 
+/* =======================================
+   === Box List ==========================
+======================================= */
+
 .paletteBoxes {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 16px; /* vertical spacing between PaletteBox items */
 }

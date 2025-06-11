@@ -69,7 +69,7 @@ export default function SetEditor({
 
   return (
     <EditorModule
-      id={Number(element.id)}
+      id={element.id}
       typeLabel="set"
       onSave={handleSave}
       onCancel={onCancel}

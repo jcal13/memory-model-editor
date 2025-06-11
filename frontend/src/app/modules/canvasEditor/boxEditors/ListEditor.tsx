@@ -70,7 +70,7 @@ export default function ListEditor({
 
   return (
     <EditorModule
-      id={Number(element.id)}
+      id={element.id}
       typeLabel="list"
       onSave={handleSave}
       onCancel={onCancel}

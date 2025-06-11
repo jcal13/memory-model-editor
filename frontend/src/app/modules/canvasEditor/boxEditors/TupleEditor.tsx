@@ -69,7 +69,7 @@ export default function TupleEditor({
 
   return (
     <EditorModule
-      id={Number(element.id)}
+      id={element.id}
       typeLabel="tuple"
       onSave={handleSave}
       onCancel={onCancel}

@@ -39,7 +39,7 @@ export default function PrimitiveEditor({
   useEffect(() => {
     const outside = (e: MouseEvent) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
-        onSave(Number(element.id),
+        onSave(element.id,
         {
           name: element.kind.name,
           type: dataTypeRef.current,

@@ -34,19 +34,17 @@ const CollectionItem = ({ mode, items, setItems }: Props) => {
     <div className={styles.collectionPairsContainer}>
       {items.map((_, idx) => (
         <div key={idx} className={styles.collectionPairContainer}>
-          <button className={styles.collectionIdBox}>
+          <div className={styles.collectionIdBox}>
             <div className={styles.collectionIdBoxText}>+</div>
-          </button>
+          </div>
           <div className={styles.collectionPairSeparator}>:</div>
-          <div>
-            <button className={styles.collectionIdBox}>
-              <div className={styles.collectionIdBoxText}>+</div>
-              <button
-                className={styles.collectionRemoveId}
-                onClick={() => removeItem(idx)}
-              >
-                ×
-              </button>
+          <div className={styles.collectionIdBox}>
+            <div className={styles.collectionIdBoxText}>+</div>
+            <button
+              className={styles.collectionRemoveId}
+              onClick={() => removeItem(idx)}
+            >
+              ×
             </button>
           </div>
         </div>

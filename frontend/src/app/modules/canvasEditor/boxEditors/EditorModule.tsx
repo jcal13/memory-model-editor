@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 
 interface Props {
-  id: number | string;
+  id: number | "None";
   typeLabel?: string;
   onSave: () => void;
   onCancel: () => void;

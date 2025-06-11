@@ -3,10 +3,10 @@ import EditorModule from "./EditorModule";
 
 type Props = {
   element: {
-    id: string;
+    id: number | "None";
     kind: { name: string; type: string; value: any[] };
   };
-  onSave: (data: { name: string; type: string; value: any[] }) => void;
+  onSave: (id: number | "None", data: { name: string; type: string; value: any[] }) => void;
   onCancel: () => void;
   onRemove: () => void;
 };
@@ -24,7 +24,7 @@ export default function ListEditor({
     setItems(items.filter((_, i) => i !== idx));
 
   const handleSave = () => {
-    onSave({ name: element.kind.name, type: element.kind.type, value: items });
+    onSave(element.id, { name: element.kind.name, type: element.kind.type, value: items });
   };
 
   const pill: React.CSSProperties = {

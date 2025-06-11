@@ -3,14 +3,16 @@ import EditorModule from "./EditorModule";
 
 type Props = {
   element: {
-    id: string;
+    id: number | "None";
     kind: {
       name: string;
       type: string;
       value: Record<string, number | null>;
     };
   };
-  onSave: (data: {
+  onSave: (
+  id: number | "None", 
+  data: {
     name: string;
     type: string;
     value: Record<string, number | null>;
@@ -36,7 +38,7 @@ export default function DictEditor({
   const handleSave = () => {
     const out: Record<string, number | null> = {};
     for (const [k, v] of entries) if (k.trim()) out[k] = v;
-    onSave({ name: "dict", type: "dict", value: out });
+    onSave(element.id, { name: "dict", type: "dict", value: out });
   };
 
   const pill: React.CSSProperties = {
@@ -81,7 +83,7 @@ export default function DictEditor({
   };
   return (
     <EditorModule
-      id={Number(element.id)}
+      id={element.id}
       typeLabel="dict"
       onSave={handleSave}
       onCancel={onCancel}
@@ -101,13 +103,11 @@ export default function DictEditor({
             style={{ display: "flex", alignItems: "center", gap: 24 }}
           >
             <button style={pill}>
-              {" "}
               <p style={{ opacity: 0.5 }}>+</p>
             </button>
             <span style={{ fontSize: "2rem" }}>:</span>
             <div style={{ position: "relative" }}>
               <button style={pill}>
-                {" "}
                 <p style={{ opacity: 0.5 }}>+</p>
               </button>
               <button

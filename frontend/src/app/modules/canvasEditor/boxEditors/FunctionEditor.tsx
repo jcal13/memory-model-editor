@@ -1,16 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import { FunctionKind } from "../shared/types";
 
 type Param = { name: string; targetId: number | null };
-interface Kind {
-  name: "function";
-  type: "function";
-  value: null;
-  functionName: string;
-  params: Param[];
-}
+
+
 interface Props {
-  element: { id: string; kind: Kind };
-  onSave: (kind: Kind) => void;
+  element: { id: number | "None"; kind: FunctionKind };
+  onSave: (id: number | "None", kind: FunctionKind) => void;
   onCancel: () => void;
   onRemove: () => void;
 }
@@ -43,7 +39,9 @@ export default function FunctionEditor({
     setParams(params.map((p, idx) => (idx === i ? { ...p, name: val } : p)));
 
   const handleSave = () =>
-    onSave({
+    onSave(
+      element.id,
+    {
       name: "function",
       type: "function",
       value: null,

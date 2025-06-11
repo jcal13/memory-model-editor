@@ -9,8 +9,8 @@ interface PrimitiveKind {
 }
 
 interface Props {
-  element: { id: string; kind: PrimitiveKind };
-  onSave: (kind: PrimitiveKind) => void;
+  element: { id: number | "None"; kind: PrimitiveKind };
+  onSave: (id: number | "None", kind: PrimitiveKind) => void;
   onCancel: () => void;
   onRemove: () => void;
 }
@@ -39,11 +39,13 @@ export default function PrimitiveEditor({
   useEffect(() => {
     const outside = (e: MouseEvent) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
-        onSave({
+        onSave(Number(element.id),
+        {
           name: element.kind.name,
           type: dataTypeRef.current,
           value: valueRef.current,
-        });
+        }
+      );
       }
     };
     document.addEventListener("mousedown", outside);
@@ -66,7 +68,7 @@ export default function PrimitiveEditor({
       : true;
 
   const handleSave = () => {
-    onSave({ name: element.kind.name, type: dataType, value });
+    onSave(element.id, { name: element.kind.name, type: dataType, value });
   };
 
   const changeType = (t: PrimitiveType) => {

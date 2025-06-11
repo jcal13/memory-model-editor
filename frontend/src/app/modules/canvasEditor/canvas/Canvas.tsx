@@ -96,10 +96,10 @@ export default function Canvas({ elements, setElements }: Props) {
     ]);
   };
 
-  const saveElement = (updatedKind: ElementKind) => {
+  const saveElement = (updatedId: number, updatedKind: ElementKind) => {
     if (!selected) return;
     setElements(prev =>
-      prev.map(el => (el.boxId === selected.boxId ? { ...el, kind: updatedKind } : el))
+      prev.map(el => (el.boxId === selected.boxId ? { ...el, id: updatedId, kind: updatedKind } : el))
     );
     setSelected(null);
   };
@@ -123,10 +123,10 @@ export default function Canvas({ elements, setElements }: Props) {
         <g>
           {elements.map(el => (
             <CanvasBox
-              key={el.id}
+              key={el.boxId}
               element={el}
               openInterface={() => setSelected(el)}
-              updatePosition={makePositionUpdater(Number(el.id))}
+              updatePosition={makePositionUpdater(Number(el.boxId))}
             />
           ))}
         </g>

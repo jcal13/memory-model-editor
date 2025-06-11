@@ -1,4 +1,4 @@
-import { pillBase } from "../../../styles/boxEditorStyles";
+import styles from "../../../styles/boxEditorStyles.module.css";
 
 interface Props {
   functionName: any;
@@ -7,24 +7,9 @@ interface Props {
 
 const FunctionName = ({ functionName, setFunctionName }: Props) => {
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        padding: 10,
-        borderBottom: "1px solid #ddd",
-        borderTopLeftRadius: 6,
-        borderTopRightRadius: 6,
-      }}
-    >
+    <div>
       <input
-        style={{
-          ...pillBase,
-          width: 160,
-          height: 40,
-          padding: "0 10px",
-          fontSize: "0.9rem",
-        }}
+        className={styles.functionNameInput}
         placeholder="function name"
         value={functionName}
         onChange={(e) => setFunctionName(e.target.value)}

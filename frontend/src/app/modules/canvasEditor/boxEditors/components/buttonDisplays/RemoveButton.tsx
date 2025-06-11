@@ -1,4 +1,5 @@
 import { PrimitiveKind } from "../../../shared/types";
+import styles from "../../styles/boxEditorStyles.module.css";
 
 interface Props {
   element: {
@@ -56,21 +57,12 @@ const RemoveButton = ({
   };
 
   return (
-    <div style={{ padding: 24, display: "flex", justifyContent: "flex-end" }}>
+    <div className={styles.removeButtonContainer}>
       <button
         onMouseEnter={() => setHoverRemove(true)}
         onMouseLeave={() => setHoverRemove(false)}
         onClick={handleClick}
-        style={{
-          backgroundColor: hoverRemove ? "#d32f2f" : "#f44336",
-          color: "#fff",
-          border: "none",
-          padding: "4px 6px",
-          fontSize: "0.8rem",
-          borderRadius: 4,
-          cursor: "pointer",
-          transition: "background-color 0.25s ease",
-        }}
+        className={styles.removeButton}
       >
         Remove Box
       </button>

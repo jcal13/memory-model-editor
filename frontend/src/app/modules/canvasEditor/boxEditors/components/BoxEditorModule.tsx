@@ -1,4 +1,4 @@
-import { module } from "../styles/boxEditorStyles";
+import styles from "../styles/boxEditorStyles.module.css";
 import RemoveButton from "./buttonDisplays/RemoveButton";
 import Header from "./headerDisplays/Header";
 import Content from "./contentDisplays/Content";
@@ -38,7 +38,7 @@ const BoxEditorModule = ({ metadata, onSave, onRemove }: BoxEditorType) => {
   );
 
   return (
-    <div ref={moduleRef} className="drag-handle" style={{ ...module }}>
+    <div ref={moduleRef} className={`drag-handle ${styles.boxEditorModule}`}>
       <Header
         element={metadata}
         dataType={dataType}

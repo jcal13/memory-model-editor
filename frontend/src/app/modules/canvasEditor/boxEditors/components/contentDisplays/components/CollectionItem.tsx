@@ -1,4 +1,4 @@
-import { closeBase, closeButton, pill } from "../../../styles/boxEditorStyles";
+import styles from "../../../styles/boxEditorStyles.module.css";
 
 interface Props {
   mode: "single" | "pair";
@@ -22,7 +22,7 @@ const CollectionItem = ({ mode, items, setItems }: Props) => {
         }}
       >
         {items.map((_, idx) => (
-          <div key={idx} style={pill}>
+          <div key={idx}>
             +
             <button
               onClick={() => removeItem(idx)}
@@ -32,7 +32,6 @@ const CollectionItem = ({ mode, items, setItems }: Props) => {
               onMouseLeave={(e) =>
                 (e.currentTarget.style.backgroundColor = "#f44336")
               }
-              style={closeBase}
             >
               ×
             </button>
@@ -56,10 +55,10 @@ const CollectionItem = ({ mode, items, setItems }: Props) => {
           key={idx}
           style={{ display: "flex", alignItems: "center", gap: 24 }}
         >
-          <button style={pill}>+</button>
+          <button>+</button>
           <span style={{ fontSize: "2rem" }}>:</span>
           <div style={{ position: "relative" }}>
-            <button style={pill}>+</button>
+            <button>+</button>
             <button
               onClick={() => removeItem(idx)}
               onMouseEnter={(e) =>
@@ -68,7 +67,6 @@ const CollectionItem = ({ mode, items, setItems }: Props) => {
               onMouseLeave={(e) =>
                 (e.currentTarget.style.backgroundColor = "#f44336")
               }
-              style={closeButton}
             >
               ×
             </button>

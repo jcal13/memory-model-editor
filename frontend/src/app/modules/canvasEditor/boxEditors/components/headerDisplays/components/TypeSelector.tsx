@@ -1,4 +1,4 @@
-import { pill } from "../../../styles/boxEditorStyles";
+import styles from "../../../styles/boxEditorStyles.module.css";
 
 type PrimitiveType = "None" | "int" | "float" | "str" | "bool";
 
@@ -30,7 +30,6 @@ const TypeSelector = ({ dataType, setDataType, value, setValue }: Props) => {
     <select
       value={dataType}
       onChange={(e) => changeType(e.target.value as PrimitiveType)}
-      style={{ ...pill, cursor: "pointer", appearance: "none" }}
     >
       <option value="None">None</option>
       <option value="int">int</option>

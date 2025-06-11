@@ -1,4 +1,4 @@
-import { pill } from "../../../styles/boxEditorStyles";
+import styles from "../../../styles/boxEditorStyles.module.css";
 import { PrimitiveKind } from "../../../../shared/types";
 
 interface Props {
@@ -6,7 +6,7 @@ interface Props {
 }
 
 const IdDisplay = ({ element }: Props) => {
-  return <span style={pill}>ID&nbsp;{element.id}</span>;
+  return <span className={styles.pill}>ID&nbsp;{element.id}</span>;
 };
 
 export default IdDisplay;

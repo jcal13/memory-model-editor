@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import Draggable from "react-draggable";
 import { CanvasElement, BoxType } from "../shared/types";
 import CanvasBox from "./CanvasBox";
-
 import BoxEditor from "../boxEditors/BoxEditor";
 
 const editorMap: Record<BoxType["name"], React.FC<any>> = {
@@ -24,6 +23,8 @@ export default function Canvas({ elements, setElements }: Props) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [viewBox, setViewBox] = useState<string>("0 0 0 0");
 
+  const dragRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
@@ -38,13 +39,12 @@ export default function Canvas({ elements, setElements }: Props) {
     return () => window.removeEventListener("resize", recalc);
   }, []);
 
-  const makePositionUpdater = (id: number) => (x: number, y: number) => {
-    setElements((prev) =>
-      prev.map((el) => (el.id === id ? { ...el, x, y } : el))
-    );
-  };
-
-  const dragRef = useRef<HTMLDivElement>(null);
+  const makePositionUpdater =
+    (id: string | number) => (x: number, y: number) => {
+      setElements((prev) =>
+        prev.map((el) => (el.id === id ? { ...el, x, y } : el))
+      );
+    };
 
   const handleDrop = (e: React.DragEvent<SVGSVGElement>) => {
     e.preventDefault();
@@ -103,25 +103,6 @@ export default function Canvas({ elements, setElements }: Props) {
     setSelected(null);
   };
 
-  // const saveFunction = (kind: BoxType) => {
-  //   if (!selected) return;
-  //   setElements((prev) =>
-  //     prev.map((el) =>
-  //       el.id === selected.id
-  //         ? {
-  //             ...el,
-  //             kind: {
-  //               name: "function",
-  //               type: "function",
-  //               value: null,
-  //               functionName: (kind as any).functionName ?? "myFunction",
-  //               params: (kind as any).params ?? [],
-  //             },
-  //           }
-  //         : el
-  //     )
-  //   );
-
   const removeElement = () => {
     if (!selected) return;
     setElements((prev) => prev.filter((el) => el.id !== selected.id));
@@ -144,7 +125,7 @@ export default function Canvas({ elements, setElements }: Props) {
               key={el.id}
               element={el}
               openInterface={() => setSelected(el)}
-              updatePosition={makePositionUpdater(Number(el.id))}
+              updatePosition={makePositionUpdater(el.id)}
             />
           ))}
         </g>
@@ -154,7 +135,10 @@ export default function Canvas({ elements, setElements }: Props) {
         <Draggable
           nodeRef={dragRef as React.RefObject<HTMLElement>}
           handle=".drag-handle"
-          defaultPosition={{ x: 400, y: 80 }}
+          defaultPosition={{
+            x: typeof window !== "undefined" ? window.innerWidth / 4 : 0,
+            y: typeof window !== "undefined" ? window.innerHeight / 4 : 0,
+          }}
         >
           <div
             ref={dragRef}

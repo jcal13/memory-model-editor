@@ -1,4 +1,4 @@
-import { header } from "../../styles/boxEditorStyles";
+import styles from "../../styles/boxEditorStyles.module.css";
 import PrimitiveHeader from "./PrimitiveHeader";
 import FunctionHeader from "./FunctionHeader";
 import CollectionHeader from "./CollectionHeader";
@@ -26,7 +26,7 @@ const Header = ({
   const kind = element.kind.name;
 
   return (
-    <div style={{ ...header }}>
+    <div className={styles.header}>
       {kind === "primitive" && (
         <PrimitiveHeader
           element={element}

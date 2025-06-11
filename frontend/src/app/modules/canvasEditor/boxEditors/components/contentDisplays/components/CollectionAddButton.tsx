@@ -1,12 +1,13 @@
-import { addButton, addPairButton } from "../../../styles/boxEditorStyles";
+import styles from "../../../styles/boxEditorStyles.module.css";
 
 interface Props {
   mode: "single" | "pair";
   items: any[];
   setItems: React.Dispatch<React.SetStateAction<any[]>>;
+  buttonText?: string;
 }
 
-const CollectionAddButton = ({ mode, items, setItems }: Props) => {
+const CollectionAddButton = ({ mode, items, setItems, buttonText }: Props) => {
   const handleAdd = () => {
     if (mode === "single") {
       setItems([...items, null]);
@@ -15,14 +16,11 @@ const CollectionAddButton = ({ mode, items, setItems }: Props) => {
     }
   };
 
-  const buttonText = mode === "single" ? "+ Add Element" : "+ Add Pair";
-  const buttonStyle = mode === "single" ? addButton : addPairButton;
+  const defaultText = mode === "single" ? "+ Add Element" : "+ Add Pair";
 
   return (
-    <div style={{ display: "flex", justifyContent: "center" }}>
-      <button onClick={handleAdd} style={buttonStyle}>
-        {buttonText}
-      </button>
+    <div>
+      <button onClick={handleAdd}>{buttonText ?? defaultText}</button>
     </div>
   );
 };

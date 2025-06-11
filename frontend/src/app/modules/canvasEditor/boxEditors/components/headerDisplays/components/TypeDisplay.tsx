@@ -1,11 +1,11 @@
-import { pill } from "../../../styles/boxEditorStyles";
+import styles from "../../../styles/boxEditorStyles.module.css";
 
 interface Props {
   typeLabel: any;
 }
 
 const TypeDisplay = ({ typeLabel }: Props) => {
-  return <span style={pill}>{typeLabel}</span>;
+  return <span>{typeLabel}</span>;
 };
 
 export default TypeDisplay;

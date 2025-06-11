@@ -1,8 +1,4 @@
-import {
-  pillBase,
-  closeButton,
-  functionModule,
-} from "../../styles/boxEditorStyles";
+import styles from "../../styles/boxEditorStyles.module.css";
 
 interface Props {
   functionParams: any;
@@ -20,73 +16,35 @@ const FunctionContent = ({ functionParams, setParams }: Props) => {
         idx === i ? { ...p, name: val } : p
       )
     );
-  return (
-    <div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 24,
-          padding: "0 24px",
-        }}
-      >
-        {functionParams.map((p: any, idx: any) => (
-          <div
-            key={idx}
-            style={{ display: "flex", alignItems: "center", gap: 24 }}
-          >
-            <input
-              style={{
-                ...pillBase,
-              }}
-              placeholder="var"
-              value={p.name}
-              onChange={(e) => changeName(idx, e.target.value)}
-            />
-            <span style={{ fontSize: "2rem" }}>=</span>
-            <div style={{ position: "relative" }}>
-              <div
-                style={{
-                  ...pillBase,
-                  width: 80,
-                  height: 50,
-                  fontSize: "1.6rem",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  cursor: "pointer",
-                }}
-              >
-                +
-              </div>
-              <button
-                onClick={() => removeParam(idx)}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor = "#d32f2f")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.backgroundColor = "#f44336")
-                }
-                style={closeButton}
-              >
-                ×
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
 
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <button
-          onClick={addParam}
-          style={{
-            ...pillBase,
-            padding: "10px 26px",
-            fontSize: "1rem",
-            cursor: "pointer",
-          }}
-        >
-          + Add Variable
+  return (
+    <div className={styles.contentContainer}>
+      {functionParams.length > 0 && (
+        <div className={styles.ItemContainer}>
+          {functionParams.map((p: any, idx: any) => (
+            <div key={idx} className={styles.pairItem}>
+              <input
+                placeholder="var"
+                value={p.name}
+                onChange={(e) => changeName(idx, e.target.value)}
+                className={styles.variableNameBox}
+              />
+              <div className={styles.idBox}>
+                <div className={styles.idBoxText}>+</div>
+                <button
+                  onClick={() => removeParam(idx)}
+                  className={styles.removeItem}
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      <div>
+        <button className={styles.addButton} onClick={addParam}>
+          Add Variable
         </button>
       </div>
     </div>

@@ -43,9 +43,9 @@ export default function Canvas({ elements, setElements }: Props) {
     return () => window.removeEventListener("resize", recalc);
   }, []);
 
-  const makePositionUpdater = (id: number) => (x: number, y: number) => {
+  const makePositionUpdater = (boxId: number) => (x: number, y: number) => {
     setElements(prev =>
-      prev.map(el => (el.id === id ? { ...el, x, y } : el))
+      prev.map(el => (el.boxId === boxId ? { ...el, x, y } : el))
     );
   };
 
@@ -92,21 +92,21 @@ export default function Canvas({ elements, setElements }: Props) {
 
     setElements(prev => [
       ...prev,
-      { id: prev.length, kind: newKind, x: coords.x, y: coords.y },
+      { boxId: prev.length, id: "None", kind: newKind, x: coords.x, y: coords.y },
     ]);
   };
 
   const saveElement = (updatedKind: ElementKind) => {
     if (!selected) return;
     setElements(prev =>
-      prev.map(el => (el.id === selected.id ? { ...el, kind: updatedKind } : el))
+      prev.map(el => (el.boxId === selected.boxId ? { ...el, kind: updatedKind } : el))
     );
     setSelected(null);
   };
 
   const removeElement = () => {
     if (!selected) return;
-    setElements(prev => prev.filter(el => el.id !== selected.id));
+    setElements(prev => prev.filter(el => el.boxId !== selected.boxId));
     setSelected(null);
   };
 

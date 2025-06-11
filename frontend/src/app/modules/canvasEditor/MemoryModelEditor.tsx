@@ -3,10 +3,12 @@ import Canvas from "./canvas/Canvas";
 import Palette from "./palette/Palette";
 import { CanvasElement } from "./shared/types";
 import { buildJSONFromElements } from "./jsonConversion/jsonBuilder";
+import IdSelector from "./idSelector/IdSelector";
 
 export default function MemoryModelEditor() {
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [jsonView, setJsonView] = useState<string>("");
+  const [ids, setIds] = useState<number[]>([]);
 
   // Width state for the right placeholder pane
   const [placeholderWidth, setPlaceholderWidth] = useState<number>(300);

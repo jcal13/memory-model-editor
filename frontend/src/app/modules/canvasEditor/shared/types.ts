@@ -51,7 +51,8 @@ export type ElementKind =
   | DictKind;
 
 export interface CanvasElement {
-  id: number | string;
+  boxId: number;
+  id: number | "None";
   x: number;
   y: number;
   kind: ElementKind;

@@ -1,4 +1,4 @@
-import styles from "../../styles/boxEditorStyles.module.css";
+import styles from "../../styles/BoxEditorStyles.module.css";
 import PrimitiveHeader from "./PrimitiveHeader";
 import FunctionHeader from "./FunctionHeader";
 import CollectionHeader from "./CollectionHeader";

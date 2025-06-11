@@ -1,29 +1,68 @@
 import { useEffect } from "react";
-import { createBoxRenderer } from "../BoxRenderer";
+import { createBoxRenderer } from "../utils/BoxRenderer";
 
-// save the set data type to the UI
-export const useDataType = (dataTypeRef: any, dataType: any) => {
+// Syncs a ref with the current dataType value
+export const useDataType = (
+  dataTypeRef: React.MutableRefObject<any>,
+  dataType: any
+) => {
   useEffect(() => {
     dataTypeRef.current = dataType;
   }, [dataType]);
 };
 
-export const useContentValue = (contentValueRef: any, contentValue: any) => {
+// Syncs a ref with the current contentValue value
+export const useContentValue = (
+  contentValueRef: React.MutableRefObject<any>,
+  contentValue: any
+) => {
   useEffect(() => {
     contentValueRef.current = contentValue;
   }, [contentValue]);
 };
 
-export const useDraggable = (
-  gRef: any,
-  element: any,
-  halfSize: any,
-  openInterface: any,
-  isDragging: any,
-  start: any,
-  origin: any,
-  updatePosition: any
+// Resizes the SVG viewBox to match its container
+export const useCanvasResize = (
+  svgRef: any,
+  setViewBox: (vb: string) => void
 ) => {
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+
+    const recalc = () => {
+      const { width, height } = svg.getBoundingClientRect();
+      setViewBox(`0 0 ${width} ${height}`);
+    };
+
+    recalc();
+    window.addEventListener("resize", recalc);
+    return () => window.removeEventListener("resize", recalc);
+  }, [svgRef, setViewBox]);
+};
+
+// Handles dragging behavior for a canvas box
+interface DraggableParams {
+  gRef: any;
+  element: any;
+  halfSize: any;
+  openInterface: any;
+  isDragging: any;
+  start: any;
+  origin: any;
+  updatePosition: (x: number, y: number) => void;
+}
+
+export const useDraggableBox = ({
+  gRef,
+  element,
+  halfSize,
+  openInterface,
+  isDragging,
+  start,
+  origin,
+  updatePosition,
+}: DraggableParams) => {
   const getSvgPoint = (e: MouseEvent | React.MouseEvent) => {
     const svg = gRef.current!.ownerSVGElement!;
     const pt = svg.createSVGPoint();
@@ -52,6 +91,9 @@ export const useDraggable = (
     const vb = svg.viewBox.baseVal;
     const { w, h } = halfSize.current;
 
+    const clamp = (val: number, min: number, max: number) =>
+      Math.min(Math.max(val, min), max);
+
     const newX = clamp(origin.current.x + dx, vb.x + w, vb.x + vb.width - w);
     const newY = clamp(origin.current.y + dy, vb.y + h, vb.y + vb.height - h);
     updatePosition(newX, newY);
@@ -62,9 +104,6 @@ export const useDraggable = (
     window.removeEventListener("mousemove", onMouseMove);
     window.removeEventListener("mouseup", onMouseUp);
   };
-
-  const clamp = (val: number, min: number, max: number) =>
-    Math.min(Math.max(val, min), max);
 
   useEffect(() => {
     if (!gRef.current) return;

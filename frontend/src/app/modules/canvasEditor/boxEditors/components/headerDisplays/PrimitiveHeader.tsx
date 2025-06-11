@@ -1,6 +1,6 @@
 import IdDisplay from "./components/IdDisplay";
 import TypeSelector from "./components/TypeSelector";
-import styles from "../../styles/boxEditorStyles.module.css";
+import styles from "../../styles/BoxEditorStyles.module.css";
 
 interface Props {
   element: any;

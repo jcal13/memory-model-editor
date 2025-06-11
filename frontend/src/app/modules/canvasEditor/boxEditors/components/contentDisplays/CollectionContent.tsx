@@ -1,6 +1,6 @@
 import CollectionItem from "./components/CollectionItem";
 import CollectionAddButton from "./components/CollectionAddButton";
-import styles from "../../styles/boxEditorStyles.module.css";
+import styles from "../../styles/BoxEditorStyles.module.css";
 
 interface Props {
   mode: "single" | "pair";

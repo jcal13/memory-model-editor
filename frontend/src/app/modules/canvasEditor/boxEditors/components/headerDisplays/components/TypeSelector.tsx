@@ -1,4 +1,4 @@
-import styles from "../../../styles/boxEditorStyles.module.css";
+import styles from "../../../styles/BoxEditorStyles.module.css";
 
 type PrimitiveType = "None" | "int" | "float" | "str" | "bool";
 

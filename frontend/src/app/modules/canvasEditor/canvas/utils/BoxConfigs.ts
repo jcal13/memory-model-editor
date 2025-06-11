@@ -8,7 +8,9 @@ const getValues = (kind: any): number[] => {
   if (Array.isArray(kind.value)) {
     return kind.value.map((v: any) => +v).filter((v: number) => !isNaN(v));
   } else if (kind.value && typeof kind.value === "object") {
-    return Object.values(kind.value).map((v: any) => +v).filter((v) => !isNaN(v));
+    return Object.values(kind.value)
+      .map((v: any) => +v)
+      .filter((v) => !isNaN(v));
   }
   return [];
 };
@@ -16,8 +18,11 @@ const getValues = (kind: any): number[] => {
 export const BoxConfigs = {
   primitive: {
     draw: (model: any, kind: any, id: number) => {
-      const type = kind.type === "None" || kind.value === null ? "None" : kind.type;
-      const value = ["string", "number", "boolean"].includes(typeof kind.value) ? kind.value : "";
+      const type =
+        kind.type === "None" || kind.value === null ? "None" : kind.type;
+      const value = ["string", "number", "boolean"].includes(typeof kind.value)
+        ? kind.value
+        : "";
       model.drawPrimitive(0, 0, type, id, value, style);
     },
     getHeight: () => 90,
@@ -58,7 +63,10 @@ export const BoxConfigs = {
   },
   dict: {
     draw: (model: any, kind: any, id: number) => {
-      const dict = typeof kind.value === "object" && !Array.isArray(kind.value) ? kind.value : {};
+      const dict =
+        typeof kind.value === "object" && !Array.isArray(kind.value)
+          ? kind.value
+          : {};
       model.drawDict(0, 0, id, dict, style);
     },
     getHeight: () => 200,

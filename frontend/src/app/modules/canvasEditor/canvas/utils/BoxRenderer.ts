@@ -1,5 +1,5 @@
 import MemoryViz from "memory-viz";
-import { CanvasElement } from "../shared/types";
+import { CanvasElement } from "../../shared/types";
 import { BoxConfigs } from "./BoxConfigs";
 
 export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
@@ -21,6 +21,6 @@ export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
 
   const model = new MemoryModel(config);
   handler?.draw?.(model, kind, Number(element.id));
-  
+
   return model.svg;
 }

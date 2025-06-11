@@ -1,0 +1,41 @@
+.paletteWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 16px 10px;
+  height: 100vh;
+  box-sizing: border-box;
+  background-color: #f3f4f6;
+}
+
+.paletteContainer {
+  width: 100%;
+  height: 100%;
+  padding: 20px 30px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #fafafa;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.paletteTitle {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #1f2937;
+  margin: 10px 0 25px 0;
+  letter-spacing: 0.25px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 8px;
+}
+
+.paletteBoxes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}

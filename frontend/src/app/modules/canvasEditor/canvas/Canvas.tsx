@@ -1,8 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import Draggable from "react-draggable";
 import { CanvasElement, BoxType } from "../shared/types";
-import CanvasBox from "./CanvasBox";
+import CanvasBox from "./components/CanvasBox";
 import BoxEditor from "../boxEditors/BoxEditor";
+import { useCanvasResize } from "./hooks/useEffect";
+import { useCanvasRefs } from "./hooks/useRef";
+import styles from "./styles/Canvas.module.css";
 
 const editorMap: Record<BoxType["name"], React.FC<any>> = {
   primitive: BoxEditor,
@@ -20,24 +23,10 @@ interface Props {
 
 export default function Canvas({ elements, setElements }: Props) {
   const [selected, setSelected] = useState<CanvasElement | null>(null);
-  const svgRef = useRef<SVGSVGElement | null>(null);
+  const { svgRef, dragRef } = useCanvasRefs();
   const [viewBox, setViewBox] = useState<string>("0 0 0 0");
 
-  const dragRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const svg = svgRef.current;
-    if (!svg) return;
-
-    const recalc = () => {
-      const { width, height } = svg.getBoundingClientRect();
-      setViewBox(`0 0 ${width} ${height}`);
-    };
-
-    recalc();
-    window.addEventListener("resize", recalc);
-    return () => window.removeEventListener("resize", recalc);
-  }, []);
+  useCanvasResize(svgRef, setViewBox);
 
   const makePositionUpdater =
     (id: string | number) => (x: number, y: number) => {
@@ -111,25 +100,27 @@ export default function Canvas({ elements, setElements }: Props) {
 
   return (
     <>
-      <svg
-        ref={svgRef}
-        viewBox={viewBox}
-        preserveAspectRatio="xMinYMin meet"
-        style={{ border: "1px solid #000", width: "100%", height: "99%" }}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={handleDrop}
-      >
-        <g>
-          {elements.map((el) => (
-            <CanvasBox
-              key={el.id}
-              element={el}
-              openInterface={() => setSelected(el)}
-              updatePosition={makePositionUpdater(el.id)}
-            />
-          ))}
-        </g>
-      </svg>
+      <div className={styles.canvasWrapper}>
+        <svg
+          ref={svgRef}
+          viewBox={viewBox}
+          preserveAspectRatio="xMinYMin meet"
+          className={styles.canvas}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={handleDrop}
+        >
+          <g>
+            {elements.map((el) => (
+              <CanvasBox
+                key={el.id}
+                element={el}
+                openInterface={() => setSelected(el)}
+                updatePosition={makePositionUpdater(el.id)}
+              />
+            ))}
+          </g>
+        </svg>
+      </div>
 
       {selected && (
         <Draggable
@@ -140,15 +131,7 @@ export default function Canvas({ elements, setElements }: Props) {
             y: typeof window !== "undefined" ? window.innerHeight / 4 : 0,
           }}
         >
-          <div
-            ref={dragRef}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              backgroundColor: "white",
-            }}
-          >
+          <div ref={dragRef} className={styles.editorContainer}>
             {(() => {
               const Editor = editorMap[selected.kind.name];
               return (

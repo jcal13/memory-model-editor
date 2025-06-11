@@ -1,7 +1,9 @@
 import MemoryViz from "memory-viz";
 import { BoxConfigs } from "./BoxConfigs";
 
-export function createBoxRenderer(kindName: keyof typeof BoxConfigs): SVGSVGElement {
+export function createBoxRenderer(
+  kindName: keyof typeof BoxConfigs
+): SVGSVGElement {
   const { MemoryModel } = MemoryViz;
   const config = BoxConfigs[kindName];
 

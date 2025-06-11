@@ -1,0 +1,27 @@
+/* === Canvas Wrapper === */
+.canvasWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 16px 10px;
+  height: 100vh;
+  box-sizing: border-box;
+  background-color: #f3f4f6;
+}
+
+/* === Canvas === */
+.canvas {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fafafa;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* === Floating Editor Panel === */
+.editorContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

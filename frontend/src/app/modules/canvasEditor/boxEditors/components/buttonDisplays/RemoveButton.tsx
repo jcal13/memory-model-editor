@@ -1,5 +1,4 @@
-import { PrimitiveKind } from "../../../shared/types";
-import styles from "../../styles/boxEditorStyles.module.css";
+import styles from "../../styles/BoxEditorStyles.module.css";
 
 interface Props {
   element: {

@@ -1,6 +1,6 @@
-import { BoxProps } from "./BoxProps";
-import { useGlobalRefs } from "./hooks/useRef";
-import { useDraggable } from "./hooks/useEffect";
+import { BoxProps } from "../utils/BoxProps";
+import { useGlobalRefs } from "../hooks/useRef";
+import { useDraggableBox } from "../hooks/useEffect";
 
 export default function CanvasBox({
   element,
@@ -9,7 +9,7 @@ export default function CanvasBox({
 }: BoxProps) {
   const { gRef, isDragging, start, origin, halfSize } = useGlobalRefs();
 
-  useDraggable(
+  useDraggableBox({
     gRef,
     element,
     halfSize,
@@ -17,8 +17,8 @@ export default function CanvasBox({
     isDragging,
     start,
     origin,
-    updatePosition
-  );
+    updatePosition,
+  });
 
   return <g ref={gRef} />;
 }

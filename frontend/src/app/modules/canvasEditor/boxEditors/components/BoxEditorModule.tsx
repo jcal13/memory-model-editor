@@ -1,4 +1,4 @@
-import styles from "../styles/boxEditorStyles.module.css";
+import styles from "../styles/BoxEditorStyles.module.css";
 import RemoveButton from "./buttonDisplays/RemoveButton";
 import Header from "./headerDisplays/Header";
 import Content from "./contentDisplays/Content";

@@ -1,4 +1,4 @@
-import { CanvasElement } from "../shared/types";
+import { CanvasElement } from "../../shared/types";
 
 export type BoxProps = {
   element: CanvasElement;

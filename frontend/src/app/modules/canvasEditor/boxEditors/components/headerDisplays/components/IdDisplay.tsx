@@ -6,7 +6,7 @@ interface Props {
 }
 
 const IdDisplay = ({ element }: Props) => {
-  return <span className={styles.pill}>ID&nbsp;{element.id}</span>;
+  return <div className={styles.moduleIdBox}>ID&nbsp;{element.id}</div>;
 };
 
 export default IdDisplay;

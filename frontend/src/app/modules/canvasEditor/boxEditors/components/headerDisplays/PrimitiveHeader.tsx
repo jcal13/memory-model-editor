@@ -1,5 +1,6 @@
 import IdDisplay from "./components/IdDisplay";
 import TypeSelector from "./components/TypeSelector";
+import styles from "../../styles/boxEditorStyles.module.css";
 
 interface Props {
   element: any;
@@ -16,7 +17,7 @@ const PrimitiveHeader = ({
   value,
   setValue,
 }: Props) => (
-  <>
+  <div className={styles.header}>
     <IdDisplay element={element} />
     <TypeSelector
       dataType={dataType}
@@ -24,7 +25,7 @@ const PrimitiveHeader = ({
       value={value}
       setValue={setValue}
     />
-  </>
+  </div>
 );
 
 export default PrimitiveHeader;

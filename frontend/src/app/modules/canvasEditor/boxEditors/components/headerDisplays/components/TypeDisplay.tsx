@@ -5,7 +5,7 @@ interface Props {
 }
 
 const TypeDisplay = ({ typeLabel }: Props) => {
-  return <span>{typeLabel}</span>;
+  return <div className={styles.typeDisplay}>{typeLabel}</div>;
 };
 
 export default TypeDisplay;

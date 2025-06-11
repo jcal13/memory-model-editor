@@ -1,4 +1,5 @@
 import { PrimitiveType } from "../../../shared/types";
+import styles from "../../styles/boxEditorStyles.module.css";
 
 interface Props {
   dataType: PrimitiveType;
@@ -18,54 +19,37 @@ const PrimitiveContent = ({ dataType, value, setValue }: Props) => {
       ? float(value)
       : dataType === "bool"
       ? bool(value)
+      : dataType === "None"
+      ? value === "None"
       : true;
 
   return (
-    <div style={{ padding: "0 24px", textAlign: "center" }}>
+    <div>
       {dataType === "bool" ? (
-        <div style={{ display: "flex", gap: 24, justifyContent: "center" }}>
+        <div className={styles.primitiveBoolContainer}>
           {["true", "false"].map((opt) => (
-            <label key={opt} style={{ fontSize: "1rem" }}>
+            <label key={opt}>
               <input
                 type="radio"
                 checked={value === opt}
                 onChange={() => setValue(opt)}
-                style={{ marginRight: 6 }}
               />
               {opt}
             </label>
           ))}
         </div>
       ) : dataType === "None" ? (
-        <div style={{ fontSize: "1rem", color: "#666" }}>None</div>
+        <div className={styles.primitiveNoneContainer}>None</div>
       ) : (
         <input
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="value"
-          style={{
-            width: "100%",
-            padding: 10,
-            borderRadius: 4,
-            border: "1px solid #ccc",
-            boxSizing: "border-box",
-            fontSize: "1rem",
-          }}
+          className={styles.primitiveValueContainer}
         />
       )}
 
-      {!isValid() && (
-        <div
-          style={{
-            color: "red",
-            fontSize: "0.85rem",
-            marginTop: 8,
-            textAlign: "center",
-          }}
-        >
-          Invalid&nbsp;{dataType}&nbsp;value
-        </div>
-      )}
+      {!isValid() && <div>Invalid&nbsp;{dataType}&nbsp;value</div>}
     </div>
   );
 };

@@ -20,7 +20,9 @@ const CollectionAddButton = ({ mode, items, setItems, buttonText }: Props) => {
 
   return (
     <div>
-      <button onClick={handleAdd}>{buttonText ?? defaultText}</button>
+      <button className={styles.addButton} onClick={handleAdd}>
+        {buttonText ?? defaultText}
+      </button>
     </div>
   );
 };

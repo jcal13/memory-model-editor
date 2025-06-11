@@ -27,16 +27,19 @@ const TypeSelector = ({ dataType, setDataType, value, setValue }: Props) => {
   };
 
   return (
-    <select
-      value={dataType}
-      onChange={(e) => changeType(e.target.value as PrimitiveType)}
-    >
-      <option value="None">None</option>
-      <option value="int">int</option>
-      <option value="float">float</option>
-      <option value="str">str</option>
-      <option value="bool">bool</option>
-    </select>
+    <div>
+      <select
+        className={styles.typeSelector}
+        value={dataType}
+        onChange={(e) => changeType(e.target.value as PrimitiveType)}
+      >
+        <option value="None">None</option>
+        <option value="int">int</option>
+        <option value="float">float</option>
+        <option value="str">str</option>
+        <option value="bool">bool</option>
+      </select>
+    </div>
   );
 };
 

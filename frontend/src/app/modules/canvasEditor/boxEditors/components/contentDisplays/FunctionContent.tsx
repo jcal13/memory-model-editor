@@ -29,8 +29,8 @@ const FunctionContent = ({ functionParams, setParams }: Props) => {
                 onChange={(e) => changeName(idx, e.target.value)}
                 className={styles.variableNameBox}
               />
-              <div className={styles.idBox}>
-                <div className={styles.idBoxText}>+</div>
+              <div className={styles.functionIdBox}>
+                <div className={styles.functionIdBoxText}>+</div>
                 <button
                   onClick={() => removeParam(idx)}
                   className={styles.removeItem}

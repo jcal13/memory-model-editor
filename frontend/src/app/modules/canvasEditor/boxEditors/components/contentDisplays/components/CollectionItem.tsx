@@ -10,28 +10,17 @@ const CollectionItem = ({ mode, items, setItems }: Props) => {
   const removeItem = (idx: number) =>
     setItems(items.filter((_, i) => i !== idx));
 
+  if (items.length === 0) return null;
+
   if (mode === "single") {
     return (
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 16,
-          justifyContent: "flex-start",
-          marginBottom: 24,
-        }}
-      >
+      <div className={styles.collectionIdContainer}>
         {items.map((_, idx) => (
-          <div key={idx}>
-            +
+          <div key={idx} className={styles.collectionIdBox}>
+            <div className={styles.collectionIdBoxText}>+</div>
             <button
+              className={styles.collectionRemoveId}
               onClick={() => removeItem(idx)}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor = "#d32f2f")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor = "#f44336")
-              }
             >
               ×
             </button>
@@ -42,33 +31,22 @@ const CollectionItem = ({ mode, items, setItems }: Props) => {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 16,
-        marginBottom: 24,
-      }}
-    >
+    <div className={styles.collectionPairsContainer}>
       {items.map((_, idx) => (
-        <div
-          key={idx}
-          style={{ display: "flex", alignItems: "center", gap: 24 }}
-        >
-          <button>+</button>
-          <span style={{ fontSize: "2rem" }}>:</span>
-          <div style={{ position: "relative" }}>
-            <button>+</button>
-            <button
-              onClick={() => removeItem(idx)}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor = "#d32f2f")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor = "#f44336")
-              }
-            >
-              ×
+        <div key={idx} className={styles.collectionPairContainer}>
+          <button className={styles.collectionIdBox}>
+            <div className={styles.collectionIdBoxText}>+</div>
+          </button>
+          <div className={styles.collectionPairSeparator}>:</div>
+          <div>
+            <button className={styles.collectionIdBox}>
+              <div className={styles.collectionIdBoxText}>+</div>
+              <button
+                className={styles.collectionRemoveId}
+                onClick={() => removeItem(idx)}
+              >
+                ×
+              </button>
             </button>
           </div>
         </div>

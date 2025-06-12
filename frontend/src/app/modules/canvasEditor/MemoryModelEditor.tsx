@@ -57,17 +57,41 @@ export default function MemoryModelEditor() {
           <div style={{ flex: 1, position: "relative" }}>
             <Canvas elements={elements} setElements={setElements} />
           </div>
+
           <button
+            style={{
+            position: "absolute",
+            bottom: 40,
+            left: 40,
+            padding: "10px 26px",
+            zIndex: 10,
+            backgroundColor: "#007bff",
+            color: "#ffffff",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer",
+            fontWeight: 500,
+            fontSize: "0.95rem",
+            width: "max-content",
+            transition: "background-color 0.2s ease",
+            boxShadow: "0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.1)",
+            }}
+>
+           Download JSON
+          </button>
+        
+          {/* <button
             onClick={showJson}
             style={{ position: "absolute", bottom: 8, right: 8, padding: "4px 8px", zIndex: 10 }}
           >
             Show JSON
-          </button>
+          </button> */}
+
           {jsonView && (
             <pre
               style={{
                 position: "fixed",
-                bottom: "40px",
+                bottom: "80px",
                 right: "8px",
                 maxHeight: "300px",
                 maxWidth: "300px",

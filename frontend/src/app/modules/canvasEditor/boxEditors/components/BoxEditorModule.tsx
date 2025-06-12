@@ -9,6 +9,7 @@ import {
   useFunctionStates,
   useCollectionSingleStates,
   useCollectionPairsStates,
+  useElementIdState
 } from "../hooks/useState";
 import { BoxEditorType } from "../../shared/types";
 import { useGlobalRefs } from "../hooks/useRef";
@@ -23,12 +24,15 @@ import { useGlobalRefs } from "../hooks/useRef";
  * - onSave: function to call with the updated box data
  * - onRemove: function to call to remove the box from the canvas
  */
-const BoxEditorModule = ({ metadata, onSave, onRemove }: BoxEditorType) => {
+const BoxEditorModule = ({ metadata, onSave, onRemove, ids, addId }: BoxEditorType) => {
   // Shared hover state for remove button
   const { hoverRemove, setHoverRemove } = useGlobalStates();
 
   // Ref to the entire module, used for drag/close handling
   const moduleRef = useGlobalRefs();
+
+  // Id state for editors
+  const [ownId, setOwnId] = useElementIdState(metadata);
 
   // State hooks for different box types
   const [dataType, setDataType, contentValue, setContentValue] =
@@ -63,6 +67,9 @@ const BoxEditorModule = ({ metadata, onSave, onRemove }: BoxEditorType) => {
         setValue={setContentValue}
         functionName={functionName}
         setFunctionName={setFunctionName}
+        ids={ids}
+        addId={addId}
+        setElementId={setOwnId}
       />
 
       {/* Middle section: displays the input or editable content for the box */}

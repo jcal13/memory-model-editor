@@ -1,0 +1,73 @@
+.trigger {
+  padding: 4px 10px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.panelContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.panel {
+  width: 260px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+  padding: 8px;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  background: #f9fafb;
+  cursor: move;
+}
+
+.form {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+}
+
+.form input {
+  flex: 1;
+  padding: 4px 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+}
+
+.form button {
+  padding: 4px 10px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+}
+
+.list {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.list li button {
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.list li button:hover {
+  background: #f0f9ff;
+}
+
+.empty {
+  padding: 6px 8px;
+  color: #6b7280;
+}

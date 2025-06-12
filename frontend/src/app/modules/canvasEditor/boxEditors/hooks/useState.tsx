@@ -1,5 +1,11 @@
-import { PrimitiveType, FunctionParams } from "../../shared/types";
+import { PrimitiveType, FunctionParams, ID } from "../../shared/types";
 import { useState } from "react";
+
+
+export const useElementIdState = (element: { id: ID }) => {
+  const [elementId, setElementId] = useState<ID>(element.id);
+  return [elementId, setElementId] as const;
+};
 
 /**
  * Manages global UI state related to the hover status of the remove button.

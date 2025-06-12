@@ -1,6 +1,7 @@
 import IdDisplay from "./components/IdDisplay";
 import TypeSelector from "./components/TypeSelector";
 import styles from "../../styles/BoxEditorStyles.module.css";
+import { ID } from "../../../shared/types";
 
 interface Props {
   element: any; // The primitive memory element, including its id and kind
@@ -8,6 +9,9 @@ interface Props {
   setDataType: (type: any) => void; // Function to update the primitive type
   value: string; // Current value of the primitive
   setValue: (v: string) => void; // Function to update the value
+  ids: ID[];
+  addId: (id: ID) => void;
+  setElementId: (id: ID) => void;
 }
 
 /**
@@ -21,9 +25,12 @@ const PrimitiveHeader = ({
   setDataType,
   value,
   setValue,
+  ids, 
+  addId,
+  setElementId
 }: Props) => (
   <div className={styles.header}>
-    <IdDisplay element={element} />
+    <IdDisplay element={element}  ids={ids} addId={addId} setElementId={setElementId} />
     <TypeSelector
       dataType={dataType}
       setDataType={setDataType}

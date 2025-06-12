@@ -3,10 +3,13 @@ import Canvas from "./canvas/Canvas";
 import Palette from "./palette/Palette";
 import { CanvasElement } from "./shared/types";
 import { buildJSONFromElements } from "./jsonConversion/jsonBuilder";
+import { ID } from "./shared/types";
+
 
 export default function MemoryModelEditor() {
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [jsonView, setJsonView] = useState<string>("");
+  const [ids, setIds] = useState<ID[]>([]);
 
   // Width state for the right placeholder pane
   const [placeholderWidth, setPlaceholderWidth] = useState<number>(300);
@@ -19,6 +22,8 @@ export default function MemoryModelEditor() {
     const snapshot = buildJSONFromElements(elements);
     setJsonView(JSON.stringify(snapshot, null, 2));
   };
+
+  const addId = (id: ID) => setIds(prev => (prev.includes(id) ? prev : [...prev, id]));
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
@@ -55,7 +60,7 @@ export default function MemoryModelEditor() {
       >
         <div style={{ flex: 1, position: "relative", display: "flex", flexDirection: "column" }}>
           <div style={{ flex: 1, position: "relative" }}>
-            <Canvas elements={elements} setElements={setElements} />
+            <Canvas elements={elements} setElements={setElements} ids={ids} addId={addId}/>
           </div>
           <button
             onClick={showJson}

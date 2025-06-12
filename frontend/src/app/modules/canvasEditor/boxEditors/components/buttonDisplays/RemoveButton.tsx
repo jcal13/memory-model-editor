@@ -1,11 +1,12 @@
 import styles from "../../styles/BoxEditorStyles.module.css";
+import { ID } from "../../../shared/types";
 
 /**
  * Props for the RemoveButton component.
  */
 interface Props {
   element: {
-    id: string;
+    id: ID;
     kind: {
       name: string; // Type of the box (e.g., "primitive", "function", "list", etc.)
       type?: string; // Optional subtype for collections

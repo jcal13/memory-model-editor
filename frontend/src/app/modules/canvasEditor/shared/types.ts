@@ -52,14 +52,20 @@ export interface DictKind {
 }
 
 export interface CanvasElement {
-  id: number | string;
+  boxId: number;
+  id: ID;
   x: number;
   y: number;
   kind: BoxType;
 }
 
+
+export type ID = number | "None";
+
 export interface BoxEditorType {
-  metadata: { id: string; kind: BoxType };
+  metadata: { id: ID; kind: BoxType };
   onSave: (kind: BoxType) => void;
   onRemove: () => void;
+  ids: ID[];
+  addId: (id: ID) => void;
 }

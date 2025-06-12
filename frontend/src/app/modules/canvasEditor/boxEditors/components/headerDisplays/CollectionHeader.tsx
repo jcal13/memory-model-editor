@@ -16,7 +16,6 @@ interface Props {
  */
 const CollectionHeader = ({ element }: Props) => (
   <>
-    <IdDisplay element={element} />
     <TypeDisplay typeLabel={element.kind.type} />
   </>
 );

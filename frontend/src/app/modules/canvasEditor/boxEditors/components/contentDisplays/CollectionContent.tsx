@@ -12,6 +12,7 @@ interface Props {
   setItems: any; // The state setter to update the collection
   ids: ID[];
   addId: (id: ID) => void;
+  removeId: (id: ID) => void;
 }
 
 /**
@@ -22,10 +23,10 @@ interface Props {
  * - In "single" mode, it manages a list of values.
  * - In "pair" mode, it manages a list of key-value pairs (e.g., for a dict).
  */
-const CollectionContent = ({ mode, items, setItems, ids, addId}: Props) => {
+const CollectionContent = ({ mode, items, setItems, ids, addId, removeId}: Props) => {
   return (
     <div className={styles.contentContainer}>
-      <CollectionItem mode={mode} items={items} setItems={setItems} ids={ids} addId={addId}/>
+      <CollectionItem mode={mode} items={items} setItems={setItems} ids={ids} addId={addId} removeId={removeId}/>
       <CollectionAddButton mode={mode} items={items} setItems={setItems} />
     </div>
   );

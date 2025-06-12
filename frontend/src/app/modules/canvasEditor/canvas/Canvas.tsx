@@ -24,12 +24,13 @@ interface Props {
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
   ids: ID[];
   addId: (id: ID) => void;
+  removeId: (id: ID) => void;
 }
 
 /* =======================================
    === Main Canvas Component ===
 ======================================= */
-export default function Canvas({ elements, setElements, ids, addId }: Props) {
+export default function Canvas({ elements, setElements, ids, addId, removeId}: Props) {
   const [selected, setSelected] = useState<CanvasElement | null>(null);
   const { svgRef, dragRef } = useCanvasRefs();
   const [viewBox, setViewBox] = useState<string>("0 0 0 0");
@@ -156,6 +157,7 @@ export default function Canvas({ elements, setElements, ids, addId }: Props) {
                   onRemove={removeElement}
                   ids={ids}
                   addId={addId}
+                  removeId={removeId}
                 />
               );
             })()}

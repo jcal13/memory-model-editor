@@ -17,6 +17,7 @@ interface Props {
   addId: (id: ID) => void;
   ownId: ID;
   setElementId: (id: ID) => void;
+  removeId: (id: ID) => void;
 }
 
 /**
@@ -38,7 +39,8 @@ const Header = ({
   ids, 
   addId,
   ownId,
-  setElementId
+  setElementId,
+  removeId
 }: Props) => {
   const kind = element.kind.name;
 
@@ -55,6 +57,7 @@ const Header = ({
           addId={addId}
           ownId={ownId}
           setElementId={setElementId}
+          removeId={removeId}
         />
       )}
       {kind === "function" && (
@@ -69,7 +72,8 @@ const Header = ({
           ids={ids}
           addId={addId}
           ownId={ownId}
-          setElementId={setElementId}/>
+          setElementId={setElementId}
+          removeId={removeId}/>
       )}
     </div>
   );

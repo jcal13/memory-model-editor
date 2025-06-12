@@ -68,4 +68,5 @@ export interface BoxEditorType {
   onRemove: () => void;
   ids: ID[];
   addId: (id: ID) => void;
+  removeId: (id: ID) => void;
 }

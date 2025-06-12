@@ -1,62 +1,66 @@
-import React, { useState } from "react";
-import styles from "../styles/IdSelector.module.css";
-import { ID } from "../../shared/types";
+import React, { useMemo } from "react";
+import panelStyles from "../styles/IdSelector.module.css";
+import boxStyles   from "../../boxEditors/styles/BoxEditorStyles.module.css";
+import { ID }      from "../../shared/types";
 
 interface Props {
   ids: ID[];
   onAdd: (id: ID) => void;
   onSelect: (id: ID) => void;
+  onRemove: (id: ID) => void;
 }
 
-export default function IdSelectorPanel({ ids, onAdd, onSelect }: Props) {
-  const [newId, setNewId] = useState("");
-
-  const add = () => {
-    const trimmed = newId.trim();
-    if (!trimmed) return;               // ignore blank input
-
-    let id: ID;
-    if (trimmed === "None") {
-      id = "None";                      // accept literal "None"
-    } else {
-      const num = Number(trimmed);
-      if (Number.isNaN(num)) return;    // reject non-numeric strings
-      id = num;
-    }
-
-    if (ids.includes(id)) return;       // duplicate guard
-    setNewId("");
-    onAdd(id);
-  };
+const IdSelectorPanel: React.FC<Props> = ({
+  ids,
+  onAdd,
+  onSelect,
+  onRemove,
+}) => {
+  const nextId = useMemo<number>(() => {
+    const nums = ids.filter((v): v is number => typeof v === "number");
+    return nums.length ? Math.max(...nums) + 1 : 1;
+  }, [ids]);
 
   return (
-    <div className={styles.panel}>
-      {/* === Header (drag handle) === */}
-      <div className={`drag-handle ${styles.header}`}>ID Selector</div>
+    <div className={`${boxStyles.boxEditorModule} ${panelStyles.panelShell}`}>
+      <div className={`drag-handle ${panelStyles.header}`}>ID Selector</div>
 
-      {/* === Add-new form === */}
-      <div className={styles.form}>
-        <input
-          value={newId}
-          onChange={(e) => setNewId(e.target.value)}
-          placeholder='New ID (number or "None")'
-        />
-        <button type="button" onClick={add}>
-          Add
+      <div className={boxStyles.collectionIdContainer}>
+        {ids.map(id => (
+          <div key={id.toString()} className={boxStyles.collectionIdBox}>
+            <button
+              type="button"
+              className={boxStyles.collectionIdNoBorder}
+              onClick={() => onSelect(id)}
+            >
+              {id}
+            </button>
+            <button
+              type="button"
+              className={boxStyles.collectionRemoveId}
+              onClick={() => onRemove(id)}
+            >
+              ×
+            </button>
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={() => onAdd(nextId)}
+          className={boxStyles.addButton}
+        >
+          + Add&nbsp;{nextId}
         </button>
       </div>
 
-      {/* === ID list === */}
-      <ul className={styles.list}>
-        {ids.map((id) => (
-          <li key={id.toString()}>
-            <button type="button" onClick={() => onSelect(id)}>
-              {id}
-            </button>
-          </li>
-        ))}
-        {ids.length === 0 && <li className={styles.empty}>No IDs yet</li>}
-      </ul>
+      {ids.length === 0 && (
+        <div className={panelStyles.empty}>
+          No IDs yet — click “Add” to create one.
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default IdSelectorPanel;

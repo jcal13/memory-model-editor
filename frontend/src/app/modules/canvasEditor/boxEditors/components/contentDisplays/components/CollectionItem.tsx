@@ -11,13 +11,14 @@ interface Props {
   setItems: React.Dispatch<React.SetStateAction<any[]>>; // updates collectionItems in BoxEditorModule
   ids: ID[];                                           // global ID pool
   addId: (id: ID) => void;                             // adds a new ID to the pool
+  removeId: (id: ID) => void;  
 }
 
 /**
  * Renders the entire collection (not a single slot) so the caller
  * only has to supply `items` and `setItems`.
  */
-const CollectionItem = ({ mode, items, setItems, ids, addId }: Props) => {
+const CollectionItem = ({ mode, items, setItems, ids, addId, removeId }: Props) => {
   const removeItem = (idx: number) =>
     setItems(prev => prev.filter((_, i) => i !== idx));
 
@@ -36,6 +37,7 @@ const CollectionItem = ({ mode, items, setItems, ids, addId }: Props) => {
               onSelect={picked =>
                 setItems(prev => prev.map((v, i) => (i === idx ? picked : v)))
               }
+              onRemove={removeId}
               buttonClassName={styles.collectionIdNoBorder}
             />
             <button

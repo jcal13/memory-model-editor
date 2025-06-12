@@ -25,7 +25,7 @@ const CollectionAddButton = ({ mode, items, setItems, buttonText }: Props) => {
     if (mode === "single") {
       setItems([...items, null]);
     } else {
-      setItems([...items, ["", null]]);
+      setItems([...items, ["None", "None"]]);
     }
   };
 

@@ -11,6 +11,7 @@ interface Props {
   addId: (id: ID) => void;
   ownId: ID;
   setElementId: (id: ID) => void;
+  removeId: (id: ID) => void;
 }
 
 /**
@@ -18,13 +19,14 @@ interface Props {
  *
  * This is useful for labeling visualized memory boxes in the editor UI.
  */
-const IdDisplay = ({ ids, addId, ownId, setElementId }: Props) => (
+const IdDisplay = ({ ids, addId, ownId, setElementId, removeId}: Props) => (
   <IdSelector                              // one-liner wrap
     ids={ids}
     onAdd={addId}
     onSelect={setElementId}
     currentId={ownId}
     buttonClassName={styles.moduleIdBox}
+    onRemove={removeId}
   />
 );
 

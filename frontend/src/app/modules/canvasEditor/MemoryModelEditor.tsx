@@ -25,6 +25,8 @@ export default function MemoryModelEditor() {
 
   const addId = (id: ID) => setIds(prev => (prev.includes(id) ? prev : [...prev, id]));
 
+  const removeId = (id: ID) => setIds(prev => prev.filter(v => v !== id));
+
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
       if (!isResizing || !subContainerRef.current) return;
@@ -60,7 +62,7 @@ export default function MemoryModelEditor() {
       >
         <div style={{ flex: 1, position: "relative", display: "flex", flexDirection: "column" }}>
           <div style={{ flex: 1, position: "relative" }}>
-            <Canvas elements={elements} setElements={setElements} ids={ids} addId={addId}/>
+            <Canvas elements={elements} setElements={setElements} ids={ids} addId={addId} removeId={removeId} />
           </div>
           <button
             onClick={showJson}

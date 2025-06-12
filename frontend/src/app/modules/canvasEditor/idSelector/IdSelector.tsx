@@ -6,16 +6,11 @@ import { useIdListSync } from "./hooks/useIdListSync";
 import styles from "./styles/IdSelector.module.css";
 import { ID } from "../shared/types";
 
-/* ==================================================
-   === ID Selector – Launcher + Draggable Panel   ===
-   ==================================================
-    ↳ Works with IDs of type **number | "None"**
-*/
-
 interface Props {
   ids: ID[];
   onSelect: (id: ID) => void;
   onAdd?: (id: ID) => void;
+  onRemove?: (id: ID) => void;
   label?: string;
   currentId: ID;
   buttonClassName?: string;
@@ -25,20 +20,24 @@ export default function IdSelector({
   ids,
   onSelect,
   onAdd,
+  onRemove,
   currentId,
   buttonClassName = "",
 }: Props) {
-  /* ========= Local State & Refs ========= */
   const [open, setOpen] = useState(false);
   const [list, setList] = useState<ID[]>(ids);
   useIdListSync(ids, setList);
   const { dragRef } = usePanelRefs();
 
-  /* ========= Handlers ========= */
   const handleAdd = (id: ID) => {
-    if (list.includes(id)) return; // duplicate guard
+    if (list.includes(id)) return;
     setList((prev) => [...prev, id]);
     onAdd?.(id);
+  };
+
+  const handleRemove = (id: ID) => {
+    setList(prev => prev.filter(v => v !== id));
+    onRemove?.(id);
   };
 
   const handleSelect = (id: ID) => {
@@ -46,7 +45,6 @@ export default function IdSelector({
     setOpen(false);
   };
 
-  /* ========= Render ========= */
   return (
     <>
       <button
@@ -67,6 +65,7 @@ export default function IdSelector({
             <IdSelectorPanel
               ids={list}
               onAdd={handleAdd}
+              onRemove={handleRemove}
               onSelect={handleSelect}
             />
           </div>

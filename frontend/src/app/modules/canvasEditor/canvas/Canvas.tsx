@@ -114,6 +114,7 @@ export default function Canvas({ elements, setElements }: Props) {
       {/* === SVG Canvas === */}
       <div className={styles.canvasWrapper}>
         <svg
+          data-testid="canvas"
           ref={svgRef}
           viewBox={viewBox}
           preserveAspectRatio="xMinYMin meet"

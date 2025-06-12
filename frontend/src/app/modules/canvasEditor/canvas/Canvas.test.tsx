@@ -50,6 +50,9 @@ beforeAll(() => {
   };
 });
 
+/**
+ * Test suite for the Canvas component
+ */
 describe("Canvas", () => {
   /**
    * Test that verifies the Canvas component renders without crashing

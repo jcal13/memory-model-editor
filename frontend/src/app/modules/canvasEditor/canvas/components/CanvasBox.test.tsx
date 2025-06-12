@@ -3,11 +3,22 @@ import { render } from "@testing-library/react";
 import CanvasBox from "./CanvasBox";
 import { BoxProps } from "../utils/BoxProps";
 
-// Mocks useRef to simulate drag behavior
+/**
+ * Mocks the global SVG <g> element and its methods
+ * to simulate the environment where CanvasBox operates.
+ */
+const gElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
+const svgContainer = document.createElementNS(
+  "http://www.w3.org/2000/svg",
+  "svg"
+);
+svgContainer.appendChild(gElement);
+
 const gRefMock = {
-  current: document.createElementNS("http://www.w3.org/2000/svg", "g"),
+  current: gElement,
 };
 
+// Mocks the useGlobalRefs hook to provide necessary references
 jest.mock("../hooks/useRef", () => ({
   useGlobalRefs: () => ({
     gRef: gRefMock,
@@ -18,12 +29,12 @@ jest.mock("../hooks/useRef", () => ({
   }),
 }));
 
+// Mocks the useDraggableBox hook
 const useDraggableBoxMock = jest.fn();
 jest.mock("../hooks/useEffect", () => ({
   useDraggableBox: (props: any) => useDraggableBoxMock(props),
 }));
 
-// Sample element and props to test rendering and hooks
 const mockElement = {
   id: 1,
   x: 100,
@@ -44,9 +55,6 @@ const baseProps: BoxProps = {
   updatePosition: mockUpdatePosition,
 };
 
-/**
- * Test suite for the <CanvasBox /> component
- */
 describe("CanvasBox", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -56,7 +64,11 @@ describe("CanvasBox", () => {
    * Renders an SVG <g> element and ensures it's present in the DOM
    */
   it("renders an SVG <g> element", () => {
-    const { container } = render(<CanvasBox {...baseProps} />);
+    const { container } = render(
+      <svg>
+        <CanvasBox {...baseProps} />
+      </svg>
+    );
     const g = container.querySelector("g");
     expect(g).toBeInTheDocument();
   });
@@ -65,7 +77,11 @@ describe("CanvasBox", () => {
    * Verifies that useDraggableBox is called with the correct props
    */
   it("calls useDraggableBox with expected parameters", () => {
-    render(<CanvasBox {...baseProps} />);
+    render(
+      <svg>
+        <CanvasBox {...baseProps} />
+      </svg>
+    );
     expect(useDraggableBoxMock).toHaveBeenCalledWith(
       expect.objectContaining({
         gRef: gRefMock,
@@ -84,7 +100,11 @@ describe("CanvasBox", () => {
    * Verifies that the element prop is passed correctly to useDraggableBox
    */
   it("passes element prop to useDraggableBox correctly", () => {
-    render(<CanvasBox {...baseProps} />);
+    render(
+      <svg>
+        <CanvasBox {...baseProps} />
+      </svg>
+    );
     const lastCall = useDraggableBoxMock.mock.calls[0][0];
     expect(lastCall.element).toEqual(mockElement);
   });
@@ -98,7 +118,11 @@ describe("CanvasBox", () => {
       openInterface: undefined as any,
       updatePosition: undefined as any,
     };
-    render(<CanvasBox {...safeProps} />);
+    render(
+      <svg>
+        <CanvasBox {...safeProps} />
+      </svg>
+    );
     const lastCall = useDraggableBoxMock.mock.calls[0][0];
     expect(lastCall.openInterface).toBeUndefined();
     expect(lastCall.updatePosition).toBeUndefined();

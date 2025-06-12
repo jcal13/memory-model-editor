@@ -2,9 +2,7 @@ import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import PaletteBox from "./PaletteBox";
 
-// ===== Mock Dependencies =====
-
-// Mock the BoxConfigs module to provide just enough structure for rendering
+// Mocks BoxConfigs to bypass actual rendering logic
 jest.mock("../utils/BoxConfigs", () => ({
   BoxConfigs: {
     primitive: {},
@@ -13,17 +11,17 @@ jest.mock("../utils/BoxConfigs", () => ({
   },
 }));
 
-// Mock the custom hook to avoid invoking real SVG rendering logic
+// Mocks the hook responsible for rendering side effects
 jest.mock("../hooks/useEffect", () => ({
   usePaletteBoxEffect: jest.fn(),
 }));
 
-// ===== Test Suite: PaletteBox Component =====
-
+/**
+ * Test suite for the <PaletteBox /> component
+ */
 describe("PaletteBox", () => {
   /**
-   * Test that the PaletteBox component renders successfully
-   * with a valid boxType and contains a draggable <div>.
+   * Renders without crashing for a valid boxType and applies correct attributes
    */
   it("renders without crashing for valid boxType", () => {
     const { container } = render(<PaletteBox boxType="primitive" />);
@@ -33,13 +31,11 @@ describe("PaletteBox", () => {
   });
 
   /**
-   * Test that the correct drag-and-drop metadata is set
-   * when the user starts dragging the PaletteBox.
+   * Fires dragStart and sets correct metadata on dataTransfer
    */
   it("calls dataTransfer.setData on dragStart", () => {
     const setData = jest.fn();
 
-    // Create a mock DragEvent object with a mock dataTransfer API
     const mockEvent = {
       dataTransfer: {
         setData,
@@ -57,8 +53,7 @@ describe("PaletteBox", () => {
   });
 
   /**
-   * Test that the inline style applied to the draggable container
-   * matches the expected values (used for consistent UI layout).
+   * Applies consistent inline styling for layout and interaction
    */
   it("has correct inline styles", () => {
     const { container } = render(<PaletteBox boxType="dict" />);

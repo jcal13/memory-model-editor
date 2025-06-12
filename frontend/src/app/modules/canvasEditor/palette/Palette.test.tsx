@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import Palette from "./Palette";
 
-// Mock PaletteBox so we can track its rendering without invoking real SVG logic
+// Mocks the PaletteBox component to intercept rendering
 jest.mock(
   "./components/PaletteBox",
   () =>
@@ -14,6 +14,9 @@ jest.mock(
       )
 );
 
+/**
+ * Test suite for the Palette component
+ */
 describe("Palette", () => {
   const expectedTypes = [
     "function",
@@ -25,7 +28,7 @@ describe("Palette", () => {
   ];
 
   /**
-   * Test that the component renders without error and shows the heading
+   * Ensures that the title "Palette" is rendered
    */
   it("renders the palette title", () => {
     render(<Palette />);
@@ -33,7 +36,7 @@ describe("Palette", () => {
   });
 
   /**
-   * Test that all expected box types are rendered via PaletteBox
+   * Verifies that all expected box types render via PaletteBox
    */
   it("renders all box types", () => {
     render(<Palette />);
@@ -46,7 +49,7 @@ describe("Palette", () => {
   });
 
   /**
-   * Test that the number of rendered boxes matches the number of supported types
+   * Checks that exactly six PaletteBoxes are rendered
    */
   it("renders exactly six PaletteBoxes", () => {
     render(<Palette />);

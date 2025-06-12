@@ -2,9 +2,7 @@ import React, { useRef } from "react";
 import { render } from "@testing-library/react";
 import { usePaletteBoxEffect } from "./useEffect";
 
-// ====== DOM-compatible SVG setup ======
-
-// Create a fake bounding box (DOMRect-like)
+// Mocks a DOM-compatible bounding box returned by getBBox
 const fakeBBox = {
   x: 0,
   y: 0,
@@ -26,25 +24,22 @@ const fakeBBox = {
   }),
 };
 
-// Create an actual DOM-compatible SVG element
+// Mocks a DOM-compatible SVG element
 const svgElement = document.createElementNS(
   "http://www.w3.org/2000/svg",
   "svg"
 );
-
-// Mock getBBox and setAttribute for the SVG element
 const getBBoxMock = jest.fn(() => fakeBBox as DOMRect);
 svgElement.getBBox = getBBoxMock as unknown as typeof svgElement.getBBox;
 svgElement.setAttribute = jest.fn();
 
-// Mock createBoxRenderer to return our DOM-compatible SVG element
+// Mocks createBoxRenderer to return the SVG element
 jest.mock("../utils/BoxRenderer", () => ({
   createBoxRenderer: jest.fn(() => svgElement),
 }));
 
 /**
- * Helper component that mounts the hook under test
- * with a test container and the given boxType.
+ * Helper component to invoke the hook under test
  */
 const createTestComponent = (boxType: string) => {
   const TestComponent = () => {
@@ -56,38 +51,37 @@ const createTestComponent = (boxType: string) => {
   return render(<TestComponent />);
 };
 
+/**
+ * Test suite for the usePaletteBoxEffect hook
+ */
 describe("usePaletteBoxEffect", () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   /**
-   * Test that the hook calls createBoxRenderer with the given boxType.
+   * Ensures createBoxRenderer is called with the correct boxType
    */
   it("calls createBoxRenderer with the correct boxType", () => {
     const { createBoxRenderer } = require("../utils/BoxRenderer");
     createTestComponent("primitive");
-
     expect(createBoxRenderer).toHaveBeenCalledWith("primitive");
   });
 
   /**
-   * Test that the hook:
-   *  - Clears the container
-   *  - Appends the SVG element
-   *  - Sets width and height using getBBox()
+   * Verifies that the hook:
+   * - Clears existing content
+   * - Appends an SVG element
+   * - Sets container width and height based on getBBox()
    */
   it("inserts SVG and sets container dimensions", () => {
     const { getByTestId } = createTestComponent("list");
     const container = getByTestId("container");
 
-    // Check that one SVG element is appended
     expect(container.children.length).toBe(1);
     expect(container.firstChild?.nodeName.toLowerCase()).toBe("svg");
-
-    // Check that getBBox was called and used
     expect(getBBoxMock).toHaveBeenCalled();
-    expect(container.style.width).toBe(`${fakeBBox.width + 5}px`);
-    expect(container.style.height).toBe(`${fakeBBox.height + 5}px`);
+    expect(container.style.width).toBe("105px");
+    expect(container.style.height).toBe("55px");
   });
 });

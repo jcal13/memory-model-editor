@@ -1,3 +1,4 @@
+// ===== Canvas.tsx =====
 import React, { useState } from "react";
 import Draggable from "react-draggable";
 import { CanvasElement, BoxType } from "../shared/types";
@@ -7,9 +8,6 @@ import { useCanvasResize } from "./hooks/useEffect";
 import { useCanvasRefs } from "./hooks/useRef";
 import styles from "./styles/Canvas.module.css";
 
-/* =======================================
-   === Box Editor Mapping by Type Name ===
-======================================= */
 const editorMap: Record<BoxType["name"], React.FC<any>> = {
   primitive: BoxEditor,
   function: BoxEditor,
@@ -24,9 +22,6 @@ interface Props {
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
 }
 
-/* =======================================
-   === Main Canvas Component ===
-======================================= */
 export default function Canvas({ elements, setElements }: Props) {
   const [selected, setSelected] = useState<CanvasElement | null>(null);
   const { svgRef, dragRef } = useCanvasRefs();
@@ -34,7 +29,6 @@ export default function Canvas({ elements, setElements }: Props) {
 
   useCanvasResize(svgRef, setViewBox);
 
-  /* === Utility: Creates updater function for a specific box ID === */
   const makePositionUpdater =
     (id: string | number) => (x: number, y: number) => {
       setElements((prev) =>
@@ -42,7 +36,6 @@ export default function Canvas({ elements, setElements }: Props) {
       );
     };
 
-  /* === Handle Drag & Drop Creation of New Elements === */
   const handleDrop = (e: React.DragEvent<SVGSVGElement>) => {
     e.preventDefault();
     const payload = e.dataTransfer.getData("application/box-type");
@@ -90,7 +83,6 @@ export default function Canvas({ elements, setElements }: Props) {
     ]);
   };
 
-  /* === Update element after editor save === */
   const saveElement = (updatedKind: BoxType) => {
     if (!selected) return;
     setElements((prev) =>
@@ -101,25 +93,24 @@ export default function Canvas({ elements, setElements }: Props) {
     setSelected(null);
   };
 
-  /* === Remove element from canvas === */
   const removeElement = () => {
     if (!selected) return;
     setElements((prev) => prev.filter((el) => el.id !== selected.id));
     setSelected(null);
   };
 
-  /* === Render === */
   return (
     <>
-      {/* === SVG Canvas === */}
       <div className={styles.canvasWrapper}>
         <svg
+          role="img"
           ref={svgRef}
           viewBox={viewBox}
           preserveAspectRatio="xMinYMin meet"
           className={styles.canvas}
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
+          data-testid="canvas"
         >
           <g>
             {elements.map((el) => (
@@ -134,7 +125,6 @@ export default function Canvas({ elements, setElements }: Props) {
         </svg>
       </div>
 
-      {/* === Floating Box Editor Panel === */}
       {selected && (
         <Draggable
           nodeRef={dragRef as React.RefObject<HTMLElement>}

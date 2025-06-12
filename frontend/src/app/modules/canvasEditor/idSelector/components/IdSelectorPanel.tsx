@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import panelStyles from "../styles/IdSelector.module.css";
-import boxStyles   from "../../boxEditors/styles/BoxEditorStyles.module.css";
-import { ID }      from "../../shared/types";
+import boxStyles from "../../boxEditors/styles/BoxEditorStyles.module.css";
+import { ID } from "../../shared/types";
 
 interface Props {
   ids: ID[];
@@ -26,7 +26,7 @@ const IdSelectorPanel: React.FC<Props> = ({
       <div className={`drag-handle ${panelStyles.header}`}>Select ID</div>
 
       <div className={boxStyles.collectionIdContainer}>
-        {ids.map(id => (
+        {ids.map((id) => (
           <div key={id.toString()} className={boxStyles.collectionIdBox}>
             <button
               type="button"
@@ -50,7 +50,7 @@ const IdSelectorPanel: React.FC<Props> = ({
           onClick={() => onAdd(nextId)}
           className={boxStyles.addButton}
         >
-          + Add&nbsp;{nextId}
+          + Add ID
         </button>
       </div>
 

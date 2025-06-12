@@ -21,7 +21,6 @@ interface Props {
  * Changing the type updates the associated value using `setValue`.
  */
 const PrimitiveHeader = ({
-  element,
   dataType,
   setDataType,
   value,
@@ -32,7 +31,7 @@ const PrimitiveHeader = ({
   setElementId
 }: Props) => (
   <div className={styles.header}>
-    <IdDisplay element={element}  ids={ids} addId={addId} ownId={ownId} setElementId={setElementId} />
+    <IdDisplay ids={ids} addId={addId} ownId={ownId} setElementId={setElementId} />
     <TypeSelector
       dataType={dataType}
       setDataType={setDataType}

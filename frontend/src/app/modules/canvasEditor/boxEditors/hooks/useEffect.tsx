@@ -34,28 +34,28 @@ export const useModule = (
     const handleClickOutside = (e: MouseEvent) => {
       if (moduleRef.current && !moduleRef.current.contains(e.target as Node)) {
         const kind = element.kind.name;
-        console.log(element)
-        console.log(ownId)
         if (kind === "primitive") {
-          onSave(
-          ownId, {
+          onSave(ownId, {
             name: kind,
             type: dataType,
             value: contentValue,
           });
         } else if (kind === "function") {
-          onSave(ownId,
-            {
+          onSave(ownId, {
             name: kind,
             type: "function",
             value: null,
             functionName,
             params,
           });
+        } else if (kind === "dict") {
+          onSave(ownId, {
+            name: kind,
+            type: element.kind.type,
+            value: Object.fromEntries(collectionItems || []),
+          });
         } else {
-          onSave(
-          ownId,
-          {
+          onSave(ownId, {
             name: kind,
             type: element.kind.type,
             value: collectionItems,

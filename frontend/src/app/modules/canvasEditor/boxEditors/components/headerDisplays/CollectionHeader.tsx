@@ -21,7 +21,7 @@ interface Props {
  */
 const CollectionHeader = ({ element, ids, addId, ownId, setElementId }: Props) => (
   <>
-    <IdDisplay element={element}  ids={ids} addId={addId} ownId={ownId} setElementId={setElementId} />
+    <IdDisplay ids={ids} addId={addId} ownId={ownId} setElementId={setElementId} />
     <TypeDisplay typeLabel={element.kind.type} />
   </>
 );

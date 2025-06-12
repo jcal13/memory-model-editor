@@ -44,6 +44,9 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, ids, addId }: BoxEditorTy
   const [collectionPairs, setCollectionPairs] =
     useCollectionPairsStates(metadata);
 
+
+  const collectionData = metadata.kind.name === "dict" ? collectionPairs : collectionItems;
+
   // Hook to sync the module and apply save logic when clicking outside
   useModule(
     moduleRef,
@@ -54,7 +57,7 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, ids, addId }: BoxEditorTy
     contentValue,
     functionName,
     functionParams,
-    collectionItems
+    collectionData
   );
 
   return (

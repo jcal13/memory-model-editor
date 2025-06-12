@@ -23,24 +23,21 @@ const CollectionItem = ({ mode, items, setItems, ids, addId }: Props) => {
 
   if (items.length === 0) return null;
 
-  /* ─────────────  SINGLE ELEMENTS (list / set / tuple) ───────────── */
+  // SINGLE ELEMENTS (list / set / tuple)
   if (mode === "single") {
     return (
       <div className={styles.collectionIdContainer}>
         {items.map((itemId: ID, idx: number) => (
           <div key={idx} className={styles.collectionIdBox}>
             <IdSelector
-              currentId={itemId}                         /* show this slot’s ID            */
+              currentId={itemId}
               ids={ids}
               onAdd={addId}
-              onSelect={(picked) =>                     /* replace this slot only         */
-                setItems(prev =>
-                  prev.map((v, i) => (i === idx ? picked : v))
-                )
+              onSelect={picked =>
+                setItems(prev => prev.map((v, i) => (i === idx ? picked : v)))
               }
-              buttonClassName={styles.collectionIdBoxText}
+              buttonClassName={styles.collectionIdNoBorder}
             />
-            <div className={styles.collectionIdBoxText}>+</div>
             <button
               className={styles.collectionRemoveId}
               onClick={() => removeItem(idx)}
@@ -53,41 +50,40 @@ const CollectionItem = ({ mode, items, setItems, ids, addId }: Props) => {
     );
   }
 
-  /* ─────────────  PAIRS (dict) ───────────── */
+  // PAIRS (dict)
   return (
     <div className={styles.collectionPairsContainer}>
-      {items.map(([key, val]: [string, ID], idx: number) => (
+      {items.map(([keyId, valId]: [ID, ID], idx: number) => (
         <div key={idx} className={styles.collectionPairContainer}>
-          {/* KEY */}
-          <input
-            className={styles.dictKeyInput}
-            value={key}
-            placeholder="key"
-            onChange={e =>
-              setItems(prev =>
-                prev.map((p, i) =>
-                  i === idx ? [e.target.value, p[1]] : p
+          {/* KEY ID */}
+          <div className={styles.collectionIdBox}>
+            <IdSelector
+              currentId={keyId}
+              ids={ids}
+              onAdd={addId}
+              onSelect={picked =>
+                setItems(prev =>
+                  prev.map((p, i) => (i === idx ? [picked, p[1]] : p))
                 )
-              )
-            }
-          />
+              }
+              buttonClassName={styles.collectionIdNoBorder}
+            />
+          </div>
 
           <div className={styles.collectionPairSeparator}>:</div>
 
-          {/* VALUE ID */}
+          {/* VALUE ID + REMOVE */}
           <div className={styles.collectionIdBox}>
             <IdSelector
-              currentId={val}
+              currentId={valId}
               ids={ids}
               onAdd={addId}
-              onSelect={(picked) =>
+              onSelect={picked =>
                 setItems(prev =>
-                  prev.map((p, i) =>
-                    i === idx ? [p[0], picked] : p
-                  )
+                  prev.map((p, i) => (i === idx ? [p[0], picked] : p))
                 )
               }
-              buttonClassName={styles.collectionIdBoxText}
+              buttonClassName={styles.collectionIdNoBorder}
             />
             <button
               className={styles.collectionRemoveId}

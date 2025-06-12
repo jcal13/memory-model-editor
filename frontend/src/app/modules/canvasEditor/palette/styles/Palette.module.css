@@ -62,7 +62,8 @@
   margin: 10px 0 25px 0;
   letter-spacing: 0.25px;
   border-bottom: 1px solid #e5e7eb;
-  padding-bottom: 8px;
+  padding: 8px 0;
+  background-color: #f3f4f6;
 }
 
 /* =======================================

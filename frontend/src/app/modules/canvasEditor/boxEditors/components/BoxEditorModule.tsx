@@ -88,8 +88,6 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, ids, addId }: BoxEditorTy
         setCollectionPairs={setCollectionPairs}
         ids={ids}
         addId={addId}
-        ownId={ownId}
-        setElementId={setOwnId}
       />
 
       {/* Bottom section: shows the remove button */}

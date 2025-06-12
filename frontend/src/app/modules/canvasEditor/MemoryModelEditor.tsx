@@ -19,7 +19,18 @@ export default function MemoryModelEditor() {
     const snapshot = buildJSONFromElements(elements);
     setJsonView(JSON.stringify(snapshot, null, 2));
   };
-
+  const downloadJsonFile = () => {
+    const snapshot = buildJSONFromElements(elements);
+    const jsonString = JSON.stringify(snapshot, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+  
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "memory_model.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
       if (!isResizing || !subContainerRef.current) return;
@@ -59,6 +70,7 @@ export default function MemoryModelEditor() {
           </div>
 
           <button
+            onClick={downloadJsonFile}
             style={{
             position: "absolute",
             bottom: 40,

@@ -12,7 +12,7 @@ interface Props {
       type?: string; // Optional subtype for collections
     };
   };
-  onSave: (params: any) => void; // Function to call with updated box data before removing
+  onSave: (id: ID, boxType: any) => void; // Function to call with updated box data before removing
   onRemove: () => void; // Function to call when removing the box
   dataType: string; // Selected data type (for primitives)
   value: string; // Value of the primitive
@@ -30,7 +30,6 @@ interface Props {
  */
 const RemoveButton = ({
   element,
-  onSave,
   onRemove,
   dataType,
   value,
@@ -62,7 +61,6 @@ const RemoveButton = ({
 
   // Trigger save and remove actions
   const handleClick = () => {
-    onSave(saveParams);
     onRemove();
   };
 

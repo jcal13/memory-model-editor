@@ -17,13 +17,16 @@ interface Props {
   onSelect: (id: ID) => void;
   onAdd?: (id: ID) => void;
   label?: string;
+  currentId: ID;
+  buttonClassName?: string;
 }
 
 export default function IdSelector({
   ids,
   onSelect,
   onAdd,
-  label = "Select ID",
+  currentId,
+  buttonClassName = "",
 }: Props) {
   /* ========= Local State & Refs ========= */
   const [open, setOpen] = useState(false);
@@ -49,9 +52,9 @@ export default function IdSelector({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={styles.trigger}
+        className={`${buttonClassName}`}
       >
-        {label}
+        {currentId ?? "None"}
       </button>
 
       {open && (

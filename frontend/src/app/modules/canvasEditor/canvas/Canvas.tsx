@@ -93,11 +93,11 @@ export default function Canvas({ elements, setElements, ids, addId }: Props) {
   };
 
   /* === Update element after editor save === */
-  const saveElement = (updatedKind: BoxType) => {
+  const saveElement = (updatedId: ID, updatedKind: BoxType) => {
     if (!selected) return;
     setElements((prev) =>
       prev.map((el) =>
-        el.boxId === selected.boxId ? { ...el, kind: updatedKind } : el
+        el.boxId === selected.boxId ? { ...el, id: updatedId, kind: updatedKind } : el
       )
     );
     setSelected(null);

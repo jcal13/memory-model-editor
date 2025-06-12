@@ -1,6 +1,7 @@
 import PrimitiveContent from "./PrimitiveContent";
 import FunctionContent from "./FunctionContent";
 import CollectionContent from "./CollectionContent";
+import { ID } from "../../../shared/types";
 
 /**
  * Props for the Content component.
@@ -16,6 +17,10 @@ interface Props {
   setCollectionItems: any; // Setter for collection items
   collectionPairs: any; // Key-value pairs for dicts
   setCollectionPairs: any; // Setter for dict pairs
+  ids: ID[];
+  addId: (id: ID) => void;
+  ownId: ID;
+  setElementId: (id: ID) => void;
 }
 
 /**
@@ -38,6 +43,10 @@ const Content = ({
   setCollectionItems,
   collectionPairs,
   setCollectionPairs,
+  ids,
+  addId,
+  ownId,
+  setElementId,
 }: Props) => {
   const kind = metadata.kind.name;
 
@@ -52,6 +61,10 @@ const Content = ({
       <FunctionContent
         functionParams={functionParams}
         setParams={setFunctionParams}
+        ids={ids}
+        addId={addId}
+        ownId={ownId}
+        setElementId={setElementId}
       />
     );
   }
@@ -62,6 +75,10 @@ const Content = ({
         mode="single"
         items={collectionItems}
         setItems={setCollectionItems}
+        ids={ids}
+        addId={addId}
+        ownId={ownId}
+        setElementId={setElementId}
       />
     );
   }
@@ -72,6 +89,10 @@ const Content = ({
         mode="pair"
         items={collectionPairs}
         setItems={setCollectionPairs}
+        ids={ids}
+        addId={addId}
+        ownId={ownId}
+        setElementId={setElementId}
       />
     );
   }

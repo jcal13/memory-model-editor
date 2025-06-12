@@ -15,6 +15,7 @@ interface Props {
   setFunctionName: React.Dispatch<React.SetStateAction<string>>; // Function to update the function name
   ids: ID[];
   addId: (id: ID) => void;
+  ownId: ID;
   setElementId: (id: ID) => void;
 }
 
@@ -36,6 +37,7 @@ const Header = ({
   setFunctionName,
   ids, 
   addId,
+  ownId,
   setElementId
 }: Props) => {
   const kind = element.kind.name;
@@ -51,6 +53,7 @@ const Header = ({
           setValue={setValue}
           ids={ids}
           addId={addId}
+          ownId={ownId}
           setElementId={setElementId}
         />
       )}
@@ -61,7 +64,12 @@ const Header = ({
         />
       )}
       {["list", "set", "tuple", "dict"].includes(kind) && (
-        <CollectionHeader element={element} />
+        <CollectionHeader 
+          element={element} 
+          ids={ids}
+          addId={addId}
+          ownId={ownId}
+          setElementId={setElementId}/>
       )}
     </div>
   );

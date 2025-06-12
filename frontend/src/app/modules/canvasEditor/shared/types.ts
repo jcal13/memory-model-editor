@@ -64,7 +64,7 @@ export type ID = number | "None";
 
 export interface BoxEditorType {
   metadata: { id: ID; kind: BoxType };
-  onSave: (kind: BoxType) => void;
+  onSave: (id: ID, kind: BoxType) => void;
   onRemove: () => void;
   ids: ID[];
   addId: (id: ID) => void;

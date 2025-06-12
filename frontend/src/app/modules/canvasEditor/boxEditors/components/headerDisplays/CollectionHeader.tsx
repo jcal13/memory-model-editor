@@ -1,8 +1,13 @@
 import IdDisplay from "./components/IdDisplay";
 import TypeDisplay from "./components/TypeDisplay";
+import { ID } from "../../../shared/types";
 
 interface Props {
   element: any; // The memory element object containing an ID and kind information
+    ids: ID[];
+    addId: (id: ID) => void;
+    ownId: ID;
+    setElementId: (id: ID) => void;
 }
 
 /**
@@ -14,8 +19,9 @@ interface Props {
  *
  * This component is typically used at the top of collection editors (like list, set, tuple, or dict).
  */
-const CollectionHeader = ({ element }: Props) => (
+const CollectionHeader = ({ element, ids, addId, ownId, setElementId }: Props) => (
   <>
+    <IdDisplay element={element}  ids={ids} addId={addId} ownId={ownId} setElementId={setElementId} />
     <TypeDisplay typeLabel={element.kind.type} />
   </>
 );

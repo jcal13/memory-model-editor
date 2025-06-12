@@ -31,7 +31,7 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, ids, addId }: BoxEditorTy
   // Ref to the entire module, used for drag/close handling
   const moduleRef = useGlobalRefs();
 
-  // Id state for editors
+  // State hook for element id
   const [ownId, setOwnId] = useElementIdState(metadata);
 
   // State hooks for different box types
@@ -49,6 +49,7 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, ids, addId }: BoxEditorTy
     moduleRef,
     onSave,
     metadata,
+    ownId,
     dataType,
     contentValue,
     functionName,
@@ -69,6 +70,7 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, ids, addId }: BoxEditorTy
         setFunctionName={setFunctionName}
         ids={ids}
         addId={addId}
+        ownId={ownId}
         setElementId={setOwnId}
       />
 
@@ -84,6 +86,10 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, ids, addId }: BoxEditorTy
         setCollectionItems={setCollectionItems}
         collectionPairs={collectionPairs}
         setCollectionPairs={setCollectionPairs}
+        ids={ids}
+        addId={addId}
+        ownId={ownId}
+        setElementId={setOwnId}
       />
 
       {/* Bottom section: shows the remove button */}

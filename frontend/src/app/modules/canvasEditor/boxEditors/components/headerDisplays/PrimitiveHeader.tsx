@@ -11,6 +11,7 @@ interface Props {
   setValue: (v: string) => void; // Function to update the value
   ids: ID[];
   addId: (id: ID) => void;
+  ownId: ID;
   setElementId: (id: ID) => void;
 }
 
@@ -27,10 +28,11 @@ const PrimitiveHeader = ({
   setValue,
   ids, 
   addId,
+  ownId,
   setElementId
 }: Props) => (
   <div className={styles.header}>
-    <IdDisplay element={element}  ids={ids} addId={addId} setElementId={setElementId} />
+    <IdDisplay element={element}  ids={ids} addId={addId} ownId={ownId} setElementId={setElementId} />
     <TypeSelector
       dataType={dataType}
       setDataType={setDataType}

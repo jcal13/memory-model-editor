@@ -52,7 +52,7 @@ export default function IdSelector({
         onClick={() => setOpen((v) => !v)}
         className={`${buttonClassName}`}
       >
-        {currentId ?? "None"}
+        {currentId ? "ID " + currentId : "ID _"}
       </button>
 
       {open && (

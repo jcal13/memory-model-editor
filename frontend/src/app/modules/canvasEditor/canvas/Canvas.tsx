@@ -89,7 +89,7 @@ export default function Canvas({ elements, setElements, ids, addId, removeId}: P
 
     setElements((prev) => [
       ...prev,
-      { boxId: prev.length, id: "None", kind: newKind, x: coords.x, y: coords.y },
+      { boxId: prev.length, id: "_", kind: newKind, x: coords.x, y: coords.y },
     ]);
   };
 

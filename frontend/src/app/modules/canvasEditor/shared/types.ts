@@ -60,7 +60,7 @@ export interface CanvasElement {
 }
 
 
-export type ID = number | "None";
+export type ID = number | "_";
 
 export interface BoxEditorType {
   metadata: { id: ID; kind: BoxType };

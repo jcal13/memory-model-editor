@@ -32,7 +32,13 @@ export const useModule = (
 ) => {
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (moduleRef.current && !moduleRef.current.contains(e.target as Node)) {
+      const target = e.target as HTMLElement;
+
+      if (
+        moduleRef.current &&                          // not the editor itself
+        !moduleRef.current.contains(target) &&        // ...
+        !target.closest('[data-editor-ignore]')       // not a whitelisted helper
+      ) {
         const kind = element.kind.name;
         if (kind === "primitive") {
           onSave(ownId, {
@@ -64,9 +70,9 @@ export const useModule = (
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside, true);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside, true);
     };
   }, [
     onSave,

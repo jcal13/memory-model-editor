@@ -6,9 +6,9 @@ import IdSelector from "../../../../idSelector/IdSelector";
  * Props for the IdDisplay component.
  */
 interface Props {
-  ids: ID[];
+  ids: any;
   addId: (id: ID) => void;
-  ownId: ID;
+  ownId: any;
   setElementId: (id: ID) => void;
   removeId: (id: ID) => void;
 }
@@ -18,8 +18,8 @@ interface Props {
  *
  * This is useful for labeling visualized memory boxes in the editor UI.
  */
-const IdDisplay = ({ ids, addId, ownId, setElementId, removeId}: Props) => (
-  <IdSelector                              // one-liner wrap
+const IdDisplay = ({ ids, addId, ownId, setElementId, removeId }: Props) => (
+  <IdSelector // one-liner wrap
     ids={ids}
     onAdd={addId}
     onSelect={setElementId}

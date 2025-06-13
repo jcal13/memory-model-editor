@@ -13,7 +13,7 @@ interface Props {
   addId: (id: ID) => void;
   ownId: ID;
   setElementId: (id: ID) => void;
-  removeId: (id: ID) => void
+  removeId: (id: ID) => void;
 }
 
 /**
@@ -26,14 +26,20 @@ const PrimitiveHeader = ({
   setDataType,
   value,
   setValue,
-  ids, 
+  ids,
   addId,
   ownId,
   setElementId,
-  removeId
+  removeId,
 }: Props) => (
-  <div className={styles.header}>
-    <IdDisplay ids={ids} addId={addId} ownId={ownId} setElementId={setElementId} removeId={removeId}/>
+  <div className={styles.header} data-testid="primitive-header">
+    <IdDisplay
+      ids={ids}
+      addId={addId}
+      ownId={ownId}
+      setElementId={setElementId}
+      removeId={removeId}
+    />
     <TypeSelector
       dataType={dataType}
       setDataType={setDataType}

@@ -7,7 +7,7 @@ import { ID } from "../../../shared/types";
 
 interface Props {
   element: any; // The memory element being edited, includes its id and kind
-  dataType: PrimitiveType; // Current primitive type selected (if applicable)
+  dataType: any; // Current primitive type selected (if applicable)
   setDataType: React.Dispatch<React.SetStateAction<PrimitiveType>>; // Function to update the primitive type
   value: string; // Current value for primitive types
   setValue: React.Dispatch<React.SetStateAction<string>>; // Function to update the value
@@ -36,11 +36,11 @@ const Header = ({
   setValue,
   functionName,
   setFunctionName,
-  ids, 
+  ids,
   addId,
   ownId,
   setElementId,
-  removeId
+  removeId,
 }: Props) => {
   const kind = element.kind.name;
 
@@ -67,13 +67,14 @@ const Header = ({
         />
       )}
       {["list", "set", "tuple", "dict"].includes(kind) && (
-        <CollectionHeader 
-          element={element} 
+        <CollectionHeader
+          element={element}
           ids={ids}
           addId={addId}
           ownId={ownId}
           setElementId={setElementId}
-          removeId={removeId}/>
+          removeId={removeId}
+        />
       )}
     </div>
   );

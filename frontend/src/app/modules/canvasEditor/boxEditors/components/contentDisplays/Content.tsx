@@ -17,9 +17,9 @@ interface Props {
   setCollectionItems: any; // Setter for collection items
   collectionPairs: any; // Key-value pairs for dicts
   setCollectionPairs: any; // Setter for dict pairs
-  ids: ID[];
+  ids: any;
   addId: (id: ID) => void;
-  removeId:(id: ID) => void;
+  removeId: (id: ID) => void;
 }
 
 /**
@@ -44,7 +44,7 @@ const Content = ({
   setCollectionPairs,
   ids,
   addId,
-  removeId, 
+  removeId,
 }: Props) => {
   const kind = metadata.kind.name;
 

@@ -36,7 +36,7 @@ export default function IdSelector({
   };
 
   const handleRemove = (id: ID) => {
-    setList(prev => prev.filter(v => v !== id));
+    setList((prev) => prev.filter((v) => v !== id));
     onRemove?.(id);
   };
 

@@ -19,7 +19,7 @@ export interface PrimitiveKind {
   value: string;
 }
 
-type FunctionKind = {
+export type FunctionKind = {
   name: "function";
   type: "function";
   value: null;

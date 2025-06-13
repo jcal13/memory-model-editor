@@ -30,7 +30,13 @@ interface Props {
 /* =======================================
    === Main Canvas Component ===
 ======================================= */
-export default function Canvas({ elements, setElements, ids, addId, removeId}: Props) {
+export default function Canvas({
+  elements,
+  setElements,
+  ids,
+  addId,
+  removeId,
+}: Props) {
   const [selected, setSelected] = useState<CanvasElement | null>(null);
   const { svgRef, dragRef } = useCanvasRefs();
   const [viewBox, setViewBox] = useState<string>("0 0 0 0");
@@ -38,12 +44,11 @@ export default function Canvas({ elements, setElements, ids, addId, removeId}: P
   useCanvasResize(svgRef, setViewBox);
 
   /* === Utility: Creates updater function for a specific box ID === */
-  const makePositionUpdater =
-    (boxId: number) => (x: number, y: number) => {
-      setElements((prev) =>
-        prev.map((el) => (el.boxId === boxId ? { ...el, x, y } : el))
-      );
-    };
+  const makePositionUpdater = (boxId: number) => (x: number, y: number) => {
+    setElements((prev) =>
+      prev.map((el) => (el.boxId === boxId ? { ...el, x, y } : el))
+    );
+  };
 
   /* === Handle Drag & Drop Creation of New Elements === */
   const handleDrop = (e: React.DragEvent<SVGSVGElement>) => {
@@ -98,7 +103,9 @@ export default function Canvas({ elements, setElements, ids, addId, removeId}: P
     if (!selected) return;
     setElements((prev) =>
       prev.map((el) =>
-        el.boxId === selected.boxId ? { ...el, id: updatedId, kind: updatedKind } : el
+        el.boxId === selected.boxId
+          ? { ...el, id: updatedId, kind: updatedKind }
+          : el
       )
     );
     setSelected(null);
@@ -117,6 +124,7 @@ export default function Canvas({ elements, setElements, ids, addId, removeId}: P
       {/* === SVG Canvas === */}
       <div className={styles.canvasWrapper}>
         <svg
+          data-testid="canvas"
           ref={svgRef}
           viewBox={viewBox}
           preserveAspectRatio="xMinYMin meet"

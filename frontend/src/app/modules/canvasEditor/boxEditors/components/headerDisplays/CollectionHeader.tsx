@@ -1,6 +1,7 @@
 import IdDisplay from "./components/IdDisplay";
 import TypeDisplay from "./components/TypeDisplay";
 import { ID } from "../../../shared/types";
+import styles from "../../styles/BoxEditorStyles.module.css";
 
 interface Props {
   element: any; // The memory element object containing an ID and kind information
@@ -28,7 +29,7 @@ const CollectionHeader = ({
   setElementId,
   removeId,
 }: Props) => (
-  <div data-testid="collection-header">
+  <div data-testid="collection-header" className={styles.collectionHeader}>
     <IdDisplay
       ids={ids}
       addId={addId}

@@ -36,6 +36,7 @@ jest.mock("../hooks/useEffect", () => ({
 }));
 
 const mockElement = {
+  boxId: 0,
   id: 1,
   x: 100,
   y: 200,

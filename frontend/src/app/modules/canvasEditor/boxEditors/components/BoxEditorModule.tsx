@@ -9,6 +9,7 @@ import {
   useFunctionStates,
   useCollectionSingleStates,
   useCollectionPairsStates,
+  useElementIdState
 } from "../hooks/useState";
 import { BoxEditorType } from "../../shared/types";
 import { useGlobalRefs } from "../hooks/useRef";
@@ -23,12 +24,15 @@ import { useGlobalRefs } from "../hooks/useRef";
  * - onSave: function to call with the updated box data
  * - onRemove: function to call to remove the box from the canvas
  */
-const BoxEditorModule = ({ metadata, onSave, onRemove }: BoxEditorType) => {
+const BoxEditorModule = ({ metadata, onSave, onRemove, ids, addId, removeId }: BoxEditorType) => {
   // Shared hover state for remove button
   const { hoverRemove, setHoverRemove } = useGlobalStates();
 
   // Ref to the entire module, used for drag/close handling
   const moduleRef = useGlobalRefs();
+
+  // State hook for element id
+  const [ownId, setOwnId] = useElementIdState(metadata);
 
   // State hooks for different box types
   const [dataType, setDataType, contentValue, setContentValue] =
@@ -40,16 +44,20 @@ const BoxEditorModule = ({ metadata, onSave, onRemove }: BoxEditorType) => {
   const [collectionPairs, setCollectionPairs] =
     useCollectionPairsStates(metadata);
 
+
+  const collectionData = metadata.kind.name === "dict" ? collectionPairs : collectionItems;
+
   // Hook to sync the module and apply save logic when clicking outside
   useModule(
     moduleRef,
     onSave,
     metadata,
+    ownId,
     dataType,
     contentValue,
     functionName,
     functionParams,
-    collectionItems
+    collectionData
   );
 
   return (
@@ -63,6 +71,11 @@ const BoxEditorModule = ({ metadata, onSave, onRemove }: BoxEditorType) => {
         setValue={setContentValue}
         functionName={functionName}
         setFunctionName={setFunctionName}
+        ids={ids}
+        addId={addId}
+        ownId={ownId}
+        setElementId={setOwnId}
+        removeId={removeId}
       />
 
       {/* Middle section: displays the input or editable content for the box */}
@@ -77,6 +90,9 @@ const BoxEditorModule = ({ metadata, onSave, onRemove }: BoxEditorType) => {
         setCollectionItems={setCollectionItems}
         collectionPairs={collectionPairs}
         setCollectionPairs={setCollectionPairs}
+        ids={ids}
+        addId={addId}
+        removeId={removeId}
       />
 
       {/* Bottom section: shows the remove button */}

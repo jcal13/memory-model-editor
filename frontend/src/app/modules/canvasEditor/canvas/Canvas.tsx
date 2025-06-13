@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Draggable from "react-draggable";
-import { CanvasElement, BoxType } from "../shared/types";
+import { CanvasElement, BoxType, ID } from "../shared/types";
 import CanvasBox from "./components/CanvasBox";
 import BoxEditor from "../boxEditors/BoxEditor";
 import { useCanvasResize } from "./hooks/useEffect";
@@ -22,12 +22,21 @@ const editorMap: Record<BoxType["name"], React.FC<any>> = {
 interface Props {
   elements: CanvasElement[];
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
+  ids: ID[];
+  addId: (id: ID) => void;
+  removeId: (id: ID) => void;
 }
 
 /* =======================================
    === Main Canvas Component ===
 ======================================= */
-export default function Canvas({ elements, setElements }: Props) {
+export default function Canvas({
+  elements,
+  setElements,
+  ids,
+  addId,
+  removeId,
+}: Props) {
   const [selected, setSelected] = useState<CanvasElement | null>(null);
   const { svgRef, dragRef } = useCanvasRefs();
   const [viewBox, setViewBox] = useState<string>("0 0 0 0");
@@ -35,12 +44,11 @@ export default function Canvas({ elements, setElements }: Props) {
   useCanvasResize(svgRef, setViewBox);
 
   /* === Utility: Creates updater function for a specific box ID === */
-  const makePositionUpdater =
-    (id: string | number) => (x: number, y: number) => {
-      setElements((prev) =>
-        prev.map((el) => (el.id === id ? { ...el, x, y } : el))
-      );
-    };
+  const makePositionUpdater = (boxId: number) => (x: number, y: number) => {
+    setElements((prev) =>
+      prev.map((el) => (el.boxId === boxId ? { ...el, x, y } : el))
+    );
+  };
 
   /* === Handle Drag & Drop Creation of New Elements === */
   const handleDrop = (e: React.DragEvent<SVGSVGElement>) => {
@@ -86,16 +94,18 @@ export default function Canvas({ elements, setElements }: Props) {
 
     setElements((prev) => [
       ...prev,
-      { id: prev.length, kind: newKind, x: coords.x, y: coords.y },
+      { boxId: prev.length, id: "_", kind: newKind, x: coords.x, y: coords.y },
     ]);
   };
 
   /* === Update element after editor save === */
-  const saveElement = (updatedKind: BoxType) => {
+  const saveElement = (updatedId: ID, updatedKind: BoxType) => {
     if (!selected) return;
     setElements((prev) =>
       prev.map((el) =>
-        el.id === selected.id ? { ...el, kind: updatedKind } : el
+        el.boxId === selected.boxId
+          ? { ...el, id: updatedId, kind: updatedKind }
+          : el
       )
     );
     setSelected(null);
@@ -104,7 +114,7 @@ export default function Canvas({ elements, setElements }: Props) {
   /* === Remove element from canvas === */
   const removeElement = () => {
     if (!selected) return;
-    setElements((prev) => prev.filter((el) => el.id !== selected.id));
+    setElements((prev) => prev.filter((el) => el.boxId !== selected.boxId));
     setSelected(null);
   };
 
@@ -125,10 +135,10 @@ export default function Canvas({ elements, setElements }: Props) {
           <g>
             {elements.map((el) => (
               <CanvasBox
-                key={el.id}
+                key={el.boxId}
                 element={el}
                 openInterface={() => setSelected(el)}
-                updatePosition={makePositionUpdater(el.id)}
+                updatePosition={makePositionUpdater(el.boxId)}
               />
             ))}
           </g>
@@ -153,6 +163,9 @@ export default function Canvas({ elements, setElements }: Props) {
                   metadata={selected}
                   onSave={saveElement}
                   onRemove={removeElement}
+                  ids={ids}
+                  addId={addId}
+                  removeId={removeId}
                 />
               );
             })()}

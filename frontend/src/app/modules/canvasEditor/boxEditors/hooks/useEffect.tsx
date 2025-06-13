@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { ID } from "../../shared/types";
 
 /**
  * useModule is a custom hook that detects clicks outside the editor module
@@ -20,8 +21,9 @@ import { useEffect } from "react";
  */
 export const useModule = (
   moduleRef: any,
-  onSave: (data: any) => void,
+  onSave: (id: ID, data: any) => void,
   element: any,
+  ownId: ID,
   dataType?: string,
   contentValue?: string,
   functionName?: string,
@@ -30,25 +32,36 @@ export const useModule = (
 ) => {
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (moduleRef.current && !moduleRef.current.contains(e.target as Node)) {
-        const kind = element.kind.name;
+      const target = e.target as HTMLElement;
 
+      if (
+        moduleRef.current &&                          // not the editor itself
+        !moduleRef.current.contains(target) &&        // ...
+        !target.closest('[data-editor-ignore]')       // not a whitelisted helper
+      ) {
+        const kind = element.kind.name;
         if (kind === "primitive") {
-          onSave({
+          onSave(ownId, {
             name: kind,
             type: dataType,
             value: contentValue,
           });
         } else if (kind === "function") {
-          onSave({
+          onSave(ownId, {
             name: kind,
             type: "function",
             value: null,
             functionName,
             params,
           });
+        } else if (kind === "dict") {
+          onSave(ownId, {
+            name: kind,
+            type: element.kind.type,
+            value: Object.fromEntries(collectionItems || []),
+          });
         } else {
-          onSave({
+          onSave(ownId, {
             name: kind,
             type: element.kind.type,
             value: collectionItems,
@@ -57,12 +70,13 @@ export const useModule = (
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside, true);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside, true);
     };
   }, [
     onSave,
+    ownId,
     element.kind.name,
     dataType,
     contentValue,

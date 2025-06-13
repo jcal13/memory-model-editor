@@ -1,14 +1,16 @@
 import styles from "../../../styles/BoxEditorStyles.module.css";
-import { PrimitiveKind } from "../../../../shared/types";
+import { ID } from "../../../../shared/types";
+import IdSelector from "../../../../idSelector/IdSelector";
 
 /**
  * Props for the IdDisplay component.
  */
 interface Props {
-  element: {
-    id: string; // The unique identifier for the element
-    kind: PrimitiveKind; // The kind of the primitive element
-  };
+  ids: ID[];
+  addId: (id: ID) => void;
+  ownId: ID;
+  setElementId: (id: ID) => void;
+  removeId: (id: ID) => void;
 }
 
 /**
@@ -16,8 +18,15 @@ interface Props {
  *
  * This is useful for labeling visualized memory boxes in the editor UI.
  */
-const IdDisplay = ({ element }: Props) => {
-  return <div className={styles.moduleIdBox}>ID&nbsp;{element.id}</div>;
-};
+const IdDisplay = ({ ids, addId, ownId, setElementId, removeId}: Props) => (
+  <IdSelector                              // one-liner wrap
+    ids={ids}
+    onAdd={addId}
+    onSelect={setElementId}
+    currentId={ownId}
+    buttonClassName={styles.moduleIdBox}
+    onRemove={removeId}
+  />
+);
 
 export default IdDisplay;

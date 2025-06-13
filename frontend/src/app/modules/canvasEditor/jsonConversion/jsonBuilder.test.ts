@@ -5,6 +5,7 @@ describe("buildJSONFromElements", () => {
   it("handles a primitive int", () => {
     const elements: CanvasElement[] = [
       {
+        boxId: 0,
         id: 1,
         x: 0,
         y: 0,
@@ -24,6 +25,7 @@ describe("buildJSONFromElements", () => {
   it("handles a function with one param", () => {
     const elements: CanvasElement[] = [
       {
+        boxId: 0,
         id: 2,
         x: 0,
         y: 0,
@@ -55,6 +57,7 @@ describe("buildJSONFromElements", () => {
   it("handles a dict", () => {
     const elements: CanvasElement[] = [
       {
+        boxId: 0,
         id: 3,
         x: 0,
         y: 0,
@@ -86,6 +89,7 @@ describe("buildJSONFromElements", () => {
   it("handles list, tuple, and set", () => {
     const elements: CanvasElement[] = [
       {
+        boxId: 0,
         id: 4,
         x: 0,
         y: 0,
@@ -96,6 +100,7 @@ describe("buildJSONFromElements", () => {
         },
       },
       {
+        boxId: 0,
         id: 5,
         x: 0,
         y: 0,
@@ -106,6 +111,7 @@ describe("buildJSONFromElements", () => {
         },
       },
       {
+        boxId: 0,
         id: 6,
         x: 0,
         y: 0,

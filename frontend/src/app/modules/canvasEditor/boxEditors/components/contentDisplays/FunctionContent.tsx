@@ -1,11 +1,15 @@
 import styles from "../../styles/BoxEditorStyles.module.css";
+import { ID
 
+ } from "../../../shared/types";
 /**
  * Props for the FunctionContent component.
  */
 interface Props {
   functionParams: any; // Array of parameter objects for the function
   setParams: any; // Setter to update the list of parameters
+  ids: ID[];
+  addId: (id: ID) => void;
 }
 
 /**

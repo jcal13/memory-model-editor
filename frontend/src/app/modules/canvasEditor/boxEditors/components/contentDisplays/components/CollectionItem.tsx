@@ -1,39 +1,45 @@
 import styles from "../../../styles/BoxEditorStyles.module.css";
+import IdSelector from "../../../../idSelector/IdSelector";
+import { ID } from "../../../../shared/types";
 
 /**
  * Props for the CollectionItem component.
  */
 interface Props {
-  mode: "single" | "pair"; // Determines if the collection consists of single elements or key-value pairs
-  items: any[]; // Current array of collection items (e.g., list items or dict pairs)
-  setItems: React.Dispatch<React.SetStateAction<any[]>>; // State setter to update the collection
+  mode: "single" | "pair";
+  items: any[];                                         // list / set / tuple OR dict pairs
+  setItems: React.Dispatch<React.SetStateAction<any[]>>; // updates collectionItems in BoxEditorModule
+  ids: ID[];                                           // global ID pool
+  addId: (id: ID) => void;                             // adds a new ID to the pool
+  removeId: (id: ID) => void;  
 }
 
 /**
- * CollectionItem displays a list of editable items in either "single" or "pair" mode.
- * - "single": renders a list of individual value boxes (e.g., list, tuple, set)
- * - "pair": renders key-value pairs (e.g., dict), with a ":" separator between key and value
- *
- * Each item includes a "×" button to remove the item from the list.
+ * Renders the entire collection (not a single slot) so the caller
+ * only has to supply `items` and `setItems`.
  */
-const CollectionItem = ({ mode, items, setItems }: Props) => {
-  /**
-   * Removes an item at the given index from the collection.
-   * @param idx - Index of the item to remove
-   */
+const CollectionItem = ({ mode, items, setItems, ids, addId, removeId }: Props) => {
   const removeItem = (idx: number) =>
-    setItems(items.filter((_, i) => i !== idx));
+    setItems(prev => prev.filter((_, i) => i !== idx));
 
-  // Don't render anything if the collection is empty
   if (items.length === 0) return null;
 
-  // Render collection for "single" mode
+  // SINGLE ELEMENTS (list / set / tuple)
   if (mode === "single") {
     return (
       <div className={styles.collectionIdContainer}>
-        {items.map((_, idx) => (
+        {items.map((itemId: ID, idx: number) => (
           <div key={idx} className={styles.collectionIdBox}>
-            <div className={styles.collectionIdBoxText}>+</div>
+            <IdSelector
+              currentId={itemId}
+              ids={ids}
+              onAdd={addId}
+              onSelect={picked =>
+                setItems(prev => prev.map((v, i) => (i === idx ? picked : v)))
+              }
+              onRemove={removeId}
+              buttonClassName={styles.collectionIdNoBorder}
+            />
             <button
               className={styles.collectionRemoveId}
               onClick={() => removeItem(idx)}
@@ -46,17 +52,41 @@ const CollectionItem = ({ mode, items, setItems }: Props) => {
     );
   }
 
-  // Render collection for "pair" mode
+  // PAIRS (dict)
   return (
     <div className={styles.collectionPairsContainer}>
-      {items.map((_, idx) => (
+      {items.map(([keyId, valId]: [ID, ID], idx: number) => (
         <div key={idx} className={styles.collectionPairContainer}>
+          {/* KEY ID */}
           <div className={styles.collectionIdBox}>
-            <div className={styles.collectionIdBoxText}>+</div>
+            <IdSelector
+              currentId={keyId}
+              ids={ids}
+              onAdd={addId}
+              onSelect={picked =>
+                setItems(prev =>
+                  prev.map((p, i) => (i === idx ? [picked, p[1]] : p))
+                )
+              }
+              buttonClassName={styles.collectionIdNoBorder}
+            />
           </div>
+
           <div className={styles.collectionPairSeparator}>:</div>
+
+          {/* VALUE ID + REMOVE */}
           <div className={styles.collectionIdBox}>
-            <div className={styles.collectionIdBoxText}>+</div>
+            <IdSelector
+              currentId={valId}
+              ids={ids}
+              onAdd={addId}
+              onSelect={picked =>
+                setItems(prev =>
+                  prev.map((p, i) => (i === idx ? [p[0], picked] : p))
+                )
+              }
+              buttonClassName={styles.collectionIdNoBorder}
+            />
             <button
               className={styles.collectionRemoveId}
               onClick={() => removeItem(idx)}

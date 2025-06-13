@@ -3,6 +3,7 @@ import PrimitiveHeader from "./PrimitiveHeader";
 import FunctionHeader from "./FunctionHeader";
 import CollectionHeader from "./CollectionHeader";
 import { PrimitiveType } from "../../../shared/types";
+import { ID } from "../../../shared/types";
 
 interface Props {
   element: any; // The memory element being edited, includes its id and kind
@@ -12,6 +13,11 @@ interface Props {
   setValue: React.Dispatch<React.SetStateAction<string>>; // Function to update the value
   functionName: string; // Name of the function (if the element is a function)
   setFunctionName: React.Dispatch<React.SetStateAction<string>>; // Function to update the function name
+  ids: ID[];
+  addId: (id: ID) => void;
+  ownId: ID;
+  setElementId: (id: ID) => void;
+  removeId: (id: ID) => void;
 }
 
 /**
@@ -30,6 +36,11 @@ const Header = ({
   setValue,
   functionName,
   setFunctionName,
+  ids, 
+  addId,
+  ownId,
+  setElementId,
+  removeId
 }: Props) => {
   const kind = element.kind.name;
 
@@ -42,6 +53,11 @@ const Header = ({
           setDataType={setDataType}
           value={value}
           setValue={setValue}
+          ids={ids}
+          addId={addId}
+          ownId={ownId}
+          setElementId={setElementId}
+          removeId={removeId}
         />
       )}
       {kind === "function" && (
@@ -51,7 +67,13 @@ const Header = ({
         />
       )}
       {["list", "set", "tuple", "dict"].includes(kind) && (
-        <CollectionHeader element={element} />
+        <CollectionHeader 
+          element={element} 
+          ids={ids}
+          addId={addId}
+          ownId={ownId}
+          setElementId={setElementId}
+          removeId={removeId}/>
       )}
     </div>
   );

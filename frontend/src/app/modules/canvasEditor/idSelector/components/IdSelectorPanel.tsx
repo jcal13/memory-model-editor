@@ -51,7 +51,7 @@ const IdSelectorPanel: React.FC<Props> = ({
           onClick={() => onAdd(nextId)}
           className={boxStyles.addButton}
         >
-          + Add ID
+          Add ID
         </button>
       </div>
 

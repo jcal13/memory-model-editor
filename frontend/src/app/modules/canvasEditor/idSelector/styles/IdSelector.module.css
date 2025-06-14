@@ -67,6 +67,7 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
+
 .form button:hover {
   background: #059669;
 }
@@ -87,6 +88,7 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
+
 .list li button:hover {
   background: #f3f4f6;
 }

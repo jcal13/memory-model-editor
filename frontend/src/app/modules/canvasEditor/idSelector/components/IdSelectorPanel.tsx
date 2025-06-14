@@ -25,26 +25,27 @@ const IdSelectorPanel: React.FC<Props> = ({
     <div className={`${boxStyles.boxEditorModule} ${panelStyles.panelShell}`}>
       <div className={`drag-handle ${panelStyles.header}`}>Select ID</div>
 
-      <div className={boxStyles.collectionIdContainer}>
-        {ids.map((id) => (
-          <div key={id.toString()} className={boxStyles.collectionIdBox}>
-            <button
-              type="button"
-              className={boxStyles.collectionIdNoBorder}
-              onClick={() => onSelect(id)}
-            >
-              {id}
-            </button>
-            <button
-              type="button"
-              className={boxStyles.collectionRemoveId}
-              onClick={() => onRemove(id)}
-            >
-              ×
-            </button>
-          </div>
-        ))}
-
+      <div className={panelStyles.content}>
+        <div className={boxStyles.collectionIdContainer}>
+          {ids.map((id) => (
+            <div key={id.toString()} className={boxStyles.collectionIdBox}>
+              <button
+                type="button"
+                className={boxStyles.collectionIdNoBorder}
+                onClick={() => onSelect(id)}
+              >
+                {id}
+              </button>
+              <button
+                type="button"
+                className={boxStyles.collectionRemoveId}
+                onClick={() => onRemove(id)}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
         <button
           type="button"
           onClick={() => onAdd(nextId)}

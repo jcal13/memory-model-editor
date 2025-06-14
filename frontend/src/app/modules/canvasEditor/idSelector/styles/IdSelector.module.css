@@ -133,6 +133,14 @@
   gap: 0;
 }
 
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+}
+
 .empty {
   padding: 14px;
   font-size: 0.95rem;

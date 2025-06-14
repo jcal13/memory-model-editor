@@ -61,6 +61,7 @@ const Content = ({
         setParams={setFunctionParams}
         ids={ids}
         addId={addId}
+        removeId={removeId}
       />
     );
   }

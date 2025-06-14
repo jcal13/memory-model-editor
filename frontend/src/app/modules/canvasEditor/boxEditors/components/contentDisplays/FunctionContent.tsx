@@ -1,7 +1,7 @@
 import styles from "../../styles/BoxEditorStyles.module.css";
-import { ID
+import { ID } from "../../../shared/types";
+import IdSelector from "../../../idSelector/IdSelector";
 
- } from "../../../shared/types";
 /**
  * Props for the FunctionContent component.
  */
@@ -10,6 +10,7 @@ interface Props {
   setParams: any; // Setter to update the list of parameters
   ids: ID[];
   addId: (id: ID) => void;
+  removeId: (id: ID) => void;
 }
 
 /**
@@ -22,7 +23,7 @@ interface Props {
  *
  * The component also provides an "Add Variable" button to append a new parameter.
  */
-const FunctionContent = ({ functionParams, setParams }: Props) => {
+const FunctionContent = ({ functionParams, setParams, ids, addId, removeId }: Props) => {
   // Add a new empty parameter to the list
   const addParam = () =>
     setParams([...functionParams, { name: "", targetId: null }]);
@@ -39,6 +40,14 @@ const FunctionContent = ({ functionParams, setParams }: Props) => {
       )
     );
 
+  // Update the targetId of a parameter at a given index
+  const setTargetId = (i: number, id: ID) =>
+    setParams(
+      functionParams.map((p: any, idx: any) =>
+        idx === i ? { ...p, targetId: id } : p
+      )
+    );
+
   return (
     <div className={styles.contentContainer}>
       {functionParams.length > 0 && (
@@ -51,11 +60,18 @@ const FunctionContent = ({ functionParams, setParams }: Props) => {
                 onChange={(e) => changeName(idx, e.target.value)}
                 className={styles.variableNameBox}
               />
-              <div className={styles.functionIdBox}>
-                <div className={styles.functionIdBoxText}>+</div>
+              <div className={styles.collectionIdBox}>
+                <IdSelector
+                  currentId={p.targetId}
+                  ids={ids}
+                  onAdd={addId}
+                  onSelect={(id) => setTargetId(idx, id)}
+                  onRemove={removeId}
+                  buttonClassName={styles.collectionIdNoBorder}
+                />
                 <button
                   onClick={() => removeParam(idx)}
-                  className={styles.removeItem}
+                  className={styles.collectionRemoveId}
                 >
                   ×
                 </button>

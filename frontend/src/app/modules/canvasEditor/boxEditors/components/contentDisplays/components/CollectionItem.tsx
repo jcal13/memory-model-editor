@@ -7,20 +7,27 @@ import { ID } from "../../../../shared/types";
  */
 interface Props {
   mode: "single" | "pair";
-  items: any[];                                         // list / set / tuple OR dict pairs
+  items: any[]; // list / set / tuple OR dict pairs
   setItems: React.Dispatch<React.SetStateAction<any[]>>; // updates collectionItems in BoxEditorModule
-  ids: ID[];                                           // global ID pool
-  addId: (id: ID) => void;                             // adds a new ID to the pool
-  removeId: (id: ID) => void;  
+  ids: any; // global ID pool
+  addId: (id: ID) => void; // adds a new ID to the pool
+  removeId: (id: ID) => void;
 }
 
 /**
  * Renders the entire collection (not a single slot) so the caller
  * only has to supply `items` and `setItems`.
  */
-const CollectionItem = ({ mode, items, setItems, ids, addId, removeId }: Props) => {
+const CollectionItem = ({
+  mode,
+  items,
+  setItems,
+  ids,
+  addId,
+  removeId,
+}: Props) => {
   const removeItem = (idx: number) =>
-    setItems(prev => prev.filter((_, i) => i !== idx));
+    setItems((prev) => prev.filter((_, i) => i !== idx));
 
   if (items.length === 0) return null;
 
@@ -34,8 +41,8 @@ const CollectionItem = ({ mode, items, setItems, ids, addId, removeId }: Props) 
               currentId={itemId}
               ids={ids}
               onAdd={addId}
-              onSelect={picked =>
-                setItems(prev => prev.map((v, i) => (i === idx ? picked : v)))
+              onSelect={(picked) =>
+                setItems((prev) => prev.map((v, i) => (i === idx ? picked : v)))
               }
               onRemove={removeId}
               buttonClassName={styles.collectionIdNoBorder}
@@ -63,8 +70,8 @@ const CollectionItem = ({ mode, items, setItems, ids, addId, removeId }: Props) 
               currentId={keyId}
               ids={ids}
               onAdd={addId}
-              onSelect={picked =>
-                setItems(prev =>
+              onSelect={(picked) =>
+                setItems((prev) =>
                   prev.map((p, i) => (i === idx ? [picked, p[1]] : p))
                 )
               }
@@ -80,8 +87,8 @@ const CollectionItem = ({ mode, items, setItems, ids, addId, removeId }: Props) 
               currentId={valId}
               ids={ids}
               onAdd={addId}
-              onSelect={picked =>
-                setItems(prev =>
+              onSelect={(picked) =>
+                setItems((prev) =>
                   prev.map((p, i) => (i === idx ? [p[0], picked] : p))
                 )
               }

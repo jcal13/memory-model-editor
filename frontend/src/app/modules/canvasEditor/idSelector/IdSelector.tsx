@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import Draggable from "react-draggable";
 import IdSelectorPanel from "./components/IdSelectorPanel";
-import { useIdListSync } from "./hooks/useIdListSync";
+import { useIdListSync } from "./hooks/useEffect";
 import styles from "./styles/IdSelector.module.css";
 import { ID } from "../shared/types";
 
@@ -47,10 +47,10 @@ export default function IdSelector({
   };
 
   return (
-    <>
+    <div data-testid="id-selector-panel">
       <button
         type="button"
-        onClick={() => setOpen(v => !v)}
+        onClick={() => setOpen((v) => !v)}
         className={buttonClassName}
       >
         {currentId ? `ID ${currentId}` : "ID _"}
@@ -61,12 +61,12 @@ export default function IdSelector({
           <Draggable
             nodeRef={panelRef as unknown as React.RefObject<HTMLElement>}
             defaultPosition={{ x: 150, y: 150 }}
-            onStart={e => e.stopPropagation()}
+            onStart={(e) => e.stopPropagation()}
           >
             <div
               ref={panelRef}
               className={styles.panelContainer}
-              data-editor-ignore     
+              data-editor-ignore
             >
               <IdSelectorPanel
                 ids={list}
@@ -78,6 +78,6 @@ export default function IdSelector({
           </Draggable>,
           document.body
         )}
-    </>
+    </div>
   );
 }

@@ -16,7 +16,7 @@ interface Props {
  */
 const FunctionName = ({ functionName, setFunctionName }: Props) => {
   return (
-    <div>
+    <div data-testid="function-header">
       <input
         className={styles.functionNameInput}
         placeholder="function name"

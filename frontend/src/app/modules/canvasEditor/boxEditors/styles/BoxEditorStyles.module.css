@@ -82,9 +82,19 @@
 ======================================= */
 
 .functionNameInput,
-.variableNameBox,
 .primitiveValueContainer {
   width: 100%;
+  font-size: 1rem;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  color: #111827;
+}
+
+.variableNameBox {
+  flex: 1;
   font-size: 1rem;
   padding: 10px 12px;
   border: 1px solid #d1d5db;
@@ -231,6 +241,11 @@
 .collectionIdBox {
   width: 55px;
   height: 50px;
+  cursor: pointer;
+}
+
+.collectionIdBox:hover {
+  background-color: #f3f4f6;
 }
 
 .functionIdBoxText,
@@ -250,6 +265,7 @@
   align-items: center;
   justify-content: center;
   font: inherit;
+  cursor: pointer;
 }
 
 /* =======================================

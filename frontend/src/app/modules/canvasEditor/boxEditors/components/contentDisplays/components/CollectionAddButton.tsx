@@ -30,7 +30,7 @@ const CollectionAddButton = ({ mode, items, setItems, buttonText }: Props) => {
   };
 
   // Determine default button label based on mode
-  const defaultText = mode === "single" ? "+ Add Element" : "+ Add Pair";
+  const defaultText = mode === "single" ? "Add Element" : "Add Pair";
 
   return (
     <div>

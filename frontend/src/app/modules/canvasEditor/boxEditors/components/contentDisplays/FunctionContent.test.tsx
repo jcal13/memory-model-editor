@@ -23,6 +23,7 @@ describe("FunctionContent", () => {
         setParams={setParamsMock}
         ids={[]}
         addId={() => {}}
+        removeId={() => {}}
       />
     );
     expect(getByPlaceholderText("var")).toBeInTheDocument();
@@ -38,6 +39,7 @@ describe("FunctionContent", () => {
         setParams={setParamsMock}
         ids={[]}
         addId={() => {}}
+        removeId={() => {}}
       />
     );
     const input = getByPlaceholderText("var");
@@ -49,13 +51,14 @@ describe("FunctionContent", () => {
   /**
    * Removes the correct parameter when delete button is clicked
    */
-  it("calls setParams to remove a parameter when × is clicked", () => {
+  it("removes the correct parameter when delete button is clicked", () => {
     const { getByText } = render(
       <FunctionContent
         functionParams={defaultParams}
         setParams={setParamsMock}
         ids={[]}
         addId={() => {}}
+        removeId={() => {}}
       />
     );
     fireEvent.click(getByText("×"));
@@ -72,6 +75,7 @@ describe("FunctionContent", () => {
         setParams={setParamsMock}
         ids={[]}
         addId={() => {}}
+        removeId={() => {}}
       />
     );
     fireEvent.click(getByText("Add Variable"));

@@ -57,7 +57,7 @@ const IdSelectorPanel: React.FC<Props> = ({
 
       {ids.length === 0 && (
         <div className={panelStyles.empty}>
-          No IDs yet — click “+ Add ID” to create one.
+          No IDs yet — click “Add ID” to create one.
         </div>
       )}
     </div>

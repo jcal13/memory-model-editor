@@ -94,12 +94,10 @@ export const BoxConfigs = {
   /* ---------- Dict Box ---------- */
   dict: {
     draw: (model: any, kind: any, id: number) => {
-      console.log(kind)
       const dict =
         typeof kind.value === "object" && !Array.isArray(kind.value)
           ? kind.value
           : {};
-      console.log(dict)
       model.drawDict(0, 0, id, dict, style);
     },
     getHeight: () => 200,

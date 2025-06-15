@@ -4,7 +4,6 @@
 const style = {
   box_id: { fill: "#fff", fillStyle: "solid" },
   box_type: { fill: "#fff", fillStyle: "solid" },
-  box_container: { fill: "#fff", fillStyle: "solid" },
 };
 
 /**

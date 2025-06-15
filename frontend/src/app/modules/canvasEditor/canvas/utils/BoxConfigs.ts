@@ -41,9 +41,10 @@ export const BoxConfigs = {
     draw: (model: any, kind: any, id: number) => {
       const type =
         kind.type === "None" || kind.value === null ? "None" : kind.type;
-      const value = ["string", "number", "boolean"].includes(typeof kind.value)
+      let value = ["string", "number", "boolean"].includes(typeof kind.value)
         ? kind.value
         : "";
+      value = kind.type === "bool" ? kind.value === "true" : value
       model.drawPrimitive(0, 0, type, id, value, style);
     },
     getHeight: () => 90,

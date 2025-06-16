@@ -44,12 +44,14 @@ export default function Canvas({
 
   useCanvasResize(svgRef, setViewBox);
 
+    /* === Utility: Creates updater function for a specific box ID === */
   const makePositionUpdater = (boxId: number) => (x: number, y: number) => {
     setElements((prev) =>
       prev.map((el) => (el.boxId === boxId ? { ...el, x, y } : el))
     );
   };
 
+  /* === Handle Drag & Drop Creation of New Elements === */
   const handleDrop = (e: React.DragEvent<SVGSVGElement>) => {
     e.preventDefault();
     const payload = e.dataTransfer.getData("application/box-type");
@@ -97,6 +99,7 @@ export default function Canvas({
     ]);
   };
 
+  /* === Update element after editor save === */
   const saveElement = (updatedId: ID, updatedKind: BoxType) => {
     if (!selected) return;
     setElements((prev) =>
@@ -109,12 +112,13 @@ export default function Canvas({
     setSelected(null);
   };
 
+  /* === Remove element from canvas === */
   const removeElement = () => {
     if (!selected) return;
     setElements((prev) => prev.filter((el) => el.boxId !== selected.boxId));
     setSelected(null);
   };
-
+  /* === Render === */
   return (
     <>
       {/* === SVG Canvas === */}

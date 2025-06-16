@@ -36,7 +36,7 @@ const CollectionItem = ({
     return (
       <div className={styles.collectionIdContainer}>
         {items.map((itemId: ID, idx: number) => (
-          <div key={idx} className={styles.collectionIdBox}>
+          <div key={idx}>
             <IdSelector
               currentId={itemId}
               ids={ids}
@@ -45,7 +45,7 @@ const CollectionItem = ({
                 setItems((prev) => prev.map((v, i) => (i === idx ? picked : v)))
               }
               onRemove={removeId}
-              buttonClassName={styles.collectionIdNoBorder}
+              buttonClassName={styles.collectionIdBox}
             />
             <button
               className={styles.collectionRemoveId}
@@ -65,7 +65,7 @@ const CollectionItem = ({
       {items.map(([keyId, valId]: [ID, ID], idx: number) => (
         <div key={idx} className={styles.collectionPairContainer}>
           {/* KEY ID */}
-          <div className={styles.collectionIdBox}>
+          <div>
             <IdSelector
               currentId={keyId}
               ids={ids}
@@ -75,14 +75,14 @@ const CollectionItem = ({
                   prev.map((p, i) => (i === idx ? [picked, p[1]] : p))
                 )
               }
-              buttonClassName={styles.collectionIdNoBorder}
+              buttonClassName={styles.collectionIdBox}
             />
           </div>
 
           <div className={styles.collectionPairSeparator}>:</div>
 
           {/* VALUE ID + REMOVE */}
-          <div className={styles.collectionIdBox}>
+          <div>
             <IdSelector
               currentId={valId}
               ids={ids}
@@ -92,7 +92,7 @@ const CollectionItem = ({
                   prev.map((p, i) => (i === idx ? [p[0], picked] : p))
                 )
               }
-              buttonClassName={styles.collectionIdNoBorder}
+              buttonClassName={styles.collectionIdBox}
             />
             <button
               className={styles.collectionRemoveId}

@@ -60,14 +60,14 @@ const FunctionContent = ({ functionParams, setParams, ids, addId, removeId }: Pr
                 onChange={(e) => changeName(idx, e.target.value)}
                 className={styles.variableNameBox}
               />
-              <div className={styles.collectionIdBox}>
+              <div>
                 <IdSelector
                   currentId={p.targetId}
                   ids={ids}
                   onAdd={addId}
                   onSelect={(id) => setTargetId(idx, id)}
                   onRemove={removeId}
-                  buttonClassName={styles.collectionIdNoBorder}
+                  buttonClassName={styles.collectionIdBox}
                 />
                 <button
                   onClick={() => removeParam(idx)}

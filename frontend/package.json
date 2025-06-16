@@ -50,5 +50,10 @@
     "jest-environment-jsdom": "^29.7.0",
     "jsdom": "^21.1.0",
     "ts-jest": "^29.1.1"
-  }
+  },
+  "contributors": [
+    "Kevin Chen",
+    "Lily Meng",
+    "Aditya Shankar Sarma Peri"
+  ]
 }

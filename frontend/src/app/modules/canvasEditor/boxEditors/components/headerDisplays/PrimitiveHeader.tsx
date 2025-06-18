@@ -14,6 +14,7 @@ interface Props {
   ownId: ID;
   setElementId: (id: ID) => void;
   removeId: (id: ID) => void;
+  sandbox: boolean;
 }
 
 /**
@@ -31,6 +32,7 @@ const PrimitiveHeader = ({
   ownId,
   setElementId,
   removeId,
+  sandbox
 }: Props) => (
   <div className={styles.header} data-testid="primitive-header">
     <IdDisplay
@@ -39,6 +41,7 @@ const PrimitiveHeader = ({
       ownId={ownId}
       setElementId={setElementId}
       removeId={removeId}
+      editable={sandbox}
     />
     <TypeSelector
       dataType={dataType}

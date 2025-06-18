@@ -6,7 +6,7 @@ import { buildJSONFromElements } from "./jsonConversion/jsonBuilder";
 import { ID } from "./shared/types";
 
 
-export default function MemoryModelEditor() {
+export default function MemoryModelEditor({sandbox = true} : {sandbox?: boolean}) {
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [jsonView, setJsonView] = useState<string>("");
   const [ids, setIds] = useState<ID[]>([]);
@@ -62,7 +62,7 @@ export default function MemoryModelEditor() {
       >
         <div style={{ flex: 1, position: "relative", display: "flex", flexDirection: "column" }}>
           <div style={{ flex: 1, position: "relative" }}>
-            <Canvas elements={elements} setElements={setElements} ids={ids} addId={addId} removeId={removeId} />
+            <Canvas elements={elements} setElements={setElements} ids={ids} addId={addId} removeId={removeId} sandbox={sandbox}/>
           </div>
           <button
             onClick={showJson}

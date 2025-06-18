@@ -46,6 +46,7 @@ const CollectionItem = ({
               }
               onRemove={removeId}
               buttonClassName={styles.collectionIdNoBorder}
+              editable={true}
             />
             <button
               className={styles.collectionRemoveId}
@@ -76,6 +77,7 @@ const CollectionItem = ({
                 )
               }
               buttonClassName={styles.collectionIdNoBorder}
+              editable={true}
             />
           </div>
 
@@ -93,6 +95,7 @@ const CollectionItem = ({
                 )
               }
               buttonClassName={styles.collectionIdNoBorder}
+              editable={true}
             />
             <button
               className={styles.collectionRemoveId}

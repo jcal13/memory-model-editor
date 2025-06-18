@@ -25,6 +25,7 @@ interface Props {
   ids: ID[];
   addId: (id: ID) => void;
   removeId: (id: ID) => void;
+  sandbox?: boolean;
 }
 
 /* =======================================
@@ -36,6 +37,7 @@ export default function Canvas({
   ids,
   addId,
   removeId,
+  sandbox = true
 }: Props) {
   const [selected, setSelected] = useState<CanvasElement | null>(null);
   const { svgRef, dragRef } = useCanvasRefs();
@@ -92,10 +94,19 @@ export default function Canvas({
       svgRef.current!.getScreenCTM()!.inverse()
     );
 
-    setElements((prev) => [
-      ...prev,
-      { boxId: prev.length, id: "_", kind: newKind, x: coords.x, y: coords.y },
-    ]);
+    setElements(prev => {
+      const newBoxId = prev.length;
+      const newId = !sandbox ? newBoxId : "_";
+      const newElement = { boxId: newBoxId, id: newId as ID, kind: newKind, x: coords.x, y: coords.y };
+
+      // only register the new ID when not sandboxed
+      if (!sandbox) {
+        addId(newBoxId);
+      }
+
+      return [...prev, newElement];
+    });
+
   };
 
   /* === Update element after editor save === */
@@ -166,6 +177,7 @@ export default function Canvas({
                   ids={ids}
                   addId={addId}
                   removeId={removeId}
+                  sandbox={sandbox}
                 />
               );
             })()}

@@ -13,6 +13,7 @@ interface Props {
   onRemove?: (id: ID) => void;
   currentId: ID;
   buttonClassName?: string;
+  editable: boolean;
 }
 
 export default function IdSelector({
@@ -22,7 +23,19 @@ export default function IdSelector({
   onRemove,
   currentId,
   buttonClassName = "",
+  editable
 }: Props) {
+  // Non-interactive display when not editable
+  if (!editable) {
+    return (
+      <div data-testid="id-selector-panel">
+        <div className={buttonClassName}>
+          {currentId ? `ID ${currentId}` : "ID _"}
+        </div>
+      </div>
+    );
+  }
+
   const [open, setOpen] = useState(false);
   const [list, setList] = useState<ID[]>(ids);
   useIdListSync(ids, setList);
@@ -31,13 +44,13 @@ export default function IdSelector({
 
   const handleAdd = (id: ID) => {
     if (!list.includes(id)) {
-      setList((prev) => [...prev, id]);
+      setList(prev => [...prev, id]);
       onAdd?.(id);
     }
   };
 
   const handleRemove = (id: ID) => {
-    setList((prev) => prev.filter((v) => v !== id));
+    setList(prev => prev.filter(v => v !== id));
     onRemove?.(id);
   };
 
@@ -50,7 +63,7 @@ export default function IdSelector({
     <div data-testid="id-selector-panel">
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setOpen(v => !v)}
         className={buttonClassName}
       >
         {currentId ? `ID ${currentId}` : "ID _"}
@@ -61,7 +74,7 @@ export default function IdSelector({
           <Draggable
             nodeRef={panelRef as unknown as React.RefObject<HTMLElement>}
             defaultPosition={{ x: 150, y: 150 }}
-            onStart={(e) => e.stopPropagation()}
+            onStart={e => e.stopPropagation()}
           >
             <div
               ref={panelRef}

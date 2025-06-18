@@ -60,7 +60,7 @@ const FunctionContent = ({ functionParams, setParams, ids, addId, removeId }: Pr
                 onChange={(e) => changeName(idx, e.target.value)}
                 className={styles.variableNameBox}
               />
-              <div>
+              <div className={styles.idSelectButtonWrapper}>
                 <IdSelector
                   currentId={p.targetId}
                   ids={ids}

@@ -41,7 +41,7 @@ const PrimitiveHeader = ({
       ownId={ownId}
       setElementId={setElementId}
       removeId={removeId}
-      editable={sandbox}
+      sandbox={sandbox}
     />
     <TypeSelector
       dataType={dataType}

@@ -59,7 +59,6 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, ids, addId, removeId, san
     functionParams,
     collectionData
   );
-
   return (
     <div ref={moduleRef} className={`drag-handle ${styles.boxEditorModule}`}>
       {/* Top section: displays type-specific headers (id, selector, name) */}
@@ -94,6 +93,7 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, ids, addId, removeId, san
         ids={ids}
         addId={addId}
         removeId={removeId}
+        sandbox={sandbox}
       />
 
       {/* Bottom section: shows the remove button */}

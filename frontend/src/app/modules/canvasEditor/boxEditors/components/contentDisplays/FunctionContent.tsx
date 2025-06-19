@@ -68,6 +68,7 @@ const FunctionContent = ({ functionParams, setParams, ids, addId, removeId }: Pr
                   onSelect={(id) => setTargetId(idx, id)}
                   onRemove={removeId}
                   buttonClassName={styles.collectionIdNoBorder}
+                  editable={true}
                 />
                 <button
                   onClick={() => removeParam(idx)}

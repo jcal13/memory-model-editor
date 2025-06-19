@@ -14,6 +14,7 @@ interface Props {
   currentId: ID;
   buttonClassName?: string;
   editable: boolean;
+  sandbox: boolean;
 }
 
 export default function IdSelector({
@@ -23,19 +24,19 @@ export default function IdSelector({
   onRemove,
   currentId,
   buttonClassName = "",
-  editable
+  editable,
+  sandbox,
 }: Props) {
-  // Non-interactive display when not editable
+  // non-interactive if not editable
   if (!editable) {
     return (
       <div data-testid="id-selector-panel">
         <div className={buttonClassName}>
-          {currentId ? `ID ${currentId}` : "ID _"}
+          {currentId != null ? `ID ${currentId}` : "ID _"}
         </div>
       </div>
     );
   }
-
   const [open, setOpen] = useState(false);
   const [list, setList] = useState<ID[]>(ids);
   useIdListSync(ids, setList);
@@ -66,7 +67,7 @@ export default function IdSelector({
         onClick={() => setOpen(v => !v)}
         className={buttonClassName}
       >
-        {currentId ? `ID ${currentId}` : "ID _"}
+        {currentId != null ? `ID ${currentId}` : "ID _"}
       </button>
 
       {open &&
@@ -86,6 +87,7 @@ export default function IdSelector({
                 onAdd={handleAdd}
                 onRemove={handleRemove}
                 onSelect={handleSelect}
+                sandbox={sandbox}
               />
             </div>
           </Draggable>,

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Draggable from "react-draggable";
 import { CanvasElement, BoxType, ID } from "../shared/types";
 import CanvasBox from "./components/CanvasBox";
@@ -37,13 +37,27 @@ export default function Canvas({
   ids,
   addId,
   removeId,
-  sandbox = true
+  sandbox = true,
 }: Props) {
   const [selected, setSelected] = useState<CanvasElement | null>(null);
   const { svgRef, dragRef } = useCanvasRefs();
   const [viewBox, setViewBox] = useState<string>("0 0 0 0");
 
   useCanvasResize(svgRef, setViewBox);
+
+  useEffect(() => {
+    if (sandbox) return;
+
+    const elementIds = elements.map((el) => el.id);
+    // newly added IDs
+    elementIds
+      .filter((id) => !ids.includes(id))
+      .forEach((id) => addId(id));
+    // removed IDs
+    ids
+      .filter((id) => !elementIds.includes(id))
+      .forEach((id) => removeId(id));
+  }, [elements, ids, sandbox, addId, removeId]);
 
   /* === Utility: Creates updater function for a specific box ID === */
   const makePositionUpdater = (boxId: number) => (x: number, y: number) => {
@@ -94,19 +108,19 @@ export default function Canvas({
       svgRef.current!.getScreenCTM()!.inverse()
     );
 
-    setElements(prev => {
+    setElements((prev) => {
       const newBoxId = prev.length;
       const newId = !sandbox ? newBoxId : "_";
-      const newElement = { boxId: newBoxId, id: newId as ID, kind: newKind, x: coords.x, y: coords.y };
-
-      // only register the new ID when not sandboxed
-      if (!sandbox) {
-        addId(newBoxId);
-      }
+      const newElement = {
+        boxId: newBoxId,
+        id: newId as ID,
+        kind: newKind,
+        x: coords.x,
+        y: coords.y,
+      };
 
       return [...prev, newElement];
     });
-
   };
 
   /* === Update element after editor save === */
@@ -162,8 +176,14 @@ export default function Canvas({
           nodeRef={dragRef as React.RefObject<HTMLElement>}
           handle=".drag-handle"
           defaultPosition={{
-            x: typeof window !== "undefined" ? window.innerWidth / 4 : 0,
-            y: typeof window !== "undefined" ? window.innerHeight / 4 : 0,
+            x:
+              typeof window !== "undefined"
+                ? window.innerWidth / 4
+                : 0,
+            y:
+              typeof window !== "undefined"
+                ? window.innerHeight / 4
+                : 0,
           }}
         >
           <div ref={dragRef} className={styles.editorContainer}>

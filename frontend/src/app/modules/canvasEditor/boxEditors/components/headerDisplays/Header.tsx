@@ -77,6 +77,7 @@ const Header = ({
           ownId={ownId}
           setElementId={setElementId}
           removeId={removeId}
+          sandbox={sandbox}
         />
       )}
     </div>

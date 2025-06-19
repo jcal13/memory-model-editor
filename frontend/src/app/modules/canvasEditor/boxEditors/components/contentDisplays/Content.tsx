@@ -64,6 +64,7 @@ const Content = ({
         ids={ids}
         addId={addId}
         removeId={removeId}
+        sandbox={sandbox}
       />
     );
   }

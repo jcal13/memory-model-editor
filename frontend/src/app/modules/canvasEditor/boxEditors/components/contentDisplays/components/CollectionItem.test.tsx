@@ -38,6 +38,7 @@ describe("CollectionItem", () => {
         ids={ids}
         addId={addId}
         removeId={removeId}
+        sandbox={true}
       />
     );
     expect(container.firstChild).toBeNull();
@@ -55,6 +56,7 @@ describe("CollectionItem", () => {
         ids={ids}
         addId={addId}
         removeId={removeId}
+        sandbox={true}
       />
     );
     expect(getByTestId("id-selector-x")).toBeInTheDocument();
@@ -74,6 +76,7 @@ describe("CollectionItem", () => {
         ids={ids}
         addId={addId}
         removeId={removeId}
+        sandbox={true}
       />
     );
 
@@ -98,6 +101,7 @@ describe("CollectionItem", () => {
         ids={ids}
         addId={addId}
         removeId={removeId}
+        sandbox={true}
       />
     );
     expect(getByTestId("id-selector-k1")).toBeInTheDocument();
@@ -117,6 +121,7 @@ describe("CollectionItem", () => {
         ids={ids}
         addId={addId}
         removeId={removeId}
+        sandbox={true}
       />
     );
 

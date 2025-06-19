@@ -27,7 +27,11 @@ export default function IdSelector({
   editable,
   sandbox,
 }: Props) {
-  // non-interactive if not editable
+  const [open, setOpen] = useState(false);
+  const [list, setList] = useState<ID[]>(ids);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useIdListSync(ids, setList);
+
   if (!editable) {
     return (
       <div data-testid="id-selector-panel">
@@ -37,12 +41,8 @@ export default function IdSelector({
       </div>
     );
   }
-  const [open, setOpen] = useState(false);
-  const [list, setList] = useState<ID[]>(ids);
-  useIdListSync(ids, setList);
 
-  const panelRef = useRef<HTMLDivElement>(null);
-
+  // handlers for editable mode
   const handleAdd = (id: ID) => {
     if (!list.includes(id)) {
       setList(prev => [...prev, id]);

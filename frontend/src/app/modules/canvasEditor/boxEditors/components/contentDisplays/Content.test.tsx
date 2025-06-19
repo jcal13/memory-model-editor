@@ -1,4 +1,3 @@
-import React from "react";
 import { render } from "@testing-library/react";
 import Content from "./Content";
 
@@ -27,6 +26,7 @@ describe("Content", () => {
   const ids = ["id1", "id2"];
   const addId = jest.fn();
   const removeId = jest.fn();
+  const sandbox = true;
 
   const baseProps = {
     dataType: "int",
@@ -41,6 +41,7 @@ describe("Content", () => {
     ids,
     addId,
     removeId,
+    sandbox
   };
 
   /**

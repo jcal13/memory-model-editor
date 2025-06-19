@@ -41,6 +41,7 @@ describe("CollectionHeader", () => {
         removeId={mockRemoveId}
         ownId={mockOwnId}
         setElementId={mockSetElementId}
+        sandbox={true}
       />
     );
 

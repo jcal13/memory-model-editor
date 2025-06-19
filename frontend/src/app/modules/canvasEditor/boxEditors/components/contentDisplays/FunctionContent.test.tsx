@@ -24,6 +24,7 @@ describe("FunctionContent", () => {
         ids={[]}
         addId={() => {}}
         removeId={() => {}}
+        sandbox ={true}
       />
     );
     expect(getByPlaceholderText("var")).toBeInTheDocument();
@@ -40,6 +41,7 @@ describe("FunctionContent", () => {
         ids={[]}
         addId={() => {}}
         removeId={() => {}}
+        sandbox ={true}
       />
     );
     const input = getByPlaceholderText("var");
@@ -59,6 +61,7 @@ describe("FunctionContent", () => {
         ids={[]}
         addId={() => {}}
         removeId={() => {}}
+        sandbox ={true}
       />
     );
     fireEvent.click(getByText("×"));
@@ -76,6 +79,7 @@ describe("FunctionContent", () => {
         ids={[]}
         addId={() => {}}
         removeId={() => {}}
+        sandbox ={true}
       />
     );
     fireEvent.click(getByText("Add Variable"));

@@ -45,28 +45,34 @@ export default function Canvas({
 
   useCanvasResize(svgRef, setViewBox);
 
+  /* ---------------- Sync ids <-> elements (non-function only) ---------------- */
   useEffect(() => {
     if (sandbox) return;
 
-    const elementIds = elements.map((el) => el.id);
-    // newly added IDs
+    // Only numeric IDs coming from non-function boxes
+    const elementIds = elements
+      .filter((el) => el.kind.name !== "function" && typeof el.id === "number")
+      .map((el) => el.id);
+
+    // Newly added IDs
     elementIds
       .filter((id) => !ids.includes(id))
       .forEach((id) => addId(id));
-    // removed IDs
+
+    // Removed IDs
     ids
       .filter((id) => !elementIds.includes(id))
       .forEach((id) => removeId(id));
   }, [elements, ids, sandbox, addId, removeId]);
 
-  /* === Utility: Creates updater function for a specific box ID === */
+  /* ---------- Utility: updater for a specific box’s position ---------- */
   const makePositionUpdater = (boxId: number) => (x: number, y: number) => {
     setElements((prev) =>
       prev.map((el) => (el.boxId === boxId ? { ...el, x, y } : el))
     );
   };
 
-  /* === Handle Drag & Drop Creation of New Elements === */
+  /* --------------------- Handle Drag-and-Drop creation --------------------- */
   const handleDrop = (e: React.DragEvent<SVGSVGElement>) => {
     e.preventDefault();
     const payload = e.dataTransfer.getData("application/box-type");
@@ -110,10 +116,15 @@ export default function Canvas({
 
     setElements((prev) => {
       const newBoxId = prev.length;
-      const newId = !sandbox ? newBoxId : "_";
-      const newElement = {
+
+      const computedId: ID =
+        !sandbox && newKind.name !== "function"
+          ? ids.length
+          : "_";
+
+      const newElement: CanvasElement = {
         boxId: newBoxId,
-        id: newId as ID,
+        id: computedId,
         kind: newKind,
         x: coords.x,
         y: coords.y,
@@ -123,7 +134,7 @@ export default function Canvas({
     });
   };
 
-  /* === Update element after editor save === */
+  /* -------------- Update element after editor save -------------- */
   const saveElement = (updatedId: ID, updatedKind: BoxType) => {
     if (!selected) return;
     setElements((prev) =>
@@ -136,14 +147,14 @@ export default function Canvas({
     setSelected(null);
   };
 
-  /* === Remove element from canvas === */
+  /* ----------------------- Remove element ----------------------- */
   const removeElement = () => {
     if (!selected) return;
     setElements((prev) => prev.filter((el) => el.boxId !== selected.boxId));
     setSelected(null);
   };
 
-  /* === Render === */
+  /* ----------------------------- Render ----------------------------- */
   return (
     <>
       {/* === SVG Canvas === */}

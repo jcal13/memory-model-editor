@@ -1,8 +1,5 @@
 import { useEffect } from "react";
 
-/* ===========================================================================
-   === 1.  Keep a local list in sync with a source array                   ===
-   ====================================================================== */
 export function useIdListSync<T>(
   source: T[],
   setLocal: React.Dispatch<React.SetStateAction<T[]>>
@@ -10,7 +7,7 @@ export function useIdListSync<T>(
   useEffect(() => setLocal(source), [source, setLocal]);
 }
 
-// Holds the closer for whichever Id-selector panel is currently open
+// global variable for holding current panel state
 let closeCurrentPanel: (() => void) | null = null;
 
 /**
@@ -23,17 +20,17 @@ let closeCurrentPanel: (() => void) | null = null;
 export function useSinglePanelRegistry(open: boolean, closeSelf: () => void) {
   useEffect(() => {
     if (open) {
-      // Close any previously-open panel before registering this one
+      // remove previously open panel ptrs before registering this one
       if (closeCurrentPanel && closeCurrentPanel !== closeSelf) {
         closeCurrentPanel();
       }
       closeCurrentPanel = closeSelf;
     } else if (closeCurrentPanel === closeSelf) {
-      // Deregister this panel when it closes
+      // release ptr to this panel when it closes
       closeCurrentPanel = null;
     }
 
-    // Cleanup if the component unmounts while it is the active panel
+    // cleanup if the component unmounts while it is the active panel
     return () => {
       if (closeCurrentPanel === closeSelf) {
         closeCurrentPanel = null;

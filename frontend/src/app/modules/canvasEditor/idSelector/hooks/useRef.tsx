@@ -1,7 +1,6 @@
 import { useRef } from "react";
 
-/** Mirrors useCanvasRefs but just for the draggable ID-panel */
-export const usePanelRefs = () => {
-  const dragRef = useRef<HTMLDivElement | null>(null);
-  return { dragRef };
-};
+/** Provides a stable ref for the draggable Id-selector panel container. */
+export function usePanelRef() {
+  return useRef<HTMLDivElement | null>(null);
+}

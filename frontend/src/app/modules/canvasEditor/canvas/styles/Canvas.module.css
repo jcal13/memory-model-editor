@@ -68,7 +68,7 @@
 }
 
 .downloadJsonButton:hover,
-.downloadJsonButton:focus {
+.downloadJsonButton:active {
   background-color: #23a6df;
 }
 

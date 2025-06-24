@@ -66,3 +66,29 @@
   font-size: 0.95rem;
   width: max-content;
 }
+
+.downloadJsonButton:hover,
+.downloadJsonButton:focus {
+  background-color: #23a6df;
+}
+
+.submitButton {
+  position: absolute;
+  bottom: 35px;
+  left: 450px;
+  z-index: 9999;
+  padding: 10px 10px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  width: max-content;
+}
+
+.submitButton:hover,
+.submitButton:focus {
+  background-color: #dc2626;
+}

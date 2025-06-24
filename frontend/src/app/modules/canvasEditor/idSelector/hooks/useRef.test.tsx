@@ -1,27 +1,27 @@
 import { renderHook } from "@testing-library/react";
-import { usePanelRefs } from "./useRef";
+import { usePanelRef } from "./useRef";
 
 /**
- * Test suite for the usePanelRefs hook.
+ * Test suite for the usePanelRef hook.
  */
-describe("usePanelRefs", () => {
+describe("usePanelRef", () => {
   /**
-   * Returns a ref object with null as the initial value.
+   * It should return a ref object whose current value is initially null.
    */
   it("returns a ref object initialized to null", () => {
-    const { result } = renderHook(() => usePanelRefs());
-    expect(result.current.dragRef).toHaveProperty("current", null);
+    const { result } = renderHook(() => usePanelRef());
+    expect(result.current).toHaveProperty("current", null);
   });
 
   /**
-   * Ref object persists across renders.
+   * The same ref object should persist across renders.
    */
   it("persists the same ref object across renders", () => {
-    const { result, rerender } = renderHook(() => usePanelRefs());
-    const initialRef = result.current.dragRef;
+    const { result, rerender } = renderHook(() => usePanelRef());
+    const initialRef = result.current;
 
     rerender();
 
-    expect(result.current.dragRef).toBe(initialRef);
+    expect(result.current).toBe(initialRef);
   });
 });

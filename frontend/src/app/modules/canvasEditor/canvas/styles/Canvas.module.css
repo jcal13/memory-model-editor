@@ -66,3 +66,9 @@
   font-size: 0.95rem;
   width: max-content;
 }
+
+
+.downloadJsonButton:hover,
+.downloadJsonButton:active {
+  background-color: #2498c5;
+}

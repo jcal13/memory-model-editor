@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import Canvas from "./canvas/Canvas";
 import Palette from "./palette/Palette";
+import ConfirmationModal from "./confirmationModal/confirmationModal";
+import styles from "./styles/MemoryModelEditor.module.css";
 import { CanvasElement } from "./shared/types";
 import { buildJSONFromElements } from "./jsonConversion/jsonBuilder";
 import { ID } from "./shared/types";
@@ -15,6 +17,9 @@ export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolea
   const [placeholderWidth, setPlaceholderWidth] = useState<number>(300);
   const [isResizing, setIsResizing] = useState<boolean>(false);
 
+  // simple modal toggle
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
+
   // Ref to sub-container (canvas + placeholder)
   const subContainerRef = useRef<HTMLDivElement>(null);
 
@@ -24,10 +29,15 @@ export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolea
     setJsonView("");
   };
 
-  const toggleSandbox = (): void => {
+  const handleToggleSandbox = (): void => setShowConfirm(true);
+
+  const confirmClear = (): void => {
     clearBoard();
     setSandboxMode(prev => !prev);
+    setShowConfirm(false);
   };
+
+  const cancelClear = (): void => setShowConfirm(false);
 
   const showJson = (): void => {
     const snapshot = buildJSONFromElements(elements);
@@ -35,7 +45,6 @@ export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolea
   };
 
   const addId = (id: ID) => setIds(prev => (prev.includes(id) ? prev : [...prev, id]));
-
   const removeId = (id: ID) => setIds(prev => prev.filter(v => v !== id));
 
   useEffect(() => {
@@ -49,9 +58,7 @@ export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolea
         setPlaceholderWidth(newWidth);
       }
     };
-    const onMouseUp = () => {
-      if (isResizing) setIsResizing(false);
-    };
+    const onMouseUp = () => { if (isResizing) setIsResizing(false); };
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
     return () => {
@@ -61,13 +68,14 @@ export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolea
   }, [isResizing]);
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-      <div style={{ overflowY: "auto" }}>
+    <div className={styles.container}>
+      <div className={styles.paletteColumn}>
         <Palette />
       </div>
-      <div ref={subContainerRef} style={{ display: "flex", flex: 1, position: "relative" }}>
-        <div style={{ flex: 1, position: "relative", display: "flex", flexDirection: "column" }}>
-          <div style={{ flex: 1, position: "relative" }}>
+
+      <div ref={subContainerRef} className={styles.subContainer}>
+        <div className={styles.column}>
+          <div className={styles.canvasArea}>
             <Canvas
               elements={elements}
               setElements={setElements}
@@ -77,68 +85,40 @@ export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolea
               sandbox={sandboxMode}
             />
           </div>
-          <button
-            onClick={toggleSandbox}
-            style={{ position: "absolute", top: 8, right: 8, padding: "4px 8px", zIndex: 10 }}
-          >
+
+          <button className={styles.toggleButton} onClick={handleToggleSandbox}>
             {sandboxMode ? "Sandbox ON" : "Sandbox OFF"}
           </button>
-          <button
-            onClick={showJson}
-            style={{ position: "absolute", bottom: 8, right: 8, padding: "4px 8px", zIndex: 10 }}
-          >
+
+          <button className={styles.jsonButton} onClick={showJson}>
             Show JSON
           </button>
-          {jsonView && (
-            <pre
-              style={{
-                position: "fixed",
-                bottom: "40px",
-                right: "8px",
-                maxHeight: "300px",
-                maxWidth: "300px",
-                overflow: "auto",
-                background: "#f5f5f5",
-                border: "1px solid #ccc",
-                padding: "8px",
-                fontSize: "0.75rem",
-                zIndex: 9999,
-                textAlign: "left",
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-              }}
-            >
-              {jsonView}
-            </pre>
-          )}
+
+          {jsonView && <pre className={styles.jsonView}>{jsonView}</pre>}
         </div>
+
         <div
-          style={{
-            width: `${placeholderWidth}px`,
-            flex: "0 0 auto",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#888",
-            fontStyle: "italic",
-            position: "relative",
-          }}
+          className={styles.placeholder}
+          style={{ width: `${placeholderWidth}px` }}
         >
           Placeholder
           <div
+            className={styles.resizeHandle}
             onMouseDown={() => setIsResizing(true)}
-            style={{
-              position: "absolute",
-              left: 0,
-              top: 0,
-              bottom: 0,
-              width: "5px",
-              cursor: "col-resize",
-              zIndex: 1,
-            }}
           />
         </div>
       </div>
+
+      {showConfirm && (
+        <ConfirmationModal
+          title="Clear Canvas?"
+          message="This will clear the entire canvas and cannot be undone."
+          confirmLabel="Clear"
+          cancelLabel="Cancel"
+          onConfirm={confirmClear}
+          onCancel={cancelClear}
+        />
+      )}
     </div>
   );
 }

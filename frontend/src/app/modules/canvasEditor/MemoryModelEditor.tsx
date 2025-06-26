@@ -86,9 +86,18 @@ export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolea
             />
           </div>
 
-          <button className={styles.toggleButton} onClick={handleToggleSandbox}>
-            {sandboxMode ? "Sandbox ON" : "Sandbox OFF"}
-          </button>
+          <label className={styles.switchWrapper}>
+            <input
+              type="checkbox"
+              className={styles.switchInput}
+              checked={sandboxMode}
+              onChange={e => {
+                e.preventDefault();
+                handleToggleSandbox();
+              }}
+            />
+            <span className={styles.switchSlider}></span>
+          </label>
 
           <button className={styles.jsonButton} onClick={showJson}>
             Show JSON

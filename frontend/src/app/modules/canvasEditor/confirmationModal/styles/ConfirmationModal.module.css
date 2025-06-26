@@ -35,6 +35,8 @@
     color: #1f2937;
     text-align: center;
     user-select: none;
+    border-top-right-radius: 12px;
+    border-top-left-radius: 12px;
 }
 
 .content {

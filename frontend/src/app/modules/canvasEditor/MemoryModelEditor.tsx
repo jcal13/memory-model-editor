@@ -64,12 +64,12 @@ export default function MemoryModelEditor() {
           <div style={{ flex: 1, position: "relative" }}>
             <Canvas elements={elements} setElements={setElements} ids={ids} addId={addId} removeId={removeId} />
           </div>
-          <button
+          {/* <button
             onClick={showJson}
             style={{ position: "absolute", bottom: 8, right: 8, padding: "4px 8px", zIndex: 10 }}
           >
             Show JSON
-          </button>
+          </button> */}
           {jsonView && (
             <pre
               style={{

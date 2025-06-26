@@ -8,6 +8,7 @@
     "@types/node": "^16.18.126",
     "@types/react": "^19.1.4",
     "@types/react-dom": "^19.1.5",
+    "axios": "^1.10.0",
     "memory-viz": "^0.6.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -50,5 +51,11 @@
     "jest-environment-jsdom": "^29.7.0",
     "jsdom": "^21.1.0",
     "ts-jest": "^29.1.1"
-  }
+  },
+  "proxy": "http://localhost:3000",
+  "contributors": [
+    "Kevin Chen",
+    "Lily Meng",
+    "Aditya Shankar Sarma Peri"
+  ]
 }

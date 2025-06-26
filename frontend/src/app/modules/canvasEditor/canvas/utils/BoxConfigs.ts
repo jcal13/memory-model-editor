@@ -1,3 +1,5 @@
+import { ID } from "../../shared/types";
+
 /**
  * Shared SVG style used by BoxRenderer for all box types.
  */
@@ -38,7 +40,7 @@ const getValues = (kind: any): number[] => {
 export const BoxConfigs = {
   /* ---------- Primitive Box ---------- */
   primitive: {
-    draw: (model: any, kind: any, id: number) => {
+    draw: (model: any, kind: any, id: ID) => {
       const type =
         kind.type === "None" || kind.value === null ? "None" : kind.type;
       let value = ["string", "number", "boolean"].includes(typeof kind.value)
@@ -53,7 +55,7 @@ export const BoxConfigs = {
 
   /* ---------- Function Box ---------- */
   function: {
-    draw: (model: any, kind: any, id: number) => {
+    draw: (model: any, kind: any, id: ID) => {
       const props: Record<string, number | null> = {};
       (kind.params || []).forEach((p: any) => (props[p.name] = p.targetId));
       model.drawClass(0, 0, kind.functionName ?? "", id, props, true, style);
@@ -64,7 +66,7 @@ export const BoxConfigs = {
 
   /* ---------- List Box ---------- */
   list: {
-    draw: (model: any, kind: any, id: number) => {
+    draw: (model: any, kind: any, id: ID) => {
       const vals = getValues(kind);
       model.drawSequence(0, 0, "list", id, vals, vals.length > 0, style);
     },
@@ -74,7 +76,7 @@ export const BoxConfigs = {
 
   /* ---------- Tuple Box ---------- */
   tuple: {
-    draw: (model: any, kind: any, id: number) => {
+    draw: (model: any, kind: any, id: ID) => {
       const vals = getValues(kind);
       model.drawSequence(0, 0, "tuple", id, vals, vals.length > 0, style);
     },
@@ -84,7 +86,7 @@ export const BoxConfigs = {
 
   /* ---------- Set Box ---------- */
   set: {
-    draw: (model: any, kind: any, id: number) => {
+    draw: (model: any, kind: any, id: ID) => {
       const vals = getValues(kind);
       model.drawSet(0, 0, id, vals, style);
     },
@@ -94,7 +96,7 @@ export const BoxConfigs = {
 
   /* ---------- Dict Box ---------- */
   dict: {
-    draw: (model: any, kind: any, id: number) => {
+    draw: (model: any, kind: any, id: ID) => {
       const dict =
         typeof kind.value === "object" && !Array.isArray(kind.value)
           ? kind.value

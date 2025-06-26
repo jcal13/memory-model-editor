@@ -24,6 +24,7 @@ describe("IdSelectorPanel", () => {
         onAdd={onAdd}
         onSelect={onSelect}
         onRemove={onRemove}
+        sandbox={true}
       />
     );
 
@@ -54,6 +55,7 @@ describe("IdSelectorPanel", () => {
         onAdd={onAdd}
         onSelect={onSelect}
         onRemove={onRemove}
+        sandbox={true}
       />
     );
 
@@ -73,6 +75,7 @@ describe("IdSelectorPanel", () => {
         onAdd={onAdd}
         onSelect={onSelect}
         onRemove={onRemove}
+        sandbox={true}
       />
     );
 

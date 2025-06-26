@@ -22,6 +22,8 @@ describe("IdSelector", () => {
     onAdd: jest.fn(),
     onRemove: jest.fn(),
     buttonClassName: "test-class",
+    sandbox: true,
+    editable: true
   };
 
   beforeEach(() => {

@@ -24,7 +24,7 @@ import { useGlobalRefs } from "../hooks/useRef";
  * - onSave: function to call with the updated box data
  * - onRemove: function to call to remove the box from the canvas
  */
-const BoxEditorModule = ({ metadata, onSave, onRemove, ids, addId, removeId }: BoxEditorType) => {
+const BoxEditorModule = ({ metadata, onSave, onRemove, ids, addId, removeId, sandbox = true }: BoxEditorType) => {
   // Shared hover state for remove button
   const { hoverRemove, setHoverRemove } = useGlobalStates();
 
@@ -59,7 +59,6 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, ids, addId, removeId }: B
     functionParams,
     collectionData
   );
-
   return (
     <div ref={moduleRef} className={`drag-handle ${styles.boxEditorModule}`}>
       {/* Top section: displays type-specific headers (id, selector, name) */}
@@ -76,6 +75,7 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, ids, addId, removeId }: B
         ownId={ownId}
         setElementId={setOwnId}
         removeId={removeId}
+        sandbox={sandbox}
       />
 
       {/* Middle section: displays the input or editable content for the box */}
@@ -93,6 +93,7 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, ids, addId, removeId }: B
         ids={ids}
         addId={addId}
         removeId={removeId}
+        sandbox={sandbox}
       />
 
       {/* Bottom section: shows the remove button */}

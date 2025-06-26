@@ -11,6 +11,7 @@ interface Props {
   ids: any;
   addId: (id: ID) => void;
   removeId: (id: ID) => void;
+  sandbox: boolean;
 }
 
 /**
@@ -23,7 +24,7 @@ interface Props {
  *
  * The component also provides an "Add Variable" button to append a new parameter.
  */
-const FunctionContent = ({ functionParams, setParams, ids, addId, removeId }: Props) => {
+const FunctionContent = ({ functionParams, setParams, ids, addId, removeId, sandbox }: Props) => {
   // Add a new empty parameter to the list
   const addParam = () =>
     setParams([...functionParams, { name: "", targetId: null }]);
@@ -68,6 +69,8 @@ const FunctionContent = ({ functionParams, setParams, ids, addId, removeId }: Pr
                   onSelect={(id) => setTargetId(idx, id)}
                   onRemove={removeId}
                   buttonClassName={styles.collectionIdBox}
+                  sandbox={sandbox}
+                  editable={true}
                 />
                 <button
                   onClick={() => removeParam(idx)}

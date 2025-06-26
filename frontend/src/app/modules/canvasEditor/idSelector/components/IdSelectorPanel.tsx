@@ -8,6 +8,7 @@ interface Props {
   onAdd: (id: ID) => void;
   onSelect: (id: ID) => void;
   onRemove: (id: ID) => void;
+  sandbox: boolean;
 }
 
 const IdSelectorPanel: React.FC<Props> = ({
@@ -15,6 +16,7 @@ const IdSelectorPanel: React.FC<Props> = ({
   onAdd,
   onSelect,
   onRemove,
+  sandbox
 }) => {
   const nextId = useMemo<number>(() => {
     const nums = ids.filter((v): v is number => typeof v === "number");
@@ -36,26 +38,33 @@ const IdSelectorPanel: React.FC<Props> = ({
               >
                 {id}
               </button>
-              <button
-                type="button"
-                className={boxStyles.collectionRemoveId}
-                onClick={() => onRemove(id)}
-              >
-                ×
-              </button>
+              {/* only show remove if sandbox=true */}
+              {sandbox === true && (
+                <button
+                  type="button"
+                  className={boxStyles.collectionRemoveId}
+                  onClick={() => onRemove(id)}
+                >
+                  ×
+                </button>
+              )}
             </div>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={() => onAdd(nextId)}
-          className={boxStyles.addButton}
-        >
-          Add ID
-        </button>
+        {/* only show add when sandbox=true */}
+        {sandbox === true && (
+          <button
+            type="button"
+            onClick={() => onAdd(nextId)}
+            className={boxStyles.addButton}
+          >
+            Add ID
+          </button>
+        )}
       </div>
 
-      {ids.length === 0 && (
+      {/* only show empty message when sandbox=true and no ids */}
+      {sandbox === true && ids.length === 0 && (
         <div className={panelStyles.empty}>
           No IDs yet — click “Add ID” to create one.
         </div>

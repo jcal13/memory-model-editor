@@ -17,6 +17,8 @@ interface Props {
   onRemove?: (id: ID) => void;
   currentId: ID;
   buttonClassName?: string;
+  editable: boolean;
+  sandbox: boolean;
 }
 
 export default function IdSelector({
@@ -26,6 +28,8 @@ export default function IdSelector({
   onRemove,
   currentId,
   buttonClassName = "",
+  editable,
+  sandbox,
 }: Props) {
   const [open, setOpen]   = useState(false);
   const [list, setList]   = useState<ID[]>(ids);
@@ -34,17 +38,29 @@ export default function IdSelector({
   const panelRef  = usePanelRef();
   const closeSelf = useCallback(() => setOpen(false), []);
 
+
   useSinglePanelRegistry(open, closeSelf);
+  
+  if (!editable) {
+    return (
+      <div data-testid="id-selector-panel">
+        <div className={buttonClassName}>
+          {currentId != null ? `ID ${currentId}` : "ID _"}
+        </div>
+      </div>
+    );
+  }
+
 
   const toggleOpen  = () => setOpen((v) => !v);
   const handleAdd   = (id: ID) => {
     if (!list.includes(id)) {
-      setList((prev) => [...prev, id]);
+      setList(prev => [...prev, id]);
       onAdd?.(id);
     }
   };
   const handleRemove = (id: ID) => {
-    setList((prev) => prev.filter((v) => v !== id));
+    setList(prev => prev.filter(v => v !== id));
     onRemove?.(id);
   };
   const handleSelect = (id: ID) => {
@@ -59,7 +75,7 @@ export default function IdSelector({
         onClick={toggleOpen}
         className={buttonClassName}
       >
-        {currentId ? `ID ${currentId}` : "ID _"}
+        {currentId != null ? `ID ${currentId}` : "ID _"}
       </button>
 
       {open &&
@@ -67,7 +83,7 @@ export default function IdSelector({
           <Draggable
             nodeRef={panelRef as unknown as React.RefObject<HTMLElement>}
             defaultPosition={{ x: 150, y: 150 }}
-            onStart={(e) => e.stopPropagation()}
+            onStart={e => e.stopPropagation()}
           >
             <div
               ref={panelRef}
@@ -79,6 +95,7 @@ export default function IdSelector({
                 onAdd={handleAdd}
                 onRemove={handleRemove}
                 onSelect={handleSelect}
+                sandbox={sandbox}
               />
             </div>
           </Draggable>,

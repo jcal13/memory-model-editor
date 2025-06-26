@@ -38,6 +38,7 @@ describe("IdDisplay", () => {
         ownId={"b"}
         setElementId={setElementId}
         removeId={removeId}
+        sandbox={true}
       />
     );
 
@@ -58,6 +59,7 @@ describe("IdDisplay", () => {
         ownId={"b"}
         setElementId={setElementId}
         removeId={removeId}
+        sandbox={true}
       />
     );
 

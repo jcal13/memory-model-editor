@@ -18,6 +18,7 @@ interface Props {
   ownId: ID;
   setElementId: (id: ID) => void;
   removeId: (id: ID) => void;
+  sandbox: boolean;
 }
 
 /**
@@ -41,6 +42,7 @@ const Header = ({
   ownId,
   setElementId,
   removeId,
+  sandbox
 }: Props) => {
   const kind = element.kind.name;
 
@@ -58,6 +60,7 @@ const Header = ({
           ownId={ownId}
           setElementId={setElementId}
           removeId={removeId}
+          sandbox={sandbox}
         />
       )}
       {kind === "function" && (
@@ -74,6 +77,7 @@ const Header = ({
           ownId={ownId}
           setElementId={setElementId}
           removeId={removeId}
+          sandbox={sandbox}
         />
       )}
     </div>

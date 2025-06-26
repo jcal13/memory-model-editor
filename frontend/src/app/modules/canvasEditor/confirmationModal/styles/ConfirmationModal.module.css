@@ -1,0 +1,100 @@
+.panelContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1100;
+}
+
+.backdrop {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.panel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: max-content;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    padding: 10px 14px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+    font-weight: 600;
+    color: #1f2937;
+    text-align: center;
+    user-select: none;
+    border-top-right-radius: 12px;
+    border-top-left-radius: 12px;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.message {
+    color: #374151;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.trigger {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #374151;
+    padding: 8px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background-color: #f9fafb;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.trigger\:hover {
+    background-color: #f3f4f6;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+}
+
+
+.removeButton {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #374151;
+    padding: 8px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    background-color: #ef4444;
+    color: white;
+    align-self: flex-end;
+
+
+}
+
+.removeButton:hover {
+  background-color: #dc2626;
+}

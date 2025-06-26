@@ -12,6 +12,7 @@ interface Props {
   ids: any; // global ID pool
   addId: (id: ID) => void; // adds a new ID to the pool
   removeId: (id: ID) => void;
+  sandbox: boolean;
 }
 
 /**
@@ -25,6 +26,7 @@ const CollectionItem = ({
   ids,
   addId,
   removeId,
+  sandbox
 }: Props) => {
   const removeItem = (idx: number) =>
     setItems((prev) => prev.filter((_, i) => i !== idx));
@@ -46,6 +48,8 @@ const CollectionItem = ({
               }
               onRemove={removeId}
               buttonClassName={styles.collectionIdBox}
+              editable={true}
+              sandbox={sandbox}
             />
             <button
               className={styles.collectionRemoveId}
@@ -65,7 +69,7 @@ const CollectionItem = ({
       {items.map(([keyId, valId]: [ID, ID], idx: number) => (
         <div key={idx} className={styles.collectionPairContainer}>
           {/* KEY ID */}
-          <div>
+          <div className={styles.idSelectButtonWrapper}>
             <IdSelector
               currentId={keyId}
               ids={ids}
@@ -76,6 +80,8 @@ const CollectionItem = ({
                 )
               }
               buttonClassName={styles.collectionIdBox}
+              editable={true}
+              sandbox={sandbox}
             />
           </div>
 
@@ -93,6 +99,8 @@ const CollectionItem = ({
                 )
               }
               buttonClassName={styles.collectionIdBox}
+              editable={true}
+              sandbox={sandbox}
             />
             <button
               className={styles.collectionRemoveId}

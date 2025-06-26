@@ -69,4 +69,5 @@ export interface BoxEditorType {
   ids: ID[];
   addId: (id: ID) => void;
   removeId: (id: ID) => void;
+  sandbox?: boolean;
 }

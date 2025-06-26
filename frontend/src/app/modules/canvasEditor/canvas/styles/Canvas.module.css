@@ -89,7 +89,7 @@
 }
 
 .submitButton:hover,
-.submitButton:focus {
-  background-color: #dc2626;
+.submitButton:active {
+  background-color: #059669; 
 
 }

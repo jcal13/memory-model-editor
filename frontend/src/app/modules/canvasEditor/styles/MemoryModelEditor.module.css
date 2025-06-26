@@ -114,9 +114,9 @@
 /* ───────── Switch toggle (replaces previous block) ───────── */
 .switchWrapper {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 10;
+  top: 35px;      
+  left: 35px;        
+  z-index: 10;    
   width: 100px;
   height: 32px;
   cursor: pointer;
@@ -134,7 +134,7 @@
   border-radius: 9999px;
   position: relative;
   transition: background-color 0.2s ease;
-  font-size: 0.8rem;
+  font-size: 0.95rem;  
   font-weight: 600;
   color: #1E40AF; /* practice text */
 }

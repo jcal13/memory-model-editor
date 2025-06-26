@@ -6,7 +6,6 @@ import BoxEditor from "../boxEditors/BoxEditor";
 import { useCanvasResize } from "./hooks/useEffect";
 import { useCanvasRefs } from "./hooks/useRef";
 import styles from "./styles/Canvas.module.css";
-import DownloadJsonButton from "./components/DownloadJsonButton";
 
 /* =======================================
    === Box Editor Mapping by Type Name ===
@@ -179,9 +178,6 @@ export default function Canvas({
             ))}
           </g>
         </svg>
-
-        {/* === Download Button Overlayed === */}
-        <DownloadJsonButton elements={elements} />
       </div>
 
       {/* === Floating Box Editor Panel === */}

@@ -6,6 +6,7 @@ import styles from "./styles/MemoryModelEditor.module.css";
 import { CanvasElement } from "./shared/types";
 import { buildJSONFromElements } from "./jsonConversion/jsonBuilder";
 import { ID } from "./shared/types";
+import DownloadJsonButton from "./canvas/components/DownloadJsonButton";
 
 export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolean }) {
   const [elements, setElements] = useState<CanvasElement[]>([]);
@@ -98,6 +99,8 @@ export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolea
             />
             <span className={styles.switchSlider}></span>
           </label>
+
+          <DownloadJsonButton elements={elements} />
 
           <button className={styles.jsonButton} onClick={showJson}>
             Show JSON

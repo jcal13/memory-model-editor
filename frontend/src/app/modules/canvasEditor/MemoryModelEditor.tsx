@@ -86,7 +86,7 @@ export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolea
               sandbox={sandboxMode}
             />
           </div>
-
+          
           <label className={styles.switchWrapper}>
             <input
               type="checkbox"

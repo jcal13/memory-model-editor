@@ -67,8 +67,29 @@
   width: max-content;
 }
 
-
 .downloadJsonButton:hover,
 .downloadJsonButton:active {
-  background-color: #2498c5;
+  background-color: #23a6df;
+}
+
+.submitButton {
+  position: absolute;
+  bottom: 35px;
+  right: 35px;
+  z-index: 9999;
+  padding: 10px 10px;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  width: max-content;
+}
+
+.submitButton:hover,
+.submitButton:active {
+  background-color: #059669; 
+
 }

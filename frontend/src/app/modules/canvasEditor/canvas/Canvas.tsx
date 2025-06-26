@@ -6,6 +6,8 @@ import BoxEditor from "../boxEditors/BoxEditor";
 import { useCanvasResize } from "./hooks/useEffect";
 import { useCanvasRefs } from "./hooks/useRef";
 import styles from "./styles/Canvas.module.css";
+import DownloadJsonButton from "./components/DownloadJsonButton";
+import SubmitButton from "./components/SubmitButton";
 
 /* =======================================
    === Box Editor Mapping by Type Name ===

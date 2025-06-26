@@ -5,18 +5,29 @@ import { CanvasElement } from "./shared/types";
 import { buildJSONFromElements } from "./jsonConversion/jsonBuilder";
 import { ID } from "./shared/types";
 
-
-export default function MemoryModelEditor({sandbox = true} : {sandbox?: boolean}) {
+export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolean }) {
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [jsonView, setJsonView] = useState<string>("");
   const [ids, setIds] = useState<ID[]>([]);
+  const [sandboxMode, setSandboxMode] = useState<boolean>(sandbox);
 
-  // Width state for the right placeholder pane
+  // width state for placeholder panel
   const [placeholderWidth, setPlaceholderWidth] = useState<number>(300);
   const [isResizing, setIsResizing] = useState<boolean>(false);
 
   // Ref to sub-container (canvas + placeholder)
   const subContainerRef = useRef<HTMLDivElement>(null);
+
+  const clearBoard = (): void => {
+    setElements([]);
+    setIds([]);
+    setJsonView("");
+  };
+
+  const toggleSandbox = (): void => {
+    clearBoard();
+    setSandboxMode(prev => !prev);
+  };
 
   const showJson = (): void => {
     const snapshot = buildJSONFromElements(elements);
@@ -33,7 +44,7 @@ export default function MemoryModelEditor({sandbox = true} : {sandbox?: boolean}
       const rect = subContainerRef.current.getBoundingClientRect();
       const newWidth = rect.right - e.clientX;
       const minPlaceholderWidth = 100;
-      const maxPlaceholderWidth = rect.width - 100; // leave at least 100px for canvas
+      const maxPlaceholderWidth = rect.width - 100;
       if (newWidth >= minPlaceholderWidth && newWidth <= maxPlaceholderWidth) {
         setPlaceholderWidth(newWidth);
       }
@@ -51,19 +62,27 @@ export default function MemoryModelEditor({sandbox = true} : {sandbox?: boolean}
 
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-
       <div style={{ overflowY: "auto" }}>
         <Palette />
       </div>
-
-      <div
-        ref={subContainerRef}
-        style={{ display: "flex", flex: 1, position: "relative" }}
-      >
+      <div ref={subContainerRef} style={{ display: "flex", flex: 1, position: "relative" }}>
         <div style={{ flex: 1, position: "relative", display: "flex", flexDirection: "column" }}>
           <div style={{ flex: 1, position: "relative" }}>
-            <Canvas elements={elements} setElements={setElements} ids={ids} addId={addId} removeId={removeId} sandbox={sandbox}/>
+            <Canvas
+              elements={elements}
+              setElements={setElements}
+              ids={ids}
+              addId={addId}
+              removeId={removeId}
+              sandbox={sandboxMode}
+            />
           </div>
+          <button
+            onClick={toggleSandbox}
+            style={{ position: "absolute", top: 8, right: 8, padding: "4px 8px", zIndex: 10 }}
+          >
+            {sandboxMode ? "Sandbox ON" : "Sandbox OFF"}
+          </button>
           <button
             onClick={showJson}
             style={{ position: "absolute", bottom: 8, right: 8, padding: "4px 8px", zIndex: 10 }}
@@ -93,10 +112,9 @@ export default function MemoryModelEditor({sandbox = true} : {sandbox?: boolean}
             </pre>
           )}
         </div>
-
         <div
           style={{
-            width: placeholderWidth,
+            width: `${placeholderWidth}px`,
             flex: "0 0 auto",
             display: "flex",
             alignItems: "center",
@@ -109,7 +127,15 @@ export default function MemoryModelEditor({sandbox = true} : {sandbox?: boolean}
           Placeholder
           <div
             onMouseDown={() => setIsResizing(true)}
-            style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "5px", cursor: "col-resize", zIndex: 1 }}
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: "5px",
+              cursor: "col-resize",
+              zIndex: 1,
+            }}
           />
         </div>
       </div>

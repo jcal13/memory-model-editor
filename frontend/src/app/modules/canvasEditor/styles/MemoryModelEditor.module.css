@@ -111,16 +111,17 @@
 }
 
 
-/* ───────── Switch toggle (replaces previous block) ───────── */
+/* ───────── Switch toggle ───────── */
 .switchWrapper {
   position: absolute;
-  top: 35px;      
-  left: 35px;        
-  z-index: 10;    
-  width: 100px;
+  top: 35px;
+  left: 35px;
+  z-index: 10;
+  width: 100px;         
   height: 32px;
   cursor: pointer;
 }
+
 
 .switchInput {
   display: none;
@@ -130,18 +131,19 @@
   display: block;
   width: 100%;
   height: 100%;
-  background: #93C5FD; /* lighter practice track */
+  background: #93C5FD;   
   border-radius: 9999px;
   position: relative;
   transition: background-color 0.2s ease;
-  font-size: 0.95rem;  
+  font-size: 0.95rem;
   font-weight: 600;
-  color: #1E40AF; /* practice text */
+  color: #1E40AF;        
 }
 
 .switchWrapper:hover .switchSlider {
-  background: #60A5FA; /* practice hover */
+  background: #60A5FA;   
 }
+
 
 .switchSlider::before {
   content: "";
@@ -153,36 +155,42 @@
   top: 2px;
   left: 2px;
   transition: transform 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
 }
 
-.switchSlider::after {
-  content: "practice";
+
+.switchSlider::after,
+.switchInput:checked + .switchSlider::after {
   position: absolute;
-  right: 10px;
-  top: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 70px;           
+  text-align: center;    
   pointer-events: none;
   text-transform: capitalize;
 }
 
-.switchInput:checked + .switchSlider {
-  background: #34D399; /* test track */
-  color: #065F46;      /* test text */
-}
-
-.switchWrapper:hover .switchInput:checked + .switchSlider {
-  background: #10B981; /* test hover */
-}
-
-.switchInput:checked + .switchSlider::before {
-  transform: translateX(70px);
+.switchSlider::after {
+  content: "practice";
+  right: 0;
 }
 
 .switchInput:checked + .switchSlider::after {
   content: "test";
-  left: 10px;
-  right: auto;
+  left: 0;
 }
 
+.switchInput:checked + .switchSlider {
+  background: #34D399;   
+  color: #065F46;      
+}
+
+.switchWrapper:hover .switchInput:checked + .switchSlider {
+  background: #10B981;  
+}
+
+.switchInput:checked + .switchSlider::before {
+  transform: translateX(69px);   
+}
 
 

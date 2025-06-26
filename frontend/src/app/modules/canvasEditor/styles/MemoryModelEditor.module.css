@@ -113,15 +113,14 @@
 
 /* ───────── Switch toggle (replaces previous block) ───────── */
 .switchWrapper {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    z-index: 10;
-    width: 80px;                
-    height: 24px;
-    cursor: pointer;
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+  width: 100px;        
+  height: 32px;        
+  cursor: pointer;
 }
-
 
 .switchInput {
   display: none;
@@ -135,7 +134,7 @@
   border-radius: 9999px;
   position: relative;
   transition: background-color 0.2s ease;
-  font-size: 0.7rem;
+  font-size: 0.8rem;   
   font-weight: 600;
   color: #374151;
 }
@@ -143,8 +142,8 @@
 .switchSlider::before {
   content: "";
   position: absolute;
-  width: 20px;
-  height: 20px;
+  width: 28px;         
+  height: 28px;        
   background: #ffffff;
   border-radius: 50%;
   top: 2px;
@@ -154,10 +153,10 @@
 }
 
 .switchSlider::after {
-  content: "practice";                 
+  content: "practice";
   position: absolute;
-  right: 6px;                          
-  top: 4px;
+  right: 10px;         
+  top: 6px;            
   pointer-events: none;
   text-transform: capitalize;
 }
@@ -167,12 +166,12 @@
 }
 
 .switchInput:checked + .switchSlider::before {
-  transform: translateX(56px);       
+  transform: translateX(70px);  
 }
 
 .switchInput:checked + .switchSlider::after {
-  content: "test";                     
-  left: 6px;
+  content: "test";
+  left: 10px;
   right: auto;
 }
 

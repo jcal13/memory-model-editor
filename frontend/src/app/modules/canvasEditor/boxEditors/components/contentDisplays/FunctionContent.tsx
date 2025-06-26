@@ -61,7 +61,7 @@ const FunctionContent = ({ functionParams, setParams, ids, addId, removeId, sand
                 onChange={(e) => changeName(idx, e.target.value)}
                 className={styles.variableNameBox}
               />
-              <div className={styles.collectionIdBox}>
+              <div className={styles.idSelectButtonWrapper}>
                 <IdSelector
                   currentId={p.targetId}
                   ids={ids}

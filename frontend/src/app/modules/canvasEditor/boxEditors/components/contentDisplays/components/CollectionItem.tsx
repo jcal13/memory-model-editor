@@ -38,7 +38,7 @@ const CollectionItem = ({
     return (
       <div className={styles.collectionIdContainer}>
         {items.map((itemId: ID, idx: number) => (
-          <div key={idx} className={styles.collectionIdBox}>
+          <div key={idx} className={styles.idSelectButtonWrapper}>
             <IdSelector
               currentId={itemId}
               ids={ids}
@@ -69,7 +69,7 @@ const CollectionItem = ({
       {items.map(([keyId, valId]: [ID, ID], idx: number) => (
         <div key={idx} className={styles.collectionPairContainer}>
           {/* KEY ID */}
-          <div className={styles.collectionIdBox}>
+          <div>
             <IdSelector
               currentId={keyId}
               ids={ids}
@@ -88,7 +88,7 @@ const CollectionItem = ({
           <div className={styles.collectionPairSeparator}>:</div>
 
           {/* VALUE ID + REMOVE */}
-          <div className={styles.collectionIdBox}>
+          <div className={styles.idSelectButtonWrapper}>
             <IdSelector
               currentId={valId}
               ids={ids}

@@ -28,7 +28,7 @@ export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
 
   // === Create the MemoryViz model and draw the element
   const model = new MemoryModel(config);
-  handler?.draw?.(model, kind, Number(element.id));
+  handler?.draw?.(model, kind, element.id);
 
   // === Return the generated SVG node
   return model.svg;

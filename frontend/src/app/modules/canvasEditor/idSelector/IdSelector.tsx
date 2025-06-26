@@ -1,8 +1,12 @@
-import React, { useRef, useState } from "react";
+import React, { useState, useCallback } from "react";
 import ReactDOM from "react-dom";
 import Draggable from "react-draggable";
 import IdSelectorPanel from "./components/IdSelectorPanel";
-import { useIdListSync } from "./hooks/useEffect";
+import {
+  useIdListSync,
+  useSinglePanelRegistry,
+} from "./hooks/useEffect";
+import { usePanelRef } from "./hooks/useRef";
 import styles from "./styles/IdSelector.module.css";
 import { ID } from "../shared/types";
 
@@ -27,10 +31,12 @@ export default function IdSelector({
   editable,
   sandbox,
 }: Props) {
-  const [open, setOpen] = useState(false);
-  const [list, setList] = useState<ID[]>(ids);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen]   = useState(false);
+  const [list, setList]   = useState<ID[]>(ids);
   useIdListSync(ids, setList);
+
+  const panelRef  = usePanelRef();
+  const closeSelf = useCallback(() => setOpen(false), []);
 
   if (!editable) {
     return (
@@ -42,29 +48,29 @@ export default function IdSelector({
     );
   }
 
-  // handlers for editable mode
-  const handleAdd = (id: ID) => {
+  useSinglePanelRegistry(open, closeSelf);
+
+  const toggleOpen  = () => setOpen((v) => !v);
+  const handleAdd   = (id: ID) => {
     if (!list.includes(id)) {
       setList(prev => [...prev, id]);
       onAdd?.(id);
     }
   };
-
   const handleRemove = (id: ID) => {
     setList(prev => prev.filter(v => v !== id));
     onRemove?.(id);
   };
-
   const handleSelect = (id: ID) => {
     onSelect(id);
-    setOpen(false);
+    closeSelf();
   };
 
   return (
     <div data-testid="id-selector-panel">
       <button
         type="button"
-        onClick={() => setOpen(v => !v)}
+        onClick={toggleOpen}
         className={buttonClassName}
       >
         {currentId != null ? `ID ${currentId}` : "ID _"}

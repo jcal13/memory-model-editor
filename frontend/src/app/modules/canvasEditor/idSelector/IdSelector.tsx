@@ -38,6 +38,9 @@ export default function IdSelector({
   const panelRef  = usePanelRef();
   const closeSelf = useCallback(() => setOpen(false), []);
 
+
+  useSinglePanelRegistry(open, closeSelf);
+  
   if (!editable) {
     return (
       <div data-testid="id-selector-panel">
@@ -48,7 +51,6 @@ export default function IdSelector({
     );
   }
 
-  useSinglePanelRegistry(open, closeSelf);
 
   const toggleOpen  = () => setOpen((v) => !v);
   const handleAdd   = (id: ID) => {

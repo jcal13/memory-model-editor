@@ -47,7 +47,7 @@ const CollectionItem = ({
                 setItems((prev) => prev.map((v, i) => (i === idx ? picked : v)))
               }
               onRemove={removeId}
-              buttonClassName={styles.collectionIdNoBorder}
+              buttonClassName={styles.collectionIdBox}
               editable={true}
               sandbox={sandbox}
             />
@@ -69,7 +69,7 @@ const CollectionItem = ({
       {items.map(([keyId, valId]: [ID, ID], idx: number) => (
         <div key={idx} className={styles.collectionPairContainer}>
           {/* KEY ID */}
-          <div>
+          <div className={styles.idSelectButtonWrapper}>
             <IdSelector
               currentId={keyId}
               ids={ids}
@@ -79,7 +79,7 @@ const CollectionItem = ({
                   prev.map((p, i) => (i === idx ? [picked, p[1]] : p))
                 )
               }
-              buttonClassName={styles.collectionIdNoBorder}
+              buttonClassName={styles.collectionIdBox}
               editable={true}
               sandbox={sandbox}
             />
@@ -98,7 +98,7 @@ const CollectionItem = ({
                   prev.map((p, i) => (i === idx ? [p[0], picked] : p))
                 )
               }
-              buttonClassName={styles.collectionIdNoBorder}
+              buttonClassName={styles.collectionIdBox}
               editable={true}
               sandbox={sandbox}
             />

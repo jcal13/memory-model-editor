@@ -68,7 +68,7 @@ const FunctionContent = ({ functionParams, setParams, ids, addId, removeId, sand
                   onAdd={addId}
                   onSelect={(id) => setTargetId(idx, id)}
                   onRemove={removeId}
-                  buttonClassName={styles.collectionIdNoBorder}
+                  buttonClassName={styles.collectionIdBox}
                   sandbox={sandbox}
                   editable={true}
                 />

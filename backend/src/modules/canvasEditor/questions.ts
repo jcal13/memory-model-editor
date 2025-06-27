@@ -234,69 +234,35 @@ const questions = {
       },
     ],
   },
-  // 7: {  this one is wrongly configured
-  //   code: [
-  //     "lst = [[1, 2,], [3, 4]]",
-  //     "for item in lst:",
-  //     "    item = item + [88]",
-  //   ],
-  //   answer: [
-  //     {
-  //       type: ".frame",
-  //       name: "__main__",
-  //       id: null,
-  //       value: {
-  //         lst: 5,
-  //         item: 9,
-  //       },
-  //     },
-  //     {
-  //       type: "int",
-  //       id: 1,
-  //       value: 1,
-  //     },
-  //     {
-  //       type: "int",
-  //       id: 2,
-  //       value: 2,
-  //     },
-  //     {
-  //       type: "int",
-  //       id: 3,
-  //       value: 3,
-  //     },
-  //     {
-  //       type: "int",
-  //       id: 4,
-  //       value: 4,
-  //     },
-  //     {
-  //       type: "int",
-  //       id: 8,
-  //       value: 88,
-  //     },
-  //     {
-  //       type: "list",
-  //       id: 5,
-  //       value: [6, 7],
-  //     },
-  //     {
-  //       type: "list",
-  //       id: 6,
-  //       value: [1, 2],
-  //     },
-  //     {
-  //       type: "list",
-  //       id: 7,
-  //       value: [3, 4],
-  //     },
-  //     {
-  //       type: "list",
-  //       id: 9,
-  //       value: [3, 4, 8],
-  //     },
-  //   ],
-  // },
+  7: {
+    code: ["a = [1]", "b = [1]"],
+    answer: [
+      {
+        type: ".frame",
+        name: "__main__",
+        id: null,
+        value: {
+          a: 2,
+          b: 3,
+        },
+      },
+      {
+        type: "int",
+        id: 1,
+        value: 1,
+      },
+      {
+        type: "list",
+        id: 2,
+        value: [1],
+      },
+      {
+        type: "list",
+        id: 3,
+        value: [1],
+      },
+    ],
+  },
 };
 
 export default questions;

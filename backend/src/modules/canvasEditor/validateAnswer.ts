@@ -322,6 +322,7 @@ function detectOrphans(
   inputFrames: MemoryBox[],
   inputMap: Map<number, MemoryBox>,
   model: MemoryBox[],
+  answerMap: Map<number, MemoryBox>,
   errors: string[]
 ) {
   const reachable = new Set<number>();
@@ -342,11 +343,11 @@ function detectOrphans(
     );
 
   for (const e of model)
-    if (e.id !== null && !reachable.has(e.id))
+    if (e.id !== null && !reachable.has(e.id) && !answerMap.has(e.id))
       errors.push(`unmapped box with id=${e.id}`);
 }
 
-/* ---------- compare IDs ---------- */
+// Compare IDs between the answer and user models
 function compareIds(
   answerID: number, // ID in the answer model
   inputID: number, // ID in the user model
@@ -460,7 +461,7 @@ export default function validateAnswer(userModel: MemoryBox[]): {
   correct: boolean;
   errors: string[];
 } {
-  const answerModel = questions[7].answer; // adjust index as needed
+  const answerModel = questions[15].answer; // adjust index as needed
   const errors: string[] = [];
 
   // gather frames from both models
@@ -498,7 +499,7 @@ export default function validateAnswer(userModel: MemoryBox[]): {
   );
 
   // detect duplicates in the user model
-  detectOrphans(inputFrames, inputMap, userModel, errors);
+  detectOrphans(inputFrames, inputMap, userModel, answerMap, errors);
 
   return { correct: errors.length === 0, errors };
 }

@@ -85,7 +85,7 @@ export default function Canvas({
           name: "function",
           type: "function",
           value: null,
-          functionName: "myFunction",
+          functionName: "__name__",
           params: [],
         };
         break;

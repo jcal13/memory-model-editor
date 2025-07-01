@@ -4,37 +4,14 @@ A drag-and-drop application for visualizing Python memory models, designed for u
 
 ## Features
 
-### Scratch-style canvas
-
-- Drag-and-drop blocks onto a canvas to create or edit a memory model
-  <short demo here>
-
-### Question bank for practice
-
-- _Build from code_: construct a full memory model diagram from a given Python snippet
-- _Fill-in-the-blanks_: complete partially-built models to test specific concepts
-  <short demo here>
-
-### Custom questions
-
-- Paste your own Python code to practice new exercises
-  <short demo here>
-
-### Automatic grading and visual feedback
-
-- Submit a model and get detailed feedback about correctness
-  <short demo here>
-
-### Checkpoint validation
-
-- Insert checkpoints in questions to verify your work incrementally
-
-  <short demo here>
-
-### Export to JSON
-
-- Download your completed model as a JSON file ready for MarkUs submission
-  <short demo here>
+- **Scratch-style canvas** - drag-and-drop blocks onto a canvas to create or edit a memory model
+- **Question bank for practice**
+  - _Build from code_: construct a full memory model diagram from a given Python snippet
+  - _Fill-in-the-blanks_: complete partially-built models to test specific concepts
+- **Custom questions** - paste your own Python code to practice new exercises
+- **Automatic grading and visual feedback** - submit a model and get detailed feedback about correctness
+- **Checkpoint validation** - insert checkpoints in questions to verify your work incrementally
+- **Export to JSON** - download your completed model as a JSON file ready for MarkUs submission
 
 ## Developer Instructions
 

@@ -1,26 +1,28 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { ID } from "../../shared/types";
 
 /**
- * useModule is a custom hook that detects clicks outside the editor module
- * and automatically calls the `onSave` function with the latest element data.
+ * useModule is a custom hook that saves the current editor state
+ * whenever any of its reactive inputs change.
  *
- * This hook handles saving logic for different element kinds:
- * - "primitive": saves type and value
- * - "function": saves name and parameters
- * - collection types ("list", "set", "tuple", "dict"): saves items or pairs
+ * The editor stays open and pushes an update on every data change,
+ * ensuring the canvas always reflects the latest values.
  *
- * @param moduleRef - React ref to the module DOM node
- * @param onSave - Callback to save updated element data
- * @param element - Metadata describing the element (includes kind and type)
- * @param dataType - Selected primitive type (if applicable)
- * @param contentValue - Content value for primitive (if applicable)
- * @param functionName - Name of the function (if applicable)
- * @param params - Parameters of the function (if applicable)
- * @param collectionItems - Items or pairs for collection types
+ * Payload structure is unchanged, so existing consumers still work:
+ * ─ "primitive": { name, type, value }
+ * ─ "function" : { name, type: "function", value: null, functionName, params }
+ * ─ collections: { name, type, value }  // list, set, tuple, dict
+ *
+ * @param onSave          Callback invoked as onSave(id, data)
+ * @param element         Element metadata (includes kind & type)
+ * @param ownId           Current element ID
+ * @param dataType        Primitive type (if applicable)
+ * @param contentValue    Primitive value (if applicable)
+ * @param functionName    Function name (if applicable)
+ * @param params          Function parameters (if applicable)
+ * @param collectionItems Items / pairs for collections
  */
 export const useModule = (
-  moduleRef: any,
   onSave: (id: ID, data: any) => void,
   element: any,
   ownId: ID,
@@ -30,54 +32,59 @@ export const useModule = (
   params?: any[],
   collectionItems?: any
 ) => {
+  /* Cache of the last payload we actually saved */
+  const prevPayloadRef = useRef<any>(null);
+
+  /* Lightweight deep comparison (good enough for our payloads) */
+  const isEqual = (a: any, b: any): boolean => {
+    if (a === b) return true;
+    if (typeof a !== "object" || typeof b !== "object" || !a || !b) return false;
+    const aKeys = Object.keys(a);
+    const bKeys = Object.keys(b);
+    if (aKeys.length !== bKeys.length) return false;
+    for (const k of aKeys) {
+      if (!isEqual(a[k], b[k])) return false;
+    }
+    return true;
+  };
+
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
+    const kind = element.kind.name;
+    let payload: any;
 
-      if (
-        moduleRef.current &&                          // not the editor itself
-        !moduleRef.current.contains(target) &&        // ...
-        !target.closest('[data-editor-ignore]')       // not a whitelisted helper
-      ) {
-        const kind = element.kind.name;
-        if (kind === "primitive") {
-          onSave(ownId, {
-            name: kind,
-            type: dataType,
-            value: contentValue,
-          });
-        } else if (kind === "function") {
-          onSave(ownId, {
-            name: kind,
-            type: "function",
-            value: null,
-            functionName,
-            params,
-          });
-        } else if (kind === "dict") {
-          onSave(ownId, {
-            name: kind,
-            type: element.kind.type,
-            value: Object.fromEntries(collectionItems || []),
-          });
-        } else {
-          onSave(ownId, {
-            name: kind,
-            type: element.kind.type,
-            value: collectionItems,
-          });
-        }
-      }
-    };
+    if (kind === "primitive") {
+      payload = { name: kind, type: dataType, value: contentValue };
+    } else if (kind === "function") {
+      payload = {
+        name: kind,
+        type: "function",
+        value: null,
+        functionName,
+        params,
+      };
+    } else if (kind === "dict") {
+      payload = {
+        name: kind,
+        type: element.kind.type,
+        value: Object.fromEntries(collectionItems ?? []),
+      };
+    } else {
+      payload = {
+        name: kind,
+        type: element.kind.type,
+        value: collectionItems,
+      };
+    }
 
-    document.addEventListener("mousedown", handleClickOutside, true);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside, true);
-    };
+    if (isEqual(prevPayloadRef.current, payload)) return;
+
+    prevPayloadRef.current = payload;   // update cache
+    onSave(ownId, payload);             // persist changes
   }, [
     onSave,
     ownId,
     element.kind.name,
+    element.kind.type,
     dataType,
     contentValue,
     functionName,

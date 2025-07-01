@@ -9,9 +9,9 @@ import { BoxEditorType } from "../shared/types";
  * @param onSave - Callback function to persist box changes
  * @param onRemove - Callback function to remove the box
  */
-const BoxEditor = ({ metadata, onSave, onRemove, ids, addId, removeId, sandbox = true }: BoxEditorType) => {
+const BoxEditor = ({ metadata, onSave, onRemove, onClose, ids, addId, removeId, sandbox = true }: BoxEditorType) => {
   return (
-    <BoxEditorModule metadata={metadata} onSave={onSave} onRemove={onRemove} ids={ids} addId={addId} removeId={removeId} sandbox={sandbox}/>
+    <BoxEditorModule metadata={metadata} onSave={onSave} onRemove={onRemove} ids={ids} addId={addId} removeId={removeId} sandbox={sandbox} onClose={onClose}/>
   );
 };
 

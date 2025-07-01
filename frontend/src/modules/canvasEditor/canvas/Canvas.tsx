@@ -140,7 +140,6 @@ export default function Canvas({
           : el
       )
     );
-    setSelected(null);
   };
 
   /* ----------------------- Remove element ----------------------- */
@@ -198,6 +197,7 @@ export default function Canvas({
                   metadata={selected}
                   onSave={saveElement}
                   onRemove={removeElement}
+                  onClose={() => setSelected(null)}
                   ids={ids}
                   addId={addId}
                   removeId={removeId}

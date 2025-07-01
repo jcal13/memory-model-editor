@@ -16,7 +16,6 @@ const TestModule = ({ element, onSave }: any) => {
   });
 
   useModule(
-    moduleRef,
     onSave,
     element,
     99,

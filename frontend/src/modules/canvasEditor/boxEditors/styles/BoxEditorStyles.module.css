@@ -4,6 +4,7 @@
 
 .boxEditorModule {
   width: max-content;
+  position: relative; 
   min-width: 340px;
   padding: 24px;
   gap: 40px;

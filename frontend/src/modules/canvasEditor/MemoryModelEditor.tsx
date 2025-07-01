@@ -6,9 +6,12 @@ import styles from "./styles/MemoryModelEditor.module.css";
 import { CanvasElement } from "./shared/types";
 import { buildJSONFromElements } from "./jsonConversion/jsonBuilder";
 import { ID } from "./shared/types";
-import DownloadJsonButton from "./canvas/components/DownloadJsonButton";
 
-export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolean }) {
+export default function MemoryModelEditor({
+  sandbox = true,
+}: {
+  sandbox?: boolean;
+}) {
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [jsonView, setJsonView] = useState<string>("");
   const [ids, setIds] = useState<ID[]>([]);
@@ -34,7 +37,7 @@ export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolea
 
   const confirmClear = (): void => {
     clearBoard();
-    setSandboxMode(prev => !prev);
+    setSandboxMode((prev) => !prev);
     setShowConfirm(false);
   };
 
@@ -45,8 +48,9 @@ export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolea
     setJsonView(JSON.stringify(snapshot, null, 2));
   };
 
-  const addId = (id: ID) => setIds(prev => (prev.includes(id) ? prev : [...prev, id]));
-  const removeId = (id: ID) => setIds(prev => prev.filter(v => v !== id));
+  const addId = (id: ID) =>
+    setIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+  const removeId = (id: ID) => setIds((prev) => prev.filter((v) => v !== id));
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
@@ -59,7 +63,9 @@ export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolea
         setPlaceholderWidth(newWidth);
       }
     };
-    const onMouseUp = () => { if (isResizing) setIsResizing(false); };
+    const onMouseUp = () => {
+      if (isResizing) setIsResizing(false);
+    };
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
     return () => {
@@ -86,13 +92,13 @@ export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolea
               sandbox={sandboxMode}
             />
           </div>
-          
+
           <label className={styles.switchWrapper}>
             <input
               type="checkbox"
               className={styles.switchInput}
               checked={sandboxMode}
-              onChange={e => {
+              onChange={(e) => {
                 e.preventDefault();
                 handleToggleSandbox();
               }}
@@ -100,11 +106,9 @@ export default function MemoryModelEditor({ sandbox = true }: { sandbox?: boolea
             <span className={styles.switchSlider}></span>
           </label>
 
-          <DownloadJsonButton elements={elements} />
-
-          <button className={styles.jsonButton} onClick={showJson}>
+          {/* <button className={styles.jsonButton} onClick={showJson}>
             Show JSON
-          </button>
+          </button> */}
 
           {jsonView && <pre className={styles.jsonView}>{jsonView}</pre>}
         </div>

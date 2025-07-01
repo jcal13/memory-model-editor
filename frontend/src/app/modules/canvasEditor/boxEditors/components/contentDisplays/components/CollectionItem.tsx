@@ -12,6 +12,7 @@ interface Props {
   ids: any; // global ID pool
   addId: (id: ID) => void; // adds a new ID to the pool
   removeId: (id: ID) => void;
+  sandbox: boolean;
 }
 
 /**
@@ -25,6 +26,7 @@ const CollectionItem = ({
   ids,
   addId,
   removeId,
+  sandbox
 }: Props) => {
   const removeItem = (idx: number) =>
     setItems((prev) => prev.filter((_, i) => i !== idx));
@@ -36,7 +38,7 @@ const CollectionItem = ({
     return (
       <div className={styles.collectionIdContainer}>
         {items.map((itemId: ID, idx: number) => (
-          <div key={idx} className={styles.collectionIdBox}>
+          <div key={idx} className={styles.idSelectButtonWrapper}>
             <IdSelector
               currentId={itemId}
               ids={ids}
@@ -45,7 +47,9 @@ const CollectionItem = ({
                 setItems((prev) => prev.map((v, i) => (i === idx ? picked : v)))
               }
               onRemove={removeId}
-              buttonClassName={styles.collectionIdNoBorder}
+              buttonClassName={styles.collectionIdBox}
+              editable={true}
+              sandbox={sandbox}
             />
             <button
               className={styles.collectionRemoveId}
@@ -65,7 +69,7 @@ const CollectionItem = ({
       {items.map(([keyId, valId]: [ID, ID], idx: number) => (
         <div key={idx} className={styles.collectionPairContainer}>
           {/* KEY ID */}
-          <div className={styles.collectionIdBox}>
+          <div className={styles.idSelectButtonWrapper}>
             <IdSelector
               currentId={keyId}
               ids={ids}
@@ -75,14 +79,16 @@ const CollectionItem = ({
                   prev.map((p, i) => (i === idx ? [picked, p[1]] : p))
                 )
               }
-              buttonClassName={styles.collectionIdNoBorder}
+              buttonClassName={styles.collectionIdBox}
+              editable={true}
+              sandbox={sandbox}
             />
           </div>
 
           <div className={styles.collectionPairSeparator}>:</div>
 
           {/* VALUE ID + REMOVE */}
-          <div className={styles.collectionIdBox}>
+          <div className={styles.idSelectButtonWrapper}>
             <IdSelector
               currentId={valId}
               ids={ids}
@@ -92,7 +98,9 @@ const CollectionItem = ({
                   prev.map((p, i) => (i === idx ? [p[0], picked] : p))
                 )
               }
-              buttonClassName={styles.collectionIdNoBorder}
+              buttonClassName={styles.collectionIdBox}
+              editable={true}
+              sandbox={sandbox}
             />
             <button
               className={styles.collectionRemoveId}

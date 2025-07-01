@@ -46,6 +46,7 @@ describe("CollectionContent", () => {
         ids={ids}
         addId={addId}
         removeId={removeId}
+        sandbox={true}
       />
     );
     expect(getByTestId("mock-collection-item-single")).toBeInTheDocument();
@@ -64,6 +65,7 @@ describe("CollectionContent", () => {
         ids={ids}
         addId={addId}
         removeId={removeId}
+        sandbox={true}
       />
     );
     expect(getByTestId("mock-collection-item-pair")).toBeInTheDocument();
@@ -86,6 +88,7 @@ describe("CollectionContent", () => {
         ids={ids}
         addId={addId}
         removeId={removeId}
+        sandbox={true}
       />
     );
 

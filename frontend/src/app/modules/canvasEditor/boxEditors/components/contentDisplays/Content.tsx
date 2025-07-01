@@ -20,6 +20,7 @@ interface Props {
   ids: any;
   addId: (id: ID) => void;
   removeId: (id: ID) => void;
+  sandbox: boolean;
 }
 
 /**
@@ -45,6 +46,7 @@ const Content = ({
   ids,
   addId,
   removeId,
+  sandbox,
 }: Props) => {
   const kind = metadata.kind.name;
 
@@ -62,6 +64,7 @@ const Content = ({
         ids={ids}
         addId={addId}
         removeId={removeId}
+        sandbox={sandbox}
       />
     );
   }
@@ -75,6 +78,7 @@ const Content = ({
         ids={ids}
         addId={addId}
         removeId={removeId}
+        sandbox={sandbox}
       />
     );
   }
@@ -88,6 +92,7 @@ const Content = ({
         ids={ids}
         addId={addId}
         removeId={removeId}
+        sandbox={sandbox}
       />
     );
   }

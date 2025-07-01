@@ -13,6 +13,7 @@ interface Props {
   ids: any;
   addId: (id: ID) => void;
   removeId: (id: ID) => void;
+  sandbox: boolean;
 }
 
 /**
@@ -30,6 +31,7 @@ const CollectionContent = ({
   ids,
   addId,
   removeId,
+  sandbox
 }: Props) => {
   return (
     <div className={styles.contentContainer}>
@@ -40,8 +42,9 @@ const CollectionContent = ({
         ids={ids}
         addId={addId}
         removeId={removeId}
+        sandbox={sandbox}
       />
-      <CollectionAddButton mode={mode} items={items} setItems={setItems} />
+      <CollectionAddButton mode={mode} items={items} setItems={setItems}/>
     </div>
   );
 };

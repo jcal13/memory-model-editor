@@ -10,6 +10,7 @@ interface Props {
   ownId: ID;
   setElementId: (id: ID) => void;
   removeId: (id: ID) => void;
+  sandbox: boolean;
 }
 
 /**
@@ -28,6 +29,7 @@ const CollectionHeader = ({
   ownId,
   setElementId,
   removeId,
+  sandbox
 }: Props) => (
   <div data-testid="collection-header" className={styles.collectionHeader}>
     <IdDisplay
@@ -36,6 +38,7 @@ const CollectionHeader = ({
       ownId={ownId}
       setElementId={setElementId}
       removeId={removeId}
+      sandbox={sandbox}
     />
     <TypeDisplay typeLabel={element.kind.type} />
   </div>

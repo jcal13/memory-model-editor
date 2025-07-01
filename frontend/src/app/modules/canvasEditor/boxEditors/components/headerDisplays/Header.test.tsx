@@ -18,6 +18,7 @@ describe("Header", () => {
     ownId: 1,
     setElementId: jest.fn(),
     removeId: jest.fn(),
+    sandbox: true
   };
 
   /**

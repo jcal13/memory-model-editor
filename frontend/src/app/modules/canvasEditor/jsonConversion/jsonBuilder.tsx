@@ -17,25 +17,12 @@ type ValueEntry = {
 export function buildJSONFromElements(
   elements: CanvasElement[]
 ): (FrameEntry | ValueEntry)[] {
-  const idMap: Map<number, number> = new Map();
-  let nextId: number = 1;
-
-  const getOrAssignId = (elementId: number): number => {
-    if (!idMap.has(elementId)) {
-      idMap.set(elementId, nextId++);
-    }
-    return idMap.get(elementId)!;
-  };
-
+  
   const jsonData: FrameEntry[] = [];
   const valueEntries: ValueEntry[] = [];
 
   // Step 1: Add .frame entries for functions
   elements.forEach(({ id, kind }) => {
-    if (typeof id !== "number") {
-      console.warn(`Skipping function with non-numeric id: ${id}`);
-      return;
-    }
 
     if (kind.name === "function") {
       const frameValue: Record<string, number> = {};

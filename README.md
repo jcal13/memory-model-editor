@@ -32,7 +32,7 @@ npm install
 npm run dev
 ```
 
-You should see the frontend being run on `http://localhost:3000` in the terminal.
+You should see the frontend being run on `http://localhost:3000` in the terminal. You need to open this link in your browser.
 
 ![alt text](readmeUtil/image.png)
 
@@ -44,6 +44,6 @@ npm install
 npm run dev
 ```
 
-You should see the backend being run on `http://localhost:3001` in the terminal.
+You should see the backend being run on `http://localhost:3001` in the terminal. You do not need to open this link in your browser.
 
 ![alt text](readmeUtil/image-1.png)

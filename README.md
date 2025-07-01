@@ -1,4 +1,4 @@
-# Memory Model Visualizer
+# MemoryLab
 
 A drag-and-drop application for visualizing Python memory models — designed for use in CS education. Students can build memory models by dragging blocks representing functions, variables, and values onto a canvas, and receive automated feedback based on correctness.
 
@@ -15,29 +15,29 @@ A drag-and-drop application for visualizing Python memory models — designed fo
 
 ---
 
-## Developer Installation
+## Developer Instructions
 
-For developers, follow these steps to set up the development environment:
+For developers, follow these steps to set up and run the development environment:
 
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/memory-model-visualizer.git
-cd memory-model-visualizer
+git clone https://github.com/YOUR_USERNAME/memory-model-editor.git
+cd memory-model-editor
 ```
 
-### 2. Install frontend dependencies
+### 2. Install frontend dependencies and start frontend server
 
 ```bash
 cd frontend
 npm install
+npm run dev
 ```
 
-### 3. something for backend
-
-### #. Start the development server
+### 3. Install backend dependencies and start backend server
 
 ```bash
-cd frontend
-npm start
+cd backend
+npm install
+npm run dev
 ```

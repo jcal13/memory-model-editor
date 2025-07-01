@@ -1,4 +1,3 @@
-import axios from "axios";
 import "./App.css";
 import MemoryModelEditor from "./modules/canvasEditor/MemoryModelEditor";
 

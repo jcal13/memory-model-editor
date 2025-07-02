@@ -19,8 +19,11 @@ const IdSelectorPanel: React.FC<Props> = ({
   sandbox,
 }) => {
   const nextId = useMemo<number>(() => {
-    const nums = ids.filter((v): v is number => typeof v === "number");
-    return nums.length ? Math.max(...nums) + 1 : 1;
+    let i = 0;
+    while (i < ids.length && ids[i] == i) {
+      i += 1
+    }
+    return i;
   }, [ids]);
 
   const [customId, setCustomId] = useState("");

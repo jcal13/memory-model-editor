@@ -127,7 +127,7 @@ const IdSelectorPanel: React.FC<Props> = ({
         )}
         {showDup && (
           <span style={{ color: "#dc2626", fontSize: "0.8rem" }}>
-            Already Added
+            Already added
           </span>
         )}
       </div>

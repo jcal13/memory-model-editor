@@ -27,25 +27,30 @@ const IdSelectorPanel: React.FC<Props> = ({
 
   const [customId, setCustomId] = useState("");
   const [showWarn, setShowWarn] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [showDup, setShowDup] = useState(false);
 
   const handleAdd = () => {
     if (customId.trim() !== "") {
       const n = Number(customId);
       if (Number.isInteger(n)) {
+        if (ids.includes(n as ID)) {
+          setShowDup(true);
+          setShowWarn(false);
+          return;
+        }
         onAdd(n as ID);
         setCustomId("");
         setShowWarn(false);
-        setShowSuccess(true);
+        setShowDup(false);
         return;
       }
       setShowWarn(true);
-      setShowSuccess(false);
+      setShowDup(false);
       return;
     }
     onAdd(nextId);
     setShowWarn(false);
-    setShowSuccess(true);
+    setShowDup(false);
   };
 
   return (
@@ -91,7 +96,7 @@ const IdSelectorPanel: React.FC<Props> = ({
                 onChange={(e) => {
                   setCustomId(e.target.value);
                   setShowWarn(false);
-                  setShowSuccess(false);
+                  setShowDup(false);
                 }}
                 placeholder="Enter custom ID or leave blank"
                 className={panelStyles.idInputBox}
@@ -114,16 +119,17 @@ const IdSelectorPanel: React.FC<Props> = ({
             Unassign
           </button>
         </div>
+
         {showWarn && (
           <span style={{ color: "#dc2626", fontSize: "0.8rem" }}>
             Please enter an integer
           </span>
-              )}
-        {showSuccess && (
-          <span style={{ color: "#16a34a", fontSize: "0.8rem" }}>
-                  Added!
-                </span>
-              )}
+        )}
+        {showDup && (
+          <span style={{ color: "#dc2626", fontSize: "0.8rem" }}>
+            Already Added
+          </span>
+        )}
       </div>
     </div>
   );

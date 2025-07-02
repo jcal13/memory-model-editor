@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import panelStyles from "../styles/IdSelector.module.css";
 import boxStyles from "../../boxEditors/styles/BoxEditorStyles.module.css";
 import { ID } from "../../shared/types";
@@ -16,12 +16,42 @@ const IdSelectorPanel: React.FC<Props> = ({
   onAdd,
   onSelect,
   onRemove,
-  sandbox
+  sandbox,
 }) => {
   const nextId = useMemo<number>(() => {
     const nums = ids.filter((v): v is number => typeof v === "number");
-    return nums.length ? Math.max(...nums) + 1 : 1;
+    let i = 1;
+    while (nums.includes(i)) i += 1;
+    return i;
   }, [ids]);
+
+  const [customId, setCustomId] = useState("");
+  const [showWarn, setShowWarn] = useState(false);
+  const [showDup, setShowDup] = useState(false);
+
+  const handleAdd = () => {
+    if (customId.trim() !== "") {
+      const n = Number(customId);
+      if (Number.isInteger(n)) {
+        if (ids.includes(n as ID)) {
+          setShowDup(true);
+          setShowWarn(false);
+          return;
+        }
+        onAdd(n as ID);
+        setCustomId("");
+        setShowWarn(false);
+        setShowDup(false);
+        return;
+      }
+      setShowWarn(true);
+      setShowDup(false);
+      return;
+    }
+    onAdd(nextId);
+    setShowWarn(false);
+    setShowDup(false);
+  };
 
   return (
     <div className={`${boxStyles.boxEditorModule} ${panelStyles.panelShell}`}>
@@ -38,8 +68,7 @@ const IdSelectorPanel: React.FC<Props> = ({
               >
                 {id}
               </button>
-              {/* only show remove if sandbox=true */}
-              {sandbox === true && (
+              {sandbox && (
                 <button
                   type="button"
                   className={boxStyles.collectionRemoveId}
@@ -51,24 +80,57 @@ const IdSelectorPanel: React.FC<Props> = ({
             </div>
           ))}
         </div>
-        {/* only show add when sandbox=true */}
-        {sandbox === true && (
+
+        {sandbox && ids.length === 0 && (
+          <div className={panelStyles.empty}>
+            No IDs yet — click “Add ID” to create one.
+          </div>
+        )}
+
+        <div className={panelStyles.panelControlsDiv}>
+          {sandbox && (
+            <>
+              <input
+                type="text"
+                value={customId}
+                onChange={(e) => {
+                  setCustomId(e.target.value);
+                  setShowWarn(false);
+                  setShowDup(false);
+                }}
+                placeholder="Enter custom ID or leave blank"
+                className={panelStyles.idInputBox}
+              />
+              <button
+                type="button"
+                onClick={handleAdd}
+                className={boxStyles.addButton}
+              >
+                Add ID
+              </button>
+            </>
+          )}
+
           <button
             type="button"
-            onClick={() => onAdd(nextId)}
-            className={boxStyles.addButton}
+            onClick={() => onSelect("_")}
+            className={boxStyles.removeButton}
           >
-            Add ID
+            Unassign
           </button>
+        </div>
+
+        {showWarn && (
+          <span style={{ color: "#dc2626", fontSize: "0.8rem" }}>
+            Please enter an integer
+          </span>
+        )}
+        {showDup && (
+          <span style={{ color: "#dc2626", fontSize: "0.8rem" }}>
+            Already added
+          </span>
         )}
       </div>
-
-      {/* only show empty message when sandbox=true and no ids */}
-      {sandbox === true && ids.length === 0 && (
-        <div className={panelStyles.empty}>
-          No IDs yet — click “Add ID” to create one.
-        </div>
-      )}
     </div>
   );
 };

@@ -23,7 +23,7 @@ const CollectionAddButton = ({ mode, items, setItems, buttonText }: Props) => {
    */
   const handleAdd = () => {
     if (mode === "single") {
-      setItems([...items, null]);
+      setItems([...items, "_"]);
     } else {
       setItems([...items, ["_", "_"]]);
     }

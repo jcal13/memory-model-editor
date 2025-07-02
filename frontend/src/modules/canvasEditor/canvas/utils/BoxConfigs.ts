@@ -19,8 +19,10 @@ const style = {
  */
 const getValues = (kind: any): number[] => {
   if (Array.isArray(kind.value)) {
-    // List / tuple / set values
-    return kind.value.map((v: any) => +v).filter((v: number) => !isNaN(v));
+  // List / tuple / set values
+  return kind.value
+    .map((v: any) => v === "_" ? "_" : +v)
+    .filter((v: any) => v === "_" || !isNaN(v));
   } else if (kind.value && typeof kind.value === "object") {
     // Dict values
     return Object.values(kind.value)

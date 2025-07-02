@@ -66,6 +66,7 @@ export interface BoxEditorType {
   metadata: { id: ID; kind: BoxType };
   onSave: (id: ID, kind: BoxType) => void;
   onRemove: () => void;
+  onClose: () => void;
   ids: ID[];
   addId: (id: ID) => void;
   removeId: (id: ID) => void;

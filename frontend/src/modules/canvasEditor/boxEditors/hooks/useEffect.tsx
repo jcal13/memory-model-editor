@@ -32,19 +32,15 @@ export const useModule = (
   params?: any[],
   collectionItems?: any
 ) => {
-  /* Cache of the last payload we actually saved */
-  const prevPayloadRef = useRef<any>(null);
+  /* Cache of last (id, payload) we saved */
+  const prevRef = useRef<{ id: ID; payload: any } | null>(null);
 
-  /* Lightweight deep comparison (good enough for our payloads) */
   const isEqual = (a: any, b: any): boolean => {
     if (a === b) return true;
     if (typeof a !== "object" || typeof b !== "object" || !a || !b) return false;
-    const aKeys = Object.keys(a);
-    const bKeys = Object.keys(b);
-    if (aKeys.length !== bKeys.length) return false;
-    for (const k of aKeys) {
-      if (!isEqual(a[k], b[k])) return false;
-    }
+    const keys = Object.keys(a);
+    if (keys.length !== Object.keys(b).length) return false;
+    for (const k of keys) if (!isEqual(a[k], b[k])) return false;
     return true;
   };
 
@@ -55,31 +51,18 @@ export const useModule = (
     if (kind === "primitive") {
       payload = { name: kind, type: dataType, value: contentValue };
     } else if (kind === "function") {
-      payload = {
-        name: kind,
-        type: "function",
-        value: null,
-        functionName,
-        params,
-      };
+      payload = { name: kind, type: "function", value: null, functionName, params };
     } else if (kind === "dict") {
-      payload = {
-        name: kind,
-        type: element.kind.type,
-        value: Object.fromEntries(collectionItems ?? []),
-      };
+      payload = { name: kind, type: element.kind.type, value: Object.fromEntries(collectionItems ?? []) };
     } else {
-      payload = {
-        name: kind,
-        type: element.kind.type,
-        value: collectionItems,
-      };
+      payload = { name: kind, type: element.kind.type, value: collectionItems };
     }
 
-    if (isEqual(prevPayloadRef.current, payload)) return;
+    const prev = prevRef.current;
+    if (prev && prev.id === ownId && isEqual(prev.payload, payload)) return;
 
-    prevPayloadRef.current = payload;   // update cache
-    onSave(ownId, payload);             // persist changes
+    prevRef.current = { id: ownId, payload };
+    onSave(ownId, payload);
   }, [
     onSave,
     ownId,

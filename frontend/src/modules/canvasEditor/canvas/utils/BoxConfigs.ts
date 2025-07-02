@@ -18,7 +18,6 @@ const style = {
  * @returns Array of numeric values
  */
 const getValues = (kind: any): number[] => {
-  console.log(kind)
   if (Array.isArray(kind.value)) {
   // List / tuple / set values
   return kind.value

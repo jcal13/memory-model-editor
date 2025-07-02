@@ -100,7 +100,6 @@ export default function Canvas({
 
   /* ---------------- Sync ids <-> elements (non-function only) ---------------- */
   useEffect(() => {
-    console.log(elements)
     if (sandbox) return;
 
     // Only numeric IDs coming from non-function boxes
@@ -113,7 +112,6 @@ export default function Canvas({
 
     // Removed IDs
     ids.filter((id) => !elementIds.includes(id)).forEach((id) => removeId(id));
-    console.log(elements)
   }, [elements, ids, sandbox, addId, removeId]);
 
   /* ---------- Utility: updater for a specific box’s position ---------- */

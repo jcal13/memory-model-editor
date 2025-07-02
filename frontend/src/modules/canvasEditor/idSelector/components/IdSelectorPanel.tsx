@@ -19,30 +19,33 @@ const IdSelectorPanel: React.FC<Props> = ({
   sandbox,
 }) => {
   const nextId = useMemo<number>(() => {
-    let i = 0;
-    while (i < ids.length && ids[i] == i) {
-      i += 1
-    }
+    const nums = ids.filter((v): v is number => typeof v === "number");
+    let i = 1;
+    while (nums.includes(i)) i += 1;
     return i;
   }, [ids]);
 
   const [customId, setCustomId] = useState("");
   const [showWarn, setShowWarn] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleAdd = () => {
     if (customId.trim() !== "") {
-      const num = Number(customId);
-      if (Number.isInteger(num)) {
-        onAdd(num as ID);
+      const n = Number(customId);
+      if (Number.isInteger(n)) {
+        onAdd(n as ID);
         setCustomId("");
         setShowWarn(false);
+        setShowSuccess(true);
         return;
       }
       setShowWarn(true);
+      setShowSuccess(false);
       return;
     }
     onAdd(nextId);
     setShowWarn(false);
+    setShowSuccess(true);
   };
 
   return (
@@ -88,6 +91,7 @@ const IdSelectorPanel: React.FC<Props> = ({
                 onChange={(e) => {
                   setCustomId(e.target.value);
                   setShowWarn(false);
+                  setShowSuccess(false);
                 }}
                 placeholder="Enter custom ID or leave blank"
                 className={panelStyles.idInputBox}
@@ -114,7 +118,12 @@ const IdSelectorPanel: React.FC<Props> = ({
           <span style={{ color: "#dc2626", fontSize: "0.8rem" }}>
             Please enter an integer
           </span>
-        )}
+              )}
+        {showSuccess && (
+          <span style={{ color: "#16a34a", fontSize: "0.8rem" }}>
+                  Added!
+                </span>
+              )}
       </div>
     </div>
   );

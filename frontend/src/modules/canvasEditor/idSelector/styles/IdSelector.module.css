@@ -15,6 +15,31 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
 }
 
+
+.panelControlsDiv {
+  display: flex;
+  gap: 16px;
+}
+
+
+.removeButton {
+  padding: 10px 26px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  width: max-content; /* same as .addButton */
+  background: #ef4444;
+  color: #ffffff;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.removeButton:hover {
+  background: #dc2626;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+}
+
 .panelContainer {
   position: absolute;
   top: 0;
@@ -151,4 +176,17 @@
 
 .panelShell {
   width: max-content; /* let content set width like other editors */
+}
+
+
+.idInputBox {
+  flex: 2;
+  min-width: 250px;    /* <-- ensure it never shrinks below this */
+  font-size: 1rem;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  color: #111827;
 }

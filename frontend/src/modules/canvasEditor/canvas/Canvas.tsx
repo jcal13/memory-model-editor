@@ -24,10 +24,60 @@ const editorMap: Record<BoxType["name"], React.FC<any>> = {
 interface Props {
   elements: CanvasElement[];
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
-  ids: ID[];
-  addId: (id: ID) => void;
+  ids: number[];
+  addId: (id: number) => void;
   removeId: (id: ID) => void;
   sandbox?: boolean;
+}
+
+function FloatingEditor({
+  element,
+  Editor,
+  onSave,
+  onRemove,
+  onClose,
+  onSelect,
+  defaultPos,
+  ids,
+  addId,
+  removeId,
+  sandbox,
+}: {
+  element: CanvasElement;
+  Editor: React.FC<any>;
+  onSave: (id: ID, kind: BoxType) => void;
+  onRemove: () => void;
+  onClose: () => void;
+  onSelect: () => void;
+  defaultPos: { x: number; y: number };
+  ids: number[];
+  addId: (id: number) => void;
+  removeId: (id: ID) => void;
+  sandbox: boolean;
+}) {
+  const nodeRef = React.useRef<HTMLDivElement>(null);
+
+  return (
+    <Draggable
+      nodeRef={nodeRef as React.RefObject<HTMLElement>}
+      handle=".drag-handle"
+      defaultPosition={defaultPos}
+      onMouseDown={onSelect}
+    >
+      <div ref={nodeRef} className={styles.editorContainer}>
+        <Editor
+          metadata={element}
+          onSave={onSave}
+          onRemove={onRemove}
+          onClose={onClose}
+          ids={ids}
+          addId={addId}
+          removeId={removeId}
+          sandbox={sandbox}
+        />
+      </div>
+    </Draggable>
+  );
 }
 
 /* =======================================
@@ -41,8 +91,9 @@ export default function Canvas({
   removeId,
   sandbox = true,
 }: Props) {
+  const [openBoxEditors, setOpenBoxEditors] = useState<CanvasElement[]>([]);
   const [selected, setSelected] = useState<CanvasElement | null>(null);
-  const { svgRef, dragRef } = useCanvasRefs();
+  const { svgRef } = useCanvasRefs();
   const [viewBox, setViewBox] = useState<string>("0 0 0 0");
 
   useCanvasResize(svgRef, setViewBox);
@@ -57,7 +108,7 @@ export default function Canvas({
       .map((el) => el.id);
 
     // Newly added IDs
-    elementIds.filter((id) => !ids.includes(id)).forEach((id) => addId(id));
+    elementIds.filter((id) => !ids.includes(id as number)).forEach((id) => addId(id as number));
 
     // Removed IDs
     ids.filter((id) => !elementIds.includes(id)).forEach((id) => removeId(id));
@@ -113,10 +164,24 @@ export default function Canvas({
     );
 
     setElements((prev) => {
-      const newBoxId = prev.length;
+    // find box id
+    let newBoxId = prev.length;
+    for (let i = 0; i < prev.length - 1; i++) {
+      if (prev[i].boxId as number + 1 !== prev[i + 1].boxId) {
+        newBoxId = prev[i].boxId as number + 1;
+      }
+    }
+    
 
-      const computedId: ID =
-        !sandbox && newKind.name !== "function" ? ids.length : "_";
+    // find compute id
+    let computedId: ID = !sandbox && newKind.name !== "function" ? ids.length : "_";
+    if (!sandbox) {
+      for (let i = 0; i < ids.length - 1; i++) {
+          if (ids[i] as number + 1 !== ids[i + 1]) {
+              computedId = ids[i] as number + 1 ;
+          }
+        }
+    }
 
       const newElement: CanvasElement = {
         boxId: newBoxId,
@@ -125,17 +190,21 @@ export default function Canvas({
         x: coords.x,
         y: coords.y,
       };
-
-      return [...prev, newElement];
+      const updated = [...prev, newElement];
+      updated.sort((a, b) => (a.boxId as number) - (b.boxId as number));
+      return updated;
     });
   };
 
   /* -------------- Update element after editor save -------------- */
-  const saveElement = (updatedId: ID, updatedKind: BoxType) => {
-    if (!selected) return;
+  const saveElement = (
+    boxId: number,
+    updatedId: ID,
+    updatedKind: BoxType
+  ) => {
     setElements((prev) =>
       prev.map((el) =>
-        el.boxId === selected.boxId
+        el.boxId === boxId
           ? { ...el, id: updatedId, kind: updatedKind }
           : el
       )
@@ -143,10 +212,19 @@ export default function Canvas({
   };
 
   /* ----------------------- Remove element ----------------------- */
-  const removeElement = () => {
-    if (!selected) return;
-    setElements((prev) => prev.filter((el) => el.boxId !== selected.boxId));
-    setSelected(null);
+  const removeElement = (boxId: number) => {
+    setElements((prev) => prev.filter((el) => el.boxId !== boxId));
+    setOpenBoxEditors((prev) => prev.filter((el) => el.boxId !== boxId));
+    setSelected((prev) => (prev && prev.boxId === boxId ? null : prev))
+  };
+
+  const openElement = (canvasElement: CanvasElement) => {
+    setOpenBoxEditors((prev) =>
+      prev.some((el) => el.boxId === canvasElement.boxId)
+        ? prev
+        : [...prev, canvasElement]
+    );
+    setSelected(canvasElement);  
   };
 
   return (
@@ -167,47 +245,45 @@ export default function Canvas({
               <CanvasBox
                 key={el.boxId}
                 element={el}
-                openInterface={() => setSelected(el)}
+                openInterface={() => openElement(el)}
                 updatePosition={makePositionUpdater(el.boxId)}
               />
             ))}
           </g>
         </svg>
 
-        {/* === Download Button Overlayed === */}
+        {/* === Download & Submit Buttons === */}
         <DownloadJsonButton elements={elements} />
         <SubmitButton elements={elements} />
       </div>
 
-      {/* === Floating Box Editor Panel === */}
-      {selected && (
-        <Draggable
-          nodeRef={dragRef as React.RefObject<HTMLElement>}
-          handle=".drag-handle"
-          defaultPosition={{
-            x: typeof window !== "undefined" ? window.innerWidth / 4 : 0,
-            y: typeof window !== "undefined" ? window.innerHeight / 4 : 0,
-          }}
-        >
-          <div ref={dragRef} className={styles.editorContainer}>
-            {(() => {
-              const Editor = editorMap[selected.kind.name];
-              return (
-                <Editor
-                  metadata={selected}
-                  onSave={saveElement}
-                  onRemove={removeElement}
-                  onClose={() => setSelected(null)}
-                  ids={ids}
-                  addId={addId}
-                  removeId={removeId}
-                  sandbox={sandbox}
-                />
-              );
-            })()}
-          </div>
-        </Draggable>
-      )}
+      {/* === Floating Box Editor Panels === */}
+      {openBoxEditors.map(el => {
+  const Editor = editorMap[el.kind.name];
+
+  return (
+    <FloatingEditor
+      key={el.boxId}
+      element={el}
+      Editor={Editor}
+      defaultPos={{
+        x: typeof window !== "undefined" ? window.innerWidth / 4 : 0,
+        y: typeof window !== "undefined" ? window.innerHeight / 4 : 0,
+      }}
+      onSelect={() => setSelected(el)}
+      onSave={(id, kind) => saveElement(el.boxId, id, kind)}
+      onRemove={() => removeElement(el.boxId)}
+      onClose={() => {
+        setOpenBoxEditors(prev => prev.filter(e => e.boxId !== el.boxId));
+        setSelected(prev => (prev && prev.boxId === el.boxId ? null : prev));
+      }}
+      ids={ids}
+      addId={addId}
+      removeId={removeId}
+      sandbox={sandbox}
+    />
+  );
+})}
     </>
   );
 }

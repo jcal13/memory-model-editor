@@ -14,7 +14,7 @@ export default function MemoryModelEditor({
 }) {
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [jsonView, setJsonView] = useState<string>("");
-  const [ids, setIds] = useState<ID[]>([]);
+  const [ids, setIds] = useState<number[]>([]);
   const [sandboxMode, setSandboxMode] = useState<boolean>(sandbox);
 
   // width state for placeholder panel
@@ -48,8 +48,15 @@ export default function MemoryModelEditor({
     setJsonView(JSON.stringify(snapshot, null, 2));
   };
 
-  const addId = (id: ID) =>
-    setIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+  const addId = (id: number) =>
+    setIds(prev => {
+      if (prev.includes(id)) return prev;          
+
+      const insertAt = prev.findIndex(x => x > id);
+      return insertAt === -1
+        ? [...prev, id]                           
+        : [...prev.slice(0, insertAt), id, ...prev.slice(insertAt)];
+    });
   const removeId = (id: ID) => setIds((prev) => prev.filter((v) => v !== id));
 
   useEffect(() => {

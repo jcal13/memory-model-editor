@@ -31,16 +31,15 @@ export default function IdSelector({
   editable,
   sandbox,
 }: Props) {
-  const [open, setOpen]   = useState(false);
-  const [list, setList]   = useState<ID[]>(ids);
+  const [open, setOpen] = useState(false);
+  const [list, setList] = useState<ID[]>(ids);
   useIdListSync(ids, setList);
 
-  const panelRef  = usePanelRef();
+  const panelRef = usePanelRef();
   const closeSelf = useCallback(() => setOpen(false), []);
 
-
   useSinglePanelRegistry(open, closeSelf);
-  
+
   if (!editable) {
     return (
       <div data-testid="id-selector-panel">
@@ -51,16 +50,15 @@ export default function IdSelector({
     );
   }
 
-
-  const toggleOpen  = () => setOpen((v) => !v);
-  const handleAdd   = (id: ID) => {
+  const toggleOpen = () => setOpen((v) => !v);
+  const handleAdd = (id: ID) => {
     if (!list.includes(id)) {
-      setList(prev => [...prev, id]);
+      setList((prev) => [...prev, id]);
       onAdd?.(id);
     }
   };
-  const handleRemove = (id: ID) => { 
-    setList(prev => prev.filter(v => v !== id));
+  const handleRemove = (id: ID) => {
+    setList((prev) => prev.filter((v) => v !== id));
     onRemove?.(id);
   };
   const handleSelect = (id: ID) => {
@@ -73,7 +71,7 @@ export default function IdSelector({
       <button
         type="button"
         onClick={toggleOpen}
-        className={buttonClassName}
+        className={`${buttonClassName} ${open ? styles.activeOutline : ""}`.trim()}
       >
         {currentId != null ? `ID ${currentId}` : "ID _"}
       </button>
@@ -83,7 +81,7 @@ export default function IdSelector({
           <Draggable
             nodeRef={panelRef as unknown as React.RefObject<HTMLElement>}
             defaultPosition={{ x: 150, y: 150 }}
-            onStart={e => e.stopPropagation()}
+            onStart={(e) => e.stopPropagation()}
           >
             <div
               ref={panelRef}

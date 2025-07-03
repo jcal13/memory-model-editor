@@ -54,7 +54,9 @@ const IdSelectorPanel: React.FC<Props> = ({
   };
 
   return (
-    <div className={`${boxStyles.boxEditorModule} ${panelStyles.panelShell}`}>
+    <div
+      className={`${boxStyles.boxEditorModule} ${panelStyles.panelShell} ${panelStyles.activeOutline}`}
+    >
       <div className={`drag-handle ${panelStyles.header}`}>Select ID</div>
 
       <div className={panelStyles.content}>

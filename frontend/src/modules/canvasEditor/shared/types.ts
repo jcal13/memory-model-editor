@@ -59,6 +59,11 @@ export interface CanvasElement {
   kind: BoxType;
 }
 
+export type SubmissionResult = {
+  correct: boolean;
+  errors: string[];
+}
+
 
 export type ID = number | "_";
 

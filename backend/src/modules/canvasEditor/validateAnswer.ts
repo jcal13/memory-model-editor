@@ -461,7 +461,7 @@ export default function validateAnswer(userModel: MemoryBox[]): {
   correct: boolean;
   errors: string[];
 } {
-  const answerModel = questions[15].answer; // adjust index as needed
+  const answerModel = questions[1].answer; // adjust index as needed
   const errors: string[] = [];
 
   // gather frames from both models

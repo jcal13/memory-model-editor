@@ -252,9 +252,6 @@ export default function Canvas({
           </g>
         </svg>
 
-        {/* === Download & Submit Buttons === */}
-        <DownloadJsonButton elements={elements} />
-        <SubmitButton elements={elements} />
       </div>
 
       {/* === Floating Box Editor Panels === */}

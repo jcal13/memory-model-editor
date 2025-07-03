@@ -3,9 +3,10 @@ import Canvas from "./canvas/Canvas";
 import Palette from "./palette/Palette";
 import ConfirmationModal from "./confirmationModal/confirmationModal";
 import styles from "./styles/MemoryModelEditor.module.css";
-import { CanvasElement } from "./shared/types";
-import { buildJSONFromElements } from "./jsonConversion/jsonBuilder";
-import { ID } from "./shared/types";
+import { CanvasElement, ID, SubmissionResult } from "./shared/types";
+import SubmitButton from "./canvas/components/SubmitButton";
+import DownloadJsonButton from "./canvas/components/DownloadJsonButton";
+import { submitCanvas } from "./services/questionValidationServices";
 
 export default function MemoryModelEditor({
   sandbox = true,
@@ -16,6 +17,7 @@ export default function MemoryModelEditor({
   const [jsonView, setJsonView] = useState<string>("");
   const [ids, setIds] = useState<number[]>([]);
   const [sandboxMode, setSandboxMode] = useState<boolean>(sandbox);
+  const [submissionResults, setSubmissionResults] = useState<SubmissionResult[]>([])
 
   // width state for placeholder panel
   const [placeholderWidth, setPlaceholderWidth] = useState<number>(300);
@@ -31,6 +33,7 @@ export default function MemoryModelEditor({
     setElements([]);
     setIds([]);
     setJsonView("");
+    setSubmissionResults([]);
   };
 
   const handleToggleSandbox = (): void => setShowConfirm(true);
@@ -43,10 +46,15 @@ export default function MemoryModelEditor({
 
   const cancelClear = (): void => setShowConfirm(false);
 
-  const showJson = (): void => {
-    const snapshot = buildJSONFromElements(elements);
-    setJsonView(JSON.stringify(snapshot, null, 2));
-  };
+  const handleSubmit = async () => {
+    try {
+      const res = await submitCanvas(elements)
+      setSubmissionResults(res);
+      console.log('Backend response:', res)
+    } catch (error) {
+      console.error('Error sending to backend:', error)
+    }
+  }
 
   const addId = (id: number) =>
     setIds(prev => {
@@ -98,6 +106,9 @@ export default function MemoryModelEditor({
               removeId={removeId}
               sandbox={sandboxMode}
             />
+            {/* === Download & Submit Buttons === */}
+            <DownloadJsonButton elements={elements} />
+            <SubmitButton onClick={handleSubmit}/>
           </div>
 
           <label className={styles.switchWrapper}>
@@ -112,10 +123,6 @@ export default function MemoryModelEditor({
             />
             <span className={styles.switchSlider}></span>
           </label>
-
-          {/* <button className={styles.jsonButton} onClick={showJson}>
-            Show JSON
-          </button> */}
 
           {jsonView && <pre className={styles.jsonView}>{jsonView}</pre>}
         </div>

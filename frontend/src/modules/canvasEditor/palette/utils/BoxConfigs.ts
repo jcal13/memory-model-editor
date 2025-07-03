@@ -67,4 +67,11 @@ export const BoxConfigs = {
     minHeight: 200,
     minWidth: 190,
   },
+  class: {
+    draw: (model: any) => {
+      model.drawClass(5, 5, "class", 0, {}, false, style);
+    },
+    minHeight: 90,
+    minWidth: 190,
+  }
 };

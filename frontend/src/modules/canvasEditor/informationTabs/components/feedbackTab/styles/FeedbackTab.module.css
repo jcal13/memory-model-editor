@@ -1,0 +1,28 @@
+.content {
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #374151;         
+  white-space: pre-wrap;
+}
+
+
+.correct {
+  color: #16a34a;         
+  font-weight: 600;
+}
+
+.incorrect {
+  color: #dc2626;         
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.errorList {
+  margin: 0;
+  padding-left: 1.25rem;   
+}
+
+.errorItem {
+  margin-bottom: 4px;
+}

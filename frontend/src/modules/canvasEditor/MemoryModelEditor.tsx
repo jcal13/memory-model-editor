@@ -18,12 +18,10 @@ export default function MemoryModelEditor({
   const [jsonView, setJsonView] = useState<string>("");
   const [ids, setIds] = useState<number[]>([]);
   const [sandboxMode, setSandboxMode] = useState<boolean>(sandbox);
-  const [submissionResults, setSubmissionResults] = useState<SubmissionResult[]>(
-    []
-  );
+  const [submissionResults, setSubmissionResults] = useState<SubmissionResult>(null);
 
   // width state for placeholder panel
-  const [placeholderWidth, setPlaceholderWidth] = useState<number>(300);
+  const [placeholderWidth, setPlaceholderWidth] = useState<number>(500);
   const [isResizing, setIsResizing] = useState<boolean>(false);
 
   // simple modal toggle
@@ -36,7 +34,7 @@ export default function MemoryModelEditor({
     setElements([]);
     setIds([]);
     setJsonView("");
-    setSubmissionResults([]);
+    setSubmissionResults(null);
   };
 
   const handleToggleSandbox = (): void => setShowConfirm(true);
@@ -136,7 +134,6 @@ export default function MemoryModelEditor({
         >
           <InformationTabs
             submissionResults={submissionResults}
-            sandboxMode={sandboxMode}
           />
           <div
             className={styles.resizeHandle}

@@ -16,10 +16,8 @@ type Tab = "feedback" | "question";
 
 export default function InformationTabs({
   submissionResults,
-  sandboxMode,
 }: {
-  submissionResults: SubmissionResult[];
-  sandboxMode: boolean;
+  submissionResults: SubmissionResult;
 }) {
   const [active, setActive] = useState<Tab>("question");
 
@@ -43,7 +41,7 @@ export default function InformationTabs({
 
         <div className={styles.tabBody}>
           {active === "feedback" ? (
-            <FeedbackTab />
+            <FeedbackTab submissionResults={submissionResults}/>
           ) : (
             <QuestionTab />
           )}

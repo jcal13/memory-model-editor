@@ -3,10 +3,11 @@ import Canvas from "./canvas/Canvas";
 import Palette from "./palette/Palette";
 import ConfirmationModal from "./confirmationModal/confirmationModal";
 import styles from "./styles/MemoryModelEditor.module.css";
-import { CanvasElement, ID, SubmissionResult } from "./shared/types";
+import { CanvasElement, ID, SubmissionResult, Tab} from "./shared/types";
 import SubmitButton from "./canvas/components/SubmitButton";
 import DownloadJsonButton from "./canvas/components/DownloadJsonButton";
 import { submitCanvas } from "./services/questionValidationServices";
+import InformationTabs from "./informationTabs/InformationTabs";
 
 export default function MemoryModelEditor({
   sandbox = true,
@@ -17,10 +18,11 @@ export default function MemoryModelEditor({
   const [jsonView, setJsonView] = useState<string>("");
   const [ids, setIds] = useState<number[]>([]);
   const [sandboxMode, setSandboxMode] = useState<boolean>(sandbox);
-  const [submissionResults, setSubmissionResults] = useState<SubmissionResult[]>([])
+  const [submissionResults, setSubmissionResults] = useState<SubmissionResult>(null);
+  const [activeTab, setActiveTab] = useState<Tab>("question")
 
   // width state for placeholder panel
-  const [placeholderWidth, setPlaceholderWidth] = useState<number>(300);
+  const [placeholderWidth, setPlaceholderWidth] = useState<number>(500);
   const [isResizing, setIsResizing] = useState<boolean>(false);
 
   // simple modal toggle
@@ -33,7 +35,7 @@ export default function MemoryModelEditor({
     setElements([]);
     setIds([]);
     setJsonView("");
-    setSubmissionResults([]);
+    setSubmissionResults(null);
   };
 
   const handleToggleSandbox = (): void => setShowConfirm(true);
@@ -48,21 +50,22 @@ export default function MemoryModelEditor({
 
   const handleSubmit = async () => {
     try {
-      const res = await submitCanvas(elements)
+      const res = await submitCanvas(elements);
       setSubmissionResults(res);
-      console.log('Backend response:', res)
+      console.log("Backend response:", res);
+      setActiveTab("feedback")
     } catch (error) {
-      console.error('Error sending to backend:', error)
+      console.error("Error sending to backend:", error);
     }
-  }
+  };
 
   const addId = (id: number) =>
-    setIds(prev => {
-      if (prev.includes(id)) return prev;          
+    setIds((prev) => {
+      if (prev.includes(id)) return prev;
 
-      const insertAt = prev.findIndex(x => x > id);
+      const insertAt = prev.findIndex((x) => x > id);
       return insertAt === -1
-        ? [...prev, id]                           
+        ? [...prev, id]
         : [...prev.slice(0, insertAt), id, ...prev.slice(insertAt)];
     });
   const removeId = (id: ID) => setIds((prev) => prev.filter((v) => v !== id));
@@ -108,7 +111,7 @@ export default function MemoryModelEditor({
             />
             {/* === Download & Submit Buttons === */}
             <DownloadJsonButton elements={elements} />
-            <SubmitButton onClick={handleSubmit}/>
+            <SubmitButton onClick={handleSubmit} />
           </div>
 
           <label className={styles.switchWrapper}>
@@ -131,7 +134,11 @@ export default function MemoryModelEditor({
           className={styles.placeholder}
           style={{ width: `${placeholderWidth}px` }}
         >
-          Placeholder
+          <InformationTabs
+            submissionResults={submissionResults}
+            activeTab={activeTab}
+            setActive={setActiveTab}
+          />
           <div
             className={styles.resizeHandle}
             onMouseDown={() => setIsResizing(true)}

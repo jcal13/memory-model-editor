@@ -59,11 +59,7 @@ export interface CanvasElement {
   kind: BoxType;
 }
 
-export type SubmissionResult = {
-  correct: boolean;
-  errors: string[];
-}
-
+export type SubmissionResult = { correct: boolean; errors: string[] } | null;
 
 export type ID = number | "_";
 
@@ -77,3 +73,6 @@ export interface BoxEditorType {
   removeId: (id: ID) => void;
   sandbox?: boolean;
 }
+
+
+export type Tab = "feedback" | "question";

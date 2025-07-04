@@ -10,7 +10,9 @@ export default function FeedbackTab({ submissionResults }: Props) {
     return (
       <>
         <h1 className={styles.title}>Feedback</h1>
-        <div className={styles.content}>No submission yet.</div>
+        <div className={styles.content}>
+          <p className={styles.correctnessMessage}>No submission yet</p>
+        </div>
       </>
     );
   }

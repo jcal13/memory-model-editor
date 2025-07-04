@@ -7,26 +7,57 @@ interface Props {
 
 export default function FeedbackTab({ submissionResults }: Props) {
   if (!submissionResults) {
-    return <div className={styles.content}>No submission yet.</div>;
+    return (
+      <>
+        <h1 className={styles.title}>Feedback</h1>
+        <div className={styles.content}>
+          <p className={styles.correctnessMessage}>No submission yet</p>
+        </div>
+      </>
+    );
   }
 
   if (submissionResults.correct) {
     return (
-      <div className={`${styles.content} ${styles.correct}`}>
-        Correct!
-      </div>
+      <>
+        <h1 className={styles.title}>Feedback</h1>
+        <div className={styles.content}>
+          <p className={styles.correctnessMessage}>
+            Your answer is: <span className={styles.correct}>correct!</span>
+          </p>
+        </div>
+      </>
     );
   }
 
   return (
     <div className={styles.content}>
-      <p className={styles.incorrect}>Incorrect – see errors below:</p>
+      <h1 className={styles.title}>Feedback</h1>
+      <p className={styles.correctnessMessage}>
+        Your answer is: <span className={styles.incorrect}>incorrect</span>
+      </p>
+      <h2 className={styles.errorsHeading}>Errors:</h2>
       <ul className={styles.errorList}>
-        {submissionResults.errors.map((err, i) => (
-          <li key={i} className={styles.errorItem}>
-            {err}
-          </li>
-        ))}
+        {submissionResults.errors.map((err, i) => {
+          const colonIndex = err.indexOf(":");
+
+          if (colonIndex === -1) {
+            return (
+              <li key={i} className={styles.errorItem}>
+                {err}
+              </li>
+            );
+          }
+
+          const before = err.slice(0, colonIndex);
+          const after = err.slice(colonIndex + 1);
+
+          return (
+            <li key={i} className={styles.errorItem}>
+              <strong>{before}</strong>: {after.trim()}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

@@ -73,3 +73,6 @@ export interface BoxEditorType {
   removeId: (id: ID) => void;
   sandbox?: boolean;
 }
+
+
+export type Tab = "feedback" | "question";

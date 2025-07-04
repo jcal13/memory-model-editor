@@ -3,6 +3,7 @@ import styles from "./styles/InformationTabs.module.css";
 import FeedbackTab from "./components/feedbackTab/FeedbackTab";
 import QuestionTab from "./components/questionTab/QuestionTab";
 import { SubmissionResult } from "../shared/types";
+import { Tab } from "../shared/types";
 
 /**
  * InformationTabs renders two pill‑style tabs:
@@ -12,19 +13,19 @@ import { SubmissionResult } from "../shared/types";
  * Each tab is its own component so we can grow their UI independently.
  */
 
-type Tab = "feedback" | "question";
-
 export default function InformationTabs({
   submissionResults,
+  activeTab,
+  setActive,
 }: {
   submissionResults: SubmissionResult;
+  activeTab: Tab;
+  setActive: (tab: Tab) => void;
 }) {
-  const [active, setActive] = useState<Tab>("question");
-
   const renderTabButton = (tab: Tab, label: string) => (
     <button
       type="button"
-      className={`${styles.tabBtn} ${active === tab ? styles.active : ""}`}
+      className={`${styles.tabBtn} ${activeTab === tab ? styles.active : ""}`}
       onClick={() => setActive(tab)}
     >
       {label}
@@ -40,7 +41,7 @@ export default function InformationTabs({
         </div>
 
         <div className={styles.tabBody}>
-          {active === "feedback" ? (
+          {activeTab === "feedback" ? (
             <FeedbackTab submissionResults={submissionResults}/>
           ) : (
             <QuestionTab />

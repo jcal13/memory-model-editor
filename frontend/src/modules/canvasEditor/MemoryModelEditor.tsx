@@ -3,7 +3,7 @@ import Canvas from "./canvas/Canvas";
 import Palette from "./palette/Palette";
 import ConfirmationModal from "./confirmationModal/confirmationModal";
 import styles from "./styles/MemoryModelEditor.module.css";
-import { CanvasElement, ID, SubmissionResult } from "./shared/types";
+import { CanvasElement, ID, SubmissionResult, Tab} from "./shared/types";
 import SubmitButton from "./canvas/components/SubmitButton";
 import DownloadJsonButton from "./canvas/components/DownloadJsonButton";
 import { submitCanvas } from "./services/questionValidationServices";
@@ -19,6 +19,7 @@ export default function MemoryModelEditor({
   const [ids, setIds] = useState<number[]>([]);
   const [sandboxMode, setSandboxMode] = useState<boolean>(sandbox);
   const [submissionResults, setSubmissionResults] = useState<SubmissionResult>(null);
+  const [activeTab, setActiveTab] = useState<Tab>("question")
 
   // width state for placeholder panel
   const [placeholderWidth, setPlaceholderWidth] = useState<number>(500);
@@ -52,6 +53,7 @@ export default function MemoryModelEditor({
       const res = await submitCanvas(elements);
       setSubmissionResults(res);
       console.log("Backend response:", res);
+      setActiveTab("feedback")
     } catch (error) {
       console.error("Error sending to backend:", error);
     }
@@ -134,6 +136,8 @@ export default function MemoryModelEditor({
         >
           <InformationTabs
             submissionResults={submissionResults}
+            activeTab={activeTab}
+            setActive={setActiveTab}
           />
           <div
             className={styles.resizeHandle}

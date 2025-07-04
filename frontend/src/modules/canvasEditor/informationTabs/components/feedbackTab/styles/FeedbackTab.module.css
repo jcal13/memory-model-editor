@@ -1,6 +1,7 @@
 .content {
   text-align: left;
   font-style: normal;
+  color: #1f2937;
 }
 
 .correct {
@@ -34,4 +35,17 @@
   padding: 8px 0;
   background-color: #f3f4f6;
   font-style: normal;
+}
+
+.errorsHeading {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1f2937;
+  font-style: normal;
+}
+
+.correctnessMessage {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #1f2937;
 }

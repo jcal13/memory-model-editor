@@ -10,10 +10,9 @@
   overflow: auto;
   scrollbar-width: thin;
   scrollbar-color: #d1d5db transparent;
-  
+
   padding: 0;
 }
-
 
 .container::-webkit-scrollbar {
   width: 8px;
@@ -26,40 +25,39 @@
   border-radius: 8px;
 }
 
-
 .tabHeaders {
   display: flex;
-  gap: 0.25rem;                     
-  margin-bottom: -1px;                                              
-  padding: 0 0 0;          
+  gap: 0.25rem;
+  margin-bottom: -1px;
+  padding: 0 0 0;
 }
 
 .tabBtn {
-  all: unset;                         
+  all: unset;
   cursor: pointer;
-  position: relative;                
+  position: relative;
   padding: 6px 16px;
   font-weight: 600;
   font-size: 0.925rem;
   border: 1px solid #d1d5db;
-  border-bottom: none;                
-  border-radius: 8px 8px 0 0;        
-  background: #cfeafc;              
-  color: #1e3a8a;                     
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  background: #cfeafc;
+  color: #1e3a8a;
   transition: background 120ms ease;
+  font-style: normal;
 }
 .tabBtn:hover {
-  background: #b7dcff;               
+  background: #b7dcff;
 }
 .active {
-  background: #ffffff;             
-  color: #0f172a;                   
-  z-index: 2;                     
+  background: #ffffff;
+  color: #0f172a;
+  z-index: 2;
 }
 
-
 .content {
-  flex: 1;                  
+  flex: 1;
   font-size: 0.85rem;
   color: #374151;
   white-space: pre-wrap;
@@ -67,23 +65,23 @@
   overflow-x: auto;
 }
 
-
 .containerWrapper {
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding: 16px 10px;
   width: 100%;
-  height: 100vh; 
-  background-color: #f3f4f6; 
+  height: 100vh;
+  background-color: #f3f4f6;
   box-sizing: border-box;
 }
 
 .tabBody {
-  background: #ffffff;               
+  background: #ffffff;
   border: 1px solid #d1d5db;
 
   border-radius: 0px 8px 8px 8px;
   height: 100vh;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  padding: 20px 30px;
 }

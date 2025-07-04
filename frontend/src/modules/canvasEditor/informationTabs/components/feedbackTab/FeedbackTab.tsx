@@ -7,20 +7,36 @@ interface Props {
 
 export default function FeedbackTab({ submissionResults }: Props) {
   if (!submissionResults) {
-    return <div className={styles.content}>No submission yet.</div>;
+    return (
+      <>
+        <h1 className={styles.title}>Feedback</h1>
+        <div className={styles.content}>No submission yet.</div>
+      </>
+    );
   }
 
   if (submissionResults.correct) {
     return (
-      <div className={`${styles.content} ${styles.correct}`}>
-        Correct!
-      </div>
+      <>
+        <h1 className={styles.title}>Feedback</h1>
+        <div className={styles.content}>
+          <p>
+            Your answer is: <span className={styles.correct}>correct!</span>
+          </p>
+        </div>
+      </>
     );
   }
 
   return (
     <div className={styles.content}>
-      <p className={styles.incorrect}>Incorrect – see errors below:</p>
+      <h1 className={styles.title}>Feedback</h1>
+      <p>
+        Your answer is: <span className={styles.incorrect}>incorrect</span>
+      </p>
+      <p>
+        <strong>Errors:</strong>
+      </p>
       <ul className={styles.errorList}>
         {submissionResults.errors.map((err, i) => (
           <li key={i} className={styles.errorItem}>

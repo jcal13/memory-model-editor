@@ -136,7 +136,7 @@ export default function Canvas({
           name: "function",
           type: "function",
           value: null,
-          functionName: "__name__",
+          functionName: "__main__",
           params: [],
         };
         break;

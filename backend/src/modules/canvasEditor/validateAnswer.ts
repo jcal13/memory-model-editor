@@ -248,9 +248,9 @@ function gatherFrames(
   const usrByName = new Map(inputFrames.map((f) => [f.name!, f]));
 
   for (const n of ansByName.keys())
-    if (!usrByName.has(n)) errors.push(`Missing function "${n}"`);
+    if (!usrByName.has(n)) errors.push(`Missing function: "${n}"`);
   for (const n of usrByName.keys())
-    if (!ansByName.has(n)) errors.push(`Unexpected function "${n}"`);
+    if (!ansByName.has(n)) errors.push(`Unexpected function: "${n}"`);
 
   return { answerFrames, inputFrames, ansByName, usrByName };
 }
@@ -264,7 +264,7 @@ function scanDuplicates(model: MemoryBox[], errors: string[]): Set<number> {
       if (seen[e.id]) dup.add(e.id);
       else seen[e.id] = true;
     }
-  dup.forEach((id) => errors.push(`duplicate ID: ${id}`));
+  dup.forEach((id) => errors.push(`Duplicate ID: ${id}`));
   return dup;
 }
 

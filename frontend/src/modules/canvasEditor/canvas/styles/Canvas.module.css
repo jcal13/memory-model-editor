@@ -16,8 +16,8 @@
 
 .canvasInner {
   position: relative;
-  width: 1000px;      /* Explicit width */
-  height: 700px;      /* Explicit height */
+  width: 1000px; /* Explicit width */
+  height: 700px; /* Explicit height */
   background-color: white;
   border: 1px solid white;
   border-radius: 8px;
@@ -57,7 +57,7 @@
   left: 35px;
   z-index: 9999;
   padding: 10px 10px;
-  background-color: #38bbf8  ;
+  background-color: #38bbf8;
   color: white;
   border: none;
   border-radius: 8px;
@@ -90,6 +90,5 @@
 
 .submitButton:hover,
 .submitButton:active {
-  background-color: #059669; 
-
+  background-color: #059669;
 }

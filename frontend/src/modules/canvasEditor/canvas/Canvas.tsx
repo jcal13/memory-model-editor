@@ -6,8 +6,7 @@ import BoxEditor from "../boxEditors/BoxEditor";
 import { useCanvasResize } from "./hooks/useEffect";
 import { useCanvasRefs } from "./hooks/useRef";
 import styles from "./styles/Canvas.module.css";
-import DownloadJsonButton from "./components/DownloadJsonButton";
-import SubmitButton from "./components/SubmitButton";
+import CallStack from "./components/CallStack";
 
 /* =======================================
    === Box Editor Mapping by Type Name ===
@@ -30,6 +29,7 @@ interface Props {
   sandbox?: boolean;
 }
 
+/* ========== Floating (draggable) editor wrapper ========== */
 function FloatingEditor({
   element,
   Editor,
@@ -80,9 +80,7 @@ function FloatingEditor({
   );
 }
 
-/* =======================================
-   === Main Canvas Component ===
-======================================= */
+/* ================ Main Canvas Component ================ */
 export default function Canvas({
   elements,
   setElements,
@@ -98,30 +96,29 @@ export default function Canvas({
 
   useCanvasResize(svgRef, setViewBox);
 
-  /* ---------------- Sync ids <-> elements (non-function only) ---------------- */
+  /* ---- Keep numeric IDs in sync when not sandboxed ---- */
   useEffect(() => {
     if (sandbox) return;
 
-    // Only numeric IDs coming from non-function boxes
     const elementIds = elements
       .filter((el) => el.kind.name !== "function" && typeof el.id === "number")
       .map((el) => el.id);
 
-    // Newly added IDs
-    elementIds.filter((id) => !ids.includes(id as number)).forEach((id) => addId(id as number));
+    elementIds
+      .filter((id) => !ids.includes(id as number))
+      .forEach((id) => addId(id as number));
 
-    // Removed IDs
     ids.filter((id) => !elementIds.includes(id)).forEach((id) => removeId(id));
   }, [elements, ids, sandbox, addId, removeId]);
 
-  /* ---------- Utility: updater for a specific box’s position ---------- */
+  /* ---------- Position updater for a specific box ---------- */
   const makePositionUpdater = (boxId: number) => (x: number, y: number) => {
     setElements((prev) =>
       prev.map((el) => (el.boxId === boxId ? { ...el, x, y } : el))
     );
   };
 
-  /* --------------------- Handle Drag-and-Drop creation --------------------- */
+  /* ---------------- Handle Drag-and-Drop creation ---------------- */
   const handleDrop = (e: React.DragEvent<SVGSVGElement>) => {
     e.preventDefault();
     const payload = e.dataTransfer.getData("application/box-type");
@@ -164,24 +161,26 @@ export default function Canvas({
     );
 
     setElements((prev) => {
-    // find box id
-    let newBoxId = prev.length;
-    for (let i = 0; i < prev.length - 1; i++) {
-      if (prev[i].boxId as number + 1 !== prev[i + 1].boxId) {
-        newBoxId = prev[i].boxId as number + 1;
+      /* --- choose next available boxId --- */
+      let newBoxId = prev.length;
+      for (let i = 0; i < prev.length - 1; i++) {
+        if ((prev[i].boxId as number) + 1 !== prev[i + 1].boxId) {
+          newBoxId = (prev[i].boxId as number) + 1;
+          break;
+        }
       }
-    }
-    
 
-    // find compute id
-    let computedId: ID = !sandbox && newKind.name !== "function" ? ids.length : "_";
-    if (!sandbox) {
-      for (let i = 0; i < ids.length - 1; i++) {
-          if (ids[i] as number + 1 !== ids[i + 1]) {
-              computedId = ids[i] as number + 1 ;
+      /* --- choose next available numeric id (when required) --- */
+      let computedId: ID =
+        !sandbox && newKind.name !== "function" ? ids.length : "_";
+      if (!sandbox) {
+        for (let i = 0; i < ids.length - 1; i++) {
+          if ((ids[i] as number) + 1 !== ids[i + 1]) {
+            computedId = (ids[i] as number) + 1;
+            break;
           }
         }
-    }
+      }
 
       const newElement: CanvasElement = {
         boxId: newBoxId,
@@ -196,26 +195,19 @@ export default function Canvas({
     });
   };
 
-  /* -------------- Update element after editor save -------------- */
-  const saveElement = (
-    boxId: number,
-    updatedId: ID,
-    updatedKind: BoxType
-  ) => {
+  /* -------------- Save / remove / open element helpers -------------- */
+  const saveElement = (boxId: number, updatedId: ID, updatedKind: BoxType) => {
     setElements((prev) =>
       prev.map((el) =>
-        el.boxId === boxId
-          ? { ...el, id: updatedId, kind: updatedKind }
-          : el
+        el.boxId === boxId ? { ...el, id: updatedId, kind: updatedKind } : el
       )
     );
   };
 
-  /* ----------------------- Remove element ----------------------- */
   const removeElement = (boxId: number) => {
     setElements((prev) => prev.filter((el) => el.boxId !== boxId));
     setOpenBoxEditors((prev) => prev.filter((el) => el.boxId !== boxId));
-    setSelected((prev) => (prev && prev.boxId === boxId ? null : prev))
+    setSelected((prev) => (prev && prev.boxId === boxId ? null : prev));
   };
 
   const openElement = (canvasElement: CanvasElement) => {
@@ -224,12 +216,15 @@ export default function Canvas({
         ? prev
         : [...prev, canvasElement]
     );
-    setSelected(canvasElement);  
+    setSelected(canvasElement);
   };
 
+  /* --------------- Derive frames for the call stack --------------- */
+  const functionFrames = elements.filter((el) => el.kind.name === "function");
+
+  /* ======================== Render ======================== */
   return (
     <>
-      {/* === SVG Canvas === */}
       <div className={styles.canvasWrapper}>
         <svg
           data-testid="canvas"
@@ -240,47 +235,61 @@ export default function Canvas({
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
+          {/* In-canvas call-stack column */}
+          <CallStack
+            frames={functionFrames}
+            selected={
+              selected && selected.kind.name === "function" ? selected : null
+            }
+            onSelect={openElement}
+          />
+
+          {/* User-placed boxes */}
           <g>
-            {elements.map((el) => (
-              <CanvasBox
-                key={el.boxId}
-                element={el}
-                openInterface={() => openElement(el)}
-                updatePosition={makePositionUpdater(el.boxId)}
-              />
-            ))}
+            {elements
+              .filter((el) => el.kind.name !== "function") // ← NEW
+              .map((el) => (
+                <CanvasBox
+                  key={el.boxId}
+                  element={el}
+                  openInterface={() => openElement(el)}
+                  updatePosition={makePositionUpdater(el.boxId)}
+                />
+              ))}
           </g>
         </svg>
-
       </div>
 
-      {/* === Floating Box Editor Panels === */}
-      {openBoxEditors.map(el => {
-  const Editor = editorMap[el.kind.name];
-
-  return (
-    <FloatingEditor
-      key={el.boxId}
-      element={el}
-      Editor={Editor}
-      defaultPos={{
-        x: typeof window !== "undefined" ? window.innerWidth / 4 : 0,
-        y: typeof window !== "undefined" ? window.innerHeight / 4 : 0,
-      }}
-      onSelect={() => setSelected(el)}
-      onSave={(id, kind) => saveElement(el.boxId, id, kind)}
-      onRemove={() => removeElement(el.boxId)}
-      onClose={() => {
-        setOpenBoxEditors(prev => prev.filter(e => e.boxId !== el.boxId));
-        setSelected(prev => (prev && prev.boxId === el.boxId ? null : prev));
-      }}
-      ids={ids}
-      addId={addId}
-      removeId={removeId}
-      sandbox={sandbox}
-    />
-  );
-})}
+      {/* Floating Box-Editor Panels */}
+      {openBoxEditors.map((el) => {
+        const Editor = editorMap[el.kind.name];
+        return (
+          <FloatingEditor
+            key={el.boxId}
+            element={el}
+            Editor={Editor}
+            defaultPos={{
+              x: typeof window !== "undefined" ? window.innerWidth / 4 : 0,
+              y: typeof window !== "undefined" ? window.innerHeight / 4 : 0,
+            }}
+            onSelect={() => setSelected(el)}
+            onSave={(id, kind) => saveElement(el.boxId, id, kind)}
+            onRemove={() => removeElement(el.boxId)}
+            onClose={() => {
+              setOpenBoxEditors((prev) =>
+                prev.filter((e) => e.boxId !== el.boxId)
+              );
+              setSelected((prev) =>
+                prev && prev.boxId === el.boxId ? null : prev
+              );
+            }}
+            ids={ids}
+            addId={addId}
+            removeId={removeId}
+            sandbox={sandbox}
+          />
+        );
+      })}
     </>
   );
 }

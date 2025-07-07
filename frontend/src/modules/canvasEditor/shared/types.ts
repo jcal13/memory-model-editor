@@ -74,5 +74,4 @@ export interface BoxEditorType {
   sandbox?: boolean;
 }
 
-
 export type Tab = "feedback" | "question";

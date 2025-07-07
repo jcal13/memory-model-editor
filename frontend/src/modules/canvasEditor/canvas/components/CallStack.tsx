@@ -1,24 +1,23 @@
 import React, {
-  useEffect,
-  useState,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
+  useState,
+  useId,
 } from "react";
 import { CanvasElement } from "../../shared/types";
 import CanvasBox from "./CanvasBox";
 
 const BOX_WIDTH = 200;
-const BOX_HEIGHT = 60;
-const GAP = 31;
+const FALLBACK_H = 60;
+const GAP = 0;
 
 const LABEL_H = 40;
 const TOP_FREE_PAD = 12;
 const BOTTOM_FREE_PAD = 12;
-
 const SEL_PAD_TOP = 25;
 const SEL_PAD_BOTTOM = 20;
-
 const TOP_PAD = TOP_FREE_PAD + SEL_PAD_TOP;
 const BOTTOM_PAD = BOTTOM_FREE_PAD + SEL_PAD_BOTTOM;
 
@@ -35,6 +34,8 @@ interface Props {
   width?: number;
 }
 
+const MemoCanvasBox = React.memo(CanvasBox);
+
 const CallStack: React.FC<Props> = ({
   frames,
   selected,
@@ -43,38 +44,54 @@ const CallStack: React.FC<Props> = ({
   y = 80,
   width = 230,
 }) => {
+  const clipId = useId();
+
   const [viewportH, setViewportH] = useState(
     typeof window !== "undefined" ? window.innerHeight - 110 : 800
   );
-
   useEffect(() => {
-    const handleResize = () => {
-      setViewportH(window.innerHeight - 110);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    const onResize = () => setViewportH(window.innerHeight - 110);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
-
-  const columnHeight = viewportH - y - 10;
-  const visibleWinHeight = columnHeight - LABEL_H - TOP_PAD - BOTTOM_PAD;
 
   const ordered = useMemo(
     () => [...frames].sort((a, b) => (a.boxId as number) - (b.boxId as number)),
     [frames]
   );
 
-  const totalStackHeight = ordered.length
-    ? ordered.length * (BOX_HEIGHT + GAP) - GAP
-    : 0;
+  const [boxHeights, setBoxHeights] = useState<Record<number, number>>({});
+  const handleSizeChange = useCallback((id: number, h: number) => {
+    if (h < 1) return;
+    setBoxHeights((p) => (p[id] === h ? p : { ...p, [id]: h }));
+  }, []);
 
-  const maxScroll = Math.max(0, totalStackHeight - visibleWinHeight);
+  const columnHeight = viewportH - y - 10;
+  const visibleWinHeight = columnHeight - LABEL_H - TOP_PAD - BOTTOM_PAD;
+
+  const layout = useMemo(() => {
+    let offset = 0;
+    const baseY = y + LABEL_H + TOP_PAD + visibleWinHeight - FALLBACK_H / 2;
+    return ordered.map((frame) => {
+      let h = boxHeights[frame.boxId] ?? FALLBACK_H;
+      h = h - 15;
+      const yLocal = baseY - offset - h / 2 + 50;
+      offset += h + GAP;
+      return { frame, yLocal, h };
+    });
+  }, [ordered, boxHeights, y, visibleWinHeight]);
+
+  const totalStackHeight = useMemo(() => {
+    if (!ordered.length) return 0;
+    return layout[0]
+      ? layout.reduce((acc, { h }) => acc + h + GAP - 9, -GAP)
+      : 0;
+  }, [layout]);
+
   const [scrollOffset, setScrollOffset] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
+  const maxScroll = Math.max(0, totalStackHeight - visibleWinHeight);
 
   useEffect(() => {
     setScrollOffset((o) => Math.min(maxScroll, Math.max(0, o)));
@@ -84,15 +101,11 @@ const CallStack: React.FC<Props> = ({
     (e: React.WheelEvent) => {
       if (maxScroll === 0) return;
       e.preventDefault();
-
       const next = scrollOffset - e.deltaY;
       setScrollOffset(Math.min(maxScroll, Math.max(0, next)));
-
       setIsScrolling(true);
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-      scrollTimeoutRef.current = setTimeout(() => {
-        setIsScrolling(false);
-      }, 250);
+      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+      scrollTimeout.current = setTimeout(() => setIsScrolling(false), 250);
     },
     [scrollOffset, maxScroll]
   );
@@ -100,7 +113,6 @@ const CallStack: React.FC<Props> = ({
   const trackX = x + width - TRACK_W - TRACK_INSET;
   const trackY = y + LABEL_H - 5;
   const trackH = TOP_PAD + visibleWinHeight + BOTTOM_PAD;
-
   const thumbH =
     maxScroll === 0
       ? trackH
@@ -134,12 +146,18 @@ const CallStack: React.FC<Props> = ({
   const onThumbUp = (e: React.PointerEvent) => {
     dragging.current = false;
     (e.target as Element).releasePointerCapture(e.pointerId);
-    scrollTimeoutRef.current = setTimeout(() => {
-      setIsScrolling(false);
-    }, 250);
+    scrollTimeout.current = setTimeout(() => setIsScrolling(false), 250);
   };
-  const bottomCenter =
-    y + LABEL_H + TOP_PAD + visibleWinHeight - BOX_HEIGHT / 2;
+
+  const memoElements = useMemo(() => {
+    const map: Record<number, CanvasElement> = {};
+    ordered.forEach((f) => {
+      map[f.boxId] = { ...f, x: 0, y: 0 };
+    });
+    return map;
+  }, [ordered]);
+
+  const H_PAD = BOX_WIDTH / 2;
 
   return (
     <g onWheel={handleWheel}>
@@ -155,13 +173,12 @@ const CallStack: React.FC<Props> = ({
         strokeWidth={1}
         opacity={0.95}
       />
-
       <text
         x={x + width / 2}
         y={y + 30}
         textAnchor="middle"
         fontSize={14}
-        fontWeight="600"
+        fontWeight={600}
         pointerEvents="none"
         style={{
           fontFamily:
@@ -171,52 +188,47 @@ const CallStack: React.FC<Props> = ({
       >
         Call&nbsp;Stack
       </text>
-
-      <clipPath id="callstack-clip">
+      <clipPath id={clipId}>
         <rect
-          x={x}
+          x={x - H_PAD - 50}
           y={y + LABEL_H}
-          width={width}
+          width={width + H_PAD * 2}
           height={TOP_PAD + visibleWinHeight + BOTTOM_PAD}
         />
       </clipPath>
-
-      <g clipPath="url(#callstack-clip)">
-        {ordered.map((frame, idx) => {
-          const yPos = bottomCenter - idx * (BOX_HEIGHT + GAP) + scrollOffset;
-          const isSel = selected?.boxId === frame.boxId;
-          const miniEl: CanvasElement = { ...frame, x: 0, y: 0 };
-
-          return (
-            <g
-              key={frame.boxId}
-              transform={`translate(${x + width / 2}, ${yPos})`}
-              style={{ cursor: "pointer" }}
-            >
-              {isSel && (
-                <rect
-                  x={-(BOX_WIDTH / 2) - 4}
-                  y={-BOX_HEIGHT / 2 - SEL_PAD_TOP}
-                  width={BOX_WIDTH + 5}
-                  height={BOX_HEIGHT + SEL_PAD_TOP + SEL_PAD_BOTTOM + 5}
-                  rx={6}
-                  ry={6}
-                  fill="none"
-                  stroke="#1d4ed8"
-                  strokeWidth={2}
-                />
-              )}
-
-              <CanvasBox
-                element={miniEl}
-                openInterface={() => onSelect(frame)}
-                updatePosition={() => {}}
+      <g
+        clipPath={`url(#${clipId})`}
+        transform={`translate(${x + width / 2}, 0)`}
+      >
+        {layout.map(({ frame, yLocal, h }) => (
+          <g
+            key={frame.boxId}
+            transform={`translate(0, ${yLocal + scrollOffset})`}
+          >
+            {selected?.boxId === frame.boxId && (
+              <rect
+                x={-(BOX_WIDTH / 2) - 4}
+                y={-h / 2 - SEL_PAD_TOP + 23}
+                width={BOX_WIDTH + 5}
+                height={h + SEL_PAD_TOP + SEL_PAD_BOTTOM - 44}
+                rx={6}
+                ry={6}
+                fill="none"
+                stroke="#1d4ed8"
+                strokeWidth={2}
               />
-            </g>
-          );
-        })}
-      </g>
+            )}
 
+            <MemoCanvasBox
+              element={memoElements[frame.boxId]}
+              openInterface={() => onSelect(frame)}
+              updatePosition={() => {}}
+              onSizeChange={handleSizeChange}
+            />
+          </g>
+        ))}
+      </g>
+      scrollbar
       {maxScroll > 0 && (
         <g
           opacity={isScrolling ? 1 : 0}

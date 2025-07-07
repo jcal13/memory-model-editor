@@ -22,7 +22,7 @@ const SEL_PAD_BOTTOM = 20;
 const TOP_PAD = TOP_FREE_PAD + SEL_PAD_TOP;
 const BOTTOM_PAD = BOTTOM_FREE_PAD + SEL_PAD_BOTTOM;
 
-const TRACK_W = 8;
+const TRACK_W = 5;
 const TRACK_INSET = 4;
 const THUMB_MIN_H = 30;
 
@@ -46,10 +46,17 @@ const CallStack: React.FC<Props> = ({
   const [viewportH, setViewportH] = useState(
     typeof window !== "undefined" ? window.innerHeight - 110 : 800
   );
+
   useEffect(() => {
-    const h = () => setViewportH(window.innerHeight);
-    window.addEventListener("resize", h);
-    return () => window.removeEventListener("resize", h);
+    const handleResize = () => {
+      setViewportH(window.innerHeight - 110);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   const columnHeight = viewportH - y - 10;
@@ -66,6 +73,8 @@ const CallStack: React.FC<Props> = ({
 
   const maxScroll = Math.max(0, totalStackHeight - visibleWinHeight);
   const [scrollOffset, setScrollOffset] = useState(0);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setScrollOffset((o) => Math.min(maxScroll, Math.max(0, o)));
@@ -75,14 +84,21 @@ const CallStack: React.FC<Props> = ({
     (e: React.WheelEvent) => {
       if (maxScroll === 0) return;
       e.preventDefault();
+
       const next = scrollOffset - e.deltaY;
       setScrollOffset(Math.min(maxScroll, Math.max(0, next)));
+
+      setIsScrolling(true);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = setTimeout(() => {
+        setIsScrolling(false);
+      }, 250);
     },
     [scrollOffset, maxScroll]
   );
 
   const trackX = x + width - TRACK_W - TRACK_INSET;
-  const trackY = y + LABEL_H;
+  const trackY = y + LABEL_H - 5;
   const trackH = TOP_PAD + visibleWinHeight + BOTTOM_PAD;
 
   const thumbH =
@@ -91,7 +107,8 @@ const CallStack: React.FC<Props> = ({
       : Math.max(THUMB_MIN_H, trackH * (visibleWinHeight / totalStackHeight));
   const thumbTravel = trackH - thumbH;
   const thumbY =
-    trackY + (maxScroll === 0 ? 0 : (scrollOffset / maxScroll) * thumbTravel);
+    trackY +
+    (maxScroll === 0 ? 0 : (1 - scrollOffset / maxScroll) * thumbTravel);
 
   const dragging = useRef(false);
   const dragStartY = useRef(0);
@@ -100,6 +117,7 @@ const CallStack: React.FC<Props> = ({
   const onThumbDown = (e: React.PointerEvent) => {
     if (maxScroll === 0) return;
     dragging.current = true;
+    setIsScrolling(true);
     dragStartY.current = e.clientY;
     startOffset.current = scrollOffset;
     (e.target as Element).setPointerCapture(e.pointerId);
@@ -116,8 +134,10 @@ const CallStack: React.FC<Props> = ({
   const onThumbUp = (e: React.PointerEvent) => {
     dragging.current = false;
     (e.target as Element).releasePointerCapture(e.pointerId);
+    scrollTimeoutRef.current = setTimeout(() => {
+      setIsScrolling(false);
+    }, 250);
   };
-
   const bottomCenter =
     y + LABEL_H + TOP_PAD + visibleWinHeight - BOX_HEIGHT / 2;
 
@@ -138,11 +158,16 @@ const CallStack: React.FC<Props> = ({
 
       <text
         x={x + width / 2}
-        y={y + 25}
+        y={y + 30}
         textAnchor="middle"
         fontSize={14}
-        fontWeight="bold"
+        fontWeight="600"
         pointerEvents="none"
+        style={{
+          fontFamily:
+            'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
+          color: "#1f2937",
+        }}
       >
         Call&nbsp;Stack
       </text>
@@ -193,7 +218,10 @@ const CallStack: React.FC<Props> = ({
       </g>
 
       {maxScroll > 0 && (
-        <>
+        <g
+          opacity={isScrolling ? 1 : 0}
+          style={{ transition: "opacity 0.3s ease" }}
+        >
           <rect
             x={trackX}
             y={trackY}
@@ -216,7 +244,7 @@ const CallStack: React.FC<Props> = ({
             onPointerMove={onThumbMove}
             onPointerUp={onThumbUp}
           />
-        </>
+        </g>
       )}
     </g>
   );

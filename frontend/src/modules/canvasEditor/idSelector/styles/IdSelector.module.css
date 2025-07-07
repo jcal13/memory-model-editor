@@ -1,0 +1,199 @@
+.trigger {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #374151;
+  padding: 8px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+.trigger:hover {
+  background-color: #f3f4f6;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+}
+
+
+.panelControlsDiv {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.removeButton {
+  background: #ef4444;
+  color: #ffffff;
+  padding: 10px 26px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  width: max-content;
+  transition: background-color 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.removeButton:hover {
+  background: #dc2626;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+}
+
+.panelContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1100;
+}
+
+.panel {
+  width: 300px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: 10px 14px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  font-weight: 600;
+  color: #1f2937;
+  cursor: move;
+  user-select: none;
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.form input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.form button {
+  padding: 8px 18px;
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.form button:hover {
+  background: #059669;
+}
+
+.list {
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.list li button {
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  font-size: 0.95rem;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.list li button:hover {
+  background: #f3f4f6;
+}
+
+.empty {
+  padding: 10px 14px;
+  color: #6b7280;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+/* ───────── Row that holds the auto-add button ───────── */
+.actionRow {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.actionRow button {
+  width: 100%;
+  padding: 10px 0;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.actionRow button:hover {
+  background: #1e40af;
+}
+
+/* Panel shell & header reuse previous rules, no change needed */
+
+.panel {
+  width: max-content;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+}
+
+.empty {
+  padding: 14px;
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.panelShell {
+  width: max-content; /* let content set width like other editors */
+}
+
+
+.idInputBox {
+  flex: 2;
+  min-width: 250px;    /* <-- ensure it never shrinks below this */
+  font-size: 1rem;
+  height: 38px;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  color: #111827;
+}
+
+.activeOutline {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}

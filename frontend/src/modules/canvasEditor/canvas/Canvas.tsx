@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Draggable from "react-draggable";
 import { CanvasElement, BoxType, ID } from "../shared/types";
 import CanvasBox from "./components/CanvasBox";
@@ -8,9 +8,6 @@ import { useCanvasRefs } from "./hooks/useRef";
 import styles from "./styles/Canvas.module.css";
 import CallStack from "./components/CallStack";
 
-/* =======================================
-   === Box Editor Mapping by Type Name ===
-======================================= */
 const editorMap: Record<BoxType["name"], React.FC<any>> = {
   primitive: BoxEditor,
   function: BoxEditor,
@@ -29,7 +26,6 @@ interface Props {
   sandbox?: boolean;
 }
 
-/* ========== Floating (draggable) editor wrapper ========== */
 function FloatingEditor({
   element,
   Editor,
@@ -80,7 +76,6 @@ function FloatingEditor({
   );
 }
 
-/* ================ Main Canvas Component ================ */
 export default function Canvas({
   elements,
   setElements,
@@ -96,7 +91,6 @@ export default function Canvas({
 
   useCanvasResize(svgRef, setViewBox);
 
-  /* ---- Keep numeric IDs in sync when not sandboxed ---- */
   useEffect(() => {
     if (sandbox) return;
 
@@ -111,14 +105,12 @@ export default function Canvas({
     ids.filter((id) => !elementIds.includes(id)).forEach((id) => removeId(id));
   }, [elements, ids, sandbox, addId, removeId]);
 
-  /* ---------- Position updater for a specific box ---------- */
   const makePositionUpdater = (boxId: number) => (x: number, y: number) => {
     setElements((prev) =>
       prev.map((el) => (el.boxId === boxId ? { ...el, x, y } : el))
     );
   };
 
-  /* ---------------- Handle Drag-and-Drop creation ---------------- */
   const handleDrop = (e: React.DragEvent<SVGSVGElement>) => {
     e.preventDefault();
     const payload = e.dataTransfer.getData("application/box-type");
@@ -161,7 +153,6 @@ export default function Canvas({
     );
 
     setElements((prev) => {
-      /* --- choose next available boxId --- */
       let newBoxId = prev.length;
       for (let i = 0; i < prev.length - 1; i++) {
         if ((prev[i].boxId as number) + 1 !== prev[i + 1].boxId) {
@@ -170,7 +161,6 @@ export default function Canvas({
         }
       }
 
-      /* --- choose next available numeric id (when required) --- */
       let computedId: ID =
         !sandbox && newKind.name !== "function" ? ids.length : "_";
       if (!sandbox) {
@@ -189,13 +179,10 @@ export default function Canvas({
         x: coords.x,
         y: coords.y,
       };
-      const updated = [...prev, newElement];
-      updated.sort((a, b) => (a.boxId as number) - (b.boxId as number));
-      return updated;
+      return [...prev, newElement];
     });
   };
 
-  /* -------------- Save / remove / open element helpers -------------- */
   const saveElement = (boxId: number, updatedId: ID, updatedKind: BoxType) => {
     setElements((prev) =>
       prev.map((el) =>
@@ -219,10 +206,27 @@ export default function Canvas({
     setSelected(canvasElement);
   };
 
-  /* --------------- Derive frames for the call stack --------------- */
   const functionFrames = elements.filter((el) => el.kind.name === "function");
 
-  /* ======================== Render ======================== */
+  const handleReorder = useCallback(
+    (from: number, to: number) => {
+      if (from === to) return;
+      setElements((prev) => {
+        const funcIdxs = prev
+          .map((el, i) => ({ el, i }))
+          .filter(({ el }) => el.kind.name === "function");
+        const fromIdx = funcIdxs[from].i;
+        const toIdx = funcIdxs[to].i;
+
+        const next = [...prev];
+        const [moved] = next.splice(fromIdx, 1);
+        next.splice(toIdx, 0, moved);
+        return next;
+      });
+    },
+    [setElements]
+  );
+
   return (
     <>
       <div className={styles.canvasWrapper}>
@@ -235,19 +239,18 @@ export default function Canvas({
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
-          {/* In-canvas call-stack column */}
           <CallStack
             frames={functionFrames}
             selected={
               selected && selected.kind.name === "function" ? selected : null
             }
             onSelect={openElement}
+            onReorder={handleReorder}
           />
 
-          {/* User-placed boxes */}
           <g>
             {elements
-              .filter((el) => el.kind.name !== "function") // ← NEW
+              .filter((el) => el.kind.name !== "function")
               .map((el) => (
                 <CanvasBox
                   key={el.boxId}
@@ -260,7 +263,6 @@ export default function Canvas({
         </svg>
       </div>
 
-      {/* Floating Box-Editor Panels */}
       {openBoxEditors.map((el) => {
         const Editor = editorMap[el.kind.name];
         return (

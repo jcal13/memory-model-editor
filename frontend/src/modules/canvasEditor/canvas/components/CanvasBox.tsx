@@ -4,7 +4,7 @@ import { useGlobalRefs } from "../hooks/useRef";
 import { useDraggableBox } from "../hooks/useEffect";
 
 interface CanvasBoxProps extends BoxProps {
-  onSizeChange?: (id: number, h: number) => void;
+  onSizeChange?: (id: number, size: { w: number; h: number }) => void;
 }
 
 export default function CanvasBox({
@@ -28,8 +28,8 @@ export default function CanvasBox({
 
   useEffect(() => {
     if (!gRef.current || !onSizeChange) return;
-    const { height } = gRef.current.getBBox();
-    onSizeChange(element.boxId as number, height);
+    const { width, height } = gRef.current.getBBox();
+    onSizeChange(element.boxId as number, { w: width, h: height });
   }, [element, gRef, onSizeChange]);
 
   return <g ref={gRef} />;

@@ -76,8 +76,7 @@ export default function MemoryModelEditor({
       const rect = subContainerRef.current.getBoundingClientRect();
       const newWidth = rect.right - e.clientX;
       const minPlaceholderWidth = 100;
-      const maxBasedOnViewport = window.innerWidth * 0.6667;   // 2/3 of the full screen
-      const maxPlaceholderWidth = Math.min(rect.width - 100, maxBasedOnViewport);
+      const maxPlaceholderWidth = rect.width - 100;
       if (newWidth >= minPlaceholderWidth && newWidth <= maxPlaceholderWidth) {
         setPlaceholderWidth(newWidth);
       }
@@ -133,10 +132,7 @@ export default function MemoryModelEditor({
 
         <div
           className={styles.placeholder}
-          style={{ 
-            width: `${placeholderWidth}px`,
-            maxWidth: '66.67vw' 
-          }}
+          style={{ width: `${placeholderWidth}px` }}
         >
           <InformationTabs
             submissionResults={submissionResults}

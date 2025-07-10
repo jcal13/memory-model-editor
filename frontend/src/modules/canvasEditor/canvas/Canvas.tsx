@@ -6,8 +6,6 @@ import BoxEditor from "../boxEditors/BoxEditor";
 import { useCanvasResize } from "./hooks/useEffect";
 import { useCanvasRefs } from "./hooks/useRef";
 import styles from "./styles/Canvas.module.css";
-import DownloadJsonButton from "./components/DownloadJsonButton";
-import SubmitButton from "./components/SubmitButton";
 
 /* =======================================
    === Box Editor Mapping by Type Name ===
@@ -164,24 +162,23 @@ export default function Canvas({
     );
 
     setElements((prev) => {
-    // find box id
-    let newBoxId = prev.length;
-    for (let i = 0; i < prev.length - 1; i++) {
-      if (prev[i].boxId as number + 1 !== prev[i + 1].boxId) {
-        newBoxId = prev[i].boxId as number + 1;
+      // find box id
+      let newBoxId = prev.length;
+      for (let i = 0; i < prev.length - 1; i++) {
+        if ((prev[i].boxId as number) + 1 !== prev[i + 1].boxId) {
+          newBoxId = (prev[i].boxId as number) + 1;
+        }
       }
-    }
-    
 
-    // find compute id
-    let computedId: ID = !sandbox && newKind.name !== "function" ? ids.length : "_";
-    if (!sandbox) {
-      for (let i = 0; i < ids.length - 1; i++) {
-          if (ids[i] as number + 1 !== ids[i + 1]) {
-              computedId = ids[i] as number + 1 ;
+      // find compute id
+      let computedId: ID = !sandbox && newKind.name !== "function" ? ids.length : "_";
+      if (!sandbox) {
+        for (let i = 0; i < ids.length - 1; i++) {
+          if ((ids[i] as number) + 1 !== ids[i + 1]) {
+            computedId = (ids[i] as number) + 1;
           }
         }
-    }
+      }
 
       const newElement: CanvasElement = {
         boxId: newBoxId,
@@ -215,16 +212,13 @@ export default function Canvas({
   const removeElement = (boxId: number) => {
     setElements((prev) => prev.filter((el) => el.boxId !== boxId));
     setOpenBoxEditors((prev) => prev.filter((el) => el.boxId !== boxId));
-    setSelected((prev) => (prev && prev.boxId === boxId ? null : prev))
+    setSelected((prev) => (prev && prev.boxId === boxId ? null : prev));
   };
 
+  /* ----------------------- Open element ----------------------- */
   const openElement = (canvasElement: CanvasElement) => {
-    setOpenBoxEditors((prev) =>
-      prev.some((el) => el.boxId === canvasElement.boxId)
-        ? prev
-        : [...prev, canvasElement]
-    );
-    setSelected(canvasElement);  
+    setOpenBoxEditors([canvasElement]);
+    setSelected(canvasElement);
   };
 
   return (
@@ -251,36 +245,35 @@ export default function Canvas({
             ))}
           </g>
         </svg>
-
       </div>
 
-      {/* === Floating Box Editor Panels === */}
-      {openBoxEditors.map(el => {
-  const Editor = editorMap[el.kind.name];
+      {/* === Floating Box Editor Panel === */}
+      {openBoxEditors.map((el) => {
+        const Editor = editorMap[el.kind.name];
 
-  return (
-    <FloatingEditor
-      key={el.boxId}
-      element={el}
-      Editor={Editor}
-      defaultPos={{
-        x: typeof window !== "undefined" ? window.innerWidth / 4 : 0,
-        y: typeof window !== "undefined" ? window.innerHeight / 4 : 0,
-      }}
-      onSelect={() => setSelected(el)}
-      onSave={(id, kind) => saveElement(el.boxId, id, kind)}
-      onRemove={() => removeElement(el.boxId)}
-      onClose={() => {
-        setOpenBoxEditors(prev => prev.filter(e => e.boxId !== el.boxId));
-        setSelected(prev => (prev && prev.boxId === el.boxId ? null : prev));
-      }}
-      ids={ids}
-      addId={addId}
-      removeId={removeId}
-      sandbox={sandbox}
-    />
-  );
-})}
+        return (
+          <FloatingEditor
+            key={el.boxId}
+            element={el}
+            Editor={Editor}
+            defaultPos={{
+              x: typeof window !== "undefined" ? window.innerWidth / 4 : 0,
+              y: typeof window !== "undefined" ? window.innerHeight / 4 : 0,
+            }}
+            onSelect={() => setSelected(el)}
+            onSave={(id, kind) => saveElement(el.boxId, id, kind)}
+            onRemove={() => removeElement(el.boxId)}
+            onClose={() => {
+              setOpenBoxEditors([]);
+              setSelected((prev) => (prev && prev.boxId === el.boxId ? null : prev));
+            }}
+            ids={ids}
+            addId={addId}
+            removeId={removeId}
+            sandbox={sandbox}
+          />
+        );
+      })}
     </>
   );
 }

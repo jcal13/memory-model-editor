@@ -82,6 +82,7 @@
    === Input Fields ===
 ======================================= */
 
+.classNameInput,
 .functionNameInput,
 .primitiveValueContainer {
   width: 100%;

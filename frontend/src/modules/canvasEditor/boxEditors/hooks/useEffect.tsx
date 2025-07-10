@@ -30,7 +30,9 @@ export const useModule = (
   contentValue?: string,
   functionName?: string,
   params?: any[],
-  collectionItems?: any
+  collectionItems?: any,
+  className?: string,
+  classVariables?: any[],
 ) => {
   /* Cache of last (id, payload) we saved */
   const prevRef = useRef<{ id: ID; payload: any } | null>(null);
@@ -54,7 +56,12 @@ export const useModule = (
       payload = { name: kind, type: "function", value: null, functionName, params };
     } else if (kind === "dict") {
       payload = { name: kind, type: element.kind.type, value: Object.fromEntries(collectionItems ?? []) };
-    } else {
+    }
+      else if (kind == "class"){
+        payload = { name: kind, type: "class", value: null, className, classVariables };
+
+    }
+      else {
       payload = { name: kind, type: element.kind.type, value: collectionItems };
     }
 

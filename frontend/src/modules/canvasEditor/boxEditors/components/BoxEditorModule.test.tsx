@@ -47,8 +47,11 @@ describe("BoxEditorModule", () => {
     onRemove: jest.fn(),
     onClose: jest.fn(),
     ids: [1, 2, 3],
+    classes: [],
     addId: jest.fn(),
     removeId: jest.fn(),
+    addClasses: jest.fn(),
+    removeClasses: jest.fn()
   };
 
   /**

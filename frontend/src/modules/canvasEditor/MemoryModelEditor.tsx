@@ -16,17 +16,16 @@ export default function MemoryModelEditor({
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [jsonView, setJsonView] = useState<string>("");
   const [ids, setIds] = useState<number[]>([]);
-  const [sandboxMode, setSandboxMode] = useState<boolean>(sandbox);
-  const [submissionResults, setSubmissionResults] = useState<SubmissionResult[]>([])
+  const [classes, setClasses] = useState<string[]>([]);
 
-  // width state for placeholder panel
+  const [sandboxMode, setSandboxMode] = useState<boolean>(sandbox);
+  const [submissionResults, setSubmissionResults] = useState<SubmissionResult[]>([]);
+
   const [placeholderWidth, setPlaceholderWidth] = useState<number>(300);
   const [isResizing, setIsResizing] = useState<boolean>(false);
 
-  // simple modal toggle
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
 
-  // Ref to sub-container (canvas + placeholder)
   const subContainerRef = useRef<HTMLDivElement>(null);
 
   const clearBoard = (): void => {
@@ -34,6 +33,7 @@ export default function MemoryModelEditor({
     setIds([]);
     setJsonView("");
     setSubmissionResults([]);
+    setClasses([]);
   };
 
   const handleToggleSandbox = (): void => setShowConfirm(true);
@@ -48,24 +48,35 @@ export default function MemoryModelEditor({
 
   const handleSubmit = async () => {
     try {
-      const res = await submitCanvas(elements)
+      const res = await submitCanvas(elements);
       setSubmissionResults(res);
-      console.log('Backend response:', res)
+      console.log('Backend response:', res);
     } catch (error) {
-      console.error('Error sending to backend:', error)
+      console.error('Error sending to backend:', error);
     }
-  }
+  };
 
   const addId = (id: number) =>
-    setIds(prev => {
-      if (prev.includes(id)) return prev;          
-
-      const insertAt = prev.findIndex(x => x > id);
+    setIds((prev) => {
+      if (prev.includes(id)) return prev;
+      const insertAt = prev.findIndex((x) => x > id);
       return insertAt === -1
-        ? [...prev, id]                           
+        ? [...prev, id]
         : [...prev.slice(0, insertAt), id, ...prev.slice(insertAt)];
     });
   const removeId = (id: ID) => setIds((prev) => prev.filter((v) => v !== id));
+
+  const addClass = (className: string) =>
+    setClasses((prev) => {
+      if (prev.includes(className)) return prev;
+      const insertAt = prev.findIndex((x) => x.localeCompare(className) > 0);
+      return insertAt === -1
+        ? [...prev, className]
+        : [...prev.slice(0, insertAt), className, ...prev.slice(insertAt)];
+    });
+
+  const removeClass = (className: string) =>
+    setClasses((prev) => prev.filter((v) => v !== className));
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
@@ -104,17 +115,22 @@ export default function MemoryModelEditor({
               ids={ids}
               addId={addId}
               removeId={removeId}
+
+              classes={classes}
+              addClasses={addClass}
+              removeClasses={removeClass}
+
               sandbox={sandboxMode}
             />
             {/* === Download & Submit Buttons === */}
             <DownloadJsonButton elements={elements} />
-            <SubmitButton onClick={handleSubmit}/>
+            <SubmitButton onClick={handleSubmit} />
           </div>
 
           <label className={styles.switchWrapper}>
             <input
               type="checkbox"
-              className={styles.switchInput}
+              className={styles.switchInput} 
               checked={sandboxMode}
               onChange={(e) => {
                 e.preventDefault();

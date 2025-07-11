@@ -63,6 +63,7 @@ const CallStack: React.FC<Props> = ({
   const [boxSizes, setBoxSizes] = useState<
     Record<number, { w: number; h: number }>
   >({});
+
   const handleSizeChange = useCallback(
     (id: number, s: { w: number; h: number }) => {
       if (s.w < 1 || s.h < 1) return;
@@ -73,11 +74,14 @@ const CallStack: React.FC<Props> = ({
     []
   );
 
-  const maxBoxW = useMemo(
-    () => Object.values(boxSizes).reduce((m, s) => Math.max(m, s.w), BOX_WIDTH),
-    [boxSizes]
-  );
+  const maxBoxW = useMemo(() => {
+    return frames.reduce((m, f) => {
+      const w = boxSizes[f.boxId]?.w ?? BOX_WIDTH;
+      return Math.max(m, w);
+    }, BOX_WIDTH);
+  }, [frames, boxSizes]);
   const colW = Math.max(width, maxBoxW);
+
   const columnH = viewportH - y - 10;
   const visibleH = columnH - LABEL_H - TOP_PAD - BOTTOM_PAD;
 

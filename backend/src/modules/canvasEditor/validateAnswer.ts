@@ -34,8 +34,7 @@ function ensureBijection(
   if (answerToInputMap.has(answerID)) {
     const prev = answerToInputMap.get(answerID)!;
     if (prev.target !== inputID) {
-      if (!isVar)
-        errors.push(`${path}mapping conflict: "${prev.path}", "${path}"`);
+      if (!isVar) errors.push(`ID mapping conflict: ${prev.path}", "${path}`);
       return true;
     }
   }
@@ -44,8 +43,7 @@ function ensureBijection(
   if (inputToAnswerMap.has(inputID)) {
     const prev = inputToAnswerMap.get(inputID)!;
     if (prev.target !== answerID) {
-      if (!isVar)
-        errors.push(`${path}mapping conflict: "${prev.path}", "${path}"`);
+      if (!isVar) errors.push(`ID mapping conflict: ${prev.path}, ${path}`);
       return true;
     }
   }
@@ -64,7 +62,7 @@ function checkTypeMismatch(
 ): boolean {
   if (answerBox.type !== inputBox.type) {
     errors.push(
-      `${path}type mismatch: got ${inputBox.type}, expected ${answerBox.type}`
+      `Type mismatch: ${path} got ${inputBox.type}, expected ${answerBox.type}`
     );
     return true;
   }
@@ -81,7 +79,7 @@ function comparePrimitives(
   if (!isContainer(answerBox.type)) {
     if (answerBox.value !== inputBox.value) {
       errors.push(
-        `${path}value mismatch: got ${inputBox.value}, expected ${answerBox.value}`
+        `Value mismatch: ${path} got ${inputBox.value}, expected ${answerBox.value}`
       );
     }
     return true;
@@ -110,13 +108,13 @@ function checkArray(
   if (actualLen < expectedLen)
     for (let i = actualLen; i < expectedLen; i++)
       errors.push(
-        `${path}[${i}] missing element id=${answerMemoryBox.value[i]}`
+        `Missing element: ${path}[${i}] id=${answerMemoryBox.value[i]}`
       );
 
   if (actualLen > expectedLen)
     for (let j = expectedLen; j < actualLen; j++)
       errors.push(
-        `${path}[${j}] unexpected element id=${inputMemoryBox.value[j]}`
+        `Unexpected element: ${path}[${j}] id=${inputMemoryBox.value[j]}`
       );
 
   // next, we compare each element 1:1 recursively; we do it this way because order matters
@@ -178,12 +176,12 @@ function checkSet(
         break;
       }
     }
-    if (!matched) errors.push(`${path}missing set element id=${answerChild}`);
+    if (!matched) errors.push(`Missing element: ${path} id=${answerChild}`);
   }
 
   // any IDs still in unmatched are unexpected extras supplied by the user
   for (const extraId of unmatched)
-    errors.push(`${path}unexpected set element id=${extraId}`);
+    errors.push(`Unexpected element: ${path} id=${extraId}`);
 }
 
 // Check if the answer box is a dict and compare keys and values recursively
@@ -204,7 +202,7 @@ function checkDict(
     if (!(key in inputMemoryBox.value)) {
       // key missing entirely in the user dict
       const missingId = answerMemoryBox.value[key];
-      errors.push(`${path}missing key "${key}" id=${missingId}`);
+      errors.push(`Missing key: ${path} key=${key}, id=${missingId}`);
       continue;
     }
 
@@ -227,7 +225,7 @@ function checkDict(
   for (const key of Object.keys(inputMemoryBox.value)) {
     if (!(key in answerMemoryBox.value)) {
       const extraId = inputMemoryBox.value[key];
-      errors.push(`${path}unexpected key "${key}" id=${extraId}`);
+      errors.push(`Unexpected key: ${path} key=${key}, id=${extraId}`);
     }
   }
 }
@@ -243,16 +241,16 @@ function gatherFrames(
 
   if (answerFrames.length !== inputFrames.length)
     errors.push(
-      `frame count mismatch: expected ${answerFrames.length}, got ${inputFrames.length}`
+      `Function count mismatch: expected ${answerFrames.length}, got ${inputFrames.length}`
     );
 
   const ansByName = new Map(answerFrames.map((f) => [f.name!, f]));
   const usrByName = new Map(inputFrames.map((f) => [f.name!, f]));
 
   for (const n of ansByName.keys())
-    if (!usrByName.has(n)) errors.push(`missing frame "${n}"`);
+    if (!usrByName.has(n)) errors.push(`Missing function: "${n}"`);
   for (const n of usrByName.keys())
-    if (!ansByName.has(n)) errors.push(`unexpected frame "${n}"`);
+    if (!ansByName.has(n)) errors.push(`Unexpected function: "${n}"`);
 
   return { answerFrames, inputFrames, ansByName, usrByName };
 }
@@ -266,7 +264,7 @@ function scanDuplicates(model: MemoryBox[], errors: string[]): Set<number> {
       if (seen[e.id]) dup.add(e.id);
       else seen[e.id] = true;
     }
-  dup.forEach((id) => errors.push(`duplicate ID ${id} detected`));
+  dup.forEach((id) => errors.push(`Duplicate ID: ${id}`));
   return dup;
 }
 
@@ -293,10 +291,12 @@ function compareFrames(
     // variable-list mismatches
     for (const k of Object.keys(aVars))
       if (!(k in uVars))
-        errors.push(`frame "${name}": missing variable "${k}"`);
+        errors.push(`Missing variable: function "${name}" expected "${k}"`);
     for (const k of Object.keys(uVars))
       if (!(k in aVars))
-        errors.push(`frame "${name}": unexpected variable "${k}"`);
+        errors.push(
+          `Unexpected variable: function "${name}" unexpected "${k}"`
+        );
 
     // deep comparison for shared variables
     for (const k of Object.keys(aVars)) {
@@ -309,7 +309,7 @@ function compareFrames(
         globalAnswerToInput,
         globalInputToAnswer,
         dup,
-        `frame "${name}" → var "${k}"→`,
+        `function "${name}" → var "${k}"→`,
         errors,
         visited
       );
@@ -344,7 +344,7 @@ function detectOrphans(
 
   for (const e of model)
     if (e.id !== null && !reachable.has(e.id) && !answerMap.has(e.id))
-      errors.push(`unmapped box with id=${e.id}`);
+      errors.push(`Unmapped box: id=${e.id}`);
 }
 
 // Compare IDs between the answer and user models
@@ -379,7 +379,7 @@ function compareIds(
   const inputMemoryBox = inputMap.get(inputID);
   if (!answerMemoryBox || !inputMemoryBox) {
     // if either ID is not found in the respective map
-    errors.push(`${path} unmapped ID`);
+    errors.push(`Unmapped ID: ${path}`);
     return;
   }
 

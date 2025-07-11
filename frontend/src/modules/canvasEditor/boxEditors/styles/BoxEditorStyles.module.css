@@ -4,7 +4,7 @@
 
 .boxEditorModule {
   width: max-content;
-  position: relative; 
+  position: relative;
   min-width: 340px;
   padding: 24px;
   gap: 40px;
@@ -166,7 +166,7 @@
 }
 
 .idSelectButtonWrapper {
-  position: relative
+  position: relative;
 }
 
 .removeItem:hover,
@@ -290,4 +290,9 @@
 .primitiveNoneContainer {
   font-size: 1rem;
   color: #6b7280;
+}
+
+.invalidMessage {
+  font-size: 1rem;
+  color: #dc2626;
 }

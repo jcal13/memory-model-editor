@@ -78,7 +78,6 @@ const CallStack: React.FC<Props> = ({
     [boxSizes]
   );
   const colW = Math.max(width, maxBoxW);
-
   const columnH = viewportH - y - 10;
   const visibleH = columnH - LABEL_H - TOP_PAD - BOTTOM_PAD;
 
@@ -94,6 +93,7 @@ const CallStack: React.FC<Props> = ({
   }, [ordered, boxSizes, y, visibleH]);
 
   const totalH = layout.reduce((acc, { h }) => acc + h + GAP - 9, -GAP);
+
   const [scroll, setScroll] = useState(0);
   const maxScroll = Math.max(0, totalH - visibleH);
 
@@ -121,39 +121,33 @@ const CallStack: React.FC<Props> = ({
   const [insertIdx, setInsertIdx] = useState<number | null>(null);
   const [markerY, setMarkerY] = useState<number | null>(null);
 
-  const computeInsert = (ghostCenter: number, from: number) => {
+  const computeInsert = (ghostCenter: number) => {
     const positions = layout.map(({ yLocal, h }, arrayIndex) => ({
       arrayIndex,
       visualTop: yLocal + scroll,
       visualBottom: yLocal + scroll + h,
-      visualCenter: yLocal + scroll + h / 2,
     }));
 
     positions.sort((a, b) => a.visualTop - b.visualTop);
 
-    let visualInsertIndex = positions.length;
+    let insert = positions.length;
     for (let i = 0; i < positions.length; i++) {
-      if (ghostCenter < positions[i].visualCenter) {
-        visualInsertIndex = i;
+      if (ghostCenter < positions[i].visualTop) {
+        insert = i;
         break;
       }
     }
 
-    const arrayInsertIndex = visualInsertIndex;
-
-    let gapY;
-    if (visualInsertIndex === 0) {
-      gapY = positions[0].visualTop - 5;
-    } else if (visualInsertIndex >= positions.length) {
-      gapY = positions[positions.length - 1].visualBottom + 5;
+    let gapY: number;
+    if (insert === 0) {
+      gapY = positions[0].visualTop;
+    } else if (insert === positions.length) {
+      gapY = positions[positions.length - 1].visualBottom;
     } else {
-      gapY = positions[visualInsertIndex].visualTop - 5;
+      gapY = positions[insert].visualTop;
     }
 
-    return {
-      idx: arrayInsertIndex,
-      gapY,
-    };
+    return { idx: insert, gapY };
   };
 
   const onRowDown =
@@ -183,20 +177,25 @@ const CallStack: React.FC<Props> = ({
     st.ghost.setAttribute("transform", `${st.origT} translate(0 ${dy})`);
 
     const ghostCenter = layout[st.from].yLocal + scroll + dy;
-
-    const { idx, gapY } = computeInsert(ghostCenter, st.from);
-    setInsertIdx((p) => (p === idx ? p : idx));
+    const { idx, gapY } = computeInsert(ghostCenter);
+    setInsertIdx(idx);
     setMarkerY(gapY);
   };
 
   const onRowUp: React.PointerEventHandler = (e) => {
     if (!dragRef.current) return;
     const st = dragRef.current;
+
     st.ghost.setAttribute("transform", st.origT);
     st.ghost.setAttribute("opacity", "1");
-    if (st.active && insertIdx !== null && insertIdx !== st.from) {
-      const invertedIdx = layout.length - 1 - insertIdx;
-      onReorder(st.from, invertedIdx);
+
+    if (st.active && insertIdx !== null) {
+      const toIdx =
+        insertIdx >= layout.length ? 0 : layout.length - 1 - insertIdx;
+
+      if (toIdx !== st.from) {
+        onReorder(st.from, toIdx);
+      }
     }
     setInsertIdx(null);
     setMarkerY(null);

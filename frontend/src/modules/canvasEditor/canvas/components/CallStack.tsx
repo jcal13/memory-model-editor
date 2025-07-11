@@ -224,7 +224,7 @@ const CallStack: React.FC<Props> = ({
   const thumbStartY = useRef(0);
   const thumbStartScroll = useRef(0);
 
-  const H_PAD = BOX_WIDTH / 2;
+  const H_PAD = maxBoxW;
 
   return (
     <g className={styles.root} onWheel={onWheel}>
@@ -249,7 +249,7 @@ const CallStack: React.FC<Props> = ({
 
       <clipPath id={clipId}>
         <rect
-          x={x - H_PAD - 100}
+          x={x - H_PAD}
           y={y + LABEL_H}
           width={colW + H_PAD * 2}
           height={TOP_PAD + visibleH + BOTTOM_PAD}

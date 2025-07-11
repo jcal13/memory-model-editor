@@ -20,7 +20,7 @@ const BOTTOM_FREE_PAD = 12;
 const SEL_PAD_TOP = 25;
 const SEL_PAD_BOTTOM = 20;
 const TOP_PAD = TOP_FREE_PAD + SEL_PAD_TOP;
-const BOTTOM_PAD = BOTTOM_FREE_PAD + SEL_PAD_BOTTOM;
+const BOTTOM_PAD = BOTTOM_FREE_PAD + SEL_PAD_BOTTOM + 25;
 
 const TRACK_W = 5;
 const TRACK_INSET = 4;
@@ -263,7 +263,7 @@ const CallStack: React.FC<Props> = ({
         {layout.map(({ f, yLocal, h }, idx) => (
           <g
             key={f.boxId}
-            transform={`translate(0, ${yLocal + scroll})`}
+            transform={`translate(0, ${yLocal + scroll + 30})`}
             cursor="grab"
             onPointerDown={onRowDown(idx, h)}
             onPointerMove={onRowMove}

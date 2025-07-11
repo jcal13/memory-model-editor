@@ -14,7 +14,7 @@ export default function Palette() {
 
         {/* Draggable Box Types */}
         <div className={styles.paletteBoxes}>
-          {["function", "primitive", "list", "tuple", "set", "dict"].map(
+          {["function", "primitive", "list", "tuple", "set", "dict", "class"].map(
             (type) => (
               <PaletteBox key={type} boxType={type as any} />
             )

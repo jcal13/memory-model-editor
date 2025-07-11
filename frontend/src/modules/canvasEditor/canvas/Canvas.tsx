@@ -197,6 +197,7 @@ export default function Canvas({
     setSelected((prev) => (prev && prev.boxId === boxId ? null : prev));
   };
 
+  /* ----------------------- Open element ----------------------- */
   const openElement = (canvasElement: CanvasElement) => {
     setOpenBoxEditors((prev) =>
       prev.some((el) => el.boxId === canvasElement.boxId)

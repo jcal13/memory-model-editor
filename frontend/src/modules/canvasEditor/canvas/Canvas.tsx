@@ -23,6 +23,9 @@ interface Props {
   ids: number[];
   addId: (id: number) => void;
   removeId: (id: ID) => void;
+  classes?: string[];
+  addClasses?: (className: string) => void;
+  removeClasses?: (className: string) => void;
   sandbox?: boolean;
 }
 
@@ -37,6 +40,9 @@ function FloatingEditor({
   ids,
   addId,
   removeId,
+  classes,
+  addClasses,
+  removeClasses,
   sandbox,
 }: {
   element: CanvasElement;
@@ -49,6 +55,9 @@ function FloatingEditor({
   ids: number[];
   addId: (id: number) => void;
   removeId: (id: ID) => void;
+  classes?: string[];
+  addClasses?: (className: string) => void;
+  removeClasses?: (className: string) => void;
   sandbox: boolean;
 }) {
   const nodeRef = React.useRef<HTMLDivElement>(null);
@@ -69,6 +78,9 @@ function FloatingEditor({
           ids={ids}
           addId={addId}
           removeId={removeId}
+          classes={classes}
+          addClasses={addClasses}
+          removeClasses={removeClasses}
           sandbox={sandbox}
         />
       </div>
@@ -82,6 +94,9 @@ export default function Canvas({
   ids,
   addId,
   removeId,
+  classes,
+  addClasses,
+  removeClasses,
   sandbox = true,
 }: Props) {
   const [openBoxEditors, setOpenBoxEditors] = useState<CanvasElement[]>([]);
@@ -95,8 +110,8 @@ export default function Canvas({
     if (sandbox) return;
 
     const elementIds = elements
-      .filter((el) => el.kind.name !== "function" && typeof el.id === "number")
-      .map((el) => el.id);
+      .filter(el => el.kind.name !== "function" && typeof el.id === "number")
+      .map(el => el.id as number);
 
     elementIds
       .filter((id) => !ids.includes(id as number))
@@ -105,9 +120,11 @@ export default function Canvas({
     ids.filter((id) => !elementIds.includes(id)).forEach((id) => removeId(id));
   }, [elements, ids, sandbox, addId, removeId]);
 
+
+
   const makePositionUpdater = (boxId: number) => (x: number, y: number) => {
-    setElements((prev) =>
-      prev.map((el) => (el.boxId === boxId ? { ...el, x, y } : el))
+    setElements(prev =>
+      prev.map(el => (el.boxId === boxId ? { ...el, x, y } : el))
     );
   };
 
@@ -148,9 +165,7 @@ export default function Canvas({
     const pt = svgRef.current!.createSVGPoint();
     pt.x = e.clientX;
     pt.y = e.clientY;
-    const coords = pt.matrixTransform(
-      svgRef.current!.getScreenCTM()!.inverse()
-    );
+    const coords = pt.matrixTransform(svgRef.current!.getScreenCTM()!.inverse());
 
     setElements((prev) => {
       let newBoxId = prev.length;
@@ -199,8 +214,8 @@ export default function Canvas({
 
   /* ----------------------- Open element ----------------------- */
   const openElement = (canvasElement: CanvasElement) => {
-    setOpenBoxEditors((prev) =>
-      prev.some((el) => el.boxId === canvasElement.boxId)
+    setOpenBoxEditors(prev =>
+      prev.some(el => el.boxId === canvasElement.boxId)
         ? prev
         : [...prev, canvasElement]
     );
@@ -237,7 +252,7 @@ export default function Canvas({
           viewBox={viewBox}
           preserveAspectRatio="xMinYMin meet"
           className={styles.canvas}
-          onDragOver={(e) => e.preventDefault()}
+          onDragOver={e => e.preventDefault()}
           onDrop={handleDrop}
         >
           <CallStack
@@ -289,6 +304,9 @@ export default function Canvas({
             ids={ids}
             addId={addId}
             removeId={removeId}
+            classes={classes}
+            addClasses={addClasses}
+            removeClasses={removeClasses}
             sandbox={sandbox}
           />
         );

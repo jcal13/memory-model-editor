@@ -9,10 +9,12 @@ import {
   useFunctionStates,
   useCollectionSingleStates,
   useCollectionPairsStates,
-  useElementIdState
+  useElementIdState,
+  useClassStates
 } from "../hooks/useState";
 import { BoxEditorType } from "../../shared/types";
 import { useGlobalRefs } from "../hooks/useRef";
+import React from "react";
 
 /**
  * BoxEditorModule renders the full editable UI for a memory box,
@@ -24,7 +26,7 @@ import { useGlobalRefs } from "../hooks/useRef";
  * - onSave: function to call with the updated box data
  * - onRemove: function to call to remove the box from the canvas
  */
-const BoxEditorModule = ({ metadata, onSave, onRemove, onClose, ids, addId, removeId, sandbox = true }: BoxEditorType) => {
+const BoxEditorModule = ({ metadata, onSave, onRemove, onClose, ids,  addId, removeId, classes, addClasses, removeClasses, sandbox = true }: BoxEditorType) => {
   // Shared hover state for remove button
   const { hoverRemove, setHoverRemove } = useGlobalStates();
 
@@ -44,6 +46,10 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, onClose, ids, addId, remo
   const [collectionPairs, setCollectionPairs] =
     useCollectionPairsStates(metadata);
 
+    // State hook for element class
+    const [ownClassName, setOwnClassName] = useClassStates(metadata);
+
+  // -----------------------------------
 
   const collectionData = metadata.kind.name === "dict" ? collectionPairs : collectionItems;
 
@@ -75,6 +81,13 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, onClose, ids, addId, remo
         setValue={setContentValue}
         functionName={functionName}
         setFunctionName={setFunctionName}
+
+        classes = {classes}
+        ownClasses={ownClassName}
+        addClasses ={addClasses}          // <-- added
+        setElementClass = {setOwnClassName}
+        removeClasses={removeClasses}    // <-- added
+        
         ids={ids}
         addId={addId}
         ownId={ownId}

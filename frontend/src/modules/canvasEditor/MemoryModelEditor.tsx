@@ -23,6 +23,8 @@ export default function MemoryModelEditor({
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [jsonView, setJsonView] = useState<string>("");
   const [ids, setIds] = useState<number[]>([]);
+  const [classes, setClasses] = useState<string[]>([]);
+
   const [sandboxMode, setSandboxMode] = useState<boolean>(sandbox);
   const [submissionResults, setSubmissionResults] = useState<SubmissionResult>(null);
   const [activeTab, setActiveTab] = useState<Tab>("question");
@@ -31,10 +33,8 @@ export default function MemoryModelEditor({
   const [placeholderWidth, setPlaceholderWidth] = useState<number>(DEFAULT_PLACEHOLDER_WIDTH);
   const [isResizing, setIsResizing] = useState<boolean>(false);
 
-  // simple modal toggle
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
 
-  // Ref to sub-container (canvas + placeholder)
   const subContainerRef = useRef<HTMLDivElement>(null);
 
   const clearBoard = (): void => {
@@ -76,6 +76,18 @@ export default function MemoryModelEditor({
     });
   const removeId = (id: ID) => setIds((prev) => prev.filter((v) => v !== id));
 
+  const addClass = (className: string) =>
+    setClasses((prev) => {
+      if (prev.includes(className)) return prev;
+      const insertAt = prev.findIndex((x) => x.localeCompare(className) > 0);
+      return insertAt === -1
+        ? [...prev, className]
+        : [...prev.slice(0, insertAt), className, ...prev.slice(insertAt)];
+    });
+
+  const removeClass = (className: string) =>
+    setClasses((prev) => prev.filter((v) => v !== className));
+
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
       if (!isResizing || !subContainerRef.current) return;
@@ -113,6 +125,11 @@ export default function MemoryModelEditor({
               ids={ids}
               addId={addId}
               removeId={removeId}
+
+              classes={classes}
+              addClasses={addClass}
+              removeClasses={removeClass}
+
               sandbox={sandboxMode}
             />
             {/* === Download & Submit Buttons === */}
@@ -123,7 +140,7 @@ export default function MemoryModelEditor({
           <label className={styles.switchWrapper}>
             <input
               type="checkbox"
-              className={styles.switchInput}
+              className={styles.switchInput} 
               checked={sandboxMode}
               onChange={(e) => {
                 e.preventDefault();

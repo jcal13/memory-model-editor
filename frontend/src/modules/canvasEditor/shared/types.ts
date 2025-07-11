@@ -62,16 +62,26 @@ export interface CanvasElement {
 export type SubmissionResult = { correct: boolean; errors: string[] } | null;
 
 export type ID = number | "_";
+export type ClassID = string | "_";
+
 
 export interface BoxEditorType {
-  metadata: { id: ID; kind: BoxType };
+  metadata: { id: ID; kind: BoxType; className?: ClassID };
   onSave: (id: ID, kind: BoxType) => void;
   onRemove: () => void;
   onClose: () => void;
+
   ids: ID[];
   addId: (id: ID) => void;
   removeId: (id: ID) => void;
+
+  classes?: string[]; // List of all class names
+  addClasses?: (className: string) => void;
+  removeClasses?: (className: string) => void;
+  
   sandbox?: boolean;
+
+
 }
 
 export type Tab = "feedback" | "question";

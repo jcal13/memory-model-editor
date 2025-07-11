@@ -22,6 +22,7 @@ describe("BoxEditor", () => {
         type: "int",
         value: "42",
       },
+      className: "Student",  
     },
     onSave: jest.fn(),
     onRemove: jest.fn(),
@@ -29,6 +30,9 @@ describe("BoxEditor", () => {
     ids: [1, 2, 3],
     addId: jest.fn(),
     removeId: jest.fn(),
+    classes: ["Student", "People"],
+    addClasses: jest.fn(),
+    removeClasses: jest.fn()
   };
 
   beforeEach(() => {
@@ -57,6 +61,9 @@ describe("BoxEditor", () => {
         ids: mockProps.ids,
         addId: mockProps.addId,
         removeId: mockProps.removeId,
+        classes: mockProps.classes,
+        addClasses: mockProps.addClasses,
+        removeClasses: mockProps.removeClasses
       })
     );
   });

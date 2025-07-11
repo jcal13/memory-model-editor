@@ -1,6 +1,7 @@
 import PrimitiveContent from "./PrimitiveContent";
 import FunctionContent from "./FunctionContent";
 import CollectionContent from "./CollectionContent";
+import ClassContent from "./ClassContent";
 import { ID } from "../../../shared/types";
 
 /**
@@ -95,6 +96,19 @@ const Content = ({
         sandbox={sandbox}
       />
     );
+  }
+
+  if (kind == "class"){
+    return (
+      <ClassContent
+        classVariables={functionParams}
+        setVariables={setFunctionParams}
+        ids={ids}
+        addId={addId}
+        removeId={removeId}
+        sandbox={sandbox}
+      />
+    )
   }
 
   return null;

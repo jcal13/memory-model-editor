@@ -9,6 +9,12 @@ import DownloadJsonButton from "./canvas/components/DownloadJsonButton";
 import { submitCanvas } from "./services/questionValidationServices";
 import InformationTabs from "./informationTabs/InformationTabs";
 
+const DEFAULT_PLACEHOLDER_WIDTH = 500;
+const MIN_PLACEHOLDER_WIDTH = 100;
+const MAX_PLACEHOLDER_VIEWPORT_RATIO = 0.6667;
+const PLACEHOLDER_SUBTRACT_OFFSET = 100; 
+const MAX_PLACEHOLDER_CSS_WIDTH = `${MAX_PLACEHOLDER_VIEWPORT_RATIO * 100}vw`;
+
 export default function MemoryModelEditor({
   sandbox = true,
 }: {
@@ -19,10 +25,10 @@ export default function MemoryModelEditor({
   const [ids, setIds] = useState<number[]>([]);
   const [sandboxMode, setSandboxMode] = useState<boolean>(sandbox);
   const [submissionResults, setSubmissionResults] = useState<SubmissionResult>(null);
-  const [activeTab, setActiveTab] = useState<Tab>("question")
+  const [activeTab, setActiveTab] = useState<Tab>("question");
 
   // width state for placeholder panel
-  const [placeholderWidth, setPlaceholderWidth] = useState<number>(500);
+  const [placeholderWidth, setPlaceholderWidth] = useState<number>(DEFAULT_PLACEHOLDER_WIDTH);
   const [isResizing, setIsResizing] = useState<boolean>(false);
 
   // simple modal toggle
@@ -53,7 +59,7 @@ export default function MemoryModelEditor({
       const res = await submitCanvas(elements);
       setSubmissionResults(res);
       console.log("Backend response:", res);
-      setActiveTab("feedback")
+      setActiveTab("feedback");
     } catch (error) {
       console.error("Error sending to backend:", error);
     }
@@ -75,9 +81,9 @@ export default function MemoryModelEditor({
       if (!isResizing || !subContainerRef.current) return;
       const rect = subContainerRef.current.getBoundingClientRect();
       const newWidth = rect.right - e.clientX;
-      const minPlaceholderWidth = 100;
-      const maxPlaceholderWidth = rect.width - 100;
-      if (newWidth >= minPlaceholderWidth && newWidth <= maxPlaceholderWidth) {
+      const maxBasedOnViewport = window.innerWidth * MAX_PLACEHOLDER_VIEWPORT_RATIO;
+      const maxPlaceholderWidth = Math.min(rect.width - PLACEHOLDER_SUBTRACT_OFFSET, maxBasedOnViewport);
+      if (newWidth >= MIN_PLACEHOLDER_WIDTH && newWidth <= maxPlaceholderWidth) {
         setPlaceholderWidth(newWidth);
       }
     };
@@ -132,7 +138,10 @@ export default function MemoryModelEditor({
 
         <div
           className={styles.placeholder}
-          style={{ width: `${placeholderWidth}px` }}
+          style={{ 
+            width: `${placeholderWidth}px`,
+            maxWidth: MAX_PLACEHOLDER_CSS_WIDTH 
+          }}
         >
           <InformationTabs
             submissionResults={submissionResults}

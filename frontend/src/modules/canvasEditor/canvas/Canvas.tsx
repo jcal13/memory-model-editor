@@ -121,12 +121,16 @@ export default function Canvas({
         newKind = { name: "primitive", type: "None", value: "None" };
         break;
       case "function":
+        const functionCount = elements.filter(
+          (el) => el.kind.name === "function"
+        ).length;
         newKind = {
           name: "function",
           type: "function",
           value: null,
           functionName: "__main__",
           params: [],
+          order: functionCount + 1,
         };
         break;
       case "list":
@@ -185,9 +189,22 @@ export default function Canvas({
 
   const saveElement = (boxId: number, updatedId: ID, updatedKind: BoxType) => {
     setElements((prev) =>
-      prev.map((el) =>
-        el.boxId === boxId ? { ...el, id: updatedId, kind: updatedKind } : el
-      )
+      prev.map((el) => {
+        if (el.boxId !== boxId) return el;
+
+        if (el.kind.name === "function" && updatedKind.name === "function") {
+          const order =
+            (updatedKind as any).order ?? (el.kind as any).order ?? 0;
+
+          return {
+            ...el,
+            id: updatedId,
+            kind: { ...el.kind, ...updatedKind, order },
+          };
+        }
+
+        return { ...el, id: updatedId, kind: updatedKind };
+      })
     );
   };
 
@@ -212,17 +229,41 @@ export default function Canvas({
   const handleReorder = useCallback(
     (from: number, to: number) => {
       if (from === to) return;
+
       setElements((prev) => {
         const funcIdxs = prev
           .map((el, i) => ({ el, i }))
           .filter(({ el }) => el.kind.name === "function");
+
         const fromIdx = funcIdxs[from].i;
         const toIdx = funcIdxs[to].i;
 
         const next = [...prev];
         const [moved] = next.splice(fromIdx, 1);
         next.splice(toIdx, 0, moved);
-        return next;
+
+        const reorderedFuncs = next.filter((el) => el.kind.name === "function");
+        const total = reorderedFuncs.length;
+
+        const orderMap = new Map<number, number>();
+        reorderedFuncs.forEach((func, idx) => {
+          orderMap.set(func.boxId, idx + 1);
+        });
+
+        console.log("Reordered functions:", orderMap);
+
+        return next.map((el) => {
+          if (el.kind.name === "function" && orderMap.has(el.boxId)) {
+            return {
+              ...el,
+              kind: {
+                ...el.kind,
+                order: orderMap.get(el.boxId)!,
+              },
+            };
+          }
+          return el;
+        });
       });
     },
     [setElements]

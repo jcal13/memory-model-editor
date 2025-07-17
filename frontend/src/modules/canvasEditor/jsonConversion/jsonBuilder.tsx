@@ -5,6 +5,7 @@ type FrameEntry = {
   name: string;
   id: null;
   value: Record<string, number>;
+  order: number;
 };
 
 type ValueEntry = {
@@ -17,13 +18,11 @@ type ValueEntry = {
 export function buildJSONFromElements(
   elements: CanvasElement[]
 ): (FrameEntry | ValueEntry)[] {
-  
   const jsonData: FrameEntry[] = [];
   const valueEntries: ValueEntry[] = [];
 
   // Step 1: Add .frame entries for functions
   elements.forEach(({ id, kind }) => {
-
     if (kind.name === "function") {
       const frameValue: Record<string, number> = {};
       for (const param of kind.params || []) {
@@ -36,6 +35,7 @@ export function buildJSONFromElements(
         name: kind.functionName || `func${id}`,
         id: null,
         value: frameValue,
+        order: kind.order ?? 0,
       });
     }
   });

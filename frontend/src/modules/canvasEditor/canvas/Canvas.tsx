@@ -153,11 +153,10 @@ export default function Canvas({
     );
 
     setElements((prev) => {
-      const boxIds = prev.map(el => el.boxId as number).sort((a, b) => a - b);
-      let newBoxId = boxIds.length;         
-      for (let i = 0; i < boxIds.length; i++) {
-        if (boxIds[i] !== i) {               
-          newBoxId = i;
+      let newBoxId = prev.length;
+      for (let i = 0; i < prev.length - 1; i++) {
+        if ((prev[i].boxId as number) + 1 !== prev[i + 1].boxId) {
+          newBoxId = (prev[i].boxId as number) + 1;
           break;
         }
       }

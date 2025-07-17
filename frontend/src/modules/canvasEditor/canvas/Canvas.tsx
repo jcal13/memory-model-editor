@@ -153,20 +153,22 @@ export default function Canvas({
     );
 
     setElements((prev) => {
-      let newBoxId = prev.length;
-      for (let i = 0; i < prev.length - 1; i++) {
-        if ((prev[i].boxId as number) + 1 !== prev[i + 1].boxId) {
-          newBoxId = (prev[i].boxId as number) + 1;
+      const boxIds = prev.map(el => el.boxId as number).sort((a, b) => a - b);
+      let newBoxId = boxIds.length;          
+      for (let i = 0; i < boxIds.length; i++) {
+        if (boxIds[i] !== i) {               
+          newBoxId = i;
           break;
         }
       }
+      let computedId: ID = "_";                           
+      if (!sandbox && newKind.name !== "function") {
+        const sortedIds = [...ids].sort((a, b) => a - b); 
+        computedId = sortedIds.length;                    
 
-      let computedId: ID =
-        !sandbox && newKind.name !== "function" ? ids.length : "_";
-      if (!sandbox) {
-        for (let i = 0; i < ids.length - 1; i++) {
-          if ((ids[i] as number) + 1 !== ids[i + 1]) {
-            computedId = (ids[i] as number) + 1;
+        for (let i = 0; i < sortedIds.length; i++) {
+          if (sortedIds[i] !== i) {                       
+            computedId = i;
             break;
           }
         }

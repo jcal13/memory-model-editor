@@ -26,7 +26,7 @@ export default function MemoryModelEditor({
   const [sandboxMode, setSandboxMode] = useState<boolean>(sandbox);
   const [submissionResults, setSubmissionResults] = useState<SubmissionResult>(null);
   const [activeTab, setActiveTab] = useState<Tab>("question");
-  const [paletteTab, setPaletteTab] = useState<PaletteTab>("basic");
+  const [paletteTab, setPaletteTab] = useState<PaletteTab>("all");
 
   // width state for placeholder panel
   const [placeholderWidth, setPlaceholderWidth] = useState<number>(DEFAULT_PLACEHOLDER_WIDTH);

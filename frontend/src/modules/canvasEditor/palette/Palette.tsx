@@ -1,24 +1,43 @@
 import PaletteBox from "./components/PaletteBox";
 import styles from "./styles/Palette.module.css";
+import { PaletteTab } from "../shared/types";
 
-/* =======================================
-   === Palette Component ===
-   Renders draggable PaletteBoxes for each type.
-======================================= */
+const BASIC_TYPES = ["primitive", "function", "class"] as const;
+const COLLECTION_TYPES = ["list", "tuple", "set", "dict"] as const;
 
-export default function Palette() {
+interface Props {
+  activeTab: PaletteTab;
+  setActive: (tab: PaletteTab) => void;
+}
+
+export default function Palette({ activeTab, setActive }: Props) {
+  const renderTabButton = (tab: PaletteTab, label: string) => (
+    <button
+      type="button"
+      className={`${styles.tabBtn} ${activeTab === tab ? styles.active : ""}`}
+      onClick={() => setActive(tab)}
+    >
+      {label}
+    </button>
+  );
+
+  const boxes =
+    activeTab === "basic" ? BASIC_TYPES : COLLECTION_TYPES;
+
   return (
-    <div className={styles.paletteWrapper}>
-      <div className={styles.paletteContainer}>
-        <h3 className={styles.paletteTitle}>Palette</h3>
+    <div className={styles.containerWrapper}>
+      <div className={styles.container}>
+        <div className={styles.tabHeaders}>
+          {renderTabButton("basic", "Basic")}
+          {renderTabButton("collections", "Collections")}
+        </div>
 
-        {/* Draggable Box Types */}
-        <div className={styles.paletteBoxes}>
-          {["function", "primitive", "list", "tuple", "set", "dict", "class"].map(
-            (type) => (
-              <PaletteBox key={type} boxType={type as any} />
-            )
-          )}
+        <div className={styles.tabBody}>
+          <div className={styles.paletteBoxes}>
+            {boxes.map((t) => (
+              <PaletteBox key={t} boxType={t} />
+            ))}
+          </div>
         </div>
       </div>
     </div>

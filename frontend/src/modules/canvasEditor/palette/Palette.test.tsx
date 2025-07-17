@@ -1,4 +1,3 @@
-import React from "react";
 import { render, screen } from "@testing-library/react";
 import Palette from "./Palette";
 
@@ -27,11 +26,14 @@ describe("Palette", () => {
     "dict",
   ];
 
+  // 💡 dummy setter so the controlled component compiles
+  const noop = () => {};
+
   /**
    * Ensures that the title "Palette" is rendered
    */
   it("renders the palette title", () => {
-    render(<Palette />);
+    render(<Palette activeTab="basic" setActive={noop} />);
     expect(screen.getByText("Palette")).toBeInTheDocument();
   });
 
@@ -39,7 +41,7 @@ describe("Palette", () => {
    * Verifies that all expected box types render via PaletteBox
    */
   it("renders all box types", () => {
-    render(<Palette />);
+    render(<Palette activeTab="basic" setActive={noop} />);
     expectedTypes.forEach((type) => {
       const box = screen.getByTestId(`palette-box-${type}`);
       expect(box).toBeInTheDocument();
@@ -52,7 +54,7 @@ describe("Palette", () => {
    * Checks that exactly six PaletteBoxes are rendered
    */
   it("renders exactly six PaletteBoxes", () => {
-    render(<Palette />);
+    render(<Palette activeTab="basic" setActive={noop} />);
     const allBoxes = screen.getAllByTestId(/palette-box-/);
     expect(allBoxes).toHaveLength(expectedTypes.length);
   });

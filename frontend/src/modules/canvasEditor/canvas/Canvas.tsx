@@ -129,7 +129,7 @@ export default function Canvas({
       case "bool":
         newKind = { name: "primitive", type: "bool", value: "false" };
         break;
-      case "primitive":          // “None”
+      case "primitive":      
         newKind = { name: "primitive", type: "None", value: "None" };
         break;
       case "function":

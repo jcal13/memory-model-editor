@@ -55,6 +55,7 @@ export default function Palette({ activeTab, setActive }: Props) {
     <div className={styles.containerWrapper}>
       <div className={styles.container}>
         <div className={styles.tabBody}>
+          <h3 className={styles.paletteTitle}>Palette</h3>
           <div className={styles.paletteBoxes}>
             {boxes.map((t) => (
               <PaletteBox key={t} boxType={t} />

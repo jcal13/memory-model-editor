@@ -74,26 +74,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px; /* vertical spacing between PaletteBox items */
+  gap: 16px;
 }
 
 
 
-/* tabs */
 .container {
   width: 100%;
   height: 100%;
-  background-color: transparent;
+  display: flex;
+  flex-direction: row;            
+  overflow: hidden;              
+  padding: 0;
   background: transparent;
   box-sizing: border-box;
-
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
-
-  padding: 0;
 }
 
 .container::-webkit-scrollbar {
@@ -109,33 +103,37 @@
 
 .tabHeaders {
   display: flex;
+  flex-direction: column;
   gap: 0.25rem;
-  margin-bottom: -1px;
-  padding: 0 0 0;
+  margin-left: -1px;            
 }
 
 .tabBtn {
   all: unset;
   cursor: pointer;
   position: relative;
-  padding: 6px 16px;
+  padding: 12px 6px;
   font-weight: 600;
-  font-size: 0.925rem;
+  font-size: 0.825rem;
   border: 1px solid #d1d5db;
-  border-bottom: none;
-  border-radius: 8px 8px 0 0;
+  border-left: none;              
+  border-radius: 0 8px 8px 0;
   background: #cfeafc;
   color: #1e3a8a;
   transition: background 120ms ease;
-  font-style: normal;
+  writing-mode: vertical-rl;      
+  text-orientation: mixed;
 }
+
 .tabBtn:hover {
   background: #b7dcff;
 }
+
 .active {
   background: #ffffff;
   color: #0f172a;
   z-index: 2;
+  border-left: 1px solid #ffffff; 
 }
 
 .content {
@@ -153,7 +151,7 @@
   align-items: flex-start;
   padding: 16px 10px;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background-color: #f3f4f6;
   box-sizing: border-box;
 }
@@ -161,9 +159,11 @@
 .tabBody {
   background: #ffffff;
   border: 1px solid #d1d5db;
-
-  border-radius: 0px 0px 8px 8px;
-  height: 100vh;
+  border-radius: 8px 0 8px 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   padding: 20px 30px;
+  flex: 1;                        
+  overflow-y: auto;               
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
 }

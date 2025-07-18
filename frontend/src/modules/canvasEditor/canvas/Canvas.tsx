@@ -117,7 +117,19 @@ export default function Canvas({
     let newKind: BoxType;
 
     switch (payload) {
-      case "primitive":
+      case "int":
+        newKind = { name: "primitive", type: "int",  value: "0" };
+        break;
+      case "float":
+        newKind = { name: "primitive", type: "float", value: "0.0" };
+        break;
+      case "str":
+        newKind = { name: "primitive", type: "str",  value: '""' };
+        break;
+      case "bool":
+        newKind = { name: "primitive", type: "bool", value: "false" };
+        break;
+      case "primitive":          // “None”
         newKind = { name: "primitive", type: "None", value: "None" };
         break;
       case "function":

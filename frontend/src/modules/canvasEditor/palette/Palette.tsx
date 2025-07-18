@@ -2,11 +2,14 @@ import PaletteBox from "./components/PaletteBox";
 import styles from "./styles/Palette.module.css";
 import { PaletteTab } from "../shared/types";
 
-/** Box categories */
+/** Keys that correspond to BoxConfigs entries */
 export type BoxType =
   | "class"
   | "function"
-  | "primitive"
+  | "int"
+  | "float"
+  | "str"
+  | "bool"
   | "list"
   | "tuple"
   | "set"
@@ -15,14 +18,18 @@ export type BoxType =
 const ALL_TYPES = [
   "class",
   "function",
-  "primitive",
+  "int",
+  "float",
+  "str",
+  "bool",
   "list",
   "tuple",
   "set",
   "dict",
 ] as const;
+
 const CLASS_FN_TYPES = ["class", "function"] as const;
-const PRIMITIVE_TYPES = ["primitive"] as const;
+const PRIMITIVE_TYPES = ["int", "float", "str", "bool"] as const;
 const COLLECTION_TYPES = ["list", "tuple", "set", "dict"] as const;
 
 interface Props {

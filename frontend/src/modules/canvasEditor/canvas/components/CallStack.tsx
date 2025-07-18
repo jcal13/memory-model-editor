@@ -27,7 +27,7 @@ const TRACK_INSET = 4;
 const THUMB_MIN_H = 30;
 const DRAG_PX = 6;
 
-const Y_OFFSET = 30; // keep maths & visuals in sync
+const Y_OFFSET = 30;
 
 interface Props {
   frames: CanvasElement[];
@@ -51,8 +51,9 @@ const CallStack: React.FC<Props> = ({
   width = 230,
 }) => {
   const clipId = useId();
+
   const [viewportH, setViewportH] = useState(
-    typeof window !== "undefined" ? window.innerHeight - 110 : 800
+    typeof window === "undefined" ? 800 : window.innerHeight - 110
   );
   useEffect(() => {
     const onResize = () => setViewportH(window.innerHeight - 110);
@@ -60,12 +61,12 @@ const CallStack: React.FC<Props> = ({
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  /* order & layout */
   const ordered = useMemo(() => [...frames], [frames]);
 
   const [boxSizes, setBoxSizes] = useState<
     Record<number, { w: number; h: number }>
   >({});
-
   const handleSizeChange = useCallback(
     (id: number, s: { w: number; h: number }) => {
       if (s.w < 1 || s.h < 1) return;
@@ -76,12 +77,14 @@ const CallStack: React.FC<Props> = ({
     []
   );
 
-  const maxBoxW = useMemo(() => {
-    return frames.reduce((m, f) => {
-      const w = boxSizes[f.boxId]?.w ?? BOX_WIDTH;
-      return Math.max(m, w);
-    }, BOX_WIDTH);
-  }, [frames, boxSizes]);
+  const maxBoxW = useMemo(
+    () =>
+      frames.reduce(
+        (m, f) => Math.max(m, boxSizes[f.boxId]?.w ?? BOX_WIDTH),
+        BOX_WIDTH
+      ),
+    [frames, boxSizes]
+  );
   const colW = Math.max(width, maxBoxW);
 
   const columnH = viewportH - y - 10;
@@ -100,9 +103,9 @@ const CallStack: React.FC<Props> = ({
 
   const totalH = layout.reduce((acc, { h }) => acc + h + GAP - 9, -GAP);
 
+  /* scrolling */
   const [scroll, setScroll] = useState(0);
   const maxScroll = Math.max(0, totalH - visibleH);
-
   const [isScrolling, setScrolling] = useState(false);
   const fadeTimer = useRef<NodeJS.Timeout | null>(null);
   const onWheel: React.WheelEventHandler = (e) => {
@@ -119,48 +122,42 @@ const CallStack: React.FC<Props> = ({
     startY: number;
     ghost: SVGGElement;
     origT: string;
-    rowH: number;
     active: boolean;
   };
-
   const dragRef = useRef<Drag>(null);
-  const [insertIdx, setInsertIdx] = useState<number | null>(null);
+  const [insertIdx, setInsertIdx] = useState<number | null>(null); // visual gap 0‥N
   const [markerY, setMarkerY] = useState<number | null>(null);
 
-  const computeInsert = (ghostCenter: number) => {
-    const positions = layout.map(({ yLocal, h }, arrayIndex) => {
-      const center = yLocal + scroll + Y_OFFSET;
-      return {
-        arrayIndex,
-        top: center - h / 2,     // ▲ true top of the box
-        bottom: center + h / 2,  // ▲ true bottom
-      };
-    });
+  // compute gap under ghost 
+  const computeInsert = (ghostCenter: number, fromIdx: number) => {
+    const positions = layout
+      .map(({ yLocal, h }, i) => ({
+        i,
+        top: yLocal + scroll + Y_OFFSET - h / 2,
+        bottom: yLocal + scroll + Y_OFFSET + h / 2,
+      }))
+      .filter(({ i }) => i !== fromIdx)
+      .sort((a, b) => a.top - b.top);
 
-    positions.sort((a, b) => a.top - b.top);
-
-    let insert = positions.length;
-    for (let i = 0; i < positions.length; i++) {
-      if (ghostCenter < positions[i].top) {
-        insert = i;
+    let gap = positions.length; // after last by default
+    for (let g = 0; g < positions.length; g++) {
+      if (ghostCenter < positions[g].top) {
+        gap = g;
         break;
       }
     }
 
-    const gapY =
-      insert === 0 ? positions[0].top : positions[insert - 1].bottom;
-
-    return { idx: insert, gapY };
+    const gapY = gap === 0 ? positions[0].top : positions[gap - 1].bottom;
+    return { gap, gapY }; // gap is visual 0‥N
   };
 
   const onRowDown =
-    (idx: number, h: number) => (e: React.PointerEvent<SVGGElement>) => {
+    (idx: number) => (e: React.PointerEvent<SVGGElement>) => {
       dragRef.current = {
         from: idx,
         startY: e.clientY,
         ghost: e.currentTarget,
         origT: e.currentTarget.getAttribute("transform") || "",
-        rowH: h,
         active: false,
       };
     };
@@ -179,10 +176,10 @@ const CallStack: React.FC<Props> = ({
 
     st.ghost.setAttribute("transform", `${st.origT} translate(0 ${dy})`);
 
-    const ghostCenter =
-      layout[st.from].yLocal + scroll + Y_OFFSET + dy;
-    const { idx, gapY } = computeInsert(ghostCenter);
-    setInsertIdx(idx);
+    const ghostCenter = layout[st.from].yLocal + scroll + Y_OFFSET + dy;
+    const { gap, gapY } = computeInsert(ghostCenter, st.from);
+
+    setInsertIdx(gap); // gap is 0‥N (N means very bottom)
     setMarkerY(gapY);
   };
 
@@ -194,13 +191,13 @@ const CallStack: React.FC<Props> = ({
     st.ghost.setAttribute("opacity", "1");
 
     if (st.active && insertIdx !== null) {
-      const toIdx =
-        insertIdx >= layout.length ? 0 : layout.length - 1 - insertIdx;
-
-      if (toIdx !== st.from) {
-        onReorder(st.from, toIdx);
-      }
+      /* ★ FIX: convert gap‑index (0‥N) → data index (0‥N‑1, 0 = bottom) */
+      const N = layout.length;
+      const targetDataIdx =
+        insertIdx === N ? 0 : N - 1 - insertIdx; // bottom gap ⇒ 0
+      if (targetDataIdx !== st.from) onReorder(st.from, targetDataIdx);
     }
+
     setInsertIdx(null);
     setMarkerY(null);
     st.ghost.releasePointerCapture(e.pointerId);
@@ -213,6 +210,7 @@ const CallStack: React.FC<Props> = ({
     return m;
   }, [ordered]);
 
+  // scrollbar maths
   const trackX = x + colW - TRACK_W - TRACK_INSET;
   const trackY = y + LABEL_H - 5;
   const trackH = TOP_PAD + visibleH + BOTTOM_PAD;
@@ -227,10 +225,12 @@ const CallStack: React.FC<Props> = ({
   const thumbDrag = useRef(false);
   const thumbStartY = useRef(0);
   const thumbStartScroll = useRef(0);
+
   const H_PAD = maxBoxW;
 
   return (
     <g className={styles.root} onWheel={onWheel}>
+
       <rect
         className={styles.containerRect}
         x={x}
@@ -241,6 +241,7 @@ const CallStack: React.FC<Props> = ({
         ry={10}
       />
 
+ 
       <text
         className={styles.title}
         x={x + colW / 2}
@@ -250,6 +251,7 @@ const CallStack: React.FC<Props> = ({
         Call&nbsp;Stack
       </text>
 
+ 
       <clipPath id={clipId}>
         <rect
           x={x - H_PAD}
@@ -258,6 +260,7 @@ const CallStack: React.FC<Props> = ({
           height={TOP_PAD + visibleH + BOTTOM_PAD}
         />
       </clipPath>
+
 
       <g
         clipPath={`url(#${clipId})`}
@@ -268,7 +271,7 @@ const CallStack: React.FC<Props> = ({
             key={f.boxId}
             transform={`translate(0, ${yLocal + scroll + Y_OFFSET})`}
             cursor="grab"
-            onPointerDown={onRowDown(idx, h)}
+            onPointerDown={onRowDown(idx)}
             onPointerMove={onRowMove}
             onPointerUp={onRowUp}
           >

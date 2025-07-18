@@ -27,6 +27,8 @@ const TRACK_INSET = 4;
 const THUMB_MIN_H = 30;
 const DRAG_PX = 6;
 
+const Y_OFFSET = 30; // keep maths & visuals in sync
+
 interface Props {
   frames: CanvasElement[];
   selected: CanvasElement | null;
@@ -126,30 +128,27 @@ const CallStack: React.FC<Props> = ({
   const [markerY, setMarkerY] = useState<number | null>(null);
 
   const computeInsert = (ghostCenter: number) => {
-    const positions = layout.map(({ yLocal, h }, arrayIndex) => ({
-      arrayIndex,
-      visualTop: yLocal + scroll,
-      visualBottom: yLocal + scroll + h,
-    }));
+    const positions = layout.map(({ yLocal, h }, arrayIndex) => {
+      const center = yLocal + scroll + Y_OFFSET;
+      return {
+        arrayIndex,
+        top: center - h / 2,     // ▲ true top of the box
+        bottom: center + h / 2,  // ▲ true bottom
+      };
+    });
 
-    positions.sort((a, b) => a.visualTop - b.visualTop);
+    positions.sort((a, b) => a.top - b.top);
 
     let insert = positions.length;
     for (let i = 0; i < positions.length; i++) {
-      if (ghostCenter < positions[i].visualTop) {
+      if (ghostCenter < positions[i].top) {
         insert = i;
         break;
       }
     }
 
-    let gapY: number;
-    if (insert === 0) {
-      gapY = positions[0].visualTop;
-    } else if (insert === positions.length) {
-      gapY = positions[positions.length - 1].visualBottom;
-    } else {
-      gapY = positions[insert].visualTop;
-    }
+    const gapY =
+      insert === 0 ? positions[0].top : positions[insert - 1].bottom;
 
     return { idx: insert, gapY };
   };
@@ -180,7 +179,8 @@ const CallStack: React.FC<Props> = ({
 
     st.ghost.setAttribute("transform", `${st.origT} translate(0 ${dy})`);
 
-    const ghostCenter = layout[st.from].yLocal + scroll + dy;
+    const ghostCenter =
+      layout[st.from].yLocal + scroll + Y_OFFSET + dy;
     const { idx, gapY } = computeInsert(ghostCenter);
     setInsertIdx(idx);
     setMarkerY(gapY);
@@ -227,7 +227,6 @@ const CallStack: React.FC<Props> = ({
   const thumbDrag = useRef(false);
   const thumbStartY = useRef(0);
   const thumbStartScroll = useRef(0);
-
   const H_PAD = maxBoxW;
 
   return (
@@ -267,28 +266,27 @@ const CallStack: React.FC<Props> = ({
         {layout.map(({ f, yLocal, h }, idx) => (
           <g
             key={f.boxId}
-            transform={`translate(0, ${yLocal + scroll + 30})`}
+            transform={`translate(0, ${yLocal + scroll + Y_OFFSET})`}
             cursor="grab"
             onPointerDown={onRowDown(idx, h)}
             onPointerMove={onRowMove}
             onPointerUp={onRowUp}
           >
-            {selected?.boxId === f.boxId &&
-              (() => {
-                const w = boxSizes[f.boxId]?.w ?? BOX_WIDTH;
-                return (
-                  <rect
-                    className={styles.selectedRect}
-                    x={-w / 2 + 6}
-                    y={-h / 2 - SEL_PAD_TOP + 23}
-                    width={w - 14}
-                    height={h + SEL_PAD_TOP + SEL_PAD_BOTTOM - 44}
-                    rx={6}
-                    ry={6}
-                    pointerEvents="none"
-                  />
-                );
-              })()}
+            {selected?.boxId === f.boxId && (() => {
+              const w = boxSizes[f.boxId]?.w ?? BOX_WIDTH;
+              return (
+                <rect
+                  className={styles.selectedRect}
+                  x={-w / 2 + 6}
+                  y={-h / 2 - SEL_PAD_TOP + 23}
+                  width={w - 14}
+                  height={h + SEL_PAD_TOP + SEL_PAD_BOTTOM - 44}
+                  rx={6}
+                  ry={6}
+                  pointerEvents="none"
+                />
+              );
+            })()}
 
             <MemoCanvasBox
               element={memoEls[f.boxId]}

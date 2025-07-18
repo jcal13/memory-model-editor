@@ -45,7 +45,7 @@ export default function Palette({ activeTab, setActive }: Props) {
       className={`${styles.tabBtn} ${activeTab === tab ? styles.active : ""}`}
       onClick={() => setActive(tab)}
     >
-      {label}
+      <span className={styles.tabLabel}>{label}</span>
     </button>
   );
 
@@ -61,6 +61,13 @@ export default function Palette({ activeTab, setActive }: Props) {
   return (
     <div className={styles.containerWrapper}>
       <div className={styles.container}>
+        <div className={styles.tabHeaders}>
+          {TabBtn("all", "All")}
+          {TabBtn("classesFns", "Classes & functions")}
+          {TabBtn("primitives", "Primitives")}
+          {TabBtn("collections", "Collections")}
+        </div>
+
         <div className={styles.tabBody}>
           <h3 className={styles.paletteTitle}>Palette</h3>
           <div className={styles.paletteBoxes}>
@@ -68,13 +75,6 @@ export default function Palette({ activeTab, setActive }: Props) {
               <PaletteBox key={t} boxType={t} />
             ))}
           </div>
-        </div>
-
-        <div className={styles.tabHeaders}>
-          {TabBtn("all", "All")}
-          {TabBtn("classesFns", "Classes & functions")}
-          {TabBtn("primitives", "Primitives")}
-          {TabBtn("collections", "Collections")}
         </div>
       </div>
     </div>

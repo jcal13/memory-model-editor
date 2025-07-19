@@ -13,6 +13,8 @@ type ValueEntry = {
   id: number;
   value: any;
   name?: string;
+  x: number;
+  y: number;
 };
 
 export function buildJSONFromElements(
@@ -41,7 +43,7 @@ export function buildJSONFromElements(
   });
 
   // Step 2: Add value entries for everything else
-  elements.forEach(({ id, kind }) => {
+  elements.forEach(({ id, kind, x, y }) => {
     if (typeof id !== "number") {
       console.warn(`Skipping value with non-numeric id: ${id}`);
       return;
@@ -57,12 +59,16 @@ export function buildJSONFromElements(
         type: kind.type,
         id,
         value: parsed,
+        x: x,
+        y: y
       });
     } else if (["list", "tuple", "set", "dict"].includes(kind.name)) {
       valueEntries.push({
         type: kind.type,
         id,
         value: kind.value,
+        x: x,
+        y: y
       });
     }
   });

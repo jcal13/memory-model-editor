@@ -8,16 +8,26 @@ import "prismjs/themes/prism-tomorrow.css";
 
 type View = "root" | "loading" | "test" | "question";
 
-export default function QuestionTab() {
+export default function QuestionTab({
+  questionIndex,
+  setQuestionIndex,
+  questionType,
+  setQuestionType,
+}: {
+  questionIndex: number | null;
+  setQuestionIndex: (i: number | null) => void;
+  questionType: "test" | "practice" | null;
+  setQuestionType: (t: "test" | "practice" | null) => void;
+}) {
   const [view, setView] = useState<View>("root");
   const [testCount, setTestCount] = useState(0);
-  const [currentId, setCurrentId] = useState<number | null>(null);
   const [questionData, setQuestionData] = useState<any>(null);
 
   const loadTestQuestions = async () => {
     setView("loading");
     const count = await fetchTestQuestionCount();
     setTestCount(count);
+    setQuestionType("test");
     setView("test");
   };
 
@@ -27,7 +37,7 @@ export default function QuestionTab() {
       `http://localhost:3001/questions/testquestions/${id}`
     );
     const data = await res.json();
-    setCurrentId(id);
+    setQuestionIndex(id);
     setQuestionData(data);
     setView("question");
   };
@@ -38,7 +48,7 @@ export default function QuestionTab() {
         {view === "test"
           ? "Test Questions"
           : view === "question"
-          ? `Question ${currentId}`
+          ? `Question ${questionIndex}`
           : "Questions"}
       </h1>
 

@@ -4,10 +4,10 @@ import validateAnswer from "./validateAnswer";
 const router = express.Router();
 
 router.post("/submit", (req, res) => {
-  const canvasJSON = req.body;
-  console.log("Canvas data:", canvasJSON);
+  const { model, questionIndex, questionType } = req.body;
+  console.log("Canvas data:", model);
 
-  const result = validateAnswer(canvasJSON);
+  const result = validateAnswer(model, questionIndex, questionType);
   console.log("User submission is", result.correct ? "Correct" : "Incorrect");
   if (!result.correct) {
     console.log("Errors:");

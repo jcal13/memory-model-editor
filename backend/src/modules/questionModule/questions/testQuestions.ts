@@ -7,7 +7,7 @@ interface TestQuestion {
 const testQuestions: Record<number, TestQuestion> = {
   /* ---------------- test questions ---------------- */
   // 2023 midterm 1
-  1: {
+  0: {
     question:
       "A `Fries` object calls `Food.update_price` through inheritance. Draw the memory model before `update_price` returns.",
     code: [
@@ -59,7 +59,7 @@ const testQuestions: Record<number, TestQuestion> = {
   },
 
   // 2024 final
-  2: {
+  1: {
     question:
       "This recursive constructor builds a `RecursiveList` for `7` and `hi`. Draw every function and object created during execution of `main`.",
     code: [
@@ -116,7 +116,7 @@ const testQuestions: Record<number, TestQuestion> = {
   },
 
   // 2024 midterm 1
-  3: {
+  2: {
     question:
       "Nested helper functions append `v` plus one to a shared list then return. Draw the memory model before `a_fun` returns.",
     code: [
@@ -175,7 +175,7 @@ const testQuestions: Record<number, TestQuestion> = {
   },
 
   // 2017 final
-  4: {
+  3: {
     question:
       "`duplicate` makes a shallow copy of an outer matrix list. Draw the memory model after `duplicate` returns to `main`.",
     code: [
@@ -216,7 +216,7 @@ const testQuestions: Record<number, TestQuestion> = {
   },
 
   // 2017 midterm 1
-  5: {
+  4: {
     question:
       "`filter_queue` removes values below `minimum` and reassigns `q` inside the function. Draw the memory model just before `filter_queue` returns.",
     code: [
@@ -265,7 +265,7 @@ const testQuestions: Record<number, TestQuestion> = {
   },
 
   // 2018 midterm
-  6: {
+  5: {
     question:
       "`mystery` aliases list via `c`, mutates it, then rebinds local `b` to a new list. Draw the memory model before `mystery` returns.",
     code: [
@@ -305,7 +305,7 @@ const testQuestions: Record<number, TestQuestion> = {
   },
 
   // 2019 midterm 1
-  7: {
+  6: {
     question:
       "`copy_of` builds a shallow copy of a tic‑tac‑toe board. Draw the memory model before `copy_of` returns.",
     code: [
@@ -350,7 +350,7 @@ const testQuestions: Record<number, TestQuestion> = {
   },
 
   // 2019 midterm 2
-  8: {
+  7: {
     question:
       "`append_sometimes` appends `2` to sublists that lack it using aliasing. Draw the memory model before `append_sometimes` returns.",
     code: [
@@ -397,7 +397,7 @@ const testQuestions: Record<number, TestQuestion> = {
   },
 
   // 2019 midterm 3
-  9: {
+  8: {
     question:
       "Two `BagOfStuff` objects share the same list which is mutated after the first construction. Draw the memory model before the `assert` executes.",
     code: [
@@ -431,7 +431,7 @@ const testQuestions: Record<number, TestQuestion> = {
   },
 
   // 2022 final
-  10: {
+  9: {
     question:
       "`do_something` appends ninety‑nine to each inner list accessed through an alias. Draw the memory model after `do_something` is popped.",
     code: [

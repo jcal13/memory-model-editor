@@ -3,6 +3,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import canvasEditorRouter from "./modules/canvasEditor";
+import questionModuleRouter from "./modules/questionModule";
 
 const app = express();
 const port = 3001;
@@ -13,6 +14,8 @@ app.use(express.json());
 
 app.use(bodyParser.json());
 app.use("/canvasEditor", canvasEditorRouter);
+
+app.use("/questions", questionModuleRouter);
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

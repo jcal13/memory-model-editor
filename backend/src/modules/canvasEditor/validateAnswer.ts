@@ -1,4 +1,4 @@
-import questions from "./questions";
+import testQuestions from "../questionModule/questions/testQuestions";
 
 /* ---------- types ---------- */
 export type MemoryBox = {
@@ -456,12 +456,30 @@ function compareIds(
   }
 }
 
+// Check if the call stack order matches between answer and input
+function checkCallStackOrder(
+  answerFrames: MemoryBox[],
+  inputFrames: MemoryBox[],
+  errors: string[]
+) {
+  // The arrays come from gatherFrames and preserve the order
+  if (answerFrames.length !== inputFrames.length) return; // size already handled
+  for (let i = 0; i < answerFrames.length; i++) {
+    if (answerFrames[i].name !== inputFrames[i].name) {
+      errors.push(
+        "Function order mismatch: call stack order differs from expected"
+      );
+      break;
+    }
+  }
+}
+
 /* ---------- main validation function ---------- */
 export default function validateAnswer(userModel: MemoryBox[]): {
   correct: boolean;
   errors: string[];
 } {
-  const answerModel = questions[1].answer; // adjust index as needed
+  const answerModel = testQuestions[1].answer as MemoryBox[]; // adjust index as needed
   const errors: string[] = [];
 
   // gather frames from both models
@@ -470,6 +488,17 @@ export default function validateAnswer(userModel: MemoryBox[]): {
     userModel,
     errors
   );
+
+  // check for function + function call stack errors
+  const hasFunctionErrors = errors.some(
+    (e) =>
+      e.startsWith("Function count mismatch") ||
+      e.startsWith("Missing function") ||
+      e.startsWith("Unexpected function")
+  );
+  if (!hasFunctionErrors) {
+    checkCallStackOrder(answerFrames, inputFrames, errors);
+  }
 
   // get duplicate IDs in the user model
   const dup = scanDuplicates(userModel, errors);
@@ -498,7 +527,7 @@ export default function validateAnswer(userModel: MemoryBox[]): {
     errors
   );
 
-  // detect duplicates in the user model
+  // detect orphans in the user model
   detectOrphans(inputFrames, inputMap, userModel, answerMap, errors);
 
   return { correct: errors.length === 0, errors };

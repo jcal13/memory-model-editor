@@ -124,7 +124,7 @@ export default function Canvas({
         newKind = { name: "primitive", type: "float", value: "0.0" };
         break;
       case "str":
-        newKind = { name: "primitive", type: "str",  value: '""' };
+        newKind = { name: "primitive", type: "str",  value: '' };
         break;
       case "bool":
         newKind = { name: "primitive", type: "bool", value: "false" };
@@ -211,11 +211,7 @@ export default function Canvas({
 
   /* ----------------------- Open element ----------------------- */
   const openElement = (canvasElement: CanvasElement) => {
-    setOpenBoxEditors((prev) =>
-      prev.some((el) => el.boxId === canvasElement.boxId)
-        ? prev
-        : [...prev, canvasElement]
-    );
+    setOpenBoxEditors([canvasElement]);
     setSelected(canvasElement);
   };
 

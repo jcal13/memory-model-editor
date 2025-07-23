@@ -25,14 +25,14 @@ export const BoxConfigs = {
   /* ---------- Concrete primitives ---------- */
   int: {
     draw: (model: any) => {
-      model.drawPrimitive(15, 15, "int",  "0",   "", style);
+      model.drawPrimitive(15, 15, "int",  "0",   "0", style);
     },
     minHeight: 90,
     minWidth: 170,
   },
   float: {
     draw: (model: any) => {
-      model.drawPrimitive(15, 15, "float","0", "", style);
+      model.drawPrimitive(15, 15, "float","0", "0.0", style);
     },
     minHeight: 90,
     minWidth: 170,

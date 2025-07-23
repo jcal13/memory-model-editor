@@ -16,8 +16,8 @@ export type BoxType =
   | "dict";
 
 const ALL_TYPES = [
-  "class",
   "function",
+  "class",
   "int",
   "float",
   "str",
@@ -28,7 +28,7 @@ const ALL_TYPES = [
   "dict",
 ] as const;
 
-const CLASS_FN_TYPES = ["class", "function"] as const;
+const CLASS_FN_TYPES = ["function", "class"] as const;
 const PRIMITIVE_TYPES = ["int", "float", "str", "bool"] as const;
 const COLLECTION_TYPES = ["list", "tuple", "set", "dict"] as const;
 

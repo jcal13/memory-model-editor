@@ -54,7 +54,6 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
 }
 
-/* === Type Selector / Display === */
 .typeSelector {
   font-size: 0.95rem;
   padding: 10px 12px;
@@ -63,19 +62,6 @@
   background-color: #f9fafb;
   color: #374151;
   cursor: pointer;           /* remains interactive for any dropdowns */
-  box-sizing: border-box;
-}
-
-/* === NEW: Non‑interactive pill for fixed primitive type === */
-.typeSelectorStatic {
-  font-size: 0.95rem;
-  padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  background-color: #f9fafb;
-  color: #374151;
-  cursor: default;           /* not pressable */
-  user-select: none;
   box-sizing: border-box;
 }
 

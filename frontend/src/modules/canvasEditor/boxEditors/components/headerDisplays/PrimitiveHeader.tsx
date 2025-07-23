@@ -2,6 +2,7 @@
 import IdDisplay from "./components/IdDisplay";
 import styles from "../../styles/BoxEditorStyles.module.css";
 import { ID, PrimitiveType } from "../../../shared/types";
+import TypeDisplay from "./components/TypeDisplay";
 
 /**
  * PrimitiveHeader now shows a read‑only pill with the fixed
@@ -40,8 +41,7 @@ const PrimitiveHeader = ({
       removeId={removeId}
       sandbox={sandbox}
     />
-
-    <div className={styles.typeSelectorStatic}>{dataType}</div>
+    <TypeDisplay typeLabel={dataType} />
   </div>
 );
 

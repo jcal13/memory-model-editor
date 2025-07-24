@@ -26,6 +26,7 @@ export type FunctionKind = {
   value: null;
   functionName: string;
   params: FunctionParams[];
+  order: number;
 };
 
 export interface ListKind {

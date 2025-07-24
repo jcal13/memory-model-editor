@@ -5,6 +5,7 @@ type FrameEntry = {
   name: string;
   id: null;
   value: Record<string, number>;
+  order: number;
 };
 
 type ValueEntry = {
@@ -12,18 +13,18 @@ type ValueEntry = {
   id: number;
   value: any;
   name?: string;
+  x: number;
+  y: number;
 };
 
 export function buildJSONFromElements(
   elements: CanvasElement[]
 ): (FrameEntry | ValueEntry)[] {
-  
   const jsonData: FrameEntry[] = [];
   const valueEntries: ValueEntry[] = [];
 
   // Step 1: Add .frame entries for functions
   elements.forEach(({ id, kind }) => {
-
     if (kind.name === "function") {
       const frameValue: Record<string, number> = {};
       for (const param of kind.params || []) {
@@ -36,12 +37,13 @@ export function buildJSONFromElements(
         name: kind.functionName || `func${id}`,
         id: null,
         value: frameValue,
+        order: kind.order ?? 0,
       });
     }
   });
 
   // Step 2: Add value entries for everything else
-  elements.forEach(({ id, kind }) => {
+  elements.forEach(({ id, kind, x, y }) => {
     if (typeof id !== "number") {
       console.warn(`Skipping value with non-numeric id: ${id}`);
       return;
@@ -57,12 +59,16 @@ export function buildJSONFromElements(
         type: kind.type,
         id,
         value: parsed,
+        x: x,
+        y: y
       });
     } else if (["list", "tuple", "set", "dict"].includes(kind.name)) {
       valueEntries.push({
         type: kind.type,
         id,
         value: kind.value,
+        x: x,
+        y: y
       });
     }
   });

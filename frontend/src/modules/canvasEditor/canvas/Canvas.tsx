@@ -121,12 +121,16 @@ export default function Canvas({
         newKind = { name: "primitive", type: "None", value: "None" };
         break;
       case "function":
+        const functionCount = elements.filter(
+          (el) => el.kind.name === "function"
+        ).length;
         newKind = {
           name: "function",
           type: "function",
           value: null,
           functionName: "__main__",
           params: [],
+          order: functionCount + 1,
         };
         break;
       case "list":
@@ -153,20 +157,22 @@ export default function Canvas({
     );
 
     setElements((prev) => {
-      let newBoxId = prev.length;
-      for (let i = 0; i < prev.length - 1; i++) {
-        if ((prev[i].boxId as number) + 1 !== prev[i + 1].boxId) {
-          newBoxId = (prev[i].boxId as number) + 1;
+      const boxIds = prev.map(el => el.boxId as number).sort((a, b) => a - b);
+      let newBoxId = boxIds.length;          
+      for (let i = 0; i < boxIds.length; i++) {
+        if (boxIds[i] !== i) {               
+          newBoxId = i;
           break;
         }
       }
+      let computedId: ID = "_";                           
+      if (!sandbox && newKind.name !== "function") {
+        const sortedIds = [...ids].sort((a, b) => a - b); 
+        computedId = sortedIds.length;                    
 
-      let computedId: ID =
-        !sandbox && newKind.name !== "function" ? ids.length : "_";
-      if (!sandbox) {
-        for (let i = 0; i < ids.length - 1; i++) {
-          if ((ids[i] as number) + 1 !== ids[i + 1]) {
-            computedId = (ids[i] as number) + 1;
+        for (let i = 0; i < sortedIds.length; i++) {
+          if (sortedIds[i] !== i) {                       
+            computedId = i;
             break;
           }
         }
@@ -185,9 +191,22 @@ export default function Canvas({
 
   const saveElement = (boxId: number, updatedId: ID, updatedKind: BoxType) => {
     setElements((prev) =>
-      prev.map((el) =>
-        el.boxId === boxId ? { ...el, id: updatedId, kind: updatedKind } : el
-      )
+      prev.map((el) => {
+        if (el.boxId !== boxId) return el;
+
+        if (el.kind.name === "function" && updatedKind.name === "function") {
+          const order =
+            (updatedKind as any).order ?? (el.kind as any).order ?? 0;
+
+          return {
+            ...el,
+            id: updatedId,
+            kind: { ...el.kind, ...updatedKind, order },
+          };
+        }
+
+        return { ...el, id: updatedId, kind: updatedKind };
+      })
     );
   };
 
@@ -212,17 +231,41 @@ export default function Canvas({
   const handleReorder = useCallback(
     (from: number, to: number) => {
       if (from === to) return;
+
       setElements((prev) => {
         const funcIdxs = prev
           .map((el, i) => ({ el, i }))
           .filter(({ el }) => el.kind.name === "function");
+
         const fromIdx = funcIdxs[from].i;
         const toIdx = funcIdxs[to].i;
 
         const next = [...prev];
         const [moved] = next.splice(fromIdx, 1);
         next.splice(toIdx, 0, moved);
-        return next;
+
+        const reorderedFuncs = next.filter((el) => el.kind.name === "function");
+        const total = reorderedFuncs.length;
+
+        const orderMap = new Map<number, number>();
+        reorderedFuncs.forEach((func, idx) => {
+          orderMap.set(func.boxId, idx + 1);
+        });
+
+        console.log("Reordered functions:", orderMap);
+
+        return next.map((el) => {
+          if (el.kind.name === "function" && orderMap.has(el.boxId)) {
+            return {
+              ...el,
+              kind: {
+                ...el.kind,
+                order: orderMap.get(el.boxId)!,
+              },
+            };
+          }
+          return el;
+        });
       });
     },
     [setElements]

@@ -59,8 +59,8 @@ const ClassContent = ({ classVariables, setVariables, ids, addId, removeId, sand
                 placeholder="variable"
                 value={v.name}
                 onChange={(e) => changeName(idx, e.target.value)}
-                className={styles.variableNameBox}
-              />
+                className={styles.variableNameBox}                  
+              />                     
               <div className={styles.idSelectButtonWrapper}>
                 <IdSelector
                   currentId={v.targetId}

@@ -41,7 +41,9 @@ describe("Content", () => {
     ids,
     addId,
     removeId,
-    sandbox
+    sandbox,
+    ownClassVariables: [],
+    setOwnClassVariables: jest.fn(),
   };
 
   /**

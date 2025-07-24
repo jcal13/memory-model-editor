@@ -10,7 +10,7 @@ interface Props {
   classes: string[];
   addClasses: (className: string) => void;
   ownClasses: string;
-  setElementClassName: (className: string) => void;
+  setOwnClassName: (className: string) => void;
   removeClasses: (className: string) => void;
   ids: ID[];
   addId: (id: ID) => void;
@@ -18,6 +18,7 @@ interface Props {
   setElementId: (id: ID) => void;
   removeId: (id: ID) => void;
   sandbox: boolean;
+  
 }
 
 /**
@@ -28,7 +29,7 @@ const ClassHeader = ({
   classes,
   addClasses,
   ownClasses,
-  setElementClassName,
+  setOwnClassName,
   removeClasses,
   
   ids,
@@ -51,7 +52,7 @@ const ClassHeader = ({
       classes={classes}
       addClassName={addClasses}
       ownClassName={ownClasses}
-      setElementClassName={setElementClassName}
+      setElementClassName={setOwnClassName}
       removeClassName={removeClasses}
       sandbox={sandbox}
     />

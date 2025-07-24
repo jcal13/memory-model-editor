@@ -7,6 +7,7 @@ import { useCanvasResize } from "./hooks/useEffect";
 import { useCanvasRefs } from "./hooks/useRef";
 import styles from "./styles/Canvas.module.css";
 import CallStack from "./components/CallStack";
+import ClassName from "../boxEditors/components/headerDisplays/components/ClassName";
 
 const editorMap: Record<BoxType["name"], React.FC<any>> = {
   primitive: BoxEditor,
@@ -15,6 +16,7 @@ const editorMap: Record<BoxType["name"], React.FC<any>> = {
   tuple: BoxEditor,
   set: BoxEditor,
   dict: BoxEditor,
+  class: BoxEditor
 };
 
 interface Props {
@@ -158,6 +160,15 @@ export default function Canvas({
       case "dict":
         newKind = { name: "dict", type: "dict", value: {} };
         break;
+      case "class":
+          newKind = {
+            name: "class",
+            type: "class",
+            value: null,
+            className: "class",
+            classVariables: []
+          };
+          break;
       default:
         return;
     }

@@ -25,8 +25,9 @@ interface Props {
   classes?: string[]; // List of all class names
   addClasses?: (className: string) => void;
   ownClasses?: string; // Current class name for this box
-  setElementClass?: (className: string) => void;
+  setOwnClassName?: (className: string) => void;
   removeClasses?: (className: string) => void;
+
 }
 
 /**
@@ -55,8 +56,9 @@ const Header = ({
   classes = [],
   addClasses = () => {},
   ownClasses = "",
-  setElementClass = () => {},
+  setOwnClassName = () => {},
   removeClasses = () => {},
+
 }: Props) => {
   const kind = element.kind.name;
 
@@ -105,7 +107,7 @@ const Header = ({
           classes={classes}
           addClasses={addClasses}
           ownClasses={ownClasses}
-          setElementClassName={setElementClass}
+          setOwnClassName={setOwnClassName}
           removeClasses={removeClasses}
         />
       )}

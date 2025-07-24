@@ -1,13 +1,14 @@
 export type PrimitiveType = "None" | "int" | "float" | "str" | "bool";
 export type CollectionType = "list" | "tuple" | "set" | "dict";
-export type SpecialType = "function";
+export type SpecialType = "function" | "class";
 export type BoxType =
   | PrimitiveKind
   | FunctionKind
   | ListKind
   | TupleKind
   | SetKind
-  | DictKind;
+  | DictKind
+  | ClassKind;
 
 export type ValueType = PrimitiveType | CollectionType | SpecialType;
 
@@ -50,6 +51,14 @@ export interface DictKind {
   type: "dict";
   value: Record<number, number | null>;
 }
+
+export type ClassKind = {
+  name: "class";
+  type: "class";
+  value: null;
+  className: string;
+  classVariables: FunctionParams[];
+};
 
 export interface CanvasElement {
   boxId: number;

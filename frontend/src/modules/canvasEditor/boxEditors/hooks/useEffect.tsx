@@ -80,5 +80,7 @@ export const useModule = (
     functionName,
     params,
     collectionItems,
+    className,
+    classVariables
   ]);
 };

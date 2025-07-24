@@ -47,22 +47,22 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, onClose, ids,  addId, rem
     useCollectionPairsStates(metadata);
 
     // State hook for element class
-    const [ownClassName, setOwnClassName] = useClassStates(metadata);
-
+    const [
+      ownClassName, setOwnClassName,
+      ownClassVariables, setOwnClassVariables
+  ] = useClassStates(metadata);
   // -----------------------------------
 
   const collectionData = metadata.kind.name === "dict" ? collectionPairs : collectionItems;
 
   // Hook to sync the module and apply save logic when clicking outside
   useModule(
-    onSave,
-    metadata,
-    ownId,
-    dataType,
-    contentValue,
-    functionName,
-    functionParams,
-    collectionData
+    onSave, metadata, ownId,
+    dataType, contentValue,
+    functionName, functionParams,
+    collectionData,
+    ownClassName,
+    ownClassVariables
   );
   return (
     <div ref={moduleRef} className={`drag-handle ${styles.boxEditorModule}`}>
@@ -85,9 +85,10 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, onClose, ids,  addId, rem
         classes = {classes}
         ownClasses={ownClassName}
         addClasses ={addClasses}          // <-- added
-        setElementClass = {setOwnClassName}
+        setOwnClassName = {setOwnClassName}
         removeClasses={removeClasses}    // <-- added
-        
+
+
         ids={ids}
         addId={addId}
         ownId={ownId}
@@ -108,6 +109,8 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, onClose, ids,  addId, rem
         setCollectionItems={setCollectionItems}
         collectionPairs={collectionPairs}
         setCollectionPairs={setCollectionPairs}
+        ownClassVariables={ownClassVariables}
+        setOwnClassVariables={setOwnClassVariables}
         ids={ids}
         addId={addId}
         removeId={removeId}
@@ -125,6 +128,9 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, onClose, ids,  addId, rem
         setHoverRemove={setHoverRemove}
         functionName={functionName}
         functionParams={functionParams}
+        className={ownClassName}
+
+        ownClassVariables={ownClassVariables}
         items={collectionItems}
       />
     </div>

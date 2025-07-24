@@ -78,11 +78,15 @@ export const useCollectionPairsStates = (element: any) => {
  * @returns [className, setClassName, classVariables, setClassVariables]
  */
 export const useClassStates = (element: any) => {
-  const [className, setClassName] = useState(
-    element.content?.className || ""
+  // Initialize from element.kind, not element.content
+  const [className, setClassName] = useState<string>(
+    element.kind.className ?? ""
   );
   const [classVariables, setClassVariables] = useState<any[]>(
-    element.content?.variables || []
+    element.kind.classVariables ?? []
   );
-  return [className, setClassName, classVariables, setClassVariables];
+
+  // Return both name and variables (with their setters)
+  return [className, setClassName, classVariables, setClassVariables] as const;
 };
+

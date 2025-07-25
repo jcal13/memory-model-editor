@@ -1,4 +1,3 @@
-import { useState } from "react";
 import styles from "./styles/InformationTabs.module.css";
 import FeedbackTab from "./components/feedbackTab/FeedbackTab";
 import QuestionTab from "./components/questionTab/QuestionTab";

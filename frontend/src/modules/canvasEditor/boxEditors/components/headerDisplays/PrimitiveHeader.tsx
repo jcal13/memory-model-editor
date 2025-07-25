@@ -1,14 +1,20 @@
+
 import IdDisplay from "./components/IdDisplay";
-import TypeSelector from "./components/TypeSelector";
 import styles from "../../styles/BoxEditorStyles.module.css";
-import { ID } from "../../../shared/types";
+import { ID, PrimitiveType } from "../../../shared/types";
+import TypeDisplay from "./components/TypeDisplay";
+
+/**
+ * PrimitiveHeader now shows a read‑only pill with the fixed
+ * primitive type instead of the old dropdown.
+ */
 
 interface Props {
-  element: any; // The primitive memory element, including its id and kind
-  dataType: any; // Current primitive type (e.g., int, str, etc.)
-  setDataType: (type: any) => void; // Function to update the primitive type
-  value: string; // Current value of the primitive
-  setValue: (v: string) => void; // Function to update the value
+  element: any;                       
+  dataType: PrimitiveType;              
+  setDataType: (t: PrimitiveType) => void; 
+  value: string;                       
+  setValue: (v: string) => void;       
   ids: ID[];
   addId: (id: ID) => void;
   ownId: ID;
@@ -17,22 +23,14 @@ interface Props {
   sandbox: boolean;
 }
 
-/**
- * PrimitiveHeader displays the top section of a primitive-type box editor.
- * It shows the element ID and a dropdown to select the data type (e.g., int, str).
- * Changing the type updates the associated value using `setValue`.
- */
 const PrimitiveHeader = ({
   dataType,
-  setDataType,
-  value,
-  setValue,
   ids,
   addId,
   ownId,
   setElementId,
   removeId,
-  sandbox
+  sandbox,
 }: Props) => (
   <div className={styles.header} data-testid="primitive-header">
     <IdDisplay
@@ -43,12 +41,7 @@ const PrimitiveHeader = ({
       removeId={removeId}
       sandbox={sandbox}
     />
-    <TypeSelector
-      dataType={dataType}
-      setDataType={setDataType}
-      value={value}
-      setValue={setValue}
-    />
+    <TypeDisplay typeLabel={dataType} />
   </div>
 );
 

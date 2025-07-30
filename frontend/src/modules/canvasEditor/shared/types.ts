@@ -75,4 +75,9 @@ export interface BoxEditorType {
   sandbox?: boolean;
 }
 
+export type PaletteTab =
+  | "all"
+  | "classesFns"
+  | "primitives"
+  | "collections";
 export type Tab = "feedback" | "question";

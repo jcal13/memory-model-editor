@@ -3,7 +3,7 @@ import Canvas from "./canvas/Canvas";
 import Palette from "./palette/Palette";
 import ConfirmationModal from "./confirmationModal/confirmationModal";
 import styles from "./styles/MemoryModelEditor.module.css";
-import { CanvasElement, ID, SubmissionResult, Tab } from "./shared/types";
+import { CanvasElement, ID, SubmissionResult, Tab, PaletteTab} from "./shared/types";
 import SubmitButton from "./canvas/components/SubmitButton";
 import DownloadJsonButton from "./canvas/components/DownloadJsonButton";
 import { submitCanvas } from "./services/questionValidationServices";
@@ -31,6 +31,7 @@ export default function MemoryModelEditor({
   const [questionType, setQuestionType] = useState<"test" | "practice" | null>(
     null
   );
+  const [paletteTab, setPaletteTab] = useState<PaletteTab>("all");
 
   // width state for placeholder panel
   const [placeholderWidth, setPlaceholderWidth] = useState<number>(
@@ -119,7 +120,7 @@ export default function MemoryModelEditor({
   return (
     <div className={styles.container}>
       <div className={styles.paletteColumn}>
-        <Palette />
+        <Palette activeTab={paletteTab} setActive={setPaletteTab} />
       </div>
 
       <div ref={subContainerRef} className={styles.subContainer}>

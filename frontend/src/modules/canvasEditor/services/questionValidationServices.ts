@@ -15,6 +15,9 @@ export async function submitCanvas(
     questionType,
   };
 
+export async function submitCanvas(elements: CanvasElement[]) {
+  const payload = buildJSONFromElements(elements)
+  // console.log(payload)
   const response = await axios.post(
     `${API_DEV_URL}/canvasEditor/submit`,
     payload

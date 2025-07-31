@@ -6,9 +6,7 @@ import { BoxEditorType } from "../../shared/types";
 /**
  * Mocks for internal hooks and subcomponents
  */
-jest.mock("../hooks/useEffect", () => ({
-  useModule: jest.fn(),
-}));
+
 jest.mock("../hooks/useState", () => ({
   useGlobalStates: () => ({
     hoverRemove: false,
@@ -47,8 +45,11 @@ describe("BoxEditorModule", () => {
     onRemove: jest.fn(),
     onClose: jest.fn(),
     ids: [1, 2, 3],
+    classes: [],
     addId: jest.fn(),
     removeId: jest.fn(),
+    addClasses: jest.fn(),
+    removeClasses: jest.fn()
   };
 
   /**

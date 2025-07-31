@@ -97,6 +97,7 @@ export const BoxConfigs = {
   },
 
   /* ---------- Dict Box ---------- */
+  /* ---------- Dict Box ---------- */
   dict: {
     draw: (model: any, kind: any, id: ID) => {
       const dict =
@@ -108,4 +109,18 @@ export const BoxConfigs = {
     getHeight: () => 200,
     getMinWidth: () => 190,
   },
+
+    /* ---------- Class Box ---------- */
+    class: {
+      draw: (model: any, kind: any, id: ID) => {
+        const props: Record<string, number | null> = {};
+        (kind.classVariables || []).forEach((p: any) => (props[p.name] = p.targetId));
+        model.drawClass(0, 0, kind.className ?? "", id, props, false, style);
+      },
+      getHeight: () => 90,
+      getMinWidth: () => 190,
+    },
+  
 };
+
+

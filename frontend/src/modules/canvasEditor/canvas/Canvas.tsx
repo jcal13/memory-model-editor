@@ -169,7 +169,7 @@ export default function Canvas({
             name: "class",
             type: "class",
             value: null,
-            className: "class",
+            className: "NoClass",
             classVariables: []
           };
           break;

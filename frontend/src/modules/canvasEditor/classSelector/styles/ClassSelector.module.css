@@ -197,3 +197,25 @@
     outline-offset: 2px;
   }
   
+  .flexWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.autoWidthBox {
+  display: inline-flex;
+  flex: 0 0 auto;    
+  width: fit-content; 
+  max-width: 100%;
+}
+
+.autoWidthText {
+  display: inline-block;
+  white-space: nowrap;    
+  width: auto !important; 
+  padding: 6px 10px;      
+}

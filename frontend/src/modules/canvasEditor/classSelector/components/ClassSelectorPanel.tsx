@@ -46,12 +46,12 @@ const ClassSelectorPanel: React.FC<Props> = ({
       <div className={`drag-handle ${panelStyles.header}`}>Select Class</div>
 
       <div className={panelStyles.content}>
-        <div className={boxStyles.collectionIdContainer}>
+        <div className={`${boxStyles.collectionIdContainer} ${panelStyles.flexWrap}`}>
           {classes.map((className) => (
-            <div key={className} className={boxStyles.collectionIdBox}>
+            <div key={className} className={`${boxStyles.collectionIdBox} ${panelStyles.autoWidthBox}`}>
               <button
                 type="button"
-                className={boxStyles.collectionIdNoBorder}
+                className={`${boxStyles.collectionIdNoBorder} ${panelStyles.autoWidthText}`}
                 onClick={() => onSelect(className)}
               >
                 {className}
@@ -87,7 +87,7 @@ const ClassSelectorPanel: React.FC<Props> = ({
                   setShowDup(false);
                 }}
                 placeholder="Enter new class name"
-                className={panelStyles.classInputBox}   // <--- fixed here!
+                className={panelStyles.classInputBox}
                 aria-label="New class name"
               />
               <button
@@ -102,7 +102,7 @@ const ClassSelectorPanel: React.FC<Props> = ({
 
           <button
             type="button"
-            onClick={() => onSelect("_")}
+            onClick={() => onSelect("NoClass")}
             className={boxStyles.removeButton}
           >
             Unassign
@@ -125,4 +125,3 @@ const ClassSelectorPanel: React.FC<Props> = ({
 };
 
 export default ClassSelectorPanel;
-

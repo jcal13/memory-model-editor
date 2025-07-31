@@ -3,7 +3,13 @@ import Canvas from "./canvas/Canvas";
 import Palette from "./palette/Palette";
 import ConfirmationModal from "./confirmationModal/confirmationModal";
 import styles from "./styles/MemoryModelEditor.module.css";
-import { CanvasElement, ID, SubmissionResult, Tab, PaletteTab} from "./shared/types";
+import {
+  CanvasElement,
+  ID,
+  SubmissionResult,
+  Tab,
+  PaletteTab,
+} from "./shared/types";
 import SubmitButton from "./canvas/components/SubmitButton";
 import DownloadJsonButton from "./canvas/components/DownloadJsonButton";
 import { submitCanvas } from "./services/questionValidationServices";
@@ -70,7 +76,9 @@ export default function MemoryModelEditor({
     }
     try {
       const res = await submitCanvas(elements, questionIndex, questionType);
-      setSubmissionResults(res);
+      if (res !== undefined) {
+        setSubmissionResults(res);
+      }
       setActiveTab("feedback");
     } catch (error) {
       console.error("Error sending to backend:", error);

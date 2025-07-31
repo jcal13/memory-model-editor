@@ -1,8 +1,19 @@
-import axios from 'axios'
-import { CanvasElement } from '../shared/types'
-import { buildJSONFromElements } from '../jsonConversion/jsonBuilder'
+import axios from "axios";
+import { CanvasElement } from "../shared/types";
+import { buildJSONFromElements } from "../jsonConversion/jsonBuilder";
 
-const API_DEV_URL = 'http://localhost:3001'
+const API_DEV_URL = "http://localhost:3001";
+
+export async function submitCanvas(
+  elements: CanvasElement[],
+  questionIndex: number,
+  questionType: "test" | "practice"
+) {
+  const payload = {
+    model: buildJSONFromElements(elements),
+    questionIndex,
+    questionType,
+  };
 
 export async function submitCanvas(elements: CanvasElement[]) {
   const payload = buildJSONFromElements(elements)
@@ -10,6 +21,6 @@ export async function submitCanvas(elements: CanvasElement[]) {
   const response = await axios.post(
     `${API_DEV_URL}/canvasEditor/submit`,
     payload
-  )
-  return response.data
+  );
+  return response.data;
 }

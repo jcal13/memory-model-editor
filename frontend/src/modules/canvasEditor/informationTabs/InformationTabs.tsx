@@ -16,10 +16,20 @@ export default function InformationTabs({
   submissionResults,
   activeTab,
   setActive,
+  questionSelected,
+  questionIndex,
+  setQuestionIndex,
+  questionType,
+  setQuestionType,
 }: {
   submissionResults: SubmissionResult;
   activeTab: Tab;
   setActive: (tab: Tab) => void;
+  questionSelected: boolean;
+  questionIndex: number | null;
+  setQuestionIndex: (i: number | null) => void;
+  questionType: "test" | "practice" | null;
+  setQuestionType: (t: "test" | "practice" | null) => void;
 }) {
   const renderTabButton = (tab: Tab, label: string) => (
     <button
@@ -35,16 +45,26 @@ export default function InformationTabs({
     <div className={styles.containerWrapper}>
       <div className={styles.container}>
         <div className={styles.tabHeaders}>
-            {renderTabButton("question", "Question")}
-            {renderTabButton("feedback", "Feedback")}
+          {renderTabButton("question", "Question")}
+          {renderTabButton("feedback", "Feedback")}
         </div>
 
         <div className={styles.tabBody}>
-          {activeTab === "feedback" ? (
-            <FeedbackTab submissionResults={submissionResults}/>
-          ) : (
-            <QuestionTab />
-          )}
+          <div className={activeTab === "question" ? "" : styles.hidden}>
+            <QuestionTab
+              questionIndex={questionIndex}
+              setQuestionIndex={setQuestionIndex}
+              questionType={questionType}
+              setQuestionType={setQuestionType}
+            />
+          </div>
+
+          <div className={activeTab === "feedback" ? "" : styles.hidden}>
+            <FeedbackTab
+              submissionResults={submissionResults}
+              questionSelected={questionSelected}
+            />
+          </div>
         </div>
       </div>
     </div>

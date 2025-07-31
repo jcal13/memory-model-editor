@@ -475,11 +475,26 @@ function checkCallStackOrder(
 }
 
 /* ---------- main validation function ---------- */
-export default function validateAnswer(userModel: MemoryBox[]): {
+export default function validateAnswer(
+  userModel: MemoryBox[],
+  questionIndex: number,
+  questionType: "test" | "practice"
+): {
   correct: boolean;
   errors: string[];
 } {
-  const answerModel = testQuestions[1].answer as MemoryBox[]; // adjust index as needed
+  // const questionBank = questionType === "practice" ? practiceQuestions : testQuestions;
+  const questionBank = testQuestions; // for now, we only have test questions
+
+  if (questionIndex < 0 || questionIndex >= Object.keys(questionBank).length) {
+    return {
+      correct: false,
+      errors: [`Invalid question index: ${questionIndex}`],
+    };
+  }
+
+  console.log(questionIndex);
+  const answerModel = questionBank[questionIndex].answer as MemoryBox[];
   const errors: string[] = [];
 
   // gather frames from both models

@@ -1,7 +1,6 @@
 import { PrimitiveType, FunctionParams, ID } from "../../shared/types";
 import { useState } from "react";
 
-
 export const useElementIdState = (element: { id: ID }) => {
   const [elementId, setElementId] = useState<ID>(element.id);
   return [elementId, setElementId] as const;
@@ -71,3 +70,23 @@ export const useCollectionPairsStates = (element: any) => {
   );
   return [collectionPairs, setCollectionPairs];
 };
+
+/**
+ * Initializes and manages state for class-type memory elements.
+ *
+ * @param element - The element metadata, expected to include `className` and `variables`.
+ * @returns [className, setClassName, classVariables, setClassVariables]
+ */
+export const useClassStates = (element: any) => {
+  // Initialize from element.kind, not element.content
+  const [className, setClassName] = useState<string>(
+    element.kind.className ?? ""
+  );
+  const [classVariables, setClassVariables] = useState<any[]>(
+    element.kind.classVariables ?? []
+  );
+
+  // Return both name and variables (with their setters)
+  return [className, setClassName, classVariables, setClassVariables] as const;
+};
+

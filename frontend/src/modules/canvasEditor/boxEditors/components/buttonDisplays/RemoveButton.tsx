@@ -8,19 +8,21 @@ interface Props {
   element: {
     id: ID;
     kind: {
-      name: string; // Type of the box (e.g., "primitive", "function", "list", etc.)
+      name: string; // Type of the box (e.g., "primitive", "function", "list", "class", etc.)
       type?: string; // Optional subtype for collections
     };
   };
-  onSave: (id: ID, boxType: any) => void; // Function to call with updated box data before removing
-  onRemove: () => void; // Function to call when removing the box
-  dataType: string; // Selected data type (for primitives)
-  value: string; // Value of the primitive
-  hoverRemove: boolean; // Whether the remove button is currently hovered
-  setHoverRemove: React.Dispatch<React.SetStateAction<boolean>>; // Hover state setter
-  functionName?: string; // Function name (if applicable)
-  functionParams?: any[]; // Parameters for the function (if applicable)
-  items: any; // Collection or structured value (e.g., list, dict)
+  onSave: (id: ID, boxType: any) => void;
+  onRemove: () => void;
+  dataType: string;
+  value: string;
+  hoverRemove: boolean;
+  setHoverRemove: React.Dispatch<React.SetStateAction<boolean>>;
+  functionName?: string;
+  functionParams?: any[];
+  className?: string; // ➕ Added for class type
+  ownClassVariables?: any[]; // ➕ Added for class type
+  items: any;
 }
 
 /**
@@ -30,6 +32,7 @@ interface Props {
  */
 const RemoveButton = ({
   element,
+  onSave,
   onRemove,
   dataType,
   value,
@@ -37,6 +40,8 @@ const RemoveButton = ({
   setHoverRemove,
   functionName,
   functionParams,
+  className,
+  ownClassVariables = [],
   items,
 }: Props) => {
   const kind = element.kind.name;
@@ -53,6 +58,13 @@ const RemoveButton = ({
           functionName,
           functionParams,
         }
+      : kind === "class"
+      ? {
+          name: kind,
+          type: "class",
+          value: ownClassVariables,
+          className, // ➕ include class name
+        }
       : {
           name: kind,
           type: element.kind.type,
@@ -61,6 +73,7 @@ const RemoveButton = ({
 
   // Trigger save and remove actions
   const handleClick = () => {
+    onSave(element.id, saveParams);
     onRemove();
   };
 
@@ -79,3 +92,4 @@ const RemoveButton = ({
 };
 
 export default RemoveButton;
+

@@ -1,7 +1,8 @@
 import PrimitiveContent from "./PrimitiveContent";
 import FunctionContent from "./FunctionContent";
 import CollectionContent from "./CollectionContent";
-import { ID } from "../../../shared/types";
+import ClassContent from "./ClassContent";
+import { ClassID, ID } from "../../../shared/types";
 
 /**
  * Props for the Content component.
@@ -20,6 +21,8 @@ interface Props {
   ids: any;
   addId: (id: ID) => void;
   removeId: (id: ID) => void;
+  ownClassVariables: any,                  
+  setOwnClassVariables: any,
   sandbox: boolean;
 }
 
@@ -43,6 +46,8 @@ const Content = ({
   setCollectionItems,
   collectionPairs,
   setCollectionPairs,
+  ownClassVariables,
+  setOwnClassVariables,
   ids,
   addId,
   removeId,
@@ -95,6 +100,19 @@ const Content = ({
         sandbox={sandbox}
       />
     );
+  }
+
+  if (kind == "class"){
+    return (
+      <ClassContent
+        classVariables={ownClassVariables}
+        setVariables={setOwnClassVariables}
+        ids={ids}
+        addId={addId}
+        removeId={removeId}
+        sandbox={sandbox}
+      />
+    )
   }
 
   return null;

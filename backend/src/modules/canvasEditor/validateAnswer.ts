@@ -1,4 +1,19 @@
-import testQuestions from "../questionModule/questions/testQuestions";
+import { Pool } from "pg";
+
+let pool: Pool | null = null;
+function getPool(): Pool {
+  if (!pool) {
+    const cs = process.env.DATABASE_URL;
+    if (!cs) {
+      throw new Error("DATABASE_URL is not set");
+    }
+    pool = new Pool({
+      connectionString: cs,
+      ssl: { rejectUnauthorized: false },
+    });
+  }
+  return pool!;
+}
 
 /* ---------- types ---------- */
 export type MemoryBox = {
@@ -474,27 +489,40 @@ function checkCallStackOrder(
   }
 }
 
+async function fetchAnswerModel(
+  questionId: number
+): Promise<MemoryBox[] | null> {
+  const { rows } = await getPool().query<{ answer: unknown }>(
+    "SELECT answer FROM test_questions WHERE id = $1",
+    [questionId]
+  );
+  if (rows.length === 0) return null;
+
+  const raw = rows[0].answer;
+  if (!Array.isArray(raw)) {
+    throw new Error("Answer in DB is not an array");
+  }
+  return raw as MemoryBox[];
+}
+
 /* ---------- main validation function ---------- */
-export default function validateAnswer(
+export default async function validateAnswer(
   userModel: MemoryBox[],
-  questionIndex: number,
+  questionId: number,
   questionType: "test" | "practice"
-): {
+): Promise<{
   correct: boolean;
   errors: string[];
-} {
+}> {
   // const questionBank = questionType === "practice" ? practiceQuestions : testQuestions;
-  const questionBank = testQuestions; // for now, we only have test questions
-
-  if (questionIndex < 0 || questionIndex >= Object.keys(questionBank).length) {
+  const answerModel = await fetchAnswerModel(questionId);
+  if (!answerModel) {
     return {
       correct: false,
-      errors: [`Invalid question index: ${questionIndex}`],
+      errors: [`Invalid question id: ${questionId}`],
     };
   }
 
-  console.log(questionIndex);
-  const answerModel = questionBank[questionIndex].answer as MemoryBox[];
   const errors: string[] = [];
 
   // gather frames from both models

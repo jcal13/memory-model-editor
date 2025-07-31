@@ -94,4 +94,9 @@ export interface BoxEditorType {
 
 }
 
+export type PaletteTab =
+  | "all"
+  | "classesFns"
+  | "primitives"
+  | "collections";
 export type Tab = "feedback" | "question";

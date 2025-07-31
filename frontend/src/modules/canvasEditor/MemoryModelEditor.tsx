@@ -3,7 +3,13 @@ import Canvas from "./canvas/Canvas";
 import Palette from "./palette/Palette";
 import ConfirmationModal from "./confirmationModal/confirmationModal";
 import styles from "./styles/MemoryModelEditor.module.css";
-import { CanvasElement, ID, SubmissionResult, Tab} from "./shared/types";
+import {
+  CanvasElement,
+  ID,
+  SubmissionResult,
+  Tab,
+  PaletteTab,
+} from "./shared/types";
 import SubmitButton from "./canvas/components/SubmitButton";
 import DownloadJsonButton from "./canvas/components/DownloadJsonButton";
 import { submitCanvas } from "./services/questionValidationServices";
@@ -12,7 +18,7 @@ import InformationTabs from "./informationTabs/InformationTabs";
 const DEFAULT_PLACEHOLDER_WIDTH = 500;
 const MIN_PLACEHOLDER_WIDTH = 100;
 const MAX_PLACEHOLDER_VIEWPORT_RATIO = 0.6667;
-const PLACEHOLDER_SUBTRACT_OFFSET = 100; 
+const PLACEHOLDER_SUBTRACT_OFFSET = 100;
 const MAX_PLACEHOLDER_CSS_WIDTH = `${MAX_PLACEHOLDER_VIEWPORT_RATIO * 100}vw`;
 
 export default function MemoryModelEditor({
@@ -26,11 +32,19 @@ export default function MemoryModelEditor({
   const [classes, setClasses] = useState<string[]>([]);
 
   const [sandboxMode, setSandboxMode] = useState<boolean>(sandbox);
-  const [submissionResults, setSubmissionResults] = useState<SubmissionResult>(null);
+  const [submissionResults, setSubmissionResults] =
+    useState<SubmissionResult>(null);
   const [activeTab, setActiveTab] = useState<Tab>("question");
+  const [questionIndex, setQuestionIndex] = useState<number | null>(null);
+  const [questionType, setQuestionType] = useState<"test" | "practice" | null>(
+    null
+  );
+  const [paletteTab, setPaletteTab] = useState<PaletteTab>("all");
 
   // width state for placeholder panel
-  const [placeholderWidth, setPlaceholderWidth] = useState<number>(DEFAULT_PLACEHOLDER_WIDTH);
+  const [placeholderWidth, setPlaceholderWidth] = useState<number>(
+    DEFAULT_PLACEHOLDER_WIDTH
+  );
   const [isResizing, setIsResizing] = useState<boolean>(false);
 
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
@@ -55,10 +69,16 @@ export default function MemoryModelEditor({
   const cancelClear = (): void => setShowConfirm(false);
 
   const handleSubmit = async () => {
+    if (questionIndex === null || questionType === null) {
+      setSubmissionResults(null);
+      setActiveTab("feedback");
+      return;
+    }
     try {
-      const res = await submitCanvas(elements);
-      setSubmissionResults(res);
-      console.log("Backend response:", res);
+      const res = await submitCanvas(elements, questionIndex, questionType);
+      if (res !== undefined) {
+        setSubmissionResults(res);
+      }
       setActiveTab("feedback");
     } catch (error) {
       console.error("Error sending to backend:", error);
@@ -93,9 +113,16 @@ export default function MemoryModelEditor({
       if (!isResizing || !subContainerRef.current) return;
       const rect = subContainerRef.current.getBoundingClientRect();
       const newWidth = rect.right - e.clientX;
-      const maxBasedOnViewport = window.innerWidth * MAX_PLACEHOLDER_VIEWPORT_RATIO;
-      const maxPlaceholderWidth = Math.min(rect.width - PLACEHOLDER_SUBTRACT_OFFSET, maxBasedOnViewport);
-      if (newWidth >= MIN_PLACEHOLDER_WIDTH && newWidth <= maxPlaceholderWidth) {
+      const maxBasedOnViewport =
+        window.innerWidth * MAX_PLACEHOLDER_VIEWPORT_RATIO;
+      const maxPlaceholderWidth = Math.min(
+        rect.width - PLACEHOLDER_SUBTRACT_OFFSET,
+        maxBasedOnViewport
+      );
+      if (
+        newWidth >= MIN_PLACEHOLDER_WIDTH &&
+        newWidth <= maxPlaceholderWidth
+      ) {
         setPlaceholderWidth(newWidth);
       }
     };
@@ -113,7 +140,7 @@ export default function MemoryModelEditor({
   return (
     <div className={styles.container}>
       <div className={styles.paletteColumn}>
-        <Palette />
+        <Palette activeTab={paletteTab} setActive={setPaletteTab} />
       </div>
 
       <div ref={subContainerRef} className={styles.subContainer}>
@@ -155,15 +182,20 @@ export default function MemoryModelEditor({
 
         <div
           className={styles.placeholder}
-          style={{ 
+          style={{
             width: `${placeholderWidth}px`,
-            maxWidth: MAX_PLACEHOLDER_CSS_WIDTH 
+            maxWidth: MAX_PLACEHOLDER_CSS_WIDTH,
           }}
         >
           <InformationTabs
             submissionResults={submissionResults}
             activeTab={activeTab}
             setActive={setActiveTab}
+            questionSelected={questionIndex !== null}
+            questionIndex={questionIndex}
+            setQuestionIndex={setQuestionIndex}
+            questionType={questionType}
+            setQuestionType={setQuestionType}
           />
           <div
             className={styles.resizeHandle}

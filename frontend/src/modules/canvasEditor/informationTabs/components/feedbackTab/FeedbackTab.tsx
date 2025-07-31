@@ -3,9 +3,24 @@ import { SubmissionResult } from "../../../shared/types";
 
 interface Props {
   submissionResults: SubmissionResult | null;
+  questionSelected: boolean;
 }
 
-export default function FeedbackTab({ submissionResults }: Props) {
+export default function FeedbackTab({
+  submissionResults,
+  questionSelected,
+}: Props) {
+  if (!questionSelected) {
+    return (
+      <>
+        <h1 className={styles.title}>Feedback</h1>
+        <div className={styles.content}>
+          <p className={styles.correctnessMessage}>No question selected</p>
+        </div>
+      </>
+    );
+  }
+
   if (!submissionResults) {
     return (
       <>

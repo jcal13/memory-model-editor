@@ -3,6 +3,21 @@
   font-style: normal;
 }
 
+.scroller {
+  max-height: 75vh;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.scroller::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroller::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
 .title {
   text-align: center;
   font-size: 1.4rem;

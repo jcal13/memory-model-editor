@@ -1,12 +1,13 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { fetchTestQuestionCount } from "./FetchQuestionService";
+import { fetchQuestionCount, fetchQuestion } from "./FetchQuestionService";
 import QuestionSelector from "./components/QuestionSelector";
 import CodeBlock from "./components/CodeBlock";
 import styles from "./styles/QuestionTab.module.css";
 import "prismjs/themes/prism-tomorrow.css";
 
-type View = "root" | "loading" | "test" | "question";
+type View = "root" | "loading" | "test" | "list" | "question" | "practice";
+type QType = "test" | "practice";
 
 export default function QuestionTab({
   questionIndex,
@@ -20,48 +21,60 @@ export default function QuestionTab({
   setQuestionType: (t: "test" | "practice" | null) => void;
 }) {
   const [view, setView] = useState<View>("root");
-  const [testCount, setTestCount] = useState(0);
+  const [questionCount, setQuestionCount] = useState(0);
   const [questionData, setQuestionData] = useState<any>(null);
 
-  const loadTestQuestions = async () => {
+  const loadQuestions = async (qt: QType) => {
     setView("loading");
-    const count = await fetchTestQuestionCount();
-    setTestCount(count);
-    setQuestionType("test");
-    setView("test");
+    const count = await fetchQuestionCount(qt);
+    setQuestionCount(count);
+    setQuestionType(qt);
+    setView("list");
   };
 
   const loadSingleQuestion = async (id: number) => {
+    if (!questionType) return;
     setView("loading");
-    const res = await fetch(
-      `http://localhost:3001/questions/testquestions/${id}`
-    );
-    const data = await res.json();
-    setQuestionIndex(id);
-    setQuestionData(data);
-    setView("question");
+    try {
+      const data = await fetchQuestion(id, questionType);
+      setQuestionIndex(id);
+      setQuestionData(data);
+      setView("question");
+    } catch (err) {
+      console.error(err);
+      setView("list");
+    }
   };
+
+  let heading = "Questions";
+  if (view === "question" && questionIndex !== null) {
+    heading = `Question ${questionIndex}`;
+  } else if (view === "list" && questionType === "test") {
+    heading = "Test Questions";
+  } else if (view === "list" && questionType === "practice") {
+    heading = "Practice Questions";
+  }
 
   return (
     <div className={styles.wrapper}>
-      <h1 className={styles.title}>
-        {view === "test"
-          ? "Test Questions"
-          : view === "question"
-          ? `Question ${questionIndex}`
-          : "Questions"}
-      </h1>
+      <h1 className={styles.title}>{heading}</h1>
 
       {view === "root" && (
         <div className={styles.selectors}>
-          <QuestionSelector text="Practice Questions" />
-          <QuestionSelector text="Test Questions" onClick={loadTestQuestions} />
+          <QuestionSelector
+            text="Practice Questions"
+            onClick={() => loadQuestions("practice")}
+          />
+          <QuestionSelector
+            text="Test Questions"
+            onClick={() => loadQuestions("test")}
+          />
         </div>
       )}
 
       {view === "loading" && <p className={styles.loading}>Loading…</p>}
 
-      {view === "test" && (
+      {view === "list" && (
         <>
           <div className={styles.backRow}>
             <button
@@ -73,14 +86,16 @@ export default function QuestionTab({
             </button>
           </div>
 
-          <div className={styles.selectors}>
-            {Array.from({ length: testCount }, (_, i) => (
-              <QuestionSelector
-                key={i + 1}
-                text={`Question ${i + 1}`}
-                onClick={() => loadSingleQuestion(i + 1)}
-              />
-            ))}
+          <div className={styles.scroller}>
+            <div className={styles.selectors}>
+              {Array.from({ length: questionCount }, (_, i) => (
+                <QuestionSelector
+                  key={i + 1}
+                  text={`Question ${i + 1}`}
+                  onClick={() => loadSingleQuestion(i + 1)}
+                />
+              ))}
+            </div>
           </div>
         </>
       )}
@@ -88,8 +103,8 @@ export default function QuestionTab({
       {view === "question" && questionData && (
         <>
           <div className={styles.backRow}>
-            <button onClick={() => setView("test")} className={styles.backBtn}>
-              ← Back
+            <button onClick={() => setView("list")} className={styles.backBtn}>
+              ← Back
             </button>
           </div>
 

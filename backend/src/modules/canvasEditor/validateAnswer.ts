@@ -316,6 +316,15 @@ function compareFrames(
     // deep comparison for shared variables
     for (const k of Object.keys(aVars)) {
       if (!(k in uVars)) continue;
+
+      const uid = (uVars as Record<string, any>)[k];
+      if (uid === null || uid === undefined || typeof uid !== "number" || !Number.isFinite(uid)) {
+        errors.push(
+          `Unassigned variable: function "${name}" variable "${k}" has no assigned ID`
+        );
+        continue;
+      }
+
       compareIds(
         aVars[k],
         uVars[k],

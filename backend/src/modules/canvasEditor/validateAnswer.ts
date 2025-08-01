@@ -318,7 +318,7 @@ function compareFrames(
       if (!(k in uVars)) continue;
 
       const uid = (uVars as Record<string, any>)[k];
-      if (uid === null) {
+      if (uid === "_") {
         errors.push(
           `Unassigned variable: function "${name}" variable "${k}" has no assigned ID`
         );

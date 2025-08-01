@@ -46,14 +46,14 @@ export default function QuestionTab({
     }
   };
 
-  const heading =
-    view === "test"
-      ? "Test Questions"
-      : view === "practice"
-      ? "Practice Questions"
-      : view === "question"
-      ? `Question ${questionIndex}`
-      : "Questions";
+  let heading = "Questions";
+  if (view === "question" && questionIndex !== null) {
+    heading = `Question ${questionIndex}`;
+  } else if (view === "list" && questionType === "test") {
+    heading = "Test Questions";
+  } else if (view === "list" && questionType === "practice") {
+    heading = "Practice Questions";
+  }
 
   return (
     <div className={styles.wrapper}>

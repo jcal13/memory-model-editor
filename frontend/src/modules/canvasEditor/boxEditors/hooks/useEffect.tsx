@@ -23,7 +23,7 @@ import { ID } from "../../shared/types";
  * @param collectionItems Items / pairs for collections
  */
 export const useModule = (
-  onSave: (id: ID, data: any) => void,
+  onSave: (id: ID, data: any, invalidated?: boolean) => void,
   element: any,
   ownId: ID,
   dataType?: string,
@@ -33,9 +33,9 @@ export const useModule = (
   collectionItems?: any,
   className?: string,
   classVariables?: any[],
+  invalidated?: boolean,            // <-- NEW
 ) => {
-  /* Cache of last (id, payload) we saved */
-  const prevRef = useRef<{ id: ID; payload: any } | null>(null);
+  const prevRef = useRef<{ id: ID; payload: any; invalidated?: boolean } | null>(null);
 
   const isEqual = (a: any, b: any): boolean => {
     if (a === b) return true;
@@ -56,20 +56,19 @@ export const useModule = (
       payload = { name: kind, type: "function", value: null, functionName, params };
     } else if (kind === "dict") {
       payload = { name: kind, type: element.kind.type, value: Object.fromEntries(collectionItems ?? []) };
-    }
-      else if (kind == "class"){
-        payload = { name: kind, type: "class", value: null, className, classVariables };
-
-    }
-      else {
+    } else if (kind === "class") {
+      payload = { name: kind, type: "class", value: null, className, classVariables };
+    } else {
       payload = { name: kind, type: element.kind.type, value: collectionItems };
     }
 
     const prev = prevRef.current;
-    if (prev && prev.id === ownId && isEqual(prev.payload, payload)) return;
+    if (prev && prev.id === ownId && isEqual(prev.payload, payload) && prev.invalidated === invalidated) {
+      return;
+    }
 
-    prevRef.current = { id: ownId, payload };
-    onSave(ownId, payload);
+    prevRef.current = { id: ownId, payload, invalidated };
+    onSave(ownId, payload, invalidated);   // <-- forward invalidated with the live payload
   }, [
     onSave,
     ownId,
@@ -81,6 +80,7 @@ export const useModule = (
     params,
     collectionItems,
     className,
-    classVariables
+    classVariables,
+    invalidated                    
   ]);
 };

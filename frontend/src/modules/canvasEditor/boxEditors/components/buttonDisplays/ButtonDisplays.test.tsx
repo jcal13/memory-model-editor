@@ -1,6 +1,5 @@
-import React from "react";
 import { render, fireEvent } from "@testing-library/react";
-import RemoveButton from "./RemoveButton";
+import RemoveButton from "./ButtonDisplays";
 import { ID } from "../../../shared/types";
 
 // Mocks props and handlers for simulating button behavior
@@ -26,6 +25,8 @@ const defaultProps = {
   functionName: "f",
   functionParams: [],
   items: [],
+  onToggleInvalidate: jest.fn(),
+  invalidated: false,
 };
 
 /**

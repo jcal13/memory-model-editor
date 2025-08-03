@@ -61,6 +61,7 @@ interface DraggableParams {
   start: any;
   origin: any;
   updatePosition: (x: number, y: number) => void;
+  invalidated?: boolean;
 }
 
 /**
@@ -75,6 +76,7 @@ export const useDraggableBox = ({
   start,
   origin,
   updatePosition,
+  invalidated = false,
 }: DraggableParams) => {
   // Converts mouse coordinates to SVG coordinates
   const getSvgPoint = (e: MouseEvent | React.MouseEvent) => {
@@ -132,15 +134,23 @@ export const useDraggableBox = ({
     gRef.current.innerHTML = "";
     gRef.current.appendChild(svgElement);
 
+    /* ----- invalidated tint ----- */
+    if (invalidated) {
+      svgElement.style.filter = "grayscale(1)";
+      const rects = svgElement.querySelectorAll("rect");
+      rects.forEach(r => {
+        if (r.getAttribute("stroke")) r.setAttribute("stroke", "red");
+      });
+      const texts = svgElement.querySelectorAll("text");
+      texts.forEach(t => t.setAttribute("fill", "red"));
+    }
+    
     // Calculate dimensions
     const bbox = svgElement.getBBox();
     const width = bbox.width + padding * 2;
     const height = bbox.height + padding * 2;
 
-    svgElement.setAttribute(
-      "viewBox",
-      `-${padding} -${padding} ${width} ${height}`
-    );
+    svgElement.setAttribute("viewBox", `-${padding} -${padding} ${width} ${height}`);
     svgElement.setAttribute("width", `${width}`);
     svgElement.setAttribute("height", `${height}`);
 
@@ -148,16 +158,11 @@ export const useDraggableBox = ({
 
     gRef.current.setAttribute(
       "transform",
-      `translate(${element.x - halfSize.current.w}, ${
-        element.y - halfSize.current.h
-      })`
+      `translate(${element.x - halfSize.current.w}, ${element.y - halfSize.current.h})`
     );
 
     // Transparent overlay for dragging and clicking
-    const overlay = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "rect"
-    );
+    const overlay = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     overlay.setAttribute("x", `-${padding}`);
     overlay.setAttribute("y", `-${padding}`);
     overlay.setAttribute("width", `${width}`);
@@ -172,5 +177,5 @@ export const useDraggableBox = ({
     });
 
     svgElement.appendChild(overlay);
-  }, [element]);
+  }, [element, invalidated]);
 };

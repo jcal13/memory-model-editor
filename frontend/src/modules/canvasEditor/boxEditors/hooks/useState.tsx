@@ -90,3 +90,11 @@ export const useClassStates = (element: any) => {
   return [className, setClassName, classVariables, setClassVariables] as const;
 };
 
+export const useInvalidatedState = (element: any) => {
+  const [invalidated, setInvalidated] = useState<boolean>(element.kind.invalidated as boolean || false);
+  const onToggleInvalidated = () => {
+    setInvalidated(!invalidated)
+  }
+  return [invalidated, onToggleInvalidated] as const;
+}
+

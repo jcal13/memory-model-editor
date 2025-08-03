@@ -16,19 +16,24 @@ const editorMap: Record<BoxType["name"], React.FC<any>> = {
   tuple: BoxEditor,
   set: BoxEditor,
   dict: BoxEditor,
-  class: BoxEditor
+  class: BoxEditor,
 };
 
-interface Props {
-  elements: CanvasElement[];
-  setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
+interface FloatingEditorProps {
+  element: CanvasElement;
+  Editor: React.FC<any>;
+  onSave: (id: ID, kind: BoxType, invalidate?: boolean) => void;
+  onRemove: () => void;
+  onClose: () => void;
+  onSelect: () => void;
+  defaultPos: { x: number; y: number };
   ids: number[];
   addId: (id: number) => void;
   removeId: (id: ID) => void;
   classes?: string[];
   addClasses?: (className: string) => void;
   removeClasses?: (className: string) => void;
-  sandbox?: boolean;
+  sandbox: boolean;
 }
 
 function FloatingEditor({
@@ -46,22 +51,7 @@ function FloatingEditor({
   addClasses,
   removeClasses,
   sandbox,
-}: {
-  element: CanvasElement;
-  Editor: React.FC<any>;
-  onSave: (id: ID, kind: BoxType) => void;
-  onRemove: () => void;
-  onClose: () => void;
-  onSelect: () => void;
-  defaultPos: { x: number; y: number };
-  ids: number[];
-  addId: (id: number) => void;
-  removeId: (id: ID) => void;
-  classes?: string[];
-  addClasses?: (className: string) => void;
-  removeClasses?: (className: string) => void;
-  sandbox: boolean;
-}) {
+}: FloatingEditorProps) {
   const nodeRef = React.useRef<HTMLDivElement>(null);
 
   return (
@@ -90,6 +80,18 @@ function FloatingEditor({
   );
 }
 
+interface CanvasProps {
+  elements: CanvasElement[];
+  setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
+  ids: number[];
+  addId: (id: number) => void;
+  removeId: (id: ID) => void;
+  classes?: string[];
+  addClasses?: (className: string) => void;
+  removeClasses?: (className: string) => void;
+  sandbox?: boolean;
+}
+
 export default function Canvas({
   elements,
   setElements,
@@ -100,11 +102,12 @@ export default function Canvas({
   addClasses,
   removeClasses,
   sandbox = true,
-}: Props) {
+}: CanvasProps) {
   const [openBoxEditors, setOpenBoxEditors] = useState<CanvasElement[]>([]);
   const [selected, setSelected] = useState<CanvasElement | null>(null);
   const { svgRef } = useCanvasRefs();
   const [viewBox, setViewBox] = useState<string>("0 0 0 0");
+  console.log(elements);
 
   useCanvasResize(svgRef, setViewBox);
 
@@ -116,13 +119,13 @@ export default function Canvas({
       .map(el => el.id as number);
 
     elementIds
-      .filter((id) => !ids.includes(id as number))
-      .forEach((id) => addId(id as number));
+      .filter(id => !ids.includes(id))
+      .forEach(id => addId(id));
 
-    ids.filter((id) => !elementIds.includes(id)).forEach((id) => removeId(id));
+    ids
+      .filter(id => !elementIds.includes(id))
+      .forEach(id => removeId(id));
   }, [elements, ids, sandbox, addId, removeId]);
-
-
 
   const makePositionUpdater = (boxId: number) => (x: number, y: number) => {
     setElements(prev =>
@@ -137,24 +140,22 @@ export default function Canvas({
 
     switch (payload) {
       case "int":
-        newKind = { name: "primitive", type: "int",  value: "0" };
+        newKind = { name: "primitive", type: "int", value: "0" };
         break;
       case "float":
         newKind = { name: "primitive", type: "float", value: "0.0" };
         break;
       case "str":
-        newKind = { name: "primitive", type: "str",  value: '' };
+        newKind = { name: "primitive", type: "str", value: "" };
         break;
       case "bool":
         newKind = { name: "primitive", type: "bool", value: "false" };
         break;
-      case "primitive":      
+      case "primitive":
         newKind = { name: "primitive", type: "None", value: "None" };
         break;
       case "function":
-        const functionCount = elements.filter(
-          (el) => el.kind.name === "function"
-        ).length;
+        const functionCount = elements.filter(el => el.kind.name === "function").length;
         newKind = {
           name: "function",
           type: "function",
@@ -177,14 +178,14 @@ export default function Canvas({
         newKind = { name: "dict", type: "dict", value: {} };
         break;
       case "class":
-          newKind = {
-            name: "class",
-            type: "class",
-            value: null,
-            className: "NoClass",
-            classVariables: []
-          };
-          break;
+        newKind = {
+          name: "class",
+          type: "class",
+          value: null,
+          className: "NoClass",
+          classVariables: [],
+        };
+        break;
       default:
         return;
     }
@@ -194,22 +195,22 @@ export default function Canvas({
     pt.y = e.clientY;
     const coords = pt.matrixTransform(svgRef.current!.getScreenCTM()!.inverse());
 
-    setElements((prev) => {
+    setElements(prev => {
       const boxIds = prev.map(el => el.boxId as number).sort((a, b) => a - b);
-      let newBoxId = boxIds.length;          
+      let newBoxId = boxIds.length;
       for (let i = 0; i < boxIds.length; i++) {
-        if (boxIds[i] !== i) {               
+        if (boxIds[i] !== i) {
           newBoxId = i;
           break;
         }
       }
-      let computedId: ID = "_";                           
-      if (!sandbox && newKind.name !== "function") {
-        const sortedIds = [...ids].sort((a, b) => a - b); 
-        computedId = sortedIds.length;                    
 
+      let computedId: ID = "_";
+      if (!sandbox && newKind.name !== "function") {
+        const sortedIds = [...ids].sort((a, b) => a - b);
+        computedId = sortedIds.length;
         for (let i = 0; i < sortedIds.length; i++) {
-          if (sortedIds[i] !== i) {                       
+          if (sortedIds[i] !== i) {
             computedId = i;
             break;
           }
@@ -227,46 +228,45 @@ export default function Canvas({
     });
   };
 
-  const saveElement = (boxId: number, updatedId: ID, updatedKind: BoxType) => {
-    setElements((prev) =>
-      prev.map((el) => {
+  // Now supports optional invalidate flag
+  const saveElement = (
+    boxId: number,
+    updatedId: ID,
+    updatedKind: BoxType,
+    invalidate?: boolean
+  ) => {
+    setElements(prev =>
+      prev.map(el => {
         if (el.boxId !== boxId) return el;
 
-        if (el.kind.name === "function" && updatedKind.name === "function") {
-          const order =
-            (updatedKind as any).order ?? (el.kind as any).order ?? 0;
+        const base = { ...el, id: updatedId, kind: updatedKind };
 
-          return {
-            ...el,
-            id: updatedId,
-            kind: { ...el.kind, ...updatedKind, order },
-          };
+        if (invalidate !== undefined) {
+          return { ...base, invalidate };
         }
-
-        return { ...el, id: updatedId, kind: updatedKind };
+        return base;
       })
     );
   };
 
   const removeElement = (boxId: number) => {
-    setElements((prev) => prev.filter((el) => el.boxId !== boxId));
-    setOpenBoxEditors((prev) => prev.filter((el) => el.boxId !== boxId));
-    setSelected((prev) => (prev && prev.boxId === boxId ? null : prev));
+    setElements(prev => prev.filter(el => el.boxId !== boxId));
+    setOpenBoxEditors(prev => prev.filter(el => el.boxId !== boxId));
+    setSelected(prev => (prev && prev.boxId === boxId ? null : prev));
   };
 
-  /* ----------------------- Open element ----------------------- */
   const openElement = (canvasElement: CanvasElement) => {
     setOpenBoxEditors([canvasElement]);
     setSelected(canvasElement);
   };
 
-  const functionFrames = elements.filter((el) => el.kind.name === "function");
+  const functionFrames = elements.filter(el => el.kind.name === "function");
 
   const handleReorder = useCallback(
     (from: number, to: number) => {
       if (from === to) return;
 
-      setElements((prev) => {
+      setElements(prev => {
         const funcIdxs = prev
           .map((el, i) => ({ el, i }))
           .filter(({ el }) => el.kind.name === "function");
@@ -278,24 +278,17 @@ export default function Canvas({
         const [moved] = next.splice(fromIdx, 1);
         next.splice(toIdx, 0, moved);
 
-        const reorderedFuncs = next.filter((el) => el.kind.name === "function");
-        const total = reorderedFuncs.length;
-
+        const reorderedFuncs = next.filter(el => el.kind.name === "function");
         const orderMap = new Map<number, number>();
         reorderedFuncs.forEach((func, idx) => {
           orderMap.set(func.boxId, idx + 1);
         });
 
-        console.log("Reordered functions:", orderMap);
-
-        return next.map((el) => {
+        return next.map(el => {
           if (el.kind.name === "function" && orderMap.has(el.boxId)) {
             return {
               ...el,
-              kind: {
-                ...el.kind,
-                order: orderMap.get(el.boxId)!,
-              },
+              kind: { ...el.kind, order: orderMap.get(el.boxId)! },
             };
           }
           return el;
@@ -328,8 +321,8 @@ export default function Canvas({
 
           <g>
             {elements
-              .filter((el) => el.kind.name !== "function")
-              .map((el) => (
+              .filter(el => el.kind.name !== "function")
+              .map(el => (
                 <CanvasBox
                   key={el.boxId}
                   element={el}
@@ -341,7 +334,7 @@ export default function Canvas({
         </svg>
       </div>
 
-      {openBoxEditors.map((el) => {
+      {openBoxEditors.map(el => {
         const Editor = editorMap[el.kind.name];
         return (
           <FloatingEditor
@@ -353,13 +346,15 @@ export default function Canvas({
               y: typeof window !== "undefined" ? window.innerHeight / 4 : 0,
             }}
             onSelect={() => setSelected(el)}
-            onSave={(id, kind) => saveElement(el.boxId, id, kind)}
+            onSave={(id, kind, invalidate) =>
+              saveElement(el.boxId, id, kind, invalidate)
+            }
             onRemove={() => removeElement(el.boxId)}
             onClose={() => {
-              setOpenBoxEditors((prev) =>
-                prev.filter((e) => e.boxId !== el.boxId)
+              setOpenBoxEditors(prev =>
+                prev.filter(e => e.boxId !== el.boxId)
               );
-              setSelected((prev) =>
+              setSelected(prev =>
                 prev && prev.boxId === el.boxId ? null : prev
               );
             }}

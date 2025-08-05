@@ -82,8 +82,8 @@ export const useDraggableBox = ({
   const getSvgPoint = (e: MouseEvent | React.MouseEvent) => {
     const svg = gRef.current!.ownerSVGElement!;
     const pt = svg.createSVGPoint();
-    pt.x = e.clientX;
-    pt.y = e.clientY;
+    pt.x = (e as MouseEvent).clientX ?? (e as React.MouseEvent).clientX;
+    pt.y = (e as MouseEvent).clientY ?? (e as React.MouseEvent).clientY;
     return pt.matrixTransform(svg.getScreenCTM()!.inverse());
   };
 
@@ -94,8 +94,8 @@ export const useDraggableBox = ({
     const pt = getSvgPoint(e);
     start.current = { x: pt.x, y: pt.y };
     origin.current = { x: element.x, y: element.y };
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
+    window.addEventListener("mousemove", onMouseMove as any);
+    window.addEventListener("mouseup", onMouseUp as any);
   };
 
   // Handles dragging movement
@@ -120,8 +120,8 @@ export const useDraggableBox = ({
   // Ends dragging
   const onMouseUp = () => {
     isDragging.current = false;
-    window.removeEventListener("mousemove", onMouseMove);
-    window.removeEventListener("mouseup", onMouseUp);
+    window.removeEventListener("mousemove", onMouseMove as any);
+    window.removeEventListener("mouseup", onMouseUp as any);
   };
 
   // Initialize box render and overlay
@@ -131,20 +131,35 @@ export const useDraggableBox = ({
     // Render SVG element
     const svgElement = createBoxRenderer(element);
     const padding = 12;
+
+    // Reset container
     gRef.current.innerHTML = "";
     gRef.current.appendChild(svgElement);
 
-    /* ----- invalidated tint ----- */
+    /* ----- invalidated tint (apply grayscale to shapes only) ----- */
+    // Select elements *inside* the rendered box, not the wrapper <g>.
+    const rects = Array.from(svgElement.querySelectorAll("rect"));
+    const texts = Array.from(svgElement.querySelectorAll<SVGElement>("text, tspan"));
+
+    // Clean any previous styles first
+    rects.forEach(r => (r as SVGElement).style.removeProperty("filter"));
+    texts.forEach(t => (t as SVGElement).style.removeProperty("fill"));
+
     if (invalidated) {
-      svgElement.style.filter = "grayscale(1)";
-      const rects = svgElement.querySelectorAll("rect");
-      rects.forEach(r => {
-        if (r.getAttribute("stroke")) r.setAttribute("stroke", "red");
+      // Grayscale shapes (leave text alone so it can be red)
+      rects
+        .filter(r => !r.hasAttribute("data-overlay")) // exclude overlay (added below)
+        .forEach(r => {
+          (r as SVGElement).style.setProperty("filter", "grayscale(1)");
+          if (r.getAttribute("stroke")) r.setAttribute("stroke", "red");
+        });
+
+      // Force text red (use !important to beat class rules)
+      texts.forEach(t => {
+        t.style.setProperty("fill", "red", "important");
       });
-      const texts = svgElement.querySelectorAll("text");
-      texts.forEach(t => t.setAttribute("fill", "red"));
     }
-    
+
     // Calculate dimensions
     const bbox = svgElement.getBBox();
     const width = bbox.width + padding * 2;
@@ -168,14 +183,23 @@ export const useDraggableBox = ({
     overlay.setAttribute("width", `${width}`);
     overlay.setAttribute("height", `${height}`);
     overlay.setAttribute("fill", "transparent");
+    overlay.setAttribute("data-overlay", "true"); // so it won't be grayscaled
     overlay.style.cursor = "grab";
 
-    overlay.addEventListener("mousedown", onMouseDown as any);
-    overlay.addEventListener("click", (e) => {
+    const clickHandler = (e: MouseEvent) => {
       e.stopPropagation();
       openInterface(element);
-    });
+    };
+
+    overlay.addEventListener("mousedown", onMouseDown as any);
+    overlay.addEventListener("click", clickHandler as any);
 
     svgElement.appendChild(overlay);
+
+    // Cleanup on re-render/unmount
+    return () => {
+      overlay.removeEventListener("mousedown", onMouseDown as any);
+      overlay.removeEventListener("click", clickHandler as any);
+    };
   }, [element, invalidated]);
 };

@@ -22,7 +22,7 @@ const editorMap: Record<BoxType["name"], React.FC<any>> = {
 interface FloatingEditorProps {
   element: CanvasElement;
   Editor: React.FC<any>;
-  onSave: (id: ID, kind: BoxType, invalidate?: boolean) => void;
+  onSave: (id: ID, kind: BoxType, invalidated?: boolean) => void;
   onRemove: () => void;
   onClose: () => void;
   onSelect: () => void;
@@ -233,7 +233,7 @@ export default function Canvas({
     boxId: number,
     updatedId: ID,
     updatedKind: BoxType,
-    invalidate?: boolean
+    invalidated?: boolean
   ) => {
     setElements(prev =>
       prev.map(el => {
@@ -241,8 +241,8 @@ export default function Canvas({
 
         const base = { ...el, id: updatedId, kind: updatedKind };
 
-        if (invalidate !== undefined) {
-          return { ...base, invalidate };
+        if (invalidated !== undefined) {
+          return { ...base, invalidated };
         }
         return base;
       })
@@ -328,6 +328,7 @@ export default function Canvas({
                   element={el}
                   openInterface={() => openElement(el)}
                   updatePosition={makePositionUpdater(el.boxId)}
+                  invalidated={el.invalidated}
                 />
               ))}
           </g>
@@ -346,8 +347,8 @@ export default function Canvas({
               y: typeof window !== "undefined" ? window.innerHeight / 4 : 0,
             }}
             onSelect={() => setSelected(el)}
-            onSave={(id, kind, invalidate) =>
-              saveElement(el.boxId, id, kind, invalidate)
+            onSave={(id, kind, invalidated) =>
+              saveElement(el.boxId, id, kind, invalidated)
             }
             onRemove={() => removeElement(el.boxId)}
             onClose={() => {

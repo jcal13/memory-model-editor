@@ -138,7 +138,7 @@ const CallStack: React.FC<Props> = ({
       }))
       .filter(({ i }) => i !== fromIdx)
       .sort((a, b) => a.top - b.top);
-
+    if (positions.length === 0) return null;
     let gap = positions.length; // after last by default
     for (let g = 0; g < positions.length; g++) {
       if (ghostCenter < positions[g].top) {
@@ -177,9 +177,16 @@ const CallStack: React.FC<Props> = ({
     st.ghost.setAttribute("transform", `${st.origT} translate(0 ${dy})`);
 
     const ghostCenter = layout[st.from].yLocal + scroll + Y_OFFSET + dy;
-    const { gap, gapY } = computeInsert(ghostCenter, st.from);
+    const res = computeInsert(ghostCenter, st.from);
 
-    setInsertIdx(gap); // gap is 0‥N (N means very bottom)
+    if (!res) {
+      setInsertIdx(null);
+      setMarkerY(null);
+      return;
+    }
+
+    const { gap, gapY } = res;
+    setInsertIdx(gap);
     setMarkerY(gapY);
   };
 
@@ -296,6 +303,7 @@ const CallStack: React.FC<Props> = ({
               openInterface={() => onSelect(f)}
               updatePosition={() => {}}
               onSizeChange={handleSizeChange}
+              invalidated={f.invalidated}
             />
           </g>
         ))}

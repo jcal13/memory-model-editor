@@ -145,19 +145,32 @@ export const useDraggableBox = ({
     rects.forEach(r => (r as SVGElement).style.removeProperty("filter"));
     texts.forEach(t => (t as SVGElement).style.removeProperty("fill"));
 
-    if (invalidated) {
-      // Grayscale shapes (leave text alone so it can be red)
-      rects
-        .filter(r => !r.hasAttribute("data-overlay")) // exclude overlay (added below)
-        .forEach(r => {
-          (r as SVGElement).style.setProperty("filter", "grayscale(1)");
-          if (r.getAttribute("stroke")) r.setAttribute("stroke", "red");
-        });
+    const COLOUR = "#9CA3AF";
 
-      // Force text red (use !important to beat class rules)
-      texts.forEach(t => {
-        t.style.setProperty("fill", "red", "important");
+    const shapes = Array.from(
+      svgElement.querySelectorAll<SVGElement>("rect,path,polygon,ellipse,circle")
+    ).filter(el => !el.closest("defs") && !el.hasAttribute("data-overlay"));
+
+    shapes.forEach(s => {
+      s.style.removeProperty("filter");
+      s.style.removeProperty("fill");
+      s.style.removeProperty("fill-opacity");
+    });
+    texts.forEach(t => t.style.removeProperty("fill"));
+
+    if (invalidated) {
+      shapes.forEach(s => {
+        s.style.setProperty("stroke", COLOUR, "important");
       });
+
+      texts.forEach(t => {
+        t.style.setProperty("fill", COLOUR, "important");
+      });
+    } else {
+      shapes.forEach(s => {
+        if (s.style.stroke === COLOUR) s.style.removeProperty("stroke");
+      });
+      texts.forEach(t => t.style.removeProperty("fill"));
     }
 
     // Calculate dimensions

@@ -7,7 +7,6 @@ import { useCanvasResize } from "./hooks/useEffect";
 import { useCanvasRefs } from "./hooks/useRef";
 import styles from "./styles/Canvas.module.css";
 import CallStack from "./components/CallStack";
-import ClassName from "../boxEditors/components/headerDisplays/components/ClassName";
 
 const editorMap: Record<BoxType["name"], React.FC<any>> = {
   primitive: BoxEditor,
@@ -107,7 +106,6 @@ export default function Canvas({
   const [selected, setSelected] = useState<CanvasElement | null>(null);
   const { svgRef } = useCanvasRefs();
   const [viewBox, setViewBox] = useState<string>("0 0 0 0");
-  console.log(elements);
 
   useCanvasResize(svgRef, setViewBox);
 

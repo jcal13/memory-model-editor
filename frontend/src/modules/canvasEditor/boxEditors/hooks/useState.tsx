@@ -91,7 +91,7 @@ export const useClassStates = (element: any) => {
 };
 
 export const useInvalidatedState = (element: any) => {
-  const [invalidated, setInvalidated] = useState<boolean>(element.kind.invalidated as boolean || false);
+  const [invalidated, setInvalidated] = useState<boolean>(element.invalidated as boolean || false);
   const onToggleInvalidated = () => {
     setInvalidated(!invalidated)
   }

@@ -69,21 +69,21 @@ export default function MemoryModelEditor({
   const cancelClear = (): void => setShowConfirm(false);
 
   const handleSubmit = async () => {
-    if (questionIndex === null || questionType === null) {
-      setSubmissionResults(null);
-      setActiveTab("feedback");
-      return;
-    }
-    try {
-      const res = await submitCanvas(elements, questionIndex, questionType);
-      if (res !== undefined) {
-        setSubmissionResults(res);
-      }
-      setActiveTab("feedback");
-    } catch (error) {
-      console.error("Error sending to backend:", error);
-    }
-  };
+  if (questionIndex === null || questionType === null) {
+    setSubmissionResults(null);
+    setActiveTab("feedback");
+    return;
+  }
+
+  const cleanElements = elements.filter(el => !el.invalidated);
+  try {
+    const res = await submitCanvas(cleanElements, questionIndex, questionType);
+    if (res !== undefined) setSubmissionResults(res);
+    setActiveTab("feedback");
+  } catch (error) {
+    console.error("Error sending to backend:", error);
+  }
+};
 
   const addId = (id: number) =>
     setIds((prev) => {

@@ -15,7 +15,6 @@ export default function CanvasBox({
   invalidated = false,
 }: CanvasBoxProps) {
   const { gRef, isDragging, start, origin, halfSize } = useGlobalRefs();
-  console.log(element, invalidated)
   useDraggableBox({
     gRef,
     element,

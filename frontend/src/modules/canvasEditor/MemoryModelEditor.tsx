@@ -11,7 +11,7 @@ import {
   PaletteTab,
 } from "./shared/types";
 import SubmitButton from "./canvas/components/SubmitButton";
-import DownloadJsonButton from "./canvas/components/DownloadJsonButton";
+import DownloadJsonButton from "./canvas/components/DownloadOptionsButton";
 import { submitCanvas } from "./services/questionValidationServices";
 import InformationTabs from "./informationTabs/InformationTabs";
 

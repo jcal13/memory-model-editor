@@ -4,7 +4,7 @@
  * Centers the canvas horizontally, aligns it to the top,
  * and applies page-wide padding and background.
  */
-.canvasWrapper {
+ .canvasWrapper {
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -51,11 +51,20 @@
   left: 0;
 }
 
-.downloadJsonButton {
+/* ========================
+ * Updated Download Options Button
+ * ========================
+ */
+.downloadContainer {
   position: absolute;
+  text-align: center;
   bottom: 35px;
   left: 35px;
   z-index: 9999;
+  display: inline-block;
+}
+
+.downloadBtn {
   padding: 10px 10px;
   background-color: #38bbf8;
   color: white;
@@ -67,11 +76,59 @@
   width: max-content;
 }
 
-.downloadJsonButton:hover,
-.downloadJsonButton:active {
+.downloadBtn:hover,
+.downloadBtn:active {
   background-color: #23a6df;
 }
 
+.downloadMenu {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: #38bbf8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  width: max-content;
+}
+
+.downloadMenu button {
+  padding: 10px;
+  border: none;
+  background-color: #38bbf8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  align-items: center;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.95rem;
+  width: max-content;
+}
+
+.downloadMenu button:hover
+ {
+  background-color: #23a6df;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  align-items: center;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.95rem;
+  width: max-content;}
+
+/* ========================
+ * Submit Button (unchanged)
+ * ========================
+ */
 .submitButton {
   position: absolute;
   bottom: 35px;

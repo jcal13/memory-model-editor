@@ -27,7 +27,7 @@ interface Props {
 const FunctionContent = ({ functionParams, setParams, ids, addId, removeId, sandbox }: Props) => {
   // Add a new empty parameter to the list
   const addParam = () =>
-    setParams([...functionParams, { name: "", targetId: null }]);
+    setParams([...functionParams, { name: "", targetId: "_" }]);
 
   // Remove a parameter at a given index
   const removeParam = (i: number) =>

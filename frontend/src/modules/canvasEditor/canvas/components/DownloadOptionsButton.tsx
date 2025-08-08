@@ -38,7 +38,7 @@ const DownloadOptionsButton: React.FC<Props> = ({ elements }) => {
     setIsOpen(false);
     await new Promise(requestAnimationFrame);
 
-    const node = document.querySelector(`.${canvasStyles.canvasArea}`)!;
+    const node = document.querySelector(`.${canvasStyles.column}`)!;
     
     domtoimage.toSvg(node)
       .then((dataUrl: string) => {
@@ -54,7 +54,7 @@ const DownloadOptionsButton: React.FC<Props> = ({ elements }) => {
     setIsOpen(false);
     await new Promise(requestAnimationFrame);
 
-    const canvasRoot = document.querySelector(`.${canvasStyles.canvasArea}`) as HTMLElement | null;
+    const canvasRoot = document.querySelector(`.${canvasStyles.column}`) as HTMLElement | null;
     if (!canvasRoot) return;
 
     const canvas = await html2canvas(canvasRoot, {

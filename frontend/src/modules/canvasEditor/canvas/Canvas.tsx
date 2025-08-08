@@ -7,7 +7,6 @@ import { useCanvasResize } from "./hooks/useEffect";
 import { useCanvasRefs } from "./hooks/useRef";
 import styles from "./styles/Canvas.module.css";
 import CallStack from "./components/CallStack";
-import ClassName from "../boxEditors/components/headerDisplays/components/ClassName";
 
 const editorMap: Record<BoxType["name"], React.FC<any>> = {
   primitive: BoxEditor,

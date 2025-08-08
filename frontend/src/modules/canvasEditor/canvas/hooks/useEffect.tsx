@@ -184,8 +184,7 @@ export function useCanvasLocalStorage({elements, ids, classes}:
     ids: number[];
     classes: string[];
   }
-)
- {
+){
 
   useEffect(() => {
       try {

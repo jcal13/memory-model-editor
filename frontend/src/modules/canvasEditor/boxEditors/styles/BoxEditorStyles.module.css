@@ -3,6 +3,9 @@
 ======================================= */
 
 .boxEditorModule {
+  position: absolute;  /* so left/top are relative to .canvasContainer */
+  z-index: 1000;
+
   width: max-content;
   position: relative;
   min-width: 340px;
@@ -15,7 +18,6 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  z-index: 1000;
 }
 
 /* =======================================

@@ -32,15 +32,15 @@ type QuestionRow = {
   answer: unknown; // jsonb
 };
 
-router.post("/testquestions", async (_req: Request, res: Response) => {
+router.post("/practicequestions", async (_req: Request, res: Response) => {
   try {
     const { rows } = await getPool().query<{ count: number }>(
-      "SELECT COUNT(*)::int AS count FROM test_questions"
+      "SELECT COUNT(*)::int AS count FROM practice_questions"
     );
     res.status(200).json({ count: rows[0].count });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to count test questions" });
+    res.status(500).json({ error: "Failed to count practice questions" });
   }
 });
 
@@ -67,15 +67,15 @@ router.get("/practicequestions/:id", async (req: Request, res: Response) => {
   }
 });
 
-router.post("/practicequestions", async (_req: Request, res: Response) => {
+router.post("/testquestions", async (_req: Request, res: Response) => {
   try {
     const { rows } = await getPool().query<{ count: number }>(
-      "SELECT COUNT(*)::int AS count FROM practice_questions"
+      "SELECT COUNT(*)::int AS count FROM test_questions"
     );
     res.status(200).json({ count: rows[0].count });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to count practice questions" });
+    res.status(500).json({ error: "Failed to count test questions" });
   }
 });
 

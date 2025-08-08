@@ -499,13 +499,25 @@ function checkCallStackOrder(
 }
 
 async function fetchAnswerModel(
+  questionType: "test" | "practice",
   questionId: number
 ): Promise<MemoryBox[] | null> {
-  const { rows } = await getPool().query<{ answer: unknown }>(
-    "SELECT answer FROM test_questions WHERE id = $1",
-    [questionId]
-  );
-  if (rows.length === 0) return null;
+  let rows: { answer: unknown }[] = [];
+  if (questionType === "practice") {
+    const result = await getPool().query<{ answer: unknown }>(
+      "SELECT answer FROM practice_questions WHERE id = $1",
+      [questionId]
+    );
+    rows = result.rows;
+    if (rows.length === 0) return null;
+  } else {
+    const result = await getPool().query<{ answer: unknown }>(
+      "SELECT answer FROM test_questions WHERE id = $1",
+      [questionId]
+    );
+    rows = result.rows;
+    if (rows.length === 0) return null;
+  }
 
   const raw = rows[0].answer;
   if (!Array.isArray(raw)) {
@@ -523,8 +535,7 @@ export default async function validateAnswer(
   correct: boolean;
   errors: string[];
 }> {
-  // const questionBank = questionType === "practice" ? practiceQuestions : testQuestions;
-  const answerModel = await fetchAnswerModel(questionId);
+  const answerModel = await fetchAnswerModel(questionType, questionId);
   if (!answerModel) {
     return {
       correct: false,

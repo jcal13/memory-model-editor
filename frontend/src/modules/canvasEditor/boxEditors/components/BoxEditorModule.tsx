@@ -1,5 +1,5 @@
 import styles from "../styles/BoxEditorStyles.module.css";
-import RemoveButton from "./buttonDisplays/RemoveButton";
+import ButtonDisplays from "./buttonDisplays/ButtonDisplays";
 import Header from "./headerDisplays/Header";
 import Content from "./contentDisplays/Content";
 import { useModule } from "../hooks/useEffect";
@@ -10,11 +10,11 @@ import {
   useCollectionSingleStates,
   useCollectionPairsStates,
   useElementIdState,
-  useClassStates
+  useClassStates,
+  useInvalidatedState
 } from "../hooks/useState";
 import { BoxEditorType } from "../../shared/types";
 import { useGlobalRefs } from "../hooks/useRef";
-import React from "react";
 
 /**
  * BoxEditorModule renders the full editable UI for a memory box,
@@ -47,10 +47,12 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, onClose, ids,  addId, rem
     useCollectionPairsStates(metadata);
 
     // State hook for element class
-    const [
+  const [
       ownClassName, setOwnClassName,
       ownClassVariables, setOwnClassVariables
   ] = useClassStates(metadata);
+
+  const [invalidated, setInvalidated] = useInvalidatedState(metadata);
   // -----------------------------------
 
   const collectionData = metadata.kind.name === "dict" ? collectionPairs : collectionItems;
@@ -62,7 +64,8 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, onClose, ids,  addId, rem
     functionName, functionParams,
     collectionData,
     ownClassName,
-    ownClassVariables
+    ownClassVariables,
+    invalidated
   );
   return (
     <div ref={moduleRef} className={`drag-handle ${styles.boxEditorModule}`}>
@@ -118,7 +121,7 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, onClose, ids,  addId, rem
       />
 
       {/* Bottom section: shows the remove button */}
-      <RemoveButton
+      <ButtonDisplays
         element={metadata}
         onSave={onSave}
         onRemove={onRemove}
@@ -129,7 +132,8 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, onClose, ids,  addId, rem
         functionName={functionName}
         functionParams={functionParams}
         className={ownClassName}
-
+        invalidated={invalidated}
+        onToggleInvalidate={setInvalidated}
         ownClassVariables={ownClassVariables}
         items={collectionItems}
       />

@@ -97,7 +97,6 @@ export const BoxConfigs = {
   },
 
   /* ---------- Dict Box ---------- */
-  /* ---------- Dict Box ---------- */
   dict: {
     draw: (model: any, kind: any, id: ID) => {
       const dict =

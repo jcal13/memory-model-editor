@@ -13,4 +13,6 @@ export type BoxProps = {
 
   /** Callback to update the element’s position on the canvas */
   updatePosition: (x: number, y: number) => void;
+  
+  invalidated?: boolean;
 };

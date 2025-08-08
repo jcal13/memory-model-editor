@@ -67,13 +67,13 @@ export interface CanvasElement {
   x: number;
   y: number;
   kind: BoxType;
+  invalidated?: boolean;        
 }
 
 export type SubmissionResult = { correct: boolean; errors: string[] } | null;
 
 export type ID = number | "_";
 export type ClassID = string | "_";
-
 
 export interface BoxEditorType {
   metadata: { id: ID; kind: BoxType; className?: ClassID };
@@ -90,8 +90,6 @@ export interface BoxEditorType {
   removeClasses?: (className: string) => void;
   
   sandbox?: boolean;
-
-
 }
 
 export type PaletteTab =

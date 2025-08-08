@@ -61,7 +61,7 @@
   border-radius: 8px;
   background-color: #f9fafb;
   color: #374151;
-  cursor: pointer;           /* remains interactive for any dropdowns */
+  cursor: pointer;
   box-sizing: border-box;
 }
 
@@ -136,11 +136,38 @@
 .removeButton {
   background-color: #ef4444;
   color: white;
-  align-self: flex-end;
 }
 
 .removeButton:hover {
   background-color: #dc2626;
+}
+
+/* ===== Invalidate Button ===== */
+.invalidateButton {
+  background-color: #3b82f6;
+  color: white;
+  padding: 10px 26px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  height: 38px;
+  width: max-content;
+  transition: background-color 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.invalidateButton:hover {
+  background-color: #2563eb;
+}
+
+/* === Button Row: Invalidate + Remove on same line === */
+.buttonRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
 }
 
 /* Floating Remove Icons (×) */

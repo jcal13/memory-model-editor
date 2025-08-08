@@ -343,8 +343,8 @@ export default function Canvas({
             element={el}
             Editor={Editor}
             defaultPos={{
-              x: typeof window !== "undefined" ? window.innerWidth / 4 : 0,
-              y: typeof window !== "undefined" ? window.innerHeight / 4 : 0,
+              x: typeof window !== "undefined" ? window.innerWidth / 6.5 : 0,
+              y: typeof window !== "undefined" ? window.innerHeight / 3 : 0,
             }}
             onSelect={() => setSelected(el)}
             onSave={(id, kind, invalidated) =>

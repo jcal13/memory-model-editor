@@ -7,6 +7,7 @@ import { useCanvasResize } from "./hooks/useEffect";
 import { useCanvasRefs } from "./hooks/useRef";
 import styles from "./styles/Canvas.module.css";
 import CallStack from "./components/CallStack";
+import MemoryModelEditorStyles from "../styles/MemoryModelEditor.module.css";
 
 const editorMap: Record<BoxType["name"], React.FC<any>> = {
   primitive: BoxEditor,
@@ -59,6 +60,7 @@ function FloatingEditor({
       handle=".drag-handle"
       defaultPosition={defaultPos}
       onMouseDown={onSelect}
+      bounds={`.${MemoryModelEditorStyles.column}`}
     >
       <div ref={nodeRef} className={styles.editorContainer}>
         <Editor
@@ -341,8 +343,8 @@ export default function Canvas({
             element={el}
             Editor={Editor}
             defaultPos={{
-              x: typeof window !== "undefined" ? window.innerWidth / 4 : 0,
-              y: typeof window !== "undefined" ? window.innerHeight / 4 : 0,
+              x: typeof window !== "undefined" ? window.innerWidth / 6.5 : 0,
+              y: typeof window !== "undefined" ? window.innerHeight / 3 : 0,
             }}
             onSelect={() => setSelected(el)}
             onSave={(id, kind, invalidated) =>

@@ -14,6 +14,7 @@ import SubmitButton from "./canvas/components/SubmitButton";
 import DownloadJsonButton from "./canvas/components/DownloadJsonButton";
 import { submitCanvas } from "./services/questionValidationServices";
 import InformationTabs from "./informationTabs/InformationTabs";
+import { clearCanvasStorage, useCanvasLocalStorage, loadInitial } from "./canvas/hooks/useEffect";
 
 const DEFAULT_PLACEHOLDER_WIDTH = 500;
 const MIN_PLACEHOLDER_WIDTH = 100;
@@ -21,15 +22,18 @@ const MAX_PLACEHOLDER_VIEWPORT_RATIO = 0.6667;
 const PLACEHOLDER_SUBTRACT_OFFSET = 100;
 const MAX_PLACEHOLDER_CSS_WIDTH = `${MAX_PLACEHOLDER_VIEWPORT_RATIO * 100}vw`;
 
+loadInitial();
+
 export default function MemoryModelEditor({
   sandbox = true,
 }: {
   sandbox?: boolean;
 }) {
-  const [elements, setElements] = useState<CanvasElement[]>([]);
+  const init = loadInitial();
+  const [elements, setElements] = useState<CanvasElement[]>(() => init.elements);
   const [jsonView, setJsonView] = useState<string>("");
-  const [ids, setIds] = useState<number[]>([]);
-  const [classes, setClasses] = useState<string[]>([]);
+  const [ids, setIds] = useState<number[]>(() => init.ids);
+  const [classes, setClasses] = useState<string[]>(() => init.classes);
 
   const [sandboxMode, setSandboxMode] = useState<boolean>(sandbox);
   const [submissionResults, setSubmissionResults] =
@@ -56,6 +60,7 @@ export default function MemoryModelEditor({
     setIds([]);
     setJsonView("");
     setSubmissionResults(null);
+    clearCanvasStorage();
   };
 
   const handleToggleSandbox = (): void => setShowConfirm(true);
@@ -136,6 +141,8 @@ export default function MemoryModelEditor({
       window.removeEventListener("mouseup", onMouseUp);
     };
   }, [isResizing]);
+
+  useCanvasLocalStorage({elements, ids, classes})
 
   return (
     <div className={styles.container}>

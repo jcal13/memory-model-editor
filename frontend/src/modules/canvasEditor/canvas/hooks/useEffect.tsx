@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createBoxRenderer } from "../utils/BoxRenderer";
+import { CanvasElement } from "../../shared/types";
 
 /**
  * Syncs the given ref with the current `dataType` state on every change.
@@ -215,4 +216,44 @@ export const useDraggableBox = ({
       overlay.removeEventListener("click", clickHandler as any);
     };
   }, [element, invalidated]);
+};
+
+const LS_KEY = 'canvas_key';
+
+export function useCanvasLocalStorage({elements, ids, classes}: 
+  {
+    elements: CanvasElement[];
+    ids: number[];
+    classes: string[];
+  }
+){
+
+  useEffect(() => {
+      try {
+        localStorage.setItem(
+          LS_KEY,
+          JSON.stringify({ elements, ids, classes })
+        );
+      } catch {}
+    }, [elements, ids, classes]);
+}
+
+export function clearCanvasStorage() {
+  localStorage.removeItem(LS_KEY);
+}
+
+
+export const loadInitial = () => {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return { elements: [], ids: [], classes: [] };
+    const parsed = JSON.parse(raw);
+    return {
+      elements: Array.isArray(parsed?.elements) ? parsed.elements : [],
+      ids: Array.isArray(parsed?.ids) ? parsed.ids : [],
+      classes: Array.isArray(parsed?.classes) ? parsed.classes : [],
+    };
+  } catch {
+    return { elements: [], ids: [], classes: [] };
+  }
 };

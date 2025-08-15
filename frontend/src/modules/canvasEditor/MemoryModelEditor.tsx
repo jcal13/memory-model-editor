@@ -17,10 +17,12 @@ import InformationTabs from "./informationTabs/InformationTabs";
 import {
   clearCanvasStorage,
   useCanvasLocalStorage,
-  loadInitial,      // existing canvas loader (unchanged)
-  loadUIInitial,    // NEW: UI loader (tab, question, mode, feedback, sandbox)
-  useUILocalStorage // NEW: UI saver
+  loadInitial,
+  loadUIInitial,
+  useUILocalStorage,
 } from "./canvas/hooks/useEffect";
+
+import ClearCanvasButton from "./canvas/components/ClearCanvasButton";
 
 const DEFAULT_PLACEHOLDER_WIDTH = 500;
 const MIN_PLACEHOLDER_WIDTH = 100;
@@ -35,16 +37,18 @@ export default function MemoryModelEditor({
 }) {
   const init = loadInitial();
   const uiInit = loadUIInitial();
-  console.log(init, uiInit)
 
   const [elements, setElements] = useState<CanvasElement[]>(init.elements);
   const [jsonView, setJsonView] = useState<string>("");
   const [ids, setIds] = useState<number[]>(init.ids);
   const [classes, setClasses] = useState<string[]>(init.classes);
   const [activeTab, setActiveTab] = useState<Tab>(uiInit.activeTab);
-  const [questionIndex, setQuestionIndex] = useState<number | null>(uiInit.questionIndex);
-  const [questionType, setQuestionType] = useState<"test" | "practice" | null>(uiInit.questionType);
-  console.log(questionIndex, questionType)
+  const [questionIndex, setQuestionIndex] = useState<number | null>(
+    uiInit.questionIndex
+  );
+  const [questionType, setQuestionType] = useState<"test" | "practice" | null>(
+    uiInit.questionType
+  );
   const [submissionResults, setSubmissionResults] =
     useState<SubmissionResult>(uiInit.submissionResults);
 
@@ -52,31 +56,25 @@ export default function MemoryModelEditor({
     () => (typeof uiInit.sandboxMode === "boolean" ? uiInit.sandboxMode : sandbox)
   );
 
-
   const [paletteTab, setPaletteTab] = useState<PaletteTab>("all");
-  const [placeholderWidth, setPlaceholderWidth] = useState<number>(DEFAULT_PLACEHOLDER_WIDTH);
+  const [placeholderWidth, setPlaceholderWidth] =
+    useState<number>(DEFAULT_PLACEHOLDER_WIDTH);
   const [isResizing, setIsResizing] = useState<boolean>(false);
-  const [showConfirm, setShowConfirm] = useState<boolean>(false);
+
+  // Separate modals
+  const [showClearConfirm, setShowClearConfirm] = useState<boolean>(false);
+  const [showToggleConfirm, setShowToggleConfirm] = useState<boolean>(false);
+
   const subContainerRef = useRef<HTMLDivElement>(null);
 
-
+  /** Existing clear helper */
   const clearBoard = (): void => {
     setElements([]);
     setIds([]);
     setJsonView("");
-    setSubmissionResults(null); 
-    clearCanvasStorage();       
+    setSubmissionResults(null);
+    clearCanvasStorage();
   };
-
-  const handleToggleSandbox = (): void => setShowConfirm(true);
-
-  const confirmClear = (): void => {
-    clearBoard();
-    setSandboxMode((prev) => !prev); 
-    setShowConfirm(false);
-  };
-
-  const cancelClear = (): void => setShowConfirm(false);
 
   const handleSubmit = async () => {
     if (questionIndex === null || questionType === null) {
@@ -85,7 +83,7 @@ export default function MemoryModelEditor({
       return;
     }
 
-    const cleanElements = elements.filter(el => !el.invalidated);
+    const cleanElements = elements.filter((el) => !el.invalidated);
     try {
       const res = await submitCanvas(cleanElements, questionIndex, questionType);
       if (res !== undefined) setSubmissionResults(res);
@@ -104,8 +102,7 @@ export default function MemoryModelEditor({
         : [...prev.slice(0, insertAt), id, ...prev.slice(insertAt)];
     });
 
-  const removeId = (id: ID) =>
-    setIds((prev) => prev.filter((v) => v !== id));
+  const removeId = (id: ID) => setIds((prev) => prev.filter((v) => v !== id));
 
   const addClass = (className: string) =>
     setClasses((prev) => {
@@ -163,6 +160,8 @@ export default function MemoryModelEditor({
       <div ref={subContainerRef} className={styles.subContainer}>
         <div className={styles.column}>
           <div className={styles.canvasArea}>
+            <ClearCanvasButton onClick={() => setShowClearConfirm(true)} />
+
             <Canvas
               elements={elements}
               setElements={setElements}
@@ -185,7 +184,7 @@ export default function MemoryModelEditor({
               checked={sandboxMode}
               onChange={(e) => {
                 e.preventDefault();
-                handleToggleSandbox();
+                setShowToggleConfirm(true);
               }}
             />
             <span className={styles.switchSlider}></span>
@@ -218,14 +217,34 @@ export default function MemoryModelEditor({
         </div>
       </div>
 
-      {showConfirm && (
+      {/* Clear Canvas confirmation */}
+      {showClearConfirm && (
         <ConfirmationModal
           title="Clear Canvas?"
           message="This will clear the entire canvas and cannot be undone."
           confirmLabel="Clear"
           cancelLabel="Cancel"
-          onConfirm={confirmClear}
-          onCancel={cancelClear}
+          onConfirm={() => {
+            clearBoard();
+            setShowClearConfirm(false);
+          }}
+          onCancel={() => setShowClearConfirm(false)}
+        />
+      )}
+
+      {/* Sandbox toggle confirmation */}
+      {showToggleConfirm && (
+        <ConfirmationModal
+          title="Switch Mode?"
+          message="Switching modes will clear the canvas. Continue?"
+          confirmLabel="Confirm"
+          cancelLabel="Cancel"
+          onConfirm={() => {
+            clearBoard();
+            setSandboxMode((prev) => !prev);
+            setShowToggleConfirm(false);
+          }}
+          onCancel={() => setShowToggleConfirm(false)}
         />
       )}
     </div>

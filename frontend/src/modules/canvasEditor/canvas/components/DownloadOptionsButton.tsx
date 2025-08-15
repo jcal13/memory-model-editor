@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { CanvasElement } from '../../shared/types';
-import { buildJSONFromElements } from '../../jsonConversion/jsonBuilder';
-import styles from '../styles/Canvas.module.css';
-import canvasStyles from '../../styles/MemoryModelEditor.module.css';
-import html2canvas from 'html2canvas';
-import domtoimage from 'dom-to-image';
+import React, { useRef, useState } from "react";
+import { CanvasElement } from "../../shared/types";
+import { buildJSONFromElements } from "../../jsonConversion/jsonBuilder";
+import styles from "../styles/Canvas.module.css";
+import canvasStyles from "../../styles/MemoryModelEditor.module.css";
+import html2canvas from "html2canvas";
+import domtoimage from "dom-to-image";
 
 interface Props {
   elements: CanvasElement[];
@@ -12,22 +12,30 @@ interface Props {
 
 const DownloadOptionsButton: React.FC<Props> = ({ elements }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const closeTimer = useRef<number | null>(null);
 
-  const boxWidth = 120;
-  const boxHeight = 60;
-  const fontSize = 12;
+  const openNow = () => {
+    if (closeTimer.current) {
+      window.clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+    setIsOpen(true);
+  };
 
+  const closeSoon = () => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    closeTimer.current = window.setTimeout(() => setIsOpen(false), 150);
+  };
 
   const downloadJsonFile = () => {
     const processed = buildJSONFromElements(elements);
     const blob = new Blob([JSON.stringify(processed, null, 2)], {
-      type: 'application/json',
+      type: "application/json",
     });
     const url = URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = 'canvas-data.json';
+    link.download = "canvas-data.json";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -39,12 +47,13 @@ const DownloadOptionsButton: React.FC<Props> = ({ elements }) => {
     await new Promise(requestAnimationFrame);
 
     const node = document.querySelector(`.${canvasStyles.column}`)!;
-    
-    domtoimage.toSvg(node)
+
+    domtoimage
+      .toSvg(node)
       .then((dataUrl: string) => {
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = dataUrl;
-        link.download = 'canvas.svg';
+        link.download = "canvas.svg";
         link.click();
       })
       .catch(console.error);
@@ -54,11 +63,13 @@ const DownloadOptionsButton: React.FC<Props> = ({ elements }) => {
     setIsOpen(false);
     await new Promise(requestAnimationFrame);
 
-    const canvasRoot = document.querySelector(`.${canvasStyles.column}`) as HTMLElement | null;
+    const canvasRoot = document.querySelector(
+      `.${canvasStyles.column}`
+    ) as HTMLElement | null;
     if (!canvasRoot) return;
 
     const canvas = await html2canvas(canvasRoot, {
-      backgroundColor: '#ffffff',
+      backgroundColor: "#ffffff",
       useCORS: true,
       scale: 2, // higher resolution
     });
@@ -66,9 +77,9 @@ const DownloadOptionsButton: React.FC<Props> = ({ elements }) => {
     canvas.toBlob((blob) => {
       if (!blob) return;
       const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = 'canvas-snapshot.png';
+      link.download = "canvas-snapshot.png";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -79,15 +90,37 @@ const DownloadOptionsButton: React.FC<Props> = ({ elements }) => {
   return (
     <div
       className={styles.downloadContainer}
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
+      onMouseEnter={openNow}
+      onMouseLeave={closeSoon}
     >
-      <button className={styles.downloadBtn}>Download Options</button>
+      <button
+        type="button"
+        className={styles.downloadBtn}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+      >
+        Download{" "}
+        <span className={styles.caret} aria-hidden>
+          ▾
+        </span>
+      </button>
+
       {isOpen && (
-        <div className={styles.downloadMenu}>
-          <button onClick={downloadSvgFile}>Download SVG</button>
-          <button onClick={downloadPngFile}>Download PNG</button>
-          <button onClick={downloadJsonFile}>Download JSON</button>
+        <div
+          className={styles.downloadMenu}
+          role="menu"
+          onMouseEnter={openNow}
+          onMouseLeave={closeSoon}
+        >
+          <button type="button" role="menuitem" onClick={downloadSvgFile}>
+            Download SVG
+          </button>
+          <button type="button" role="menuitem" onClick={downloadPngFile}>
+            Download PNG
+          </button>
+          <button type="button" role="menuitem" onClick={downloadJsonFile}>
+            Download JSON
+          </button>
         </div>
       )}
     </div>

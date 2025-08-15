@@ -115,21 +115,17 @@ export default function Canvas({
     if (sandbox) return;
 
     const elementIds = elements
-      .filter(el => el.kind.name !== "function" && typeof el.id === "number")
-      .map(el => el.id as number);
+      .filter((el) => el.kind.name !== "function" && typeof el.id === "number")
+      .map((el) => el.id as number);
 
-    elementIds
-      .filter(id => !ids.includes(id))
-      .forEach(id => addId(id));
+    elementIds.filter((id) => !ids.includes(id)).forEach((id) => addId(id));
 
-    ids
-      .filter(id => !elementIds.includes(id))
-      .forEach(id => removeId(id));
+    ids.filter((id) => !elementIds.includes(id)).forEach((id) => removeId(id));
   }, [elements, ids, sandbox, addId, removeId]);
 
   const makePositionUpdater = (boxId: number) => (x: number, y: number) => {
-    setElements(prev =>
-      prev.map(el => (el.boxId === boxId ? { ...el, x, y } : el))
+    setElements((prev) =>
+      prev.map((el) => (el.boxId === boxId ? { ...el, x, y } : el))
     );
   };
 
@@ -139,6 +135,9 @@ export default function Canvas({
     let newKind: BoxType;
 
     switch (payload) {
+      case "none":
+        newKind = { name: "primitive", type: "None", value: "None" };
+        break;
       case "int":
         newKind = { name: "primitive", type: "int", value: "0" };
         break;
@@ -155,7 +154,9 @@ export default function Canvas({
         newKind = { name: "primitive", type: "None", value: "None" };
         break;
       case "function":
-        const functionCount = elements.filter(el => el.kind.name === "function").length;
+        const functionCount = elements.filter(
+          (el) => el.kind.name === "function"
+        ).length;
         newKind = {
           name: "function",
           type: "function",
@@ -193,10 +194,12 @@ export default function Canvas({
     const pt = svgRef.current!.createSVGPoint();
     pt.x = e.clientX;
     pt.y = e.clientY;
-    const coords = pt.matrixTransform(svgRef.current!.getScreenCTM()!.inverse());
+    const coords = pt.matrixTransform(
+      svgRef.current!.getScreenCTM()!.inverse()
+    );
 
-    setElements(prev => {
-      const boxIds = prev.map(el => el.boxId as number).sort((a, b) => a - b);
+    setElements((prev) => {
+      const boxIds = prev.map((el) => el.boxId as number).sort((a, b) => a - b);
       let newBoxId = boxIds.length;
       for (let i = 0; i < boxIds.length; i++) {
         if (boxIds[i] !== i) {
@@ -235,8 +238,8 @@ export default function Canvas({
     updatedKind: BoxType,
     invalidated?: boolean
   ) => {
-    setElements(prev =>
-      prev.map(el => {
+    setElements((prev) =>
+      prev.map((el) => {
         if (el.boxId !== boxId) return el;
 
         const base = { ...el, id: updatedId, kind: updatedKind };
@@ -250,9 +253,9 @@ export default function Canvas({
   };
 
   const removeElement = (boxId: number) => {
-    setElements(prev => prev.filter(el => el.boxId !== boxId));
-    setOpenBoxEditors(prev => prev.filter(el => el.boxId !== boxId));
-    setSelected(prev => (prev && prev.boxId === boxId ? null : prev));
+    setElements((prev) => prev.filter((el) => el.boxId !== boxId));
+    setOpenBoxEditors((prev) => prev.filter((el) => el.boxId !== boxId));
+    setSelected((prev) => (prev && prev.boxId === boxId ? null : prev));
   };
 
   const openElement = (canvasElement: CanvasElement) => {
@@ -260,13 +263,13 @@ export default function Canvas({
     setSelected(canvasElement);
   };
 
-  const functionFrames = elements.filter(el => el.kind.name === "function");
+  const functionFrames = elements.filter((el) => el.kind.name === "function");
 
   const handleReorder = useCallback(
     (from: number, to: number) => {
       if (from === to) return;
 
-      setElements(prev => {
+      setElements((prev) => {
         const funcIdxs = prev
           .map((el, i) => ({ el, i }))
           .filter(({ el }) => el.kind.name === "function");
@@ -278,13 +281,13 @@ export default function Canvas({
         const [moved] = next.splice(fromIdx, 1);
         next.splice(toIdx, 0, moved);
 
-        const reorderedFuncs = next.filter(el => el.kind.name === "function");
+        const reorderedFuncs = next.filter((el) => el.kind.name === "function");
         const orderMap = new Map<number, number>();
         reorderedFuncs.forEach((func, idx) => {
           orderMap.set(func.boxId, idx + 1);
         });
 
-        return next.map(el => {
+        return next.map((el) => {
           if (el.kind.name === "function" && orderMap.has(el.boxId)) {
             return {
               ...el,
@@ -307,7 +310,7 @@ export default function Canvas({
           viewBox={viewBox}
           preserveAspectRatio="xMinYMin meet"
           className={styles.canvas}
-          onDragOver={e => e.preventDefault()}
+          onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
           <CallStack
@@ -321,8 +324,8 @@ export default function Canvas({
 
           <g>
             {elements
-              .filter(el => el.kind.name !== "function")
-              .map(el => (
+              .filter((el) => el.kind.name !== "function")
+              .map((el) => (
                 <CanvasBox
                   key={el.boxId}
                   element={el}
@@ -335,7 +338,7 @@ export default function Canvas({
         </svg>
       </div>
 
-      {openBoxEditors.map(el => {
+      {openBoxEditors.map((el) => {
         const Editor = editorMap[el.kind.name];
         return (
           <FloatingEditor
@@ -352,10 +355,10 @@ export default function Canvas({
             }
             onRemove={() => removeElement(el.boxId)}
             onClose={() => {
-              setOpenBoxEditors(prev =>
-                prev.filter(e => e.boxId !== el.boxId)
+              setOpenBoxEditors((prev) =>
+                prev.filter((e) => e.boxId !== el.boxId)
               );
-              setSelected(prev =>
+              setSelected((prev) =>
                 prev && prev.boxId === el.boxId ? null : prev
               );
             }}

@@ -19,10 +19,10 @@ const style = {
  */
 const getValues = (kind: any): number[] => {
   if (Array.isArray(kind.value)) {
-  // List / tuple / set values
-  return kind.value
-    .map((v: any) => v === "_" ? "_" : +v)
-    .filter((v: any) => v === "_" || !isNaN(v));
+    // List / tuple / set values
+    return kind.value
+      .map((v: any) => (v === "_" ? "_" : +v))
+      .filter((v: any) => v === "_" || !isNaN(v));
   } else if (kind.value && typeof kind.value === "object") {
     // Dict values
     return Object.values(kind.value)
@@ -43,12 +43,18 @@ export const BoxConfigs = {
   /* ---------- Primitive Box ---------- */
   primitive: {
     draw: (model: any, kind: any, id: ID) => {
-      const type =
-        kind.type === "None" || kind.value === null ? "None" : kind.type;
-      let value = ["string", "number", "boolean"].includes(typeof kind.value)
-        ? kind.value
-        : "";
-      value = kind.type === "bool" ? kind.value === "true" : value
+      const isNone = kind.type === "None" || kind.value === null;
+      const type = isNone ? "None" : kind.type;
+
+      let value: any;
+      if (isNone) {
+        value = "null";
+      } else if (["string", "number", "boolean"].includes(typeof kind.value)) {
+        value = kind.type === "bool" ? kind.value === "true" : kind.value;
+      } else {
+        value = "";
+      }
+
       model.drawPrimitive(0, 0, type, id, value, style);
     },
     getHeight: () => 90,
@@ -109,17 +115,16 @@ export const BoxConfigs = {
     getMinWidth: () => 190,
   },
 
-    /* ---------- Class Box ---------- */
-    class: {
-      draw: (model: any, kind: any, id: ID) => {
-        const props: Record<string, number | null> = {};
-        (kind.classVariables || []).forEach((p: any) => (props[p.name] = p.targetId));
-        model.drawClass(0, 0, kind.className ?? "", id, props, false, style);
-      },
-      getHeight: () => 90,
-      getMinWidth: () => 190,
+  /* ---------- Class Box ---------- */
+  class: {
+    draw: (model: any, kind: any, id: ID) => {
+      const props: Record<string, number | null> = {};
+      (kind.classVariables || []).forEach(
+        (p: any) => (props[p.name] = p.targetId)
+      );
+      model.drawClass(0, 0, kind.className ?? "", id, props, false, style);
     },
-  
+    getHeight: () => 90,
+    getMinWidth: () => 190,
+  },
 };
-
-

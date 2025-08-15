@@ -3,7 +3,7 @@
 ======================================= */
 
 const style = {
-  box_id:   { fill: "#fff", fillStyle: "solid" },
+  box_id: { fill: "#fff", fillStyle: "solid" },
   box_type: { fill: "#fff", fillStyle: "solid" },
 };
 
@@ -23,23 +23,30 @@ export const BoxConfigs = {
   },
 
   /* ---------- Concrete primitives ---------- */
+  none: {
+    draw: (model: any) => {
+      model.drawPrimitive(15, 15, "None", "0", "null", style);
+    },
+    minHeight: 90,
+    minWidth: 170,
+  },
   int: {
     draw: (model: any) => {
-      model.drawPrimitive(15, 15, "int",  "0",   "0", style);
+      model.drawPrimitive(15, 15, "int", "0", "0", style);
     },
     minHeight: 90,
     minWidth: 170,
   },
   float: {
     draw: (model: any) => {
-      model.drawPrimitive(15, 15, "float","0", "0.0", style);
+      model.drawPrimitive(15, 15, "float", "0", "0.0", style);
     },
     minHeight: 90,
     minWidth: 170,
   },
   str: {
     draw: (model: any) => {
-      model.drawPrimitive(15, 15, "str",  '0',  "", style);
+      model.drawPrimitive(15, 15, "str", "0", "", style);
     },
     minHeight: 90,
     minWidth: 170,

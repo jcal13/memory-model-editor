@@ -6,6 +6,7 @@ import { PaletteTab } from "../shared/types";
 export type BoxType =
   | "class"
   | "function"
+  | "none"
   | "int"
   | "float"
   | "str"
@@ -18,6 +19,7 @@ export type BoxType =
 const ALL_TYPES = [
   "function",
   "class",
+  "none",
   "int",
   "float",
   "str",
@@ -29,7 +31,7 @@ const ALL_TYPES = [
 ] as const;
 
 const CLASS_FN_TYPES = ["function", "class"] as const;
-const PRIMITIVE_TYPES = ["int", "float", "str", "bool"] as const;
+const PRIMITIVE_TYPES = ["none", "int", "float", "str", "bool"] as const;
 const COLLECTION_TYPES = ["list", "tuple", "set", "dict"] as const;
 
 interface Props {

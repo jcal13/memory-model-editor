@@ -37,19 +37,31 @@ const normalizeIdDict = (obj: unknown): Record<string, number | null> => {
   return out;
 };
 
+const makeUniqueKey = (raw: unknown, used: Set<string>): string => {
+  const base = typeof raw === "string" ? raw : "";
+  let key = base;
+  while (used.has(key)) key += "\u200B";
+  used.add(key);
+  return key;
+};
+
 export function buildJSONFromElements(
   elements: CanvasElement[]
 ): (FrameEntry | ValueEntry)[] {
   const jsonData: FrameEntry[] = [];
   const valueEntries: ValueEntry[] = [];
 
-  // Step 1: Add .frame entries for functions
+  // Step 1: Add .frame entries for functions (include ALL params; "_" -> null)
   elements.forEach(({ id, kind }) => {
     if (kind.name === "function") {
+      const used = new Set<string>();
       const frameValue: Record<string, number | null> = {};
+
       for (const param of kind.params || []) {
-        frameValue[param.name] = normalizeId(param.targetId);
+        const key = makeUniqueKey(param.name, used);
+        frameValue[key] = normalizeId(param.targetId); // "_" => null
       }
+
       jsonData.push({
         type: ".frame",
         name: kind.functionName || `func${id}`,
@@ -63,6 +75,7 @@ export function buildJSONFromElements(
   // Step 2: Add value entries for everything else
   elements.forEach(({ id, kind, x, y }) => {
     const jsonId = normalizeId(id);
+
     if (jsonId === null && id !== "_" && id !== null) {
       console.warn(
         `Skipping value with non-numeric/non-blank id: ${String(id)}`

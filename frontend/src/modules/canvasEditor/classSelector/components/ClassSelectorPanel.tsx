@@ -46,12 +46,12 @@ const ClassSelectorPanel: React.FC<Props> = ({
       <div className={`drag-handle ${panelStyles.header}`}>Select Class</div>
 
       <div className={panelStyles.content}>
-        <div className={`${boxStyles.collectionIdContainer} ${panelStyles.flexWrap}`}>
+        <div className={boxStyles.collectionIdContainer}>
           {classes.map((className) => (
-            <div key={className} className={`${boxStyles.collectionIdBox} ${panelStyles.autoWidthBox}`}>
+            <div key={className} className={boxStyles.collectionIdBox}>
               <button
                 type="button"
-                className={`${boxStyles.collectionIdNoBorder} ${panelStyles.autoWidthText}`}
+                className={boxStyles.collectionIdNoBorder}
                 onClick={() => onSelect(className)}
               >
                 {className}

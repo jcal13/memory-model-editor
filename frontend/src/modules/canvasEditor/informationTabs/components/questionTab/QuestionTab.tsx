@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { fetchQuestionCount, fetchQuestion } from "./FetchQuestionService";
 import QuestionSelector from "./components/QuestionSelector";
@@ -8,6 +8,33 @@ import "prismjs/themes/prism-tomorrow.css";
 
 type View = "root" | "loading" | "test" | "list" | "question" | "practice";
 type QType = "test" | "practice";
+
+const UI_LS_KEY = "uiState";
+
+function loadSavedQuestionView(): View {
+  try {
+    const raw = localStorage.getItem(UI_LS_KEY);
+    if (!raw) return "root";
+    const parsed = JSON.parse(raw) ?? {};
+    const v = parsed?.questionView as View | undefined;
+    if (!v || !["root", "loading", "test", "list", "question", "practice"].includes(v)) {
+      return "root";
+    }
+    return v === "loading" ? "root" : v;
+  } catch {
+    return "root";
+  }
+}
+
+function persistQuestionView(view: View) {
+  try {
+    const raw = localStorage.getItem(UI_LS_KEY);
+    const parsed = raw ? JSON.parse(raw) ?? {} : {};
+    parsed.questionView = view;
+    localStorage.setItem(UI_LS_KEY, JSON.stringify(parsed));
+  } catch {
+  }
+}
 
 export default function QuestionTab({
   questionIndex,
@@ -20,23 +47,37 @@ export default function QuestionTab({
   questionType: "test" | "practice" | null;
   setQuestionType: (t: "test" | "practice" | null) => void;
 }) {
-  const [view, setView] = useState<View>("root");
+  const [view, setView] = useState<View>(() => loadSavedQuestionView());
   const [questionCount, setQuestionCount] = useState(0);
   const [questionData, setQuestionData] = useState<any>(null);
 
+  useEffect(() => {
+    persistQuestionView(view);
+  }, [view]);
+
   const loadQuestions = async (qt: QType) => {
     setView("loading");
-    const count = await fetchQuestionCount(qt);
-    setQuestionCount(count);
-    setQuestionType(qt);
-    setView("list");
+    try {
+      const count = await fetchQuestionCount(qt);
+      setQuestionCount(count);
+      setQuestionType(qt);
+      setQuestionIndex(null);
+      setView("list");
+    } catch (e) {
+      console.error(e);
+      setView("root");
+    }
   };
 
   const loadSingleQuestion = async (id: number) => {
-    if (!questionType) return;
+    const qt = questionType;
+    if (!qt) {
+      setView("root");
+      return;
+    }
     setView("loading");
     try {
-      const data = await fetchQuestion(id, questionType);
+      const data = await fetchQuestion(id, qt);
       setQuestionIndex(id);
       setQuestionData(data);
       setView("question");
@@ -45,6 +86,46 @@ export default function QuestionTab({
       setView("list");
     }
   };
+  const hydratedList = useRef(false);
+  useEffect(() => {
+    if (view === "list" && questionType && !hydratedList.current) {
+      hydratedList.current = true;
+      // don't flip to "loading" here to avoid a flicker; just hydrate silently
+      fetchQuestionCount(questionType)
+        .then((count) => setQuestionCount(count))
+        .catch((e) => {
+          console.error(e);
+          setView("root");
+        });
+    }
+  }, [view, questionType]);
+
+  const hydratedQuestion = useRef(false);
+  useEffect(() => {
+    if (
+      view === "question" &&
+      questionType &&
+      questionIndex != null &&
+      !questionData &&
+      !hydratedQuestion.current
+    ) {
+      hydratedQuestion.current = true;
+      (async () => {
+        try {
+          const data = await fetchQuestion(questionIndex, questionType);
+          setQuestionData(data);
+        } catch (e) {
+          console.error(e);
+          setView("list");
+        }
+      })();
+    }
+  }, [view, questionType, questionIndex, questionData]);
+
+  useEffect(() => {
+    if (view === "list" && !questionType) setView("root");
+    if (view === "question" && (!questionType || questionIndex == null)) setView("root");
+  }, [view, questionType, questionIndex]);
 
   let heading = "Questions";
   if (view === "question" && questionIndex !== null) {
@@ -79,7 +160,10 @@ export default function QuestionTab({
           <div className={styles.backRow}>
             <button
               type="button"
-              onClick={() => setView("root")}
+              onClick={() => {
+                setQuestionIndex(null);
+                setView("root");
+              }}
               className={styles.backBtn}
             >
               ← Back
@@ -103,7 +187,22 @@ export default function QuestionTab({
       {view === "question" && questionData && (
         <>
           <div className={styles.backRow}>
-            <button onClick={() => setView("list")} className={styles.backBtn}>
+            <button
+              onClick={async () => {
+                // ensure list is hydrated if we came straight from a cold resume
+                if ((questionCount ?? 0) === 0 && questionType) {
+                  try {
+                    const count = await fetchQuestionCount(questionType);
+                    setQuestionCount(count);
+                  } catch (e) {
+                    console.error(e);
+                  }
+                }
+                setQuestionIndex(null);
+                setView("list");
+              }}
+              className={styles.backBtn}
+            >
               ← Back
             </button>
           </div>

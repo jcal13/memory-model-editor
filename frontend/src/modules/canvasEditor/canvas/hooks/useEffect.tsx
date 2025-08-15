@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { createBoxRenderer } from "../utils/BoxRenderer";
-import { CanvasElement } from "../../shared/types";
+import { CanvasElement, SubmissionResult, Tab } from "../../shared/types";
 
 /**
  * Syncs the given ref with the current `dataType` state on every change.
@@ -137,41 +137,22 @@ export const useDraggableBox = ({
     gRef.current.innerHTML = "";
     gRef.current.appendChild(svgElement);
 
-    /* ----- invalidated tint (apply grayscale to shapes only) ----- */
-    // Select elements *inside* the rendered box, not the wrapper <g>.
-    const rects = Array.from(svgElement.querySelectorAll("rect"));
     const texts = Array.from(svgElement.querySelectorAll<SVGElement>("text, tspan"));
-
-    // Clean any previous styles first
-    rects.forEach(r => (r as SVGElement).style.removeProperty("filter"));
-    texts.forEach(t => (t as SVGElement).style.removeProperty("fill"));
-
-    const COLOUR = "#9CA3AF";
-
     const shapes = Array.from(
       svgElement.querySelectorAll<SVGElement>("rect,path,polygon,ellipse,circle")
     ).filter(el => !el.closest("defs") && !el.hasAttribute("data-overlay"));
 
-    shapes.forEach(s => {
-      s.style.removeProperty("filter");
+    [...shapes, ...texts].forEach(s => {
+      s.style.removeProperty("stroke");
       s.style.removeProperty("fill");
+      s.style.removeProperty("filter");
       s.style.removeProperty("fill-opacity");
     });
-    texts.forEach(t => t.style.removeProperty("fill"));
 
+    const COLOUR = "#9CA3AF";
     if (invalidated) {
-      shapes.forEach(s => {
-        s.style.setProperty("stroke", COLOUR, "important");
-      });
-
-      texts.forEach(t => {
-        t.style.setProperty("fill", COLOUR, "important");
-      });
-    } else {
-      shapes.forEach(s => {
-        if (s.style.stroke === COLOUR) s.style.removeProperty("stroke");
-      });
-      texts.forEach(t => t.style.removeProperty("fill"));
+      shapes.forEach(s => s.style.setProperty("stroke", COLOUR, "important"));
+      texts.forEach(t => t.style.setProperty("fill", COLOUR, "important"));
     }
 
     // Calculate dimensions
@@ -197,7 +178,7 @@ export const useDraggableBox = ({
     overlay.setAttribute("width", `${width}`);
     overlay.setAttribute("height", `${height}`);
     overlay.setAttribute("fill", "transparent");
-    overlay.setAttribute("data-overlay", "true"); // so it won't be grayscaled
+    overlay.setAttribute("data-overlay", "true");
     overlay.style.cursor = "grab";
 
     const clickHandler = (e: MouseEvent) => {
@@ -218,30 +199,30 @@ export const useDraggableBox = ({
   }, [element, invalidated]);
 };
 
-const LS_KEY = 'canvas_key';
+const LS_KEY = "canvas_key";
 
-export function useCanvasLocalStorage({elements, ids, classes}: 
-  {
-    elements: CanvasElement[];
-    ids: number[];
-    classes: string[];
-  }
-){
-
+export function useCanvasLocalStorage({
+  elements,
+  ids,
+  classes,
+}: {
+  elements: CanvasElement[];
+  ids: number[];
+  classes: string[];
+}) {
   useEffect(() => {
-      try {
-        localStorage.setItem(
-          LS_KEY,
-          JSON.stringify({ elements, ids, classes })
-        );
-      } catch {}
-    }, [elements, ids, classes]);
+    try {
+      localStorage.setItem(
+        LS_KEY,
+        JSON.stringify({ elements, ids, classes })
+      );
+    } catch {}
+  }, [elements, ids, classes]);
 }
 
 export function clearCanvasStorage() {
   localStorage.removeItem(LS_KEY);
 }
-
 
 export const loadInitial = () => {
   try {
@@ -257,3 +238,115 @@ export const loadInitial = () => {
     return { elements: [], ids: [], classes: [] };
   }
 };
+
+const UI_LS_KEY = "canvas_ui_state_v3";
+
+export type UIState = {
+  activeTab: Tab; 
+  questionIndex: number | null;
+  questionType: "test" | "practice" | null;
+  submissionResults: SubmissionResult;
+  sandboxMode: boolean | null; 
+};
+
+export function loadUIInitial(): UIState {
+  try {
+    const raw = localStorage.getItem(UI_LS_KEY);
+    if (!raw) {
+      return {
+        activeTab: "question",
+        questionIndex: null,
+        questionType: null,
+        submissionResults: null,
+        sandboxMode: null,
+      };
+    }
+    const parsed = JSON.parse(raw);
+
+    const activeTab: Tab =
+      parsed?.activeTab === "feedback" ? "feedback" : "question";
+
+    const questionIndex =
+      typeof parsed?.questionIndex === "number" ? parsed.questionIndex : null;
+
+    const questionType =
+      parsed?.questionType === "test" || parsed?.questionType === "practice"
+        ? parsed.questionType
+        : null;
+
+    const sr = parsed?.submissionResults;
+    const submissionResults: SubmissionResult =
+      sr && typeof sr === "object"
+        ? {
+            correct: !!sr.correct,
+            errors: Array.isArray(sr.errors)
+              ? sr.errors
+              : Array.isArray(sr.messages)
+              ? sr.messages
+              : [],
+          }
+        : null;
+
+    const sandboxMode: boolean | null =
+      typeof parsed?.sandboxMode === "boolean" ? parsed.sandboxMode : null;
+
+    return { activeTab, questionIndex, questionType, submissionResults, sandboxMode };
+  } catch {
+    return {
+      activeTab: "question",
+      questionIndex: null,
+      questionType: null,
+      submissionResults: null,
+      sandboxMode: null,
+    };
+  }
+}
+
+/** Persist UI state (tab, question, mode, feedback, sandbox) under the NEW key */
+export function useUILocalStorage(state: UIState) {
+  const {
+    activeTab,
+    questionIndex,
+    questionType,
+    submissionResults,
+    sandboxMode,
+  } = state;
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        UI_LS_KEY,
+        JSON.stringify({
+          activeTab,
+          questionIndex,
+          questionType,
+          submissionResults,
+          sandboxMode,
+        })
+      );
+    } catch {}
+  }, [activeTab, questionIndex, questionType, submissionResults, sandboxMode]);
+}
+
+export function loadSavedQuestionView(): string {
+  try {
+    const raw = localStorage.getItem(UI_LS_KEY);
+    if (!raw) return "root";
+    const parsed = JSON.parse(raw);
+    const v = parsed?.questionView;
+    return v === "loading" || v === "list" || v === "question" ? v : "root";
+  } catch {
+    return "root";
+  }
+}
+
+export function usePersistQuestionView(view: string) {
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(UI_LS_KEY);
+      const parsed = raw ? JSON.parse(raw) || {} : {};
+      parsed.questionView = view;
+      localStorage.setItem(UI_LS_KEY, JSON.stringify(parsed));
+    } catch {}
+  }, [view]);
+}

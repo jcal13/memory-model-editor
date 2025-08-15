@@ -210,14 +210,21 @@ export default function Canvas({
 
       let computedId: ID = "_";
       if (!sandbox && newKind.name !== "function") {
-        const sortedIds = [...ids].sort((a, b) => a - b);
-        computedId = sortedIds.length;
-        for (let i = 0; i < sortedIds.length; i++) {
-          if (sortedIds[i] !== i) {
-            computedId = i;
+        const sortedPos = [...ids]
+          .filter((n) => Number.isInteger(n) && n >= 1)
+          .sort((a, b) => a - b);
+
+        let computed = 1;
+        for (let i = 0; i < sortedPos.length; i++) {
+          const expected = i + 1;
+          if (sortedPos[i] !== expected) {
+            computed = expected;
             break;
           }
+          computed = sortedPos.length + 1;
         }
+
+        computedId = computed;
       }
 
       const newElement: CanvasElement = {

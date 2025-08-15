@@ -11,10 +11,18 @@ import {
   PaletteTab,
 } from "./shared/types";
 import SubmitButton from "./canvas/components/SubmitButton";
-import DownloadJsonButton from "./canvas/components/DownloadJsonButton";
+import DownloadJsonButton from "./canvas/components/DownloadOptionsButton";
 import { submitCanvas } from "./services/questionValidationServices";
 import InformationTabs from "./informationTabs/InformationTabs";
-import { clearCanvasStorage, useCanvasLocalStorage, loadInitial } from "./canvas/hooks/useEffect";
+import {
+  clearCanvasStorage,
+  useCanvasLocalStorage,
+  loadInitial,
+  loadUIInitial,
+  useUILocalStorage,
+} from "./canvas/hooks/useEffect";
+
+import ClearCanvasButton from "./canvas/components/ClearCanvasButton";
 
 const DEFAULT_PLACEHOLDER_WIDTH = 500;
 const MIN_PLACEHOLDER_WIDTH = 100;
@@ -22,83 +30,79 @@ const MAX_PLACEHOLDER_VIEWPORT_RATIO = 0.6667;
 const PLACEHOLDER_SUBTRACT_OFFSET = 100;
 const MAX_PLACEHOLDER_CSS_WIDTH = `${MAX_PLACEHOLDER_VIEWPORT_RATIO * 100}vw`;
 
-loadInitial();
-
 export default function MemoryModelEditor({
   sandbox = true,
 }: {
   sandbox?: boolean;
 }) {
   const init = loadInitial();
-  const [elements, setElements] = useState<CanvasElement[]>(() => init.elements);
+  const uiInit = loadUIInitial();
+
+  const [elements, setElements] = useState<CanvasElement[]>(init.elements);
   const [jsonView, setJsonView] = useState<string>("");
-  const [ids, setIds] = useState<number[]>(() => init.ids);
-  const [classes, setClasses] = useState<string[]>(() => init.classes);
-
-  const [sandboxMode, setSandboxMode] = useState<boolean>(sandbox);
-  const [submissionResults, setSubmissionResults] =
-    useState<SubmissionResult>(null);
-  const [activeTab, setActiveTab] = useState<Tab>("question");
-  const [questionIndex, setQuestionIndex] = useState<number | null>(null);
+  const [ids, setIds] = useState<number[]>(init.ids);
+  const [classes, setClasses] = useState<string[]>(init.classes);
+  const [activeTab, setActiveTab] = useState<Tab>(uiInit.activeTab);
+  const [questionIndex, setQuestionIndex] = useState<number | null>(
+    uiInit.questionIndex
+  );
   const [questionType, setQuestionType] = useState<"test" | "practice" | null>(
-    null
+    uiInit.questionType
   );
-  const [paletteTab, setPaletteTab] = useState<PaletteTab>("all");
+  const [submissionResults, setSubmissionResults] =
+    useState<SubmissionResult>(uiInit.submissionResults);
 
-  // width state for placeholder panel
-  const [placeholderWidth, setPlaceholderWidth] = useState<number>(
-    DEFAULT_PLACEHOLDER_WIDTH
+  const [sandboxMode, setSandboxMode] = useState<boolean>(
+    () => (typeof uiInit.sandboxMode === "boolean" ? uiInit.sandboxMode : sandbox)
   );
+
+  const [paletteTab, setPaletteTab] = useState<PaletteTab>("all");
+  const [placeholderWidth, setPlaceholderWidth] =
+    useState<number>(DEFAULT_PLACEHOLDER_WIDTH);
   const [isResizing, setIsResizing] = useState<boolean>(false);
 
-  const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  // Separate modals
+  const [showClearConfirm, setShowClearConfirm] = useState<boolean>(false);
+  const [showToggleConfirm, setShowToggleConfirm] = useState<boolean>(false);
 
   const subContainerRef = useRef<HTMLDivElement>(null);
 
+  /** Existing clear helper */
   const clearBoard = (): void => {
     setElements([]);
     setIds([]);
+    setClasses([]);
     setJsonView("");
     setSubmissionResults(null);
     clearCanvasStorage();
   };
 
-  const handleToggleSandbox = (): void => setShowConfirm(true);
-
-  const confirmClear = (): void => {
-    clearBoard();
-    setSandboxMode((prev) => !prev);
-    setShowConfirm(false);
-  };
-
-  const cancelClear = (): void => setShowConfirm(false);
-
   const handleSubmit = async () => {
-  if (questionIndex === null || questionType === null) {
-    setSubmissionResults(null);
-    setActiveTab("feedback");
-    return;
-  }
+    if (questionIndex === null || questionType === null) {
+      setSubmissionResults(null);
+      setActiveTab("feedback");
+      return;
+    }
 
-  const cleanElements = elements.filter(el => !el.invalidated);
-  try {
-    const res = await submitCanvas(cleanElements, questionIndex, questionType);
-    if (res !== undefined) setSubmissionResults(res);
-    setActiveTab("feedback");
-  } catch (error) {
-    console.error("Error sending to backend:", error);
-  }
-};
+    const cleanElements = elements.filter((el) => !el.invalidated);
+    try {
+      const res = await submitCanvas(cleanElements, questionIndex, questionType);
+      if (res !== undefined) setSubmissionResults(res);
+      setActiveTab("feedback");
+    } catch (error) {
+      console.error("Error sending to backend:", error);
+    }
+  };
 
   const addId = (id: number) =>
     setIds((prev) => {
       if (prev.includes(id)) return prev;
-
       const insertAt = prev.findIndex((x) => x > id);
       return insertAt === -1
         ? [...prev, id]
         : [...prev.slice(0, insertAt), id, ...prev.slice(insertAt)];
     });
+
   const removeId = (id: ID) => setIds((prev) => prev.filter((v) => v !== id));
 
   const addClass = (className: string) =>
@@ -118,16 +122,12 @@ export default function MemoryModelEditor({
       if (!isResizing || !subContainerRef.current) return;
       const rect = subContainerRef.current.getBoundingClientRect();
       const newWidth = rect.right - e.clientX;
-      const maxBasedOnViewport =
-        window.innerWidth * MAX_PLACEHOLDER_VIEWPORT_RATIO;
+      const maxBasedOnViewport = window.innerWidth * MAX_PLACEHOLDER_VIEWPORT_RATIO;
       const maxPlaceholderWidth = Math.min(
         rect.width - PLACEHOLDER_SUBTRACT_OFFSET,
         maxBasedOnViewport
       );
-      if (
-        newWidth >= MIN_PLACEHOLDER_WIDTH &&
-        newWidth <= maxPlaceholderWidth
-      ) {
+      if (newWidth >= MIN_PLACEHOLDER_WIDTH && newWidth <= maxPlaceholderWidth) {
         setPlaceholderWidth(newWidth);
       }
     };
@@ -142,7 +142,15 @@ export default function MemoryModelEditor({
     };
   }, [isResizing]);
 
-  useCanvasLocalStorage({elements, ids, classes})
+  useCanvasLocalStorage({ elements, ids, classes });
+
+  useUILocalStorage({
+    activeTab,
+    questionIndex,
+    questionType,
+    submissionResults,
+    sandboxMode,
+  });
 
   return (
     <div className={styles.container}>
@@ -153,20 +161,19 @@ export default function MemoryModelEditor({
       <div ref={subContainerRef} className={styles.subContainer}>
         <div className={styles.column}>
           <div className={styles.canvasArea}>
+            <ClearCanvasButton onClick={() => setShowClearConfirm(true)} />
+
             <Canvas
               elements={elements}
               setElements={setElements}
               ids={ids}
               addId={addId}
               removeId={removeId}
-
               classes={classes}
               addClasses={addClass}
               removeClasses={removeClass}
-
               sandbox={sandboxMode}
             />
-            {/* === Download & Submit Buttons === */}
             <DownloadJsonButton elements={elements} />
             <SubmitButton onClick={handleSubmit} />
           </div>
@@ -174,11 +181,11 @@ export default function MemoryModelEditor({
           <label className={styles.switchWrapper}>
             <input
               type="checkbox"
-              className={styles.switchInput} 
+              className={styles.switchInput}
               checked={sandboxMode}
               onChange={(e) => {
                 e.preventDefault();
-                handleToggleSandbox();
+                setShowToggleConfirm(true);
               }}
             />
             <span className={styles.switchSlider}></span>
@@ -211,14 +218,34 @@ export default function MemoryModelEditor({
         </div>
       </div>
 
-      {showConfirm && (
+      {/* Clear Canvas confirmation */}
+      {showClearConfirm && (
         <ConfirmationModal
           title="Clear Canvas?"
           message="This will clear the entire canvas and cannot be undone."
           confirmLabel="Clear"
           cancelLabel="Cancel"
-          onConfirm={confirmClear}
-          onCancel={cancelClear}
+          onConfirm={() => {
+            clearBoard();
+            setShowClearConfirm(false);
+          }}
+          onCancel={() => setShowClearConfirm(false)}
+        />
+      )}
+
+      {/* Sandbox toggle confirmation */}
+      {showToggleConfirm && (
+        <ConfirmationModal
+          title="Switch Mode?"
+          message="Switching modes will clear the canvas. Continue?"
+          confirmLabel="Confirm"
+          cancelLabel="Cancel"
+          onConfirm={() => {
+            clearBoard();
+            setSandboxMode((prev) => !prev);
+            setShowToggleConfirm(false);
+          }}
+          onCancel={() => setShowToggleConfirm(false)}
         />
       )}
     </div>

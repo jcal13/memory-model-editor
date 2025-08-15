@@ -1,6 +1,5 @@
 import React from 'react'
 import styles from '../styles/Canvas.module.css'
-import { CanvasElement } from '../../shared/types'
 interface Props {
   onClick: () => Promise<void>;
 }

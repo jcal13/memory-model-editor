@@ -71,6 +71,7 @@ export default function MemoryModelEditor({
   const clearBoard = (): void => {
     setElements([]);
     setIds([]);
+    setClasses([]);
     setJsonView("");
     setSubmissionResults(null);
     clearCanvasStorage();

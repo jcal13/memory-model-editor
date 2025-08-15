@@ -110,8 +110,7 @@ export function buildJSONFromElements(
         x,
         y,
       });
-    }
-    else if (kind.name == "class"){
+    } else if (kind.name == "class") {
       const frameValue: Record<string, number> = {};
       for (const variable of kind.classVariables || []) {
         if (variable.targetId !== null) {
@@ -121,10 +120,10 @@ export function buildJSONFromElements(
       valueEntries.push({
         type: kind.type,
         name: kind.className,
-        id,
+        id: normalizeId(id),
         value: frameValue,
-        x:x,
-        y:y
+        x: x,
+        y: y,
       });
     }
   });

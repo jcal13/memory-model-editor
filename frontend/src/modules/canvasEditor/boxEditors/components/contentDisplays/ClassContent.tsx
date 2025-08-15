@@ -7,7 +7,7 @@ import IdSelector from "../../../idSelector/IdSelector";
  */
 interface Props {
   classVariables: any; // Array of variable objects for the class
-  setVariables: any;   // Setter to update the list of variables
+  setVariables: any; // Setter to update the list of variables
   ids: any;
   addId: (id: ID) => void;
   removeId: (id: ID) => void;
@@ -24,10 +24,17 @@ interface Props {
  *
  * The component also provides an "Add Variable" button to append a new attribute.
  */
-const ClassContent = ({ classVariables, setVariables, ids, addId, removeId, sandbox }: Props) => {
+const ClassContent = ({
+  classVariables,
+  setVariables,
+  ids,
+  addId,
+  removeId,
+  sandbox,
+}: Props) => {
   // Add a new empty variable to the list
   const addVariable = () =>
-    setVariables([...classVariables, { name: "", targetId: null }]);
+    setVariables([...classVariables, { name: "", targetId: "_" }]);
 
   // Remove a variable at a given index
   const removeVariable = (i: number) =>
@@ -59,8 +66,8 @@ const ClassContent = ({ classVariables, setVariables, ids, addId, removeId, sand
                 placeholder="variable"
                 value={v.name}
                 onChange={(e) => changeName(idx, e.target.value)}
-                className={styles.variableNameBox}                  
-              />                     
+                className={styles.variableNameBox}
+              />
               <div className={styles.idSelectButtonWrapper}>
                 <IdSelector
                   currentId={v.targetId}

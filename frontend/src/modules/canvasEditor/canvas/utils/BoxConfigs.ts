@@ -32,6 +32,17 @@ const getValues = (kind: any): number[] => {
   return [];
 };
 
+const normalizeIdForRender = (v: unknown): number | "_" =>
+  typeof v === "number" && Number.isInteger(v) ? v : "_";
+
+const makeUniqueKey = (raw: unknown, used: Set<string>): string => {
+  const base = typeof raw === "string" ? raw : "";
+  let key = base;
+  while (used.has(key)) key += "\u200B"; // visually identical
+  used.add(key);
+  return key;
+};
+
 /* ==========================================================
  * BoxConfigs: Configuration map for every supported box type
  * Each entry includes:
@@ -64,8 +75,14 @@ export const BoxConfigs = {
   /* ---------- Function Box ---------- */
   function: {
     draw: (model: any, kind: any, id: ID) => {
-      const props: Record<string, number | null> = {};
-      (kind.params || []).forEach((p: any) => (props[p.name] = p.targetId));
+      const used = new Set<string>();
+      const props: Record<string, number | "_"> = {};
+
+      (kind.params || []).forEach((p: any) => {
+        const key = makeUniqueKey(p.name, used);
+        props[key] = normalizeIdForRender(p.targetId); // "_" visible if unassigned
+      });
+
       model.drawClass(0, 0, kind.functionName ?? "", id, props, true, style);
     },
     getHeight: () => 90,
@@ -118,10 +135,14 @@ export const BoxConfigs = {
   /* ---------- Class Box ---------- */
   class: {
     draw: (model: any, kind: any, id: ID) => {
-      const props: Record<string, number | null> = {};
-      (kind.classVariables || []).forEach(
-        (p: any) => (props[p.name] = p.targetId)
-      );
+      const used = new Set<string>();
+      const props: Record<string, number | "_"> = {};
+
+      (kind.classVariables || []).forEach((p: any) => {
+        const key = makeUniqueKey(p.name, used);
+        props[key] = normalizeIdForRender(p.targetId); // "_" visible if unassigned
+      });
+
       model.drawClass(0, 0, kind.className ?? "", id, props, false, style);
     },
     getHeight: () => 90,

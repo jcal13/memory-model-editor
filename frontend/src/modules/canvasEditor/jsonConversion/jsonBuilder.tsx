@@ -37,18 +37,28 @@ const normalizeIdDict = (obj: unknown): Record<string, number | null> => {
   return out;
 };
 
+const makeUniqueKey = (raw: unknown, used: Set<string>): string => {
+  const base = typeof raw === "string" ? raw : "";
+  let key = base;
+  while (used.has(key)) key += "\u200B";
+  used.add(key);
+  return key;
+};
+
 export function buildJSONFromElements(
   elements: CanvasElement[]
 ): (FrameEntry | ValueEntry)[] {
   const jsonData: FrameEntry[] = [];
   const valueEntries: ValueEntry[] = [];
 
-  // Step 1: Add .frame entries for functions
+  // Step 1: function frames
   elements.forEach(({ id, kind }) => {
     if (kind.name === "function") {
+      const used = new Set<string>();
       const frameValue: Record<string, number | null> = {};
       for (const param of kind.params || []) {
-        frameValue[param.name] = normalizeId(param.targetId);
+        const key = makeUniqueKey(param.name, used);
+        frameValue[key] = normalizeId(param.targetId);
       }
       jsonData.push({
         type: ".frame",
@@ -60,7 +70,7 @@ export function buildJSONFromElements(
     }
   });
 
-  // Step 2: Add value entries for everything else
+  // Step 2: everything else (including class / object boxes)
   elements.forEach(({ id, kind, x, y }) => {
     const jsonId = normalizeId(id);
     if (jsonId === null && id !== "_" && id !== null) {
@@ -72,7 +82,6 @@ export function buildJSONFromElements(
 
     if (kind.name === "primitive") {
       let parsed: string | number | boolean | null = kind.value;
-
       if (kind.type === "None" || parsed === "null" || parsed === null) {
         parsed = null;
       } else if (kind.type === "int") {
@@ -82,14 +91,7 @@ export function buildJSONFromElements(
       } else if (kind.type === "bool") {
         parsed = kind.value === "true";
       }
-
-      valueEntries.push({
-        type: kind.type,
-        id: jsonId,
-        value: parsed,
-        x,
-        y,
-      });
+      valueEntries.push({ type: kind.type, id: jsonId, value: parsed, x, y });
     } else if (
       kind.name === "list" ||
       kind.name === "tuple" ||
@@ -110,20 +112,20 @@ export function buildJSONFromElements(
         x,
         y,
       });
-    } else if (kind.name == "class") {
-      const frameValue: Record<string, number> = {};
-      for (const variable of kind.classVariables || []) {
-        if (variable.targetId !== null) {
-          frameValue[variable.name] = variable.targetId;
-        }
+    } else if (kind.name === "class") {
+      const used = new Set<string>();
+      const vars: Record<string, number | null> = {};
+      for (const v of kind.classVariables || []) {
+        const key = makeUniqueKey(v.name, used);
+        vars[key] = normalizeId(v.targetId);
       }
       valueEntries.push({
         type: kind.type,
-        name: kind.className,
-        id: normalizeId(id),
-        value: frameValue,
-        x: x,
-        y: y,
+        id: jsonId,
+        name: kind.className ?? "NoClass",
+        value: vars,
+        x,
+        y,
       });
     }
   });

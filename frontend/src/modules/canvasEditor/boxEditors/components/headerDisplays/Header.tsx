@@ -21,13 +21,12 @@ interface Props {
   setElementId: (id: ID) => void;
   removeId: (id: ID) => void;
   sandbox: boolean;
-   // ---- CLASS SELECTOR STYLE PROPS BELOW ----
+  // ---- CLASS SELECTOR STYLE PROPS BELOW ----
   classes?: string[]; // List of all class names
   addClasses?: (className: string) => void;
   ownClasses?: string; // Current class name for this box
   setOwnClassName?: (className: string) => void;
   removeClasses?: (className: string) => void;
-
 }
 
 /**
@@ -58,7 +57,6 @@ const Header = ({
   ownClasses = "",
   setOwnClassName = () => {},
   removeClasses = () => {},
-
 }: Props) => {
   const kind = element.kind.name;
 
@@ -103,7 +101,7 @@ const Header = ({
           ownId={ownId}
           setElementId={setElementId}
           removeId={removeId}
-          sandbox={sandbox}
+          sandbox={true}
           classes={classes}
           addClasses={addClasses}
           ownClasses={ownClasses}

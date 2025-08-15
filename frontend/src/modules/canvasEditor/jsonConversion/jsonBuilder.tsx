@@ -111,6 +111,22 @@ export function buildJSONFromElements(
         y,
       });
     }
+    else if (kind.name == "class"){
+      const frameValue: Record<string, number> = {};
+      for (const variable of kind.classVariables || []) {
+        if (variable.targetId !== null) {
+          frameValue[variable.name] = variable.targetId;
+        }
+      }
+      valueEntries.push({
+        type: kind.type,
+        name: kind.className,
+        id,
+        value: frameValue,
+        x:x,
+        y:y
+      });
+    }
   });
 
   return [...jsonData, ...valueEntries];

@@ -136,7 +136,7 @@ export default function Canvas({
 
     switch (payload) {
       case "none":
-        newKind = { name: "primitive", type: "None", value: "None" };
+        newKind = { name: "primitive", type: "None", value: "null" };
         break;
       case "int":
         newKind = { name: "primitive", type: "int", value: "0" };

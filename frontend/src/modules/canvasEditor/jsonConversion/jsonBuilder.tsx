@@ -10,7 +10,7 @@ type FrameEntry = {
 
 type ValueEntry = {
   type: string;
-  id: number;
+  id: number | null;
   value: any;
   name?: string;
   x: number;
@@ -44,11 +44,17 @@ export function buildJSONFromElements(
 
   // Step 2: Add value entries for everything else
   elements.forEach(({ id, kind, x, y }) => {
-    if (typeof id !== "number") {
-      console.warn(`Skipping value with non-numeric id: ${id}`);
+    let jsonId: number | null;
+    if (typeof id === "number") {
+      jsonId = id;
+    } else if (id === "_") {
+      jsonId = null;
+    } else {
+      console.warn(
+        `Skipping value with non-numeric/non-blank id: ${String(id)}`
+      );
       return;
     }
-
     if (kind.name === "primitive") {
       let parsed: string | number | boolean = kind.value;
       if (kind.type === "int") parsed = parseInt(kind.value, 10);
@@ -57,18 +63,18 @@ export function buildJSONFromElements(
 
       valueEntries.push({
         type: kind.type,
-        id,
+        id: jsonId,
         value: parsed,
         x: x,
-        y: y
+        y: y,
       });
     } else if (["list", "tuple", "set", "dict"].includes(kind.name)) {
       valueEntries.push({
         type: kind.type,
-        id,
+        id: jsonId,
         value: kind.value,
         x: x,
-        y: y
+        y: y,
       });
     }
   });

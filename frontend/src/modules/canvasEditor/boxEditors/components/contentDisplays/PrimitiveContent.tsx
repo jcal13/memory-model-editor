@@ -66,7 +66,7 @@ const PrimitiveContent = ({ dataType, value, setValue }: Props) => {
       )}
 
       {/* Inline validation message */}
-      {!isValid() && (
+      {!isValid() && dataType !== "None" && (
         <div className={styles.invalidMessage}>
           Invalid&nbsp;{dataType}&nbsp;value
         </div>

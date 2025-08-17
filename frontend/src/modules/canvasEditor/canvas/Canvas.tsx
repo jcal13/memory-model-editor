@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Draggable from "react-draggable";
 import { CanvasElement, BoxType, ID } from "../shared/types";
 import CanvasBox from "./components/CanvasBox";
 import BoxEditor from "../boxEditors/BoxEditor";
-import { useCanvasResize } from "./hooks/useEffect";
+// IMPORTANT: do NOT import/use useCanvasResize anymore
 import { useCanvasRefs } from "./hooks/useRef";
 import styles from "./styles/Canvas.module.css";
 import CallStack from "./components/CallStack";
@@ -107,10 +107,60 @@ export default function Canvas({
   const [openBoxEditors, setOpenBoxEditors] = useState<CanvasElement[]>([]);
   const [selected, setSelected] = useState<CanvasElement | null>(null);
   const { svgRef } = useCanvasRefs();
-  const [viewBox, setViewBox] = useState<string>("0 0 0 0");
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [frozenHeight, setFrozenHeight] = useState<number | null>(null);
+  const lastVB = useRef<string>("");
 
-  useCanvasResize(svgRef, setViewBox);
+  useEffect(() => {
+    const measure = () => {
+      const svg = svgRef.current;
+      if (!svg) return;
+      const h = Math.max(1, svg.clientHeight || Math.round(svg.getBoundingClientRect().height));
+      const w = Math.max(1, svg.clientWidth  || Math.round(svg.getBoundingClientRect().width));
+      setFrozenHeight(h);
+      const vb = `0 0 ${w} ${h}`;
+      svg.setAttribute("viewBox", vb);
+      lastVB.current = vb;
+    };
+    const r1 = requestAnimationFrame(() => {
+      const r2 = requestAnimationFrame(measure);
+      return () => cancelAnimationFrame(r2);
+    });
+    return () => cancelAnimationFrame(r1);
+  }, [svgRef]);
 
+  useEffect(() => {
+    if (!frozenHeight) return;
+    const svg = svgRef.current;
+    if (!svg) return;
+
+    let raf = 0;
+    let prevW = -1;
+
+    const updateWidth = () => {
+      const w = Math.max(1, svg.clientWidth || Math.round(svg.getBoundingClientRect().width));
+      if (w !== prevW) {
+        prevW = w;
+        const vb = `0 0 ${w} ${frozenHeight}`;
+        if (vb !== lastVB.current) {
+          svg.setAttribute("viewBox", vb);
+          lastVB.current = vb;
+        }
+      }
+    };
+
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(updateWidth);
+    });
+
+    ro.observe(svg);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
+  }, [frozenHeight, svgRef]);
   useEffect(() => {
     if (sandbox) return;
 
@@ -119,7 +169,6 @@ export default function Canvas({
       .map((el) => el.id as number);
 
     elementIds.filter((id) => !ids.includes(id)).forEach((id) => addId(id));
-
     ids.filter((id) => !elementIds.includes(id)).forEach((id) => removeId(id));
   }, [elements, ids, sandbox, addId, removeId]);
 
@@ -153,7 +202,7 @@ export default function Canvas({
       case "primitive":
         newKind = { name: "primitive", type: "None", value: "None" };
         break;
-      case "function":
+      case "function": {
         const functionCount = elements.filter(
           (el) => el.kind.name === "function"
         ).length;
@@ -166,6 +215,7 @@ export default function Canvas({
           order: functionCount + 1,
         };
         break;
+      }
       case "list":
         newKind = { name: "list", type: "list", value: [] };
         break;
@@ -191,12 +241,17 @@ export default function Canvas({
         return;
     }
 
-    const pt = svgRef.current!.createSVGPoint();
+    const svg = svgRef.current;
+    if (!svg) return;
+
+    const pt = svg.createSVGPoint();
     pt.x = e.clientX;
     pt.y = e.clientY;
-    const coords = pt.matrixTransform(
-      svgRef.current!.getScreenCTM()!.inverse()
-    );
+
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return;
+
+    const coords = pt.matrixTransform(ctm.inverse());
 
     setElements((prev) => {
       const boxIds = prev.map((el) => el.boxId as number).sort((a, b) => a - b);
@@ -238,7 +293,6 @@ export default function Canvas({
     });
   };
 
-  // Now supports optional invalidate flag
   const saveElement = (
     boxId: number,
     updatedId: ID,
@@ -248,12 +302,8 @@ export default function Canvas({
     setElements((prev) =>
       prev.map((el) => {
         if (el.boxId !== boxId) return el;
-
         const base = { ...el, id: updatedId, kind: updatedKind };
-
-        if (invalidated !== undefined) {
-          return { ...base, invalidated };
-        }
+        if (invalidated !== undefined) return { ...base, invalidated };
         return base;
       })
     );
@@ -310,13 +360,25 @@ export default function Canvas({
 
   return (
     <>
-      <div className={styles.canvasWrapper}>
+      <div
+        ref={wrapperRef}
+        className={styles.canvasWrapper}
+        style={{ overflowX: "hidden" }} 
+      >
         <svg
           data-testid="canvas"
           ref={svgRef}
-          viewBox={viewBox}
-          preserveAspectRatio="xMinYMin meet"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none" 
           className={styles.canvas}
+          style={{
+            width: "100%",
+            height: frozenHeight ?? undefined, 
+            display: "block",
+            padding: 0,
+            border: 0,
+            boxSizing: "content-box",
+          }}
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >

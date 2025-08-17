@@ -3,7 +3,6 @@ import Draggable from "react-draggable";
 import { CanvasElement, BoxType, ID } from "../shared/types";
 import CanvasBox from "./components/CanvasBox";
 import BoxEditor from "../boxEditors/BoxEditor";
-// IMPORTANT: do NOT import/use useCanvasResize anymore
 import { useCanvasRefs } from "./hooks/useRef";
 import styles from "./styles/Canvas.module.css";
 import CallStack from "./components/CallStack";

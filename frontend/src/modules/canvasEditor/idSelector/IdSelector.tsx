@@ -94,6 +94,7 @@ export default function IdSelector({
                 onRemove={handleRemove}
                 onSelect={handleSelect}
                 sandbox={sandbox}
+                onClose={closeSelf}
               />
             </div>
           </Draggable>,

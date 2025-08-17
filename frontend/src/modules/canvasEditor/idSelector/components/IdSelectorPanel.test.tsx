@@ -9,6 +9,7 @@ describe("IdSelectorPanel", () => {
   const onAdd = jest.fn();
   const onSelect = jest.fn();
   const onRemove = jest.fn();
+  const onClose = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -24,6 +25,7 @@ describe("IdSelectorPanel", () => {
         onAdd={onAdd}
         onSelect={onSelect}
         onRemove={onRemove}
+        onClose={onClose}
         sandbox={true}
       />
     );
@@ -31,17 +33,20 @@ describe("IdSelectorPanel", () => {
     const id1Btn = getByText("1");
     const id2Btn = getByText("2");
 
+    // Select works
     fireEvent.click(id1Btn);
     expect(onSelect).toHaveBeenCalledWith(1);
 
-    const removeBtns = document.querySelectorAll("button");
-    const removeBtn = Array.from(removeBtns).find(
-      (btn) => btn.textContent === "×"
-    );
+    // Remove: find the remove button within the same row as "1"
+    const container = id1Btn.parentElement as HTMLElement | null;
+    const removeBtn =
+      container?.querySelectorAll("button")?.[1] || null; // second button in the row
 
     if (removeBtn) {
       fireEvent.click(removeBtn);
       expect(onRemove).toHaveBeenCalled();
+    } else {
+      throw new Error("Remove button for ID 1 not found");
     }
   });
 
@@ -55,6 +60,7 @@ describe("IdSelectorPanel", () => {
         onAdd={onAdd}
         onSelect={onSelect}
         onRemove={onRemove}
+        onClose={onClose}
         sandbox={true}
       />
     );
@@ -75,6 +81,7 @@ describe("IdSelectorPanel", () => {
         onAdd={onAdd}
         onSelect={onSelect}
         onRemove={onRemove}
+        onClose={onClose}
         sandbox={true}
       />
     );

@@ -37,7 +37,7 @@ export default function MemoryModelEditor({
 }) {
   const init = loadInitial();
   const uiInit = loadUIInitial();
-
+  const [editorResetKey, setEditorResetKey] = useState(0);
   const [elements, setElements] = useState<CanvasElement[]>(init.elements);
   const [jsonView, setJsonView] = useState<string>("");
   const [ids, setIds] = useState<number[]>(init.ids);
@@ -74,6 +74,7 @@ export default function MemoryModelEditor({
     setClasses([]);
     setJsonView("");
     setSubmissionResults(null);
+    setEditorResetKey((k) => k + 1);
     clearCanvasStorage();
   };
 
@@ -164,6 +165,7 @@ export default function MemoryModelEditor({
             <ClearCanvasButton onClick={() => setShowClearConfirm(true)} />
 
             <Canvas
+              key={editorResetKey} 
               elements={elements}
               setElements={setElements}
               ids={ids}
@@ -218,7 +220,6 @@ export default function MemoryModelEditor({
         </div>
       </div>
 
-      {/* Clear Canvas confirmation */}
       {showClearConfirm && (
         <ConfirmationModal
           title="Clear Canvas?"
@@ -233,7 +234,6 @@ export default function MemoryModelEditor({
         />
       )}
 
-      {/* Sandbox toggle confirmation */}
       {showToggleConfirm && (
         <ConfirmationModal
           title="Switch Mode?"

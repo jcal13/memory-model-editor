@@ -53,7 +53,6 @@ function FloatingEditor({
   sandbox,
 }: FloatingEditorProps) {
   const nodeRef = React.useRef<HTMLDivElement>(null);
-
   return (
     <Draggable
       nodeRef={nodeRef as React.RefObject<HTMLElement>}
@@ -110,7 +109,6 @@ export default function Canvas({
   const [viewBox, setViewBox] = useState<string>("0 0 0 0");
 
   useCanvasResize(svgRef, setViewBox);
-
   useEffect(() => {
     if (sandbox) return;
 

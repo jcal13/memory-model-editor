@@ -67,7 +67,10 @@ export default function MemoryModelEditor({
 
   const subContainerRef = useRef<HTMLDivElement>(null);
 
-  /** Existing clear helper */
+  // Panel open/close
+  const [paletteOpen, setPaletteOpen] = useState(true);
+  const [infoOpen, setInfoOpen] = useState(true);
+
   const clearBoard = (): void => {
     setElements([]);
     setIds([]);
@@ -120,7 +123,7 @@ export default function MemoryModelEditor({
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
-      if (!isResizing || !subContainerRef.current) return;
+      if (!isResizing || !subContainerRef.current || !infoOpen) return;
       const rect = subContainerRef.current.getBoundingClientRect();
       const newWidth = rect.right - e.clientX;
       const maxBasedOnViewport = window.innerWidth * MAX_PLACEHOLDER_VIEWPORT_RATIO;
@@ -141,7 +144,7 @@ export default function MemoryModelEditor({
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
     };
-  }, [isResizing]);
+  }, [isResizing, infoOpen]);
 
   useCanvasLocalStorage({ elements, ids, classes });
 
@@ -155,9 +158,28 @@ export default function MemoryModelEditor({
 
   return (
     <div className={styles.container}>
-      <div className={styles.paletteColumn}>
+      <div
+        className={styles.paletteColumn}
+        style={{
+          width: paletteOpen ? undefined : 0,
+          minWidth: paletteOpen ? undefined : 0,
+          overflow: "hidden",
+        }}
+      >
         <Palette activeTab={paletteTab} setActive={setPaletteTab} />
       </div>
+
+
+        <button
+          type="button"
+          className={styles.panelTabBtnLeft}
+          onClick={() => setPaletteOpen((v) => !v)}
+          title={paletteOpen ? "Hide palette" : "Show palette"}
+          aria-label={paletteOpen ? "Hide palette" : "Show palette"}
+        >
+          {paletteOpen ? "«" : "»"}
+        </button>
+  
 
       <div ref={subContainerRef} className={styles.subContainer}>
         <div className={styles.column}>
@@ -196,11 +218,28 @@ export default function MemoryModelEditor({
           {jsonView && <pre className={styles.jsonView}>{jsonView}</pre>}
         </div>
 
+
+          <button
+            type="button"
+            className={styles.panelTabBtnRight}
+            onClick={() => {
+              setIsResizing(false);
+              setInfoOpen((v) => !v);
+            }}
+            title={infoOpen ? "Hide info" : "Show info"}
+            aria-label={infoOpen ? "Hide info" : "Show info"}
+          >
+            {infoOpen ? "»" : "«"}
+          </button>
+
+
         <div
           className={styles.placeholder}
           style={{
-            width: `${placeholderWidth}px`,
+            width: infoOpen ? `${placeholderWidth}px` : 0,
             maxWidth: MAX_PLACEHOLDER_CSS_WIDTH,
+            overflow: "hidden",
+            position: "relative",
           }}
         >
           <InformationTabs
@@ -215,7 +254,8 @@ export default function MemoryModelEditor({
           />
           <div
             className={styles.resizeHandle}
-            onMouseDown={() => setIsResizing(true)}
+            onMouseDown={() => infoOpen && setIsResizing(true)}
+            style={{ pointerEvents: infoOpen ? "auto" : "none" }}
           />
         </div>
       </div>

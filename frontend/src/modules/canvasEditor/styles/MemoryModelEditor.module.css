@@ -2,17 +2,21 @@
   display: flex;
   height: 100vh;
   overflow: hidden;
+  align-items: stretch;                
+  background: var(--mm-editor-bg);      
 }
 
 .paletteColumn {
   overflow-y: auto;
   height: 100%;
+  min-width: 0;
 }
 
 .subContainer {
   display: flex;
   flex: 1;
   position: relative;
+  align-items: stretch;                 
 }
 
 .column {
@@ -26,8 +30,6 @@
   flex: 1;
   position: relative;
 }
-
-/* ───────── Buttons ───────── */
 .toggleButton {
   position: absolute;
   top: 8px;
@@ -85,7 +87,7 @@
   cursor: pointer;
   font-weight: 500;
   font-size: 0.95rem;
-  width: max-content;        
+  width: max-content;
 }
 
 .clearCanvasButton:hover {
@@ -114,7 +116,6 @@
   word-break: break-word;
 }
 
-/* ───────── Placeholder panel + resizer ───────── */
 .placeholder {
   flex: 0 0 auto;
   display: flex;
@@ -122,6 +123,7 @@
   justify-content: center;
   font-style: italic;
   position: relative;
+  overflow: hidden;
 }
 
 .resizeHandle {
@@ -134,7 +136,7 @@
   z-index: 1;
 }
 
-/* ───────── Switch toggle ───────── */
+
 .switchWrapper {
   position: absolute;
   top: 35px;
@@ -212,3 +214,85 @@
 .switchInput:checked + .switchSlider::before {
   transform: translateX(69px);
 }
+
+.panelTabBtnLeft {
+  align-self: center;                 
+  width: var(--mm-tab-w);
+  min-width: var(--mm-tab-w);
+  height: var(--mm-tab-h);
+  padding: 0;                         
+  margin: 0 var(--mm-tab-gap);        
+
+  border-left: 0px solid #d1d5db;
+  border-top: 1px solid #d1d5db;
+  border-bottom: 1px solid #d1d5db;
+  border-right: 1px solid #d1d5db;
+  border-radius: 0 var(--mm-tab-radius) var(--mm-tab-radius) 0;
+  background: #ffffff;
+  color: #374151;
+  cursor: pointer;
+  user-select: none;
+
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
+
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+  transform: translateX(-1px);
+  touch-action: manipulation;
+}
+
+.panelTabBtnRight {
+  align-self: center;                 
+  width: var(--mm-tab-w);
+  min-width: var(--mm-tab-w);
+  height: var(--mm-tab-h);
+  padding: 0;                         
+  margin: 0 var(--mm-tab-gap);        
+
+  border-left: 1px solid #d1d5db;
+  border-top: 1px solid #d1d5db;
+  border-bottom: 1px solid #d1d5db;
+  border-right: 0px solid #d1d5db;
+  border-radius: var(--mm-tab-radius) 0 0 var(--mm-tab-radius);
+  background: #ffffff;
+  color: #374151;
+  cursor: pointer;
+  user-select: none;
+
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
+
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+  transform: translateX(1px);
+  z-index: 1;
+  touch-action: manipulation;
+}
+
+.panelTabBtnLeft:hover {
+  background: #f3f4f6;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+}
+
+.panelTabBtnRight:hover {
+  background: #f3f4f6;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+}
+
+
+:root {
+
+  --mm-editor-bg: #f3f4f6;
+
+  --mm-tab-w: 22px;
+  --mm-tab-h: 400px;
+  --mm-tab-radius: 8px;
+}
+

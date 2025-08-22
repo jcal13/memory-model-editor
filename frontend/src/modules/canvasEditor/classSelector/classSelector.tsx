@@ -93,6 +93,7 @@ export default function ClassSelector({
           onAdd={handleAdd}
           onRemove={handleRemove}
           onSelect={handleSelect}
+          onClose={closeSelf}
           sandbox={sandbox}
         />
 

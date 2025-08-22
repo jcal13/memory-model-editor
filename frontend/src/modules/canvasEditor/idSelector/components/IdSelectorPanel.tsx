@@ -8,6 +8,7 @@ interface Props {
   onAdd: (id: ID) => void;
   onSelect: (id: ID) => void;
   onRemove: (id: ID) => void;
+  onClose: () => void;
   sandbox: boolean;
 }
 
@@ -16,6 +17,7 @@ const IdSelectorPanel: React.FC<Props> = ({
   onAdd,
   onSelect,
   onRemove,
+  onClose,
   sandbox,
 }) => {
   const nextId = useMemo<number>(() => {
@@ -52,13 +54,18 @@ const IdSelectorPanel: React.FC<Props> = ({
     setShowWarn(false);
     setShowDup(false);
   };
-
   return (
     <div
       className={`${boxStyles.boxEditorModule} ${panelStyles.panelShell} ${panelStyles.activeOutline}`}
     >
+      <button
+        className={boxStyles.removeItem}
+        onClick={onClose}
+      >
+        ×
+      </button>
       <div className={`drag-handle ${panelStyles.header}`}>Select ID</div>
-
+    
       <div className={panelStyles.content}>
         <div className={boxStyles.collectionIdContainer}>
           {ids.map((id) => (

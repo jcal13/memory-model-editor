@@ -7,6 +7,7 @@ interface Props {
   onAdd: (className: string) => void;
   onSelect: (className: string) => void;
   onRemove: (className: string) => void;
+  onClose: () => void;
   sandbox: boolean;
 }
 
@@ -15,6 +16,7 @@ const ClassSelectorPanel: React.FC<Props> = ({
   onAdd,
   onSelect,
   onRemove,
+  onClose,
   sandbox,
 }) => {
   const [customClass, setCustomClass] = useState("");
@@ -43,6 +45,12 @@ const ClassSelectorPanel: React.FC<Props> = ({
     <div
       className={`${boxStyles.boxEditorModule} ${panelStyles.panelShell} ${panelStyles.activeOutline}`}
     >
+      <button
+        className={boxStyles.removeItem}
+        onClick={onClose}
+      >
+        ×
+      </button>
       <div className={`drag-handle ${panelStyles.header}`}>Select Class</div>
 
       <div className={panelStyles.content}>

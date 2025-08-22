@@ -52,7 +52,6 @@ function FloatingEditor({
   sandbox,
 }: FloatingEditorProps) {
   const nodeRef = React.useRef<HTMLDivElement>(null);
-
   return (
     <Draggable
       nodeRef={nodeRef as React.RefObject<HTMLElement>}
@@ -160,6 +159,7 @@ export default function Canvas({
       ro.disconnect();
     };
   }, [frozenHeight, svgRef]);
+    
   useEffect(() => {
     if (sandbox) return;
 

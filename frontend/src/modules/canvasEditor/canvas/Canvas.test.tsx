@@ -1,11 +1,15 @@
 import { render, fireEvent } from "@testing-library/react";
 import Canvas from "./Canvas";
-import { CanvasElement } from "../shared/types";
-import { ID } from "../shared/types";
+import { CanvasElement } from "../../shared/types";
+import { ID } from "../../shared/types";
 
-const mockAddIds = (id: ID) => {return}
+const mockAddIds = (id: ID) => {
+  return;
+};
 
-const mockRemoveIds = (id: ID) => {return}
+const mockRemoveIds = (id: ID) => {
+  return;
+};
 
 /**
  * Set up necessary DOM mocks for SVG-specific methods
@@ -76,7 +80,13 @@ describe("Canvas", () => {
     const setElements = jest.fn();
 
     const { getByTestId } = render(
-      <Canvas elements={elements} setElements={setElements} ids={[]} addId={mockAddIds} removeId={mockRemoveIds}/>
+      <Canvas
+        elements={elements}
+        setElements={setElements}
+        ids={[]}
+        addId={mockAddIds}
+        removeId={mockRemoveIds}
+      />
     );
 
     expect(getByTestId("canvas")).toBeInTheDocument();
@@ -91,7 +101,13 @@ describe("Canvas", () => {
     const setElements = jest.fn();
 
     const { getByTestId } = render(
-      <Canvas elements={elements} setElements={setElements} ids={[]} addId={mockAddIds} removeId={mockRemoveIds}/>
+      <Canvas
+        elements={elements}
+        setElements={setElements}
+        ids={[]}
+        addId={mockAddIds}
+        removeId={mockRemoveIds}
+      />
     );
 
     const svg = getByTestId("canvas");

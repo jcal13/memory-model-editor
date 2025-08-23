@@ -1,5 +1,5 @@
 import styles from "../../styles/BoxEditorStyles.module.css";
-import { ID } from "../../../shared/types";
+import { ID } from "../../../../shared/types";
 import IdSelector from "../../../idSelector/IdSelector";
 
 /**
@@ -24,7 +24,14 @@ interface Props {
  *
  * The component also provides an "Add Variable" button to append a new parameter.
  */
-const FunctionContent = ({ functionParams, setParams, ids, addId, removeId, sandbox }: Props) => {
+const FunctionContent = ({
+  functionParams,
+  setParams,
+  ids,
+  addId,
+  removeId,
+  sandbox,
+}: Props) => {
   // Add a new empty parameter to the list
   const addParam = () =>
     setParams([...functionParams, { name: "", targetId: "_" }]);

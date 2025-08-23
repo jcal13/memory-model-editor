@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Draggable from "react-draggable";
-import { CanvasElement, BoxType, ID } from "../shared/types";
+import { CanvasElement, BoxType, ID } from "../../shared/types";
 import CanvasBox from "./components/CanvasBox";
 import BoxEditor from "../boxEditors/BoxEditor";
 import { useCanvasRefs } from "./hooks/useRef";
@@ -113,8 +113,14 @@ export default function Canvas({
     const measure = () => {
       const svg = svgRef.current;
       if (!svg) return;
-      const h = Math.max(1, svg.clientHeight || Math.round(svg.getBoundingClientRect().height));
-      const w = Math.max(1, svg.clientWidth  || Math.round(svg.getBoundingClientRect().width));
+      const h = Math.max(
+        1,
+        svg.clientHeight || Math.round(svg.getBoundingClientRect().height)
+      );
+      const w = Math.max(
+        1,
+        svg.clientWidth || Math.round(svg.getBoundingClientRect().width)
+      );
       setFrozenHeight(h);
       const vb = `0 0 ${w} ${h}`;
       svg.setAttribute("viewBox", vb);
@@ -136,7 +142,10 @@ export default function Canvas({
     let prevW = -1;
 
     const updateWidth = () => {
-      const w = Math.max(1, svg.clientWidth || Math.round(svg.getBoundingClientRect().width));
+      const w = Math.max(
+        1,
+        svg.clientWidth || Math.round(svg.getBoundingClientRect().width)
+      );
       if (w !== prevW) {
         prevW = w;
         const vb = `0 0 ${w} ${frozenHeight}`;
@@ -159,7 +168,7 @@ export default function Canvas({
       ro.disconnect();
     };
   }, [frozenHeight, svgRef]);
-    
+
   useEffect(() => {
     if (sandbox) return;
 
@@ -362,17 +371,17 @@ export default function Canvas({
       <div
         ref={wrapperRef}
         className={styles.canvasWrapper}
-        style={{ overflowX: "hidden" }} 
+        style={{ overflowX: "hidden" }}
       >
         <svg
           data-testid="canvas"
           ref={svgRef}
           viewBox="0 0 100 100"
-          preserveAspectRatio="none" 
+          preserveAspectRatio="none"
           className={styles.canvas}
           style={{
             width: "100%",
-            height: frozenHeight ?? undefined, 
+            height: frozenHeight ?? undefined,
             display: "block",
             padding: 0,
             border: 0,

@@ -1,7 +1,7 @@
 import CollectionItem from "./components/CollectionItem";
 import CollectionAddButton from "./components/CollectionAddButton";
 import styles from "../../styles/BoxEditorStyles.module.css";
-import { ID } from "../../../shared/types";
+import { ID } from "../../../../shared/types";
 
 /**
  * Props for the CollectionContent component.
@@ -31,7 +31,7 @@ const CollectionContent = ({
   ids,
   addId,
   removeId,
-  sandbox
+  sandbox,
 }: Props) => {
   return (
     <div className={styles.contentContainer}>
@@ -44,7 +44,7 @@ const CollectionContent = ({
         removeId={removeId}
         sandbox={sandbox}
       />
-      <CollectionAddButton mode={mode} items={items} setItems={setItems}/>
+      <CollectionAddButton mode={mode} items={items} setItems={setItems} />
     </div>
   );
 };

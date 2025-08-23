@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ID } from "../../shared/types";
+import { ID } from "../../../shared/types";
 
 /**
  * useModule is a custom hook that saves the current editor state
@@ -33,13 +33,18 @@ export const useModule = (
   collectionItems?: any,
   className?: string,
   classVariables?: any[],
-  invalidated?: boolean,            // <-- NEW
+  invalidated?: boolean // <-- NEW
 ) => {
-  const prevRef = useRef<{ id: ID; payload: any; invalidated?: boolean } | null>(null);
+  const prevRef = useRef<{
+    id: ID;
+    payload: any;
+    invalidated?: boolean;
+  } | null>(null);
 
   const isEqual = (a: any, b: any): boolean => {
     if (a === b) return true;
-    if (typeof a !== "object" || typeof b !== "object" || !a || !b) return false;
+    if (typeof a !== "object" || typeof b !== "object" || !a || !b)
+      return false;
     const keys = Object.keys(a);
     if (keys.length !== Object.keys(b).length) return false;
     for (const k of keys) if (!isEqual(a[k], b[k])) return false;
@@ -53,22 +58,43 @@ export const useModule = (
     if (kind === "primitive") {
       payload = { name: kind, type: dataType, value: contentValue };
     } else if (kind === "function") {
-      payload = { name: kind, type: "function", value: null, functionName, params };
+      payload = {
+        name: kind,
+        type: "function",
+        value: null,
+        functionName,
+        params,
+      };
     } else if (kind === "dict") {
-      payload = { name: kind, type: element.kind.type, value: Object.fromEntries(collectionItems ?? []) };
+      payload = {
+        name: kind,
+        type: element.kind.type,
+        value: Object.fromEntries(collectionItems ?? []),
+      };
     } else if (kind === "class") {
-      payload = { name: kind, type: "class", value: null, className, classVariables };
+      payload = {
+        name: kind,
+        type: "class",
+        value: null,
+        className,
+        classVariables,
+      };
     } else {
       payload = { name: kind, type: element.kind.type, value: collectionItems };
     }
 
     const prev = prevRef.current;
-    if (prev && prev.id === ownId && isEqual(prev.payload, payload) && prev.invalidated === invalidated) {
+    if (
+      prev &&
+      prev.id === ownId &&
+      isEqual(prev.payload, payload) &&
+      prev.invalidated === invalidated
+    ) {
       return;
     }
 
     prevRef.current = { id: ownId, payload, invalidated };
-    onSave(ownId, payload, invalidated);   // <-- forward invalidated with the live payload
+    onSave(ownId, payload, invalidated); // <-- forward invalidated with the live payload
   }, [
     onSave,
     ownId,
@@ -81,6 +107,6 @@ export const useModule = (
     collectionItems,
     className,
     classVariables,
-    invalidated                    
+    invalidated,
   ]);
 };

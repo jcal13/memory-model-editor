@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { CanvasElement } from "../../shared/types";
+import { CanvasElement } from "../../../shared/types";
 import { buildJSONFromElements } from "../../jsonConversion/jsonBuilder";
 import styles from "../styles/Canvas.module.css";
 import canvasStyles from "../../styles/MemoryModelEditor.module.css";

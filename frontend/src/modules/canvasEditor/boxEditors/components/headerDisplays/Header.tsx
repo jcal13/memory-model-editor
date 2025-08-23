@@ -3,8 +3,8 @@ import PrimitiveHeader from "./PrimitiveHeader";
 import FunctionHeader from "./FunctionHeader";
 import CollectionHeader from "./CollectionHeader";
 import ClassHeader from "./ClassHeader";
-import { PrimitiveType } from "../../../shared/types";
-import { ID } from "../../../shared/types";
+import { PrimitiveType } from "../../../../shared/types";
+import { ID } from "../../../../shared/types";
 
 interface Props {
   element: any; // The memory element being edited, includes its id and kind

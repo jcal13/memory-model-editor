@@ -8,7 +8,7 @@ import {
 } from "./hooks/useEffect";
 import { useClassPanelRef } from "./hooks/useRef";
 import styles from "./styles/ClassSelector.module.css";
-import { ClassID } from "../shared/types"; 
+import { ClassID } from "../../shared/types";
 
 interface Props {
   classes: ClassID[];
@@ -71,7 +71,9 @@ export default function ClassSelector({
       <button
         type="button"
         onClick={toggleOpen}
-        className={`${buttonClassName} ${open ? styles.activeOutline : ""}`.trim()}
+        className={`${buttonClassName} ${
+          open ? styles.activeOutline : ""
+        }`.trim()}
       >
         {currentClass != "" ? `${currentClass}` : "Class _"}
       </button>
@@ -88,15 +90,14 @@ export default function ClassSelector({
               className={styles.panelContainer}
               data-editor-ignore
             >
-        <ClassSelectorPanel
-          classes={list}
-          onAdd={handleAdd}
-          onRemove={handleRemove}
-          onSelect={handleSelect}
-          onClose={closeSelf}
-          sandbox={sandbox}
-        />
-
+              <ClassSelectorPanel
+                classes={list}
+                onAdd={handleAdd}
+                onRemove={handleRemove}
+                onSelect={handleSelect}
+                onClose={closeSelf}
+                sandbox={sandbox}
+              />
             </div>
           </Draggable>,
           document.body

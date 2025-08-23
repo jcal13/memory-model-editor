@@ -1,7 +1,6 @@
-
 import IdDisplay from "./components/IdDisplay";
 import styles from "../../styles/BoxEditorStyles.module.css";
-import { ID, PrimitiveType } from "../../../shared/types";
+import { ID, PrimitiveType } from "../../../../shared/types";
 import TypeDisplay from "./components/TypeDisplay";
 
 /**
@@ -10,11 +9,11 @@ import TypeDisplay from "./components/TypeDisplay";
  */
 
 interface Props {
-  element: any;                       
-  dataType: PrimitiveType;              
-  setDataType: (t: PrimitiveType) => void; 
-  value: string;                       
-  setValue: (v: string) => void;       
+  element: any;
+  dataType: PrimitiveType;
+  setDataType: (t: PrimitiveType) => void;
+  value: string;
+  setValue: (v: string) => void;
   ids: ID[];
   addId: (id: ID) => void;
   ownId: ID;

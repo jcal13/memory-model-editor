@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { createBoxRenderer } from "../utils/BoxRenderer";
-import { CanvasElement, SubmissionResult, Tab } from "../../shared/types";
+import { CanvasElement, SubmissionResult, Tab } from "../../../shared/types";
 
 /**
  * Syncs the given ref with the current `dataType` state on every change.
@@ -137,12 +137,16 @@ export const useDraggableBox = ({
     gRef.current.innerHTML = "";
     gRef.current.appendChild(svgElement);
 
-    const texts = Array.from(svgElement.querySelectorAll<SVGElement>("text, tspan"));
+    const texts = Array.from(
+      svgElement.querySelectorAll<SVGElement>("text, tspan")
+    );
     const shapes = Array.from(
-      svgElement.querySelectorAll<SVGElement>("rect,path,polygon,ellipse,circle")
-    ).filter(el => !el.closest("defs") && !el.hasAttribute("data-overlay"));
+      svgElement.querySelectorAll<SVGElement>(
+        "rect,path,polygon,ellipse,circle"
+      )
+    ).filter((el) => !el.closest("defs") && !el.hasAttribute("data-overlay"));
 
-    [...shapes, ...texts].forEach(s => {
+    [...shapes, ...texts].forEach((s) => {
       s.style.removeProperty("stroke");
       s.style.removeProperty("fill");
       s.style.removeProperty("filter");
@@ -151,8 +155,8 @@ export const useDraggableBox = ({
 
     const COLOUR = "#9CA3AF";
     if (invalidated) {
-      shapes.forEach(s => s.style.setProperty("stroke", COLOUR, "important"));
-      texts.forEach(t => t.style.setProperty("fill", COLOUR, "important"));
+      shapes.forEach((s) => s.style.setProperty("stroke", COLOUR, "important"));
+      texts.forEach((t) => t.style.setProperty("fill", COLOUR, "important"));
     }
 
     // Calculate dimensions
@@ -160,7 +164,10 @@ export const useDraggableBox = ({
     const width = bbox.width + padding * 2;
     const height = bbox.height + padding * 2;
 
-    svgElement.setAttribute("viewBox", `-${padding} -${padding} ${width} ${height}`);
+    svgElement.setAttribute(
+      "viewBox",
+      `-${padding} -${padding} ${width} ${height}`
+    );
     svgElement.setAttribute("width", `${width}`);
     svgElement.setAttribute("height", `${height}`);
 
@@ -168,11 +175,16 @@ export const useDraggableBox = ({
 
     gRef.current.setAttribute(
       "transform",
-      `translate(${element.x - halfSize.current.w}, ${element.y - halfSize.current.h})`
+      `translate(${element.x - halfSize.current.w}, ${
+        element.y - halfSize.current.h
+      })`
     );
 
     // Transparent overlay for dragging and clicking
-    const overlay = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    const overlay = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "rect"
+    );
     overlay.setAttribute("x", `-${padding}`);
     overlay.setAttribute("y", `-${padding}`);
     overlay.setAttribute("width", `${width}`);
@@ -212,10 +224,7 @@ export function useCanvasLocalStorage({
 }) {
   useEffect(() => {
     try {
-      localStorage.setItem(
-        LS_KEY,
-        JSON.stringify({ elements, ids, classes })
-      );
+      localStorage.setItem(LS_KEY, JSON.stringify({ elements, ids, classes }));
     } catch {}
   }, [elements, ids, classes]);
 }
@@ -242,11 +251,11 @@ export const loadInitial = () => {
 const UI_LS_KEY = "canvas_ui_state_v3";
 
 export type UIState = {
-  activeTab: Tab; 
+  activeTab: Tab;
   questionIndex: number | null;
   questionType: "test" | "practice" | null;
   submissionResults: SubmissionResult;
-  sandboxMode: boolean | null; 
+  sandboxMode: boolean | null;
 };
 
 export function loadUIInitial(): UIState {
@@ -290,7 +299,13 @@ export function loadUIInitial(): UIState {
     const sandboxMode: boolean | null =
       typeof parsed?.sandboxMode === "boolean" ? parsed.sandboxMode : null;
 
-    return { activeTab, questionIndex, questionType, submissionResults, sandboxMode };
+    return {
+      activeTab,
+      questionIndex,
+      questionType,
+      submissionResults,
+      sandboxMode,
+    };
   } catch {
     return {
       activeTab: "question",

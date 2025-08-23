@@ -2,13 +2,10 @@ import React, { useState, useCallback } from "react";
 import ReactDOM from "react-dom";
 import Draggable from "react-draggable";
 import IdSelectorPanel from "./components/IdSelectorPanel";
-import {
-  useIdListSync,
-  useSinglePanelRegistry,
-} from "./hooks/useEffect";
+import { useIdListSync, useSinglePanelRegistry } from "./hooks/useEffect";
 import { usePanelRef } from "./hooks/useRef";
 import styles from "./styles/IdSelector.module.css";
-import { ID } from "../shared/types";
+import { ID } from "../../shared/types";
 
 interface Props {
   ids: ID[];
@@ -71,7 +68,9 @@ export default function IdSelector({
       <button
         type="button"
         onClick={toggleOpen}
-        className={`${buttonClassName} ${open ? styles.activeOutline : ""}`.trim()}
+        className={`${buttonClassName} ${
+          open ? styles.activeOutline : ""
+        }`.trim()}
       >
         {currentId != null ? `ID ${currentId}` : "ID _"}
       </button>

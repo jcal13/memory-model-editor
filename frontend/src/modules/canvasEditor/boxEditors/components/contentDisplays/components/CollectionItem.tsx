@@ -1,6 +1,6 @@
 import styles from "../../../styles/BoxEditorStyles.module.css";
 import IdSelector from "../../../../idSelector/IdSelector";
-import { ID } from "../../../../shared/types";
+import { ID } from "../../../../../shared/types";
 
 /**
  * Props for the CollectionItem component.
@@ -26,7 +26,7 @@ const CollectionItem = ({
   ids,
   addId,
   removeId,
-  sandbox
+  sandbox,
 }: Props) => {
   const removeItem = (idx: number) =>
     setItems((prev) => prev.filter((_, i) => i !== idx));

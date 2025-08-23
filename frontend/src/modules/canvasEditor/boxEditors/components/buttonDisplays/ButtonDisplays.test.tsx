@@ -1,6 +1,6 @@
 import { render, fireEvent } from "@testing-library/react";
 import RemoveButton from "./ButtonDisplays";
-import { ID } from "../../../shared/types";
+import { ID } from "../../../../shared/types";
 
 // Mocks props and handlers for simulating button behavior
 const mockOnRemove = jest.fn();

@@ -6,7 +6,7 @@ import React, {
   useState,
   useId,
 } from "react";
-import { CanvasElement } from "../../shared/types";
+import { CanvasElement } from "../../../shared/types";
 import CanvasBox from "./CanvasBox";
 import styles from "../styles/CallStack.module.css";
 
@@ -128,7 +128,7 @@ const CallStack: React.FC<Props> = ({
   const [insertIdx, setInsertIdx] = useState<number | null>(null); // visual gap 0‥N
   const [markerY, setMarkerY] = useState<number | null>(null);
 
-  // compute gap under ghost 
+  // compute gap under ghost
   const computeInsert = (ghostCenter: number, fromIdx: number) => {
     const positions = layout
       .map(({ yLocal, h }, i) => ({
@@ -151,16 +151,15 @@ const CallStack: React.FC<Props> = ({
     return { gap, gapY }; // gap is visual 0‥N
   };
 
-  const onRowDown =
-    (idx: number) => (e: React.PointerEvent<SVGGElement>) => {
-      dragRef.current = {
-        from: idx,
-        startY: e.clientY,
-        ghost: e.currentTarget,
-        origT: e.currentTarget.getAttribute("transform") || "",
-        active: false,
-      };
+  const onRowDown = (idx: number) => (e: React.PointerEvent<SVGGElement>) => {
+    dragRef.current = {
+      from: idx,
+      startY: e.clientY,
+      ghost: e.currentTarget,
+      origT: e.currentTarget.getAttribute("transform") || "",
+      active: false,
     };
+  };
 
   const onRowMove: React.PointerEventHandler = (e) => {
     if (!dragRef.current) return;
@@ -200,8 +199,7 @@ const CallStack: React.FC<Props> = ({
     if (st.active && insertIdx !== null) {
       /* ★ FIX: convert gap‑index (0‥N) → data index (0‥N‑1, 0 = bottom) */
       const N = layout.length;
-      const targetDataIdx =
-        insertIdx === N ? 0 : N - 1 - insertIdx; // bottom gap ⇒ 0
+      const targetDataIdx = insertIdx === N ? 0 : N - 1 - insertIdx; // bottom gap ⇒ 0
       if (targetDataIdx !== st.from) onReorder(st.from, targetDataIdx);
     }
 
@@ -237,7 +235,6 @@ const CallStack: React.FC<Props> = ({
 
   return (
     <g className={styles.root} onWheel={onWheel}>
-
       <rect
         className={styles.containerRect}
         x={x}
@@ -248,7 +245,6 @@ const CallStack: React.FC<Props> = ({
         ry={10}
       />
 
- 
       <text
         className={styles.title}
         x={x + colW / 2}
@@ -258,7 +254,6 @@ const CallStack: React.FC<Props> = ({
         Call&nbsp;Stack
       </text>
 
- 
       <clipPath id={clipId}>
         <rect
           x={x - H_PAD}
@@ -267,7 +262,6 @@ const CallStack: React.FC<Props> = ({
           height={TOP_PAD + visibleH + BOTTOM_PAD}
         />
       </clipPath>
-
 
       <g
         clipPath={`url(#${clipId})`}
@@ -282,21 +276,22 @@ const CallStack: React.FC<Props> = ({
             onPointerMove={onRowMove}
             onPointerUp={onRowUp}
           >
-            {selected?.boxId === f.boxId && (() => {
-              const w = boxSizes[f.boxId]?.w ?? BOX_WIDTH;
-              return (
-                <rect
-                  className={styles.selectedRect}
-                  x={-w / 2 + 6}
-                  y={-h / 2 - SEL_PAD_TOP + 23}
-                  width={w - 14}
-                  height={h + SEL_PAD_TOP + SEL_PAD_BOTTOM - 44}
-                  rx={6}
-                  ry={6}
-                  pointerEvents="none"
-                />
-              );
-            })()}
+            {selected?.boxId === f.boxId &&
+              (() => {
+                const w = boxSizes[f.boxId]?.w ?? BOX_WIDTH;
+                return (
+                  <rect
+                    className={styles.selectedRect}
+                    x={-w / 2 + 6}
+                    y={-h / 2 - SEL_PAD_TOP + 23}
+                    width={w - 14}
+                    height={h + SEL_PAD_TOP + SEL_PAD_BOTTOM - 44}
+                    rx={6}
+                    ry={6}
+                    pointerEvents="none"
+                  />
+                );
+              })()}
 
             <MemoCanvasBox
               element={memoEls[f.boxId]}

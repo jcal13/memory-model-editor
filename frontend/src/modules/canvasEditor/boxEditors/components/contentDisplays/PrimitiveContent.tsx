@@ -1,4 +1,4 @@
-import { PrimitiveType } from "../../../shared/types";
+import { PrimitiveType } from "../../../../shared/types";
 import styles from "../../styles/BoxEditorStyles.module.css";
 
 /**

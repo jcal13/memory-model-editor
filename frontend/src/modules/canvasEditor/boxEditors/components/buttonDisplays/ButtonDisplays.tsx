@@ -1,12 +1,12 @@
 import React from "react";
 import styles from "../../styles/BoxEditorStyles.module.css";
-import { ID } from "../../../shared/types";
+import { ID } from "../../../../shared/types";
 
 /**
  * Props for the ButtonDisplays component.
  */
 interface Props {
-  element: { 
+  element: {
     id: ID;
     kind: {
       name: string; // Type of the box (e.g., "primitive", "function", "list", "class", etc.)
@@ -25,7 +25,7 @@ interface Props {
   functionName?: string;
   functionParams?: any[];
   className?: string;
-  ownClassVariables?: any[]; 
+  ownClassVariables?: any[];
   items: any;
 }
 

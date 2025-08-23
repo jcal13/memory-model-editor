@@ -1,7 +1,7 @@
 import styles from "../../styles/BoxEditorStyles.module.css";
 import IdDisplay from "./components/IdDisplay";
 import ClassDisplay from "./components/ClassDisplay"; // <--- import ClassDisplay
-import { ID } from "../../../shared/types";
+import { ID } from "../../../../shared/types";
 
 /**
  * Props for the ClassHeader component.
@@ -18,20 +18,18 @@ interface Props {
   setElementId: (id: ID) => void;
   removeId: (id: ID) => void;
   sandbox: boolean;
-  
 }
 
 /**
  * ClassHeader displays the class's name and its ID selector.
  */
 const ClassHeader = ({
-
   classes,
   addClasses,
   ownClasses,
   setOwnClassName,
   removeClasses,
-  
+
   ids,
   addId,
   ownId,
@@ -60,4 +58,3 @@ const ClassHeader = ({
 );
 
 export default ClassHeader;
-

@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import BoxEditorModule from "./BoxEditorModule";
-import { BoxEditorType } from "../../shared/types";
+import { BoxEditorType } from "../../../shared/types";
 
 /**
  * Mocks for internal hooks and subcomponents
@@ -49,7 +49,7 @@ describe("BoxEditorModule", () => {
     addId: jest.fn(),
     removeId: jest.fn(),
     addClasses: jest.fn(),
-    removeClasses: jest.fn()
+    removeClasses: jest.fn(),
   };
 
   /**

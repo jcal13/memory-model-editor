@@ -11,9 +11,9 @@ import {
   useCollectionPairsStates,
   useElementIdState,
   useClassStates,
-  useInvalidatedState
+  useInvalidatedState,
 } from "../hooks/useState";
-import { BoxEditorType } from "../../shared/types";
+import { BoxEditorType } from "../../../shared/types";
 import { useGlobalRefs } from "../hooks/useRef";
 
 /**
@@ -26,7 +26,19 @@ import { useGlobalRefs } from "../hooks/useRef";
  * - onSave: function to call with the updated box data
  * - onRemove: function to call to remove the box from the canvas
  */
-const BoxEditorModule = ({ metadata, onSave, onRemove, onClose, ids,  addId, removeId, classes, addClasses, removeClasses, sandbox = true }: BoxEditorType) => {
+const BoxEditorModule = ({
+  metadata,
+  onSave,
+  onRemove,
+  onClose,
+  ids,
+  addId,
+  removeId,
+  classes,
+  addClasses,
+  removeClasses,
+  sandbox = true,
+}: BoxEditorType) => {
   // Shared hover state for remove button
   const { hoverRemove, setHoverRemove } = useGlobalStates();
 
@@ -46,22 +58,29 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, onClose, ids,  addId, rem
   const [collectionPairs, setCollectionPairs] =
     useCollectionPairsStates(metadata);
 
-    // State hook for element class
+  // State hook for element class
   const [
-      ownClassName, setOwnClassName,
-      ownClassVariables, setOwnClassVariables
+    ownClassName,
+    setOwnClassName,
+    ownClassVariables,
+    setOwnClassVariables,
   ] = useClassStates(metadata);
 
   const [invalidated, setInvalidated] = useInvalidatedState(metadata);
   // -----------------------------------
 
-  const collectionData = metadata.kind.name === "dict" ? collectionPairs : collectionItems;
+  const collectionData =
+    metadata.kind.name === "dict" ? collectionPairs : collectionItems;
 
   // Hook to sync the module and apply save logic when clicking outside
   useModule(
-    onSave, metadata, ownId,
-    dataType, contentValue,
-    functionName, functionParams,
+    onSave,
+    metadata,
+    ownId,
+    dataType,
+    contentValue,
+    functionName,
+    functionParams,
     collectionData,
     ownClassName,
     ownClassVariables,
@@ -69,10 +88,7 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, onClose, ids,  addId, rem
   );
   return (
     <div ref={moduleRef} className={`drag-handle ${styles.boxEditorModule}`}>
-      <button
-        className={styles.removeItem}
-        onClick={onClose}
-      >
+      <button className={styles.removeItem} onClick={onClose}>
         ×
       </button>
       {/* Top section: displays type-specific headers (id, selector, name) */}
@@ -84,14 +100,11 @@ const BoxEditorModule = ({ metadata, onSave, onRemove, onClose, ids,  addId, rem
         setValue={setContentValue}
         functionName={functionName}
         setFunctionName={setFunctionName}
-
-        classes = {classes}
+        classes={classes}
         ownClasses={ownClassName}
-        addClasses ={addClasses}          // <-- added
-        setOwnClassName = {setOwnClassName}
-        removeClasses={removeClasses}    // <-- added
-
-
+        addClasses={addClasses} // <-- added
+        setOwnClassName={setOwnClassName}
+        removeClasses={removeClasses} // <-- added
         ids={ids}
         addId={addId}
         ownId={ownId}

@@ -1,4 +1,4 @@
-import { ID } from "../../shared/types";
+import { ID } from "../../../shared/types";
 
 /**
  * Shared SVG style used by BoxRenderer for all box types.

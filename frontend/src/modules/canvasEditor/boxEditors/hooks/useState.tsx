@@ -1,4 +1,4 @@
-import { PrimitiveType, FunctionParams, ID } from "../../shared/types";
+import { PrimitiveType, FunctionParams, ID } from "../../../shared/types";
 import { useState } from "react";
 
 export const useElementIdState = (element: { id: ID }) => {
@@ -91,10 +91,11 @@ export const useClassStates = (element: any) => {
 };
 
 export const useInvalidatedState = (element: any) => {
-  const [invalidated, setInvalidated] = useState<boolean>(element.invalidated as boolean || false);
+  const [invalidated, setInvalidated] = useState<boolean>(
+    (element.invalidated as boolean) || false
+  );
   const onToggleInvalidated = () => {
-    setInvalidated(!invalidated)
-  }
+    setInvalidated(!invalidated);
+  };
   return [invalidated, onToggleInvalidated] as const;
-}
-
+};

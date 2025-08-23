@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import BoxEditor from "./BoxEditor";
 import BoxEditorModule from "./components/BoxEditorModule";
 import React from "react";
-import { BoxEditorType } from "../shared/types";
+import { BoxEditorType } from "../../shared/types";
 
 // Mock the BoxEditorModule to isolate BoxEditor behavior
 jest.mock("./components/BoxEditorModule", () => ({
@@ -22,7 +22,7 @@ describe("BoxEditor", () => {
         type: "int",
         value: "42",
       },
-      className: "Student",  
+      className: "Student",
     },
     onSave: jest.fn(),
     onRemove: jest.fn(),
@@ -32,7 +32,7 @@ describe("BoxEditor", () => {
     removeId: jest.fn(),
     classes: ["Student", "People"],
     addClasses: jest.fn(),
-    removeClasses: jest.fn()
+    removeClasses: jest.fn(),
   };
 
   beforeEach(() => {
@@ -63,7 +63,7 @@ describe("BoxEditor", () => {
         removeId: mockProps.removeId,
         classes: mockProps.classes,
         addClasses: mockProps.addClasses,
-        removeClasses: mockProps.removeClasses
+        removeClasses: mockProps.removeClasses,
       })
     );
   });

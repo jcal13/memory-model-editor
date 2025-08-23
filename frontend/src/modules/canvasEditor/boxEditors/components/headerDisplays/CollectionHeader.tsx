@@ -1,6 +1,6 @@
 import IdDisplay from "./components/IdDisplay";
 import TypeDisplay from "./components/TypeDisplay";
-import { ID } from "../../../shared/types";
+import { ID } from "../../../../shared/types";
 import styles from "../../styles/BoxEditorStyles.module.css";
 
 interface Props {
@@ -29,7 +29,7 @@ const CollectionHeader = ({
   ownId,
   setElementId,
   removeId,
-  sandbox
+  sandbox,
 }: Props) => (
   <div data-testid="collection-header" className={styles.collectionHeader}>
     <IdDisplay

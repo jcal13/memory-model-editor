@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import Canvas from "./canvas/Canvas";
-import Palette from "./palette/Palette";
+import Palette from "../palette/Palette";
 import ConfirmationModal from "./confirmationModal/confirmationModal";
 import styles from "./styles/MemoryModelEditor.module.css";
 import {
@@ -9,11 +9,11 @@ import {
   SubmissionResult,
   Tab,
   PaletteTab,
-} from "./shared/types";
+} from "../shared/types";
 import SubmitButton from "./canvas/components/SubmitButton";
 import DownloadJsonButton from "./canvas/components/DownloadOptionsButton";
 import { submitCanvas } from "./services/questionValidationServices";
-import InformationTabs from "./informationTabs/InformationTabs";
+import InformationTabs from "../informationTabs/InformationTabs";
 import {
   clearCanvasStorage,
   useCanvasLocalStorage,
@@ -49,16 +49,18 @@ export default function MemoryModelEditor({
   const [questionType, setQuestionType] = useState<"test" | "practice" | null>(
     uiInit.questionType
   );
-  const [submissionResults, setSubmissionResults] =
-    useState<SubmissionResult>(uiInit.submissionResults);
+  const [submissionResults, setSubmissionResults] = useState<SubmissionResult>(
+    uiInit.submissionResults
+  );
 
-  const [sandboxMode, setSandboxMode] = useState<boolean>(
-    () => (typeof uiInit.sandboxMode === "boolean" ? uiInit.sandboxMode : sandbox)
+  const [sandboxMode, setSandboxMode] = useState<boolean>(() =>
+    typeof uiInit.sandboxMode === "boolean" ? uiInit.sandboxMode : sandbox
   );
 
   const [paletteTab, setPaletteTab] = useState<PaletteTab>("all");
-  const [placeholderWidth, setPlaceholderWidth] =
-    useState<number>(DEFAULT_PLACEHOLDER_WIDTH);
+  const [placeholderWidth, setPlaceholderWidth] = useState<number>(
+    DEFAULT_PLACEHOLDER_WIDTH
+  );
   const [isResizing, setIsResizing] = useState<boolean>(false);
 
   // Separate modals
@@ -90,7 +92,11 @@ export default function MemoryModelEditor({
 
     const cleanElements = elements.filter((el) => !el.invalidated);
     try {
-      const res = await submitCanvas(cleanElements, questionIndex, questionType);
+      const res = await submitCanvas(
+        cleanElements,
+        questionIndex,
+        questionType
+      );
       if (res !== undefined) setSubmissionResults(res);
       setActiveTab("feedback");
     } catch (error) {
@@ -126,12 +132,16 @@ export default function MemoryModelEditor({
       if (!isResizing || !subContainerRef.current || !infoOpen) return;
       const rect = subContainerRef.current.getBoundingClientRect();
       const newWidth = rect.right - e.clientX;
-      const maxBasedOnViewport = window.innerWidth * MAX_PLACEHOLDER_VIEWPORT_RATIO;
+      const maxBasedOnViewport =
+        window.innerWidth * MAX_PLACEHOLDER_VIEWPORT_RATIO;
       const maxPlaceholderWidth = Math.min(
         rect.width - PLACEHOLDER_SUBTRACT_OFFSET,
         maxBasedOnViewport
       );
-      if (newWidth >= MIN_PLACEHOLDER_WIDTH && newWidth <= maxPlaceholderWidth) {
+      if (
+        newWidth >= MIN_PLACEHOLDER_WIDTH &&
+        newWidth <= maxPlaceholderWidth
+      ) {
         setPlaceholderWidth(newWidth);
       }
     };
@@ -169,17 +179,15 @@ export default function MemoryModelEditor({
         <Palette activeTab={paletteTab} setActive={setPaletteTab} />
       </div>
 
-
-        <button
-          type="button"
-          className={styles.panelTabBtnLeft}
-          onClick={() => setPaletteOpen((v) => !v)}
-          title={paletteOpen ? "Hide palette" : "Show palette"}
-          aria-label={paletteOpen ? "Hide palette" : "Show palette"}
-        >
-          {paletteOpen ? "«" : "»"}
-        </button>
-  
+      <button
+        type="button"
+        className={styles.panelTabBtnLeft}
+        onClick={() => setPaletteOpen((v) => !v)}
+        title={paletteOpen ? "Hide palette" : "Show palette"}
+        aria-label={paletteOpen ? "Hide palette" : "Show palette"}
+      >
+        {paletteOpen ? "«" : "»"}
+      </button>
 
       <div ref={subContainerRef} className={styles.subContainer}>
         <div className={styles.column}>
@@ -187,7 +195,7 @@ export default function MemoryModelEditor({
             <ClearCanvasButton onClick={() => setShowClearConfirm(true)} />
 
             <Canvas
-              key={editorResetKey} 
+              key={editorResetKey}
               elements={elements}
               setElements={setElements}
               ids={ids}
@@ -218,20 +226,18 @@ export default function MemoryModelEditor({
           {jsonView && <pre className={styles.jsonView}>{jsonView}</pre>}
         </div>
 
-
-          <button
-            type="button"
-            className={styles.panelTabBtnRight}
-            onClick={() => {
-              setIsResizing(false);
-              setInfoOpen((v) => !v);
-            }}
-            title={infoOpen ? "Hide info" : "Show info"}
-            aria-label={infoOpen ? "Hide info" : "Show info"}
-          >
-            {infoOpen ? "»" : "«"}
-          </button>
-
+        <button
+          type="button"
+          className={styles.panelTabBtnRight}
+          onClick={() => {
+            setIsResizing(false);
+            setInfoOpen((v) => !v);
+          }}
+          title={infoOpen ? "Hide info" : "Show info"}
+          aria-label={infoOpen ? "Hide info" : "Show info"}
+        >
+          {infoOpen ? "»" : "«"}
+        </button>
 
         <div
           className={styles.placeholder}

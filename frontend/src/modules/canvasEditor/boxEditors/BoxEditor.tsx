@@ -1,5 +1,5 @@
 import BoxEditorModule from "./components/BoxEditorModule";
-import { BoxEditorType } from "../shared/types";
+import { BoxEditorType } from "../../shared/types";
 
 /**
  * BoxEditor is a wrapper component that delegates
@@ -9,9 +9,33 @@ import { BoxEditorType } from "../shared/types";
  * @param onSave - Callback function to persist box changes
  * @param onRemove - Callback function to remove the box
  */
-const BoxEditor = ({ metadata, onSave, onRemove, onClose, ids, addId, removeId, classes, addClasses, removeClasses, sandbox = true }: BoxEditorType) => {
+const BoxEditor = ({
+  metadata,
+  onSave,
+  onRemove,
+  onClose,
+  ids,
+  addId,
+  removeId,
+  classes,
+  addClasses,
+  removeClasses,
+  sandbox = true,
+}: BoxEditorType) => {
   return (
-    <BoxEditorModule metadata={metadata} onSave={onSave} onRemove={onRemove} ids={ids} addId={addId} removeId={removeId} classes={classes} addClasses={addClasses} removeClasses={removeClasses}  sandbox={sandbox} onClose={onClose}/>
+    <BoxEditorModule
+      metadata={metadata}
+      onSave={onSave}
+      onRemove={onRemove}
+      ids={ids}
+      addId={addId}
+      removeId={removeId}
+      classes={classes}
+      addClasses={addClasses}
+      removeClasses={removeClasses}
+      sandbox={sandbox}
+      onClose={onClose}
+    />
   );
 };
 

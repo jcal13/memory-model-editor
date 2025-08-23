@@ -1,5 +1,5 @@
 import MemoryViz from "memory-viz";
-import { CanvasElement } from "../../shared/types";
+import { CanvasElement } from "../../../shared/types";
 import { BoxConfigs } from "./BoxConfigs";
 
 /* ==============================================

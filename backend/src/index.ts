@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import canvasEditorRouter from "./modules/canvasEditor";
-import questionModuleRouter from "./modules/questionModule";
+import questionModuleRouter from "./modules/informationTabs/questionModule";
 
 const app = express();
 const port = 3001;

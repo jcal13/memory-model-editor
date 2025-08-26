@@ -1,5 +1,5 @@
 import "./App.css";
-import MemoryModelEditor from "./modules/canvasEditor/MemoryModelEditor";
+import MemoryModelEditor from "./MemoryModelEditor";
 
 function App() {
   return (

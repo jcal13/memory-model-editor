@@ -49,123 +49,12 @@
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 9999;                 /* higher than  side tab/panel */
-
+  z-index: 9999; /* higher than  side tab/panel */
 }
 
-/* ========================
- * Updated Download Options Button
- * ========================
- */
-.downloadContainer {
-  position: absolute;
-  bottom: 24px;
-  left: 24px;
-  z-index: 40;
-}
-
-.downloadBtn {
-  padding: 10px 10px;
-  background-color: #38bbf8;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 0.95rem;
-  width: max-content;
-}
-
-.downloadBtn:hover,
-.downloadBtn:active {
-  background-color: #23a6df;
-}
-
-.downloadBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 12px;
-  background-color: #38bbf8;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  line-height: 1;
-}
-
-.caret {
-  font-size: 0.9em;
-  opacity: 0.9;
-}
-
-.downloadMenu {
-  position: absolute;
-  bottom: calc(100% + 10px);
-  left: 0;
+.column {
+  flex: 1;
+  position: relative;
   display: flex;
   flex-direction: column;
-  padding: 6px;
-  background-color: #ffffff;
-  color: #111827;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  min-width: 180px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
-}
-
-.downloadMenu::after {
-  content: "";
-  position: absolute;
-  bottom: -6px;
-  left: 14px;
-  width: 10px;
-  height: 10px;
-  background: #fff;
-  border-left: 1px solid #e5e7eb;
-  border-bottom: 1px solid #e5e7eb;
-  transform: rotate(45deg);
-}
-
-.downloadMenu button {
-  padding: 10px 10px;
-  border: none;
-  background: transparent;
-  color: #111827;
-  text-align: left;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 0.95rem;
-  line-height: 1.1;
-  cursor: pointer;
-}
-
-.downloadMenu button:hover {
-  background-color: #f3f4f6;
-}
-
-/* ========================
- * Submit Button (unchanged)
- * ========================
- */
-.submitButton {
-  position: absolute;
-  bottom: 35px;
-  right: 35px;
-  z-index: 9999;
-  padding: 10px 10px;
-  background-color: #10b981;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 0.95rem;
-  width: max-content;
-}
-
-.submitButton:hover,
-.submitButton:active {
-  background-color: #059669;
 }

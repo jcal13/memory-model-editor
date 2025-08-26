@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../Canvas.module.css";
+import styles from "./SubmitButton.module.css";
 interface Props {
   onClick: () => Promise<void>;
 }

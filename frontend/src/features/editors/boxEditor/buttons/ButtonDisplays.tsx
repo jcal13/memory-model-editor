@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../BoxEditorStyles.module.css";
+import styles from "./ButtonDisplays.module.css";
 import { ID } from "../../../shared/types";
 
 /**

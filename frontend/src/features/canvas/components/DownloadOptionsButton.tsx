@@ -1,8 +1,7 @@
 import React, { useRef, useState } from "react";
 import { CanvasElement } from "../../shared/types";
 import { buildJSONFromElements } from "../../validation/jsonBuilder";
-import styles from "../Canvas.module.css";
-import canvasStyles from "../../../MemoryModelEditor.module.css";
+import styles from "./DownloadOptionsButton.module.css";
 import html2canvas from "html2canvas";
 import domtoimage from "dom-to-image";
 
@@ -46,7 +45,7 @@ const DownloadOptionsButton: React.FC<Props> = ({ elements }) => {
     setIsOpen(false);
     await new Promise(requestAnimationFrame);
 
-    const node = document.querySelector(`.${canvasStyles.column}`)!;
+    const node = document.querySelector(`.${styles.column}`)!;
 
     domtoimage
       .toSvg(node)
@@ -64,7 +63,7 @@ const DownloadOptionsButton: React.FC<Props> = ({ elements }) => {
     await new Promise(requestAnimationFrame);
 
     const canvasRoot = document.querySelector(
-      `.${canvasStyles.column}`
+      `.${styles.column}`
     ) as HTMLElement | null;
     if (!canvasRoot) return;
 

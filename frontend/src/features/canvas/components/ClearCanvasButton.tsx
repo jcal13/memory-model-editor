@@ -1,4 +1,4 @@
-import styles from "../../../MemoryModelEditor.module.css";
+import styles from "./ClearCanvasButton.module.css";
 
 type Props = { onClick: () => void };
 

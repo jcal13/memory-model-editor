@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import Canvas from "./features/canvas/Canvas";
 import Palette from "./features/palette/Palette";
-import ConfirmationModal from "./features/canvas/confirmationModal";
+import ConfirmationModal from "./features/canvas/components/confirmationModal";
 import styles from "./MemoryModelEditor.module.css";
 import {
   CanvasElement,

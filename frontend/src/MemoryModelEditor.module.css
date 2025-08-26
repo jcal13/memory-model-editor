@@ -2,8 +2,8 @@
   display: flex;
   height: 100vh;
   overflow: hidden;
-  align-items: stretch;                
-  background: var(--mm-editor-bg);      
+  align-items: stretch;
+  background: var(--mm-editor-bg);
 }
 
 .paletteColumn {
@@ -16,7 +16,7 @@
   display: flex;
   flex: 1;
   position: relative;
-  align-items: stretch;                 
+  align-items: stretch;
 }
 
 .column {
@@ -74,22 +74,6 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
 }
 
-.clearCanvasButton {
-  position: absolute;
-  top: 35px;
-  right: 35px;
-  z-index: 9999;
-  padding: 10px 10px;
-  background-color: red;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 0.95rem;
-  width: max-content;
-}
-
 .clearCanvasButton:hover {
   background-color: #dc2626; /* red-600 */
 }
@@ -136,7 +120,6 @@
   z-index: 1;
 }
 
-
 .switchWrapper {
   position: absolute;
   top: 35px;
@@ -155,17 +138,17 @@
   display: block;
   width: 100%;
   height: 100%;
-  background: #93C5FD;
+  background: #93c5fd;
   border-radius: 9999px;
   position: relative;
   transition: background-color 0.2s ease;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #1E40AF;
+  color: #1e40af;
 }
 
 .switchWrapper:hover .switchSlider {
-  background: #60A5FA;
+  background: #60a5fa;
 }
 
 .switchSlider::before {
@@ -178,7 +161,7 @@
   top: 2px;
   left: 2px;
   transition: transform 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 .switchSlider::after,
@@ -203,12 +186,12 @@
 }
 
 .switchInput:checked + .switchSlider {
-  background: #34D399;
-  color: #065F46;
+  background: #34d399;
+  color: #065f46;
 }
 
 .switchWrapper:hover .switchInput:checked + .switchSlider {
-  background: #10B981;
+  background: #10b981;
 }
 
 .switchInput:checked + .switchSlider::before {
@@ -216,12 +199,12 @@
 }
 
 .panelTabBtnLeft {
-  align-self: center;                 
+  align-self: center;
   width: var(--mm-tab-w);
   min-width: var(--mm-tab-w);
   height: var(--mm-tab-h);
-  padding: 0;                         
-  margin: 0 var(--mm-tab-gap);        
+  padding: 0;
+  margin: 0 var(--mm-tab-gap);
 
   border-left: 0px solid #d1d5db;
   border-top: 1px solid #d1d5db;
@@ -239,19 +222,20 @@
   font-size: 0.95rem;
   line-height: 1;
 
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: background-color 0.15s ease, box-shadow 0.15s ease,
+    transform 0.05s ease;
   transform: translateX(-1px);
   touch-action: manipulation;
 }
 
 .panelTabBtnRight {
-  align-self: center;                 
+  align-self: center;
   width: var(--mm-tab-w);
   min-width: var(--mm-tab-w);
   height: var(--mm-tab-h);
-  padding: 0;                         
-  margin: 0 var(--mm-tab-gap);        
+  padding: 0;
+  margin: 0 var(--mm-tab-gap);
 
   border-left: 1px solid #d1d5db;
   border-top: 1px solid #d1d5db;
@@ -269,8 +253,9 @@
   font-size: 0.95rem;
   line-height: 1;
 
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: background-color 0.15s ease, box-shadow 0.15s ease,
+    transform 0.05s ease;
   transform: translateX(1px);
   z-index: 1;
   touch-action: manipulation;
@@ -278,21 +263,18 @@
 
 .panelTabBtnLeft:hover {
   background: #f3f4f6;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 }
 
 .panelTabBtnRight:hover {
   background: #f3f4f6;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 }
 
-
 :root {
-
   --mm-editor-bg: #f3f4f6;
 
   --mm-tab-w: 22px;
   --mm-tab-h: 400px;
   --mm-tab-radius: 8px;
 }
-

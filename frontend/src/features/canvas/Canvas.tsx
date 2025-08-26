@@ -6,7 +6,6 @@ import BoxEditor from "../editors/boxEditor/BoxEditor";
 import { useCanvasRefs } from "./hooks/useRef";
 import styles from "./Canvas.module.css";
 import CallStack from "./components/CallStack";
-import MemoryModelEditorStyles from "../../MemoryModelEditor.module.css";
 
 const editorMap: Record<BoxType["name"], React.FC<any>> = {
   primitive: BoxEditor,
@@ -58,7 +57,7 @@ function FloatingEditor({
       handle=".drag-handle"
       defaultPosition={defaultPos}
       onMouseDown={onSelect}
-      bounds={`.${MemoryModelEditorStyles.column}`}
+      bounds={`.${styles.column}`}
     >
       <div ref={nodeRef} className={styles.editorContainer}>
         <Editor

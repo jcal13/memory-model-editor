@@ -66,66 +66,16 @@ export function useMemoryModelEditorState(sandbox: boolean) {
   const [showModeToggleModal, setShowModeToggleModal] =
     useState<boolean>(false);
 
-  // Canvas management functions
-  const clearCanvas = (): void => {
-    setElements([]);
-    setElementIds([]);
-    setElementClasses([]);
-    setJsonOutput("");
-    setSubmissionResults(null);
-    setCanvasResetKey((prev) => prev + 1);
-    clearCanvasStorage();
-  };
-
-  // Element ID management
-  const addElementId = (id: number) => {
-    setElementIds((prevIds) => {
-      if (prevIds.includes(id)) return prevIds;
-
-      const insertIndex = prevIds.findIndex((existingId) => existingId > id);
-      return insertIndex === -1
-        ? [...prevIds, id]
-        : [...prevIds.slice(0, insertIndex), id, ...prevIds.slice(insertIndex)];
-    });
-  };
-
-  const removeElementId = (id: ID) => {
-    setElementIds((prevIds) =>
-      prevIds.filter((existingId) => existingId !== id)
-    );
-  };
-
-  // Element class management
-  const addElementClass = (className: string) => {
-    setElementClasses((prevClasses) => {
-      if (prevClasses.includes(className)) return prevClasses;
-
-      const insertIndex = prevClasses.findIndex(
-        (existingClass) => existingClass.localeCompare(className) > 0
-      );
-      return insertIndex === -1
-        ? [...prevClasses, className]
-        : [
-            ...prevClasses.slice(0, insertIndex),
-            className,
-            ...prevClasses.slice(insertIndex),
-          ];
-    });
-  };
-
-  const removeElementClass = (className: string) => {
-    setElementClasses((prevClasses) =>
-      prevClasses.filter((existingClass) => existingClass !== className)
-    );
-  };
-
   return {
     // Canvas state
     canvasResetKey,
+    setCanvasResetKey,
     elements,
     setElements,
     elementIds,
+    setElementIds,
     elementClasses,
+    setElementClasses,
     jsonOutput,
     setJsonOutput,
 
@@ -158,12 +108,5 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     setShowClearCanvasModal,
     showModeToggleModal,
     setShowModeToggleModal,
-
-    // Functions
-    clearCanvas,
-    addElementId,
-    removeElementId,
-    addElementClass,
-    removeElementClass,
   };
 }

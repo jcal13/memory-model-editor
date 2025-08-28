@@ -3,11 +3,16 @@ import Draggable from "react-draggable";
 import { CanvasElement, BoxType, ID } from "../shared/types";
 import CanvasBox from "./components/CanvasBox";
 import BoxEditor from "../editors/boxEditor/BoxEditor";
-import { useCanvasRefs } from "./hooks/useRef";
-import styles from "./Canvas.module.css";
 import CallStack from "./components/CallStack";
+import {
+  ClearCanvasButton,
+  SubmitButton,
+  DownloadButton,
+} from "./components/CanvasButtons";
+import { useCanvasRefs } from "./hooks/hooks";
+import styles from "./Canvas.module.css";
 
-const editorMap: Record<BoxType["name"], React.FC<any>> = {
+const EDITOR_MAP: Record<BoxType["name"], React.FC<any>> = {
   primitive: BoxEditor,
   function: BoxEditor,
   list: BoxEditor,
@@ -24,7 +29,7 @@ interface FloatingEditorProps {
   onRemove: () => void;
   onClose: () => void;
   onSelect: () => void;
-  defaultPos: { x: number; y: number };
+  defaultPosition: { x: number; y: number };
   ids: number[];
   addId: (id: number) => void;
   removeId: (id: ID) => void;
@@ -41,7 +46,7 @@ function FloatingEditor({
   onRemove,
   onClose,
   onSelect,
-  defaultPos,
+  defaultPosition,
   ids,
   addId,
   removeId,
@@ -50,16 +55,17 @@ function FloatingEditor({
   removeClasses,
   sandbox,
 }: FloatingEditorProps) {
-  const nodeRef = React.useRef<HTMLDivElement>(null);
+  const nodeRef = useRef<HTMLDivElement>(null);
+
   return (
     <Draggable
       nodeRef={nodeRef as React.RefObject<HTMLElement>}
       handle=".drag-handle"
-      defaultPosition={defaultPos}
+      defaultPosition={defaultPosition}
       onMouseDown={onSelect}
-      bounds={`.${styles.column}`}
+      bounds={`.${styles.canvasColumn}`}
     >
-      <div ref={nodeRef} className={styles.editorContainer}>
+      <div ref={nodeRef} className={styles.floatingEditor}>
         <Editor
           metadata={element}
           onSave={onSave}
@@ -88,6 +94,8 @@ interface CanvasProps {
   addClasses?: (className: string) => void;
   removeClasses?: (className: string) => void;
   sandbox?: boolean;
+  onClear: () => void;
+  onSubmit: () => Promise<void>;
 }
 
 export default function Canvas({
@@ -100,262 +108,226 @@ export default function Canvas({
   addClasses,
   removeClasses,
   sandbox = true,
+  onClear,
+  onSubmit,
 }: CanvasProps) {
-  const [openBoxEditors, setOpenBoxEditors] = useState<CanvasElement[]>([]);
-  const [selected, setSelected] = useState<CanvasElement | null>(null);
+  const [openEditors, setOpenEditors] = useState<CanvasElement[]>([]);
+  const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(
+    null
+  );
+  const [canvasHeight, setCanvasHeight] = useState<number | null>(null);
+
   const { svgRef } = useCanvasRefs();
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const [frozenHeight, setFrozenHeight] = useState<number | null>(null);
-  const lastVB = useRef<string>("");
+  const lastViewBox = useRef<string>("");
 
+  // Canvas sizing and viewBox management
   useEffect(() => {
-    const measure = () => {
+    const measureCanvas = () => {
       const svg = svgRef.current;
       if (!svg) return;
-      const h = Math.max(
+
+      const height = Math.max(
         1,
-        svg.clientHeight || Math.round(svg.getBoundingClientRect().height)
+        svg.clientHeight || svg.getBoundingClientRect().height
       );
-      const w = Math.max(
+      const width = Math.max(
         1,
-        svg.clientWidth || Math.round(svg.getBoundingClientRect().width)
+        svg.clientWidth || svg.getBoundingClientRect().width
       );
-      setFrozenHeight(h);
-      const vb = `0 0 ${w} ${h}`;
-      svg.setAttribute("viewBox", vb);
-      lastVB.current = vb;
+
+      setCanvasHeight(height);
+      const viewBox = `0 0 ${width} ${height}`;
+      svg.setAttribute("viewBox", viewBox);
+      lastViewBox.current = viewBox;
     };
-    const r1 = requestAnimationFrame(() => {
-      const r2 = requestAnimationFrame(measure);
-      return () => cancelAnimationFrame(r2);
+
+    const frame1 = requestAnimationFrame(() => {
+      const frame2 = requestAnimationFrame(measureCanvas);
+      return () => cancelAnimationFrame(frame2);
     });
-    return () => cancelAnimationFrame(r1);
+
+    return () => cancelAnimationFrame(frame1);
   }, [svgRef]);
 
+  // Handle canvas width changes while preserving height
   useEffect(() => {
-    if (!frozenHeight) return;
+    if (!canvasHeight) return;
+
     const svg = svgRef.current;
     if (!svg) return;
 
-    let raf = 0;
-    let prevW = -1;
+    let animationFrame = 0;
+    let previousWidth = -1;
 
     const updateWidth = () => {
-      const w = Math.max(
+      const width = Math.max(
         1,
-        svg.clientWidth || Math.round(svg.getBoundingClientRect().width)
+        svg.clientWidth || svg.getBoundingClientRect().width
       );
-      if (w !== prevW) {
-        prevW = w;
-        const vb = `0 0 ${w} ${frozenHeight}`;
-        if (vb !== lastVB.current) {
-          svg.setAttribute("viewBox", vb);
-          lastVB.current = vb;
+
+      if (width !== previousWidth) {
+        previousWidth = width;
+        const viewBox = `0 0 ${width} ${canvasHeight}`;
+
+        if (viewBox !== lastViewBox.current) {
+          svg.setAttribute("viewBox", viewBox);
+          lastViewBox.current = viewBox;
         }
       }
     };
 
-    const ro = new ResizeObserver(() => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(updateWidth);
+    const resizeObserver = new ResizeObserver(() => {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(updateWidth);
     });
 
-    ro.observe(svg);
+    resizeObserver.observe(svg);
 
     return () => {
-      cancelAnimationFrame(raf);
-      ro.disconnect();
+      cancelAnimationFrame(animationFrame);
+      resizeObserver.disconnect();
     };
-  }, [frozenHeight, svgRef]);
+  }, [canvasHeight, svgRef]);
 
+  // Sync element IDs in non-sandbox mode
   useEffect(() => {
     if (sandbox) return;
 
-    const elementIds = elements
+    const currentElementIds = elements
       .filter((el) => el.kind.name !== "function" && typeof el.id === "number")
       .map((el) => el.id as number);
 
-    elementIds.filter((id) => !ids.includes(id)).forEach((id) => addId(id));
-    ids.filter((id) => !elementIds.includes(id)).forEach((id) => removeId(id));
+    // Add missing IDs
+    currentElementIds
+      .filter((id) => !ids.includes(id))
+      .forEach((id) => addId(id));
+
+    // Remove orphaned IDs
+    ids
+      .filter((id) => !currentElementIds.includes(id))
+      .forEach((id) => removeId(id));
   }, [elements, ids, sandbox, addId, removeId]);
 
-  const makePositionUpdater = (boxId: number) => (x: number, y: number) => {
-    setElements((prev) =>
-      prev.map((el) => (el.boxId === boxId ? { ...el, x, y } : el))
-    );
-  };
+  const createPositionUpdater = useCallback(
+    (boxId: number) => (x: number, y: number) => {
+      setElements((prev) =>
+        prev.map((el) => (el.boxId === boxId ? { ...el, x, y } : el))
+      );
+    },
+    [setElements]
+  );
 
-  const handleDrop = (e: React.DragEvent<SVGSVGElement>) => {
-    e.preventDefault();
-    const payload = e.dataTransfer.getData("application/box-type");
-    let newKind: BoxType;
+  const handleCanvasDrop = useCallback(
+    (event: React.DragEvent<SVGSVGElement>) => {
+      event.preventDefault();
+      const boxType = event.dataTransfer.getData("application/box-type");
 
-    switch (payload) {
-      case "none":
-        newKind = { name: "primitive", type: "None", value: "null" };
-        break;
-      case "int":
-        newKind = { name: "primitive", type: "int", value: "0" };
-        break;
-      case "float":
-        newKind = { name: "primitive", type: "float", value: "0.0" };
-        break;
-      case "str":
-        newKind = { name: "primitive", type: "str", value: "" };
-        break;
-      case "bool":
-        newKind = { name: "primitive", type: "bool", value: "false" };
-        break;
-      case "primitive":
-        newKind = { name: "primitive", type: "None", value: "None" };
-        break;
-      case "function": {
-        const functionCount = elements.filter(
-          (el) => el.kind.name === "function"
-        ).length;
-        newKind = {
-          name: "function",
-          type: "function",
-          value: null,
-          functionName: "__main__",
-          params: [],
-          order: functionCount + 1,
+      const newKind = createNewElement(boxType, elements);
+      if (!newKind) return;
+
+      const svg = svgRef.current;
+      if (!svg) return;
+
+      // Convert screen coordinates to SVG coordinates
+      const point = svg.createSVGPoint();
+      point.x = event.clientX;
+      point.y = event.clientY;
+      const ctm = svg.getScreenCTM();
+      if (!ctm) return;
+      const coords = point.matrixTransform(ctm.inverse());
+
+      setElements((prev) => {
+        const newBoxId = getNextBoxId(prev);
+        const newId =
+          sandbox || newKind.name === "function" ? "_" : getNextElementId(ids);
+
+        const newElement: CanvasElement = {
+          boxId: newBoxId,
+          id: newId,
+          kind: newKind,
+          x: coords.x,
+          y: coords.y,
         };
-        break;
-      }
-      case "list":
-        newKind = { name: "list", type: "list", value: [] };
-        break;
-      case "tuple":
-        newKind = { name: "tuple", type: "tuple", value: [] };
-        break;
-      case "set":
-        newKind = { name: "set", type: "set", value: [] };
-        break;
-      case "dict":
-        newKind = { name: "dict", type: "dict", value: {} };
-        break;
-      case "class":
-        newKind = {
-          name: "class",
-          type: "class",
-          value: null,
-          className: "NoClass",
-          classVariables: [],
-        };
-        break;
-      default:
-        return;
-    }
 
-    const svg = svgRef.current;
-    if (!svg) return;
+        return [...prev, newElement];
+      });
+    },
+    [elements, ids, sandbox, svgRef, setElements]
+  );
 
-    const pt = svg.createSVGPoint();
-    pt.x = e.clientX;
-    pt.y = e.clientY;
+  const saveElement = useCallback(
+    (
+      boxId: number,
+      updatedId: ID,
+      updatedKind: BoxType,
+      invalidated?: boolean
+    ) => {
+      setElements((prev) =>
+        prev.map((el) => {
+          if (el.boxId !== boxId) return el;
+          const updated = { ...el, id: updatedId, kind: updatedKind };
+          return invalidated !== undefined
+            ? { ...updated, invalidated }
+            : updated;
+        })
+      );
+    },
+    [setElements]
+  );
 
-    const ctm = svg.getScreenCTM();
-    if (!ctm) return;
+  const removeElement = useCallback(
+    (boxId: number) => {
+      setElements((prev) => prev.filter((el) => el.boxId !== boxId));
+      setOpenEditors((prev) => prev.filter((el) => el.boxId !== boxId));
+      setSelectedElement((prev) => (prev?.boxId === boxId ? null : prev));
+    },
+    [setElements]
+  );
 
-    const coords = pt.matrixTransform(ctm.inverse());
+  const openElementEditor = useCallback((element: CanvasElement) => {
+    setOpenEditors([element]);
+    setSelectedElement(element);
+  }, []);
 
-    setElements((prev) => {
-      const boxIds = prev.map((el) => el.boxId as number).sort((a, b) => a - b);
-      let newBoxId = boxIds.length;
-      for (let i = 0; i < boxIds.length; i++) {
-        if (boxIds[i] !== i) {
-          newBoxId = i;
-          break;
-        }
-      }
-
-      let computedId: ID = "_";
-      if (!sandbox && newKind.name !== "function") {
-        const sortedPos = [...ids]
-          .filter((n) => Number.isInteger(n) && n >= 1)
-          .sort((a, b) => a - b);
-
-        let computed = 1;
-        for (let i = 0; i < sortedPos.length; i++) {
-          const expected = i + 1;
-          if (sortedPos[i] !== expected) {
-            computed = expected;
-            break;
-          }
-          computed = sortedPos.length + 1;
-        }
-
-        computedId = computed;
-      }
-
-      const newElement: CanvasElement = {
-        boxId: newBoxId,
-        id: computedId,
-        kind: newKind,
-        x: coords.x,
-        y: coords.y,
-      };
-      return [...prev, newElement];
-    });
-  };
-
-  const saveElement = (
-    boxId: number,
-    updatedId: ID,
-    updatedKind: BoxType,
-    invalidated?: boolean
-  ) => {
-    setElements((prev) =>
-      prev.map((el) => {
-        if (el.boxId !== boxId) return el;
-        const base = { ...el, id: updatedId, kind: updatedKind };
-        if (invalidated !== undefined) return { ...base, invalidated };
-        return base;
-      })
-    );
-  };
-
-  const removeElement = (boxId: number) => {
-    setElements((prev) => prev.filter((el) => el.boxId !== boxId));
-    setOpenBoxEditors((prev) => prev.filter((el) => el.boxId !== boxId));
-    setSelected((prev) => (prev && prev.boxId === boxId ? null : prev));
-  };
-
-  const openElement = (canvasElement: CanvasElement) => {
-    setOpenBoxEditors([canvasElement]);
-    setSelected(canvasElement);
-  };
+  const closeElementEditor = useCallback((boxId: number) => {
+    setOpenEditors((prev) => prev.filter((el) => el.boxId !== boxId));
+    setSelectedElement((prev) => (prev?.boxId === boxId ? null : prev));
+  }, []);
 
   const functionFrames = elements.filter((el) => el.kind.name === "function");
 
-  const handleReorder = useCallback(
-    (from: number, to: number) => {
-      if (from === to) return;
+  const handleCallStackReorder = useCallback(
+    (fromIndex: number, toIndex: number) => {
+      if (fromIndex === toIndex) return;
 
       setElements((prev) => {
-        const funcIdxs = prev
+        const functionIndices = prev
           .map((el, i) => ({ el, i }))
           .filter(({ el }) => el.kind.name === "function");
 
-        const fromIdx = funcIdxs[from].i;
-        const toIdx = funcIdxs[to].i;
+        const sourceIndex = functionIndices[fromIndex].i;
+        const targetIndex = functionIndices[toIndex].i;
 
-        const next = [...prev];
-        const [moved] = next.splice(fromIdx, 1);
-        next.splice(toIdx, 0, moved);
+        const reordered = [...prev];
+        const [movedElement] = reordered.splice(sourceIndex, 1);
+        reordered.splice(targetIndex, 0, movedElement);
 
-        const reorderedFuncs = next.filter((el) => el.kind.name === "function");
-        const orderMap = new Map<number, number>();
-        reorderedFuncs.forEach((func, idx) => {
-          orderMap.set(func.boxId, idx + 1);
+        // Update order properties
+        const reorderedFunctions = reordered.filter(
+          (el) => el.kind.name === "function"
+        );
+        const orderMapping = new Map<number, number>();
+
+        reorderedFunctions.forEach((func, index) => {
+          orderMapping.set(func.boxId, index + 1);
         });
 
-        return next.map((el) => {
-          if (el.kind.name === "function" && orderMap.has(el.boxId)) {
+        return reordered.map((el) => {
+          if (el.kind.name === "function" && orderMapping.has(el.boxId)) {
             return {
               ...el,
-              kind: { ...el.kind, order: orderMap.get(el.boxId)! },
+              kind: { ...el.kind, order: orderMapping.get(el.boxId)! },
             };
           }
           return el;
@@ -364,6 +336,11 @@ export default function Canvas({
     },
     [setElements]
   );
+
+  const defaultEditorPosition = {
+    x: typeof window !== "undefined" ? window.innerWidth / 6.5 : 0,
+    y: typeof window !== "undefined" ? window.innerHeight / 3 : 0,
+  };
 
   return (
     <>
@@ -380,22 +357,22 @@ export default function Canvas({
           className={styles.canvas}
           style={{
             width: "100%",
-            height: frozenHeight ?? undefined,
+            height: canvasHeight ?? undefined,
             display: "block",
             padding: 0,
             border: 0,
             boxSizing: "content-box",
           }}
           onDragOver={(e) => e.preventDefault()}
-          onDrop={handleDrop}
+          onDrop={handleCanvasDrop}
         >
           <CallStack
             frames={functionFrames}
             selected={
-              selected && selected.kind.name === "function" ? selected : null
+              selectedElement?.kind.name === "function" ? selectedElement : null
             }
-            onSelect={openElement}
-            onReorder={handleReorder}
+            onSelect={openElementEditor}
+            onReorder={handleCallStackReorder}
           />
 
           <g>
@@ -405,39 +382,36 @@ export default function Canvas({
                 <CanvasBox
                   key={el.boxId}
                   element={el}
-                  openInterface={() => openElement(el)}
-                  updatePosition={makePositionUpdater(el.boxId)}
+                  openInterface={() => openElementEditor(el)}
+                  updatePosition={createPositionUpdater(el.boxId)}
                   invalidated={el.invalidated}
                 />
               ))}
           </g>
         </svg>
+
+        <ClearCanvasButton onClick={onClear} />
+        <SubmitButton onClick={onSubmit} />
+        <DownloadButton
+          elements={elements}
+          canvasSelector={`.${styles.canvasColumn}`}
+        />
       </div>
 
-      {openBoxEditors.map((el) => {
-        const Editor = editorMap[el.kind.name];
+      {openEditors.map((element) => {
+        const Editor = EDITOR_MAP[element.kind.name];
         return (
           <FloatingEditor
-            key={el.boxId}
-            element={el}
+            key={element.boxId}
+            element={element}
             Editor={Editor}
-            defaultPos={{
-              x: typeof window !== "undefined" ? window.innerWidth / 6.5 : 0,
-              y: typeof window !== "undefined" ? window.innerHeight / 3 : 0,
-            }}
-            onSelect={() => setSelected(el)}
+            defaultPosition={defaultEditorPosition}
+            onSelect={() => setSelectedElement(element)}
             onSave={(id, kind, invalidated) =>
-              saveElement(el.boxId, id, kind, invalidated)
+              saveElement(element.boxId, id, kind, invalidated)
             }
-            onRemove={() => removeElement(el.boxId)}
-            onClose={() => {
-              setOpenBoxEditors((prev) =>
-                prev.filter((e) => e.boxId !== el.boxId)
-              );
-              setSelected((prev) =>
-                prev && prev.boxId === el.boxId ? null : prev
-              );
-            }}
+            onRemove={() => removeElement(element.boxId)}
+            onClose={() => closeElementEditor(element.boxId)}
             ids={ids}
             addId={addId}
             removeId={removeId}
@@ -450,4 +424,79 @@ export default function Canvas({
       })}
     </>
   );
+}
+
+// Helper functions
+function createNewElement(
+  boxType: string,
+  elements: CanvasElement[]
+): BoxType | null {
+  switch (boxType) {
+    case "none":
+      return { name: "primitive", type: "None", value: "null" };
+    case "int":
+      return { name: "primitive", type: "int", value: "0" };
+    case "float":
+      return { name: "primitive", type: "float", value: "0.0" };
+    case "str":
+      return { name: "primitive", type: "str", value: "" };
+    case "bool":
+      return { name: "primitive", type: "bool", value: "false" };
+    case "primitive":
+      return { name: "primitive", type: "None", value: "None" };
+    case "function": {
+      const functionCount = elements.filter(
+        (el) => el.kind.name === "function"
+      ).length;
+      return {
+        name: "function",
+        type: "function",
+        value: null,
+        functionName: "__main__",
+        params: [],
+        order: functionCount + 1,
+      };
+    }
+    case "list":
+      return { name: "list", type: "list", value: [] };
+    case "tuple":
+      return { name: "tuple", type: "tuple", value: [] };
+    case "set":
+      return { name: "set", type: "set", value: [] };
+    case "dict":
+      return { name: "dict", type: "dict", value: {} };
+    case "class":
+      return {
+        name: "class",
+        type: "class",
+        value: null,
+        className: "NoClass",
+        classVariables: [],
+      };
+    default:
+      return null;
+  }
+}
+
+function getNextBoxId(elements: CanvasElement[]): number {
+  const boxIds = elements.map((el) => el.boxId as number).sort((a, b) => a - b);
+
+  for (let i = 0; i < boxIds.length; i++) {
+    if (boxIds[i] !== i) return i;
+  }
+
+  return boxIds.length;
+}
+
+function getNextElementId(ids: number[]): number {
+  const sortedIds = [...ids]
+    .filter((id) => Number.isInteger(id) && id >= 1)
+    .sort((a, b) => a - b);
+
+  for (let i = 0; i < sortedIds.length; i++) {
+    const expected = i + 1;
+    if (sortedIds[i] !== expected) return expected;
+  }
+
+  return sortedIds.length + 1;
 }

@@ -1,11 +1,6 @@
 import { useEffect } from "react";
-import { BoxProps } from "../utils/BoxProps";
-import { useGlobalRefs } from "../hooks/useRef";
-import { useDraggableBox } from "../hooks/useEffect";
-
-interface CanvasBoxProps extends BoxProps {
-  onSizeChange?: (id: number, size: { w: number; h: number }) => void;
-}
+import { useBoxDragState, useDraggableBox } from "../hooks/hooks";
+import { CanvasBoxProps } from "../utils/types";
 
 export default function CanvasBox({
   element,
@@ -14,24 +9,27 @@ export default function CanvasBox({
   onSizeChange,
   invalidated = false,
 }: CanvasBoxProps) {
-  const { gRef, isDragging, start, origin, halfSize } = useGlobalRefs();
+  const { gRef, dragState, dimensions } = useBoxDragState();
+
   useDraggableBox({
     gRef,
     element,
-    halfSize,
+    dimensions,
+    dragState,
     openInterface,
-    isDragging,
-    start,
-    origin,
     updatePosition,
     invalidated,
   });
 
+  // Report size changes for parent components (like CallStack)
   useEffect(() => {
-    if (!gRef.current || !onSizeChange) return;
-    const { width, height } = gRef.current.getBBox();
-    onSizeChange(element.boxId as number, { w: width, h: height });
-  }, [element, gRef, onSizeChange]);
+    if (!onSizeChange || !gRef.current) return;
+
+    const { width, height } = dimensions.current;
+    if (width > 0 && height > 0) {
+      onSizeChange(element.boxId as number, { w: width, h: height });
+    }
+  }, [element, onSizeChange, dimensions]);
 
   return <g ref={gRef} />;
 }

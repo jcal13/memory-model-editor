@@ -1,9 +1,4 @@
-/* ========================
- * Canvas Outer Wrapper
- * ========================
- * Centers the canvas horizontally, aligns it to the top,
- * and applies page-wide padding and background.
- */
+/* Canvas wrapper - centers and styles the main canvas area */
 .canvasWrapper {
   display: flex;
   justify-content: center;
@@ -14,47 +9,29 @@
   box-sizing: border-box;
 }
 
-.canvasInner {
-  position: relative;
-  width: 1000px; /* Explicit width */
-  height: 700px; /* Explicit height */
-  background-color: white;
-  border: 1px solid white;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-/* ========================
- * Main SVG Canvas Styling
- * ========================
- * Gives the canvas full area, rounded edges, and a subtle shadow.
- */
+/* Main SVG canvas */
 .canvas {
   width: 100%;
   height: 100%;
   display: block;
-  background: white; /* helps visualize area */
+  background: white;
   border: 1px solid white;
   border-radius: 8px;
-}
-/* ===================================
- * Floating Box Editor (Overlay Panel)
- * ===================================
- * Absolute positioning for placing the editor directly
- * on top of the canvas from the top-left corner.
- */
-.editorContainer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 9999; /* higher than  side tab/panel */
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 }
 
-.column {
+/* Column layout for canvas content */
+.canvasColumn {
   flex: 1;
   position: relative;
   display: flex;
   flex-direction: column;
+}
+
+/* Floating editor overlay */
+.floatingEditor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
 }

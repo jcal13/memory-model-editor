@@ -1,9 +1,6 @@
 import Canvas from "../canvas/Canvas";
 import Palette from "../palette/Palette";
 import ConfirmationModal from "./components/ConfirmationModal";
-import SubmitButton from "../canvas/components/SubmitButton";
-import DownloadJsonButton from "../canvas/components/DownloadOptionsButton";
-import ClearCanvasButton from "../canvas/components/ClearCanvasButton";
 import InformationTabs from "../informationTabs/InformationTabs";
 import styles from "./MemoryModelEditor.module.css";
 
@@ -14,6 +11,7 @@ import {
   useUILocalStorage,
   useInfoPanelResize,
   useCanvasSubmission,
+  clearCanvasStorage,
 } from "./hooks/useEffect";
 
 // Layout constants
@@ -29,6 +27,57 @@ export default function MemoryModelEditor({
 }: MemoryModelEditorProps) {
   const state = useMemoryModelEditorState(sandbox);
   const refs = useMemoryModelEditorRefs();
+
+  // Canvas management functions
+  const clearCanvas = (): void => {
+    state.setElements([]);
+    state.setElementIds([]);
+    state.setElementClasses([]);
+    state.setJsonOutput("");
+    state.setSubmissionResults(null);
+    state.setCanvasResetKey((prev) => prev + 1);
+    clearCanvasStorage();
+  };
+
+  const addElementId = (id: number) => {
+    state.setElementIds((prevIds) => {
+      if (prevIds.includes(id)) return prevIds;
+
+      const insertIndex = prevIds.findIndex((existingId) => existingId > id);
+      return insertIndex === -1
+        ? [...prevIds, id]
+        : [...prevIds.slice(0, insertIndex), id, ...prevIds.slice(insertIndex)];
+    });
+  };
+
+  const removeElementId = (id: any) => {
+    state.setElementIds((prevIds) =>
+      prevIds.filter((existingId) => existingId !== id)
+    );
+  };
+
+  const addElementClass = (className: string) => {
+    state.setElementClasses((prevClasses) => {
+      if (prevClasses.includes(className)) return prevClasses;
+
+      const insertIndex = prevClasses.findIndex(
+        (existingClass) => existingClass.localeCompare(className) > 0
+      );
+      return insertIndex === -1
+        ? [...prevClasses, className]
+        : [
+            ...prevClasses.slice(0, insertIndex),
+            className,
+            ...prevClasses.slice(insertIndex),
+          ];
+    });
+  };
+
+  const removeElementClass = (className: string) => {
+    state.setElementClasses((prevClasses) =>
+      prevClasses.filter((existingClass) => existingClass !== className)
+    );
+  };
 
   const { handleCanvasSubmit } = useCanvasSubmission({
     selectedQuestionIndex: state.selectedQuestionIndex,
@@ -89,25 +138,20 @@ export default function MemoryModelEditor({
       <div ref={refs.mainContainerRef} className={styles.mainContainer}>
         <div className={styles.canvasColumn}>
           <div className={styles.canvasArea}>
-            <ClearCanvasButton
-              onClick={() => state.setShowClearCanvasModal(true)}
-            />
-
             <Canvas
               key={state.canvasResetKey}
               elements={state.elements}
               setElements={state.setElements}
               ids={state.elementIds}
-              addId={state.addElementId}
-              removeId={state.removeElementId}
+              addId={addElementId}
+              removeId={removeElementId}
               classes={state.elementClasses}
-              addClasses={state.addElementClass}
-              removeClasses={state.removeElementClass}
+              addClasses={addElementClass}
+              removeClasses={removeElementClass}
               sandbox={state.isSandboxMode}
+              onClear={() => state.setShowClearCanvasModal(true)}
+              onSubmit={handleCanvasSubmit}
             />
-
-            <DownloadJsonButton elements={state.elements} />
-            <SubmitButton onClick={handleCanvasSubmit} />
           </div>
 
           <label className={styles.modeToggleSwitch}>
@@ -178,7 +222,7 @@ export default function MemoryModelEditor({
           confirmLabel="Clear"
           cancelLabel="Cancel"
           onConfirm={() => {
-            state.clearCanvas();
+            clearCanvas();
             state.setShowClearCanvasModal(false);
           }}
           onCancel={() => state.setShowClearCanvasModal(false)}
@@ -192,7 +236,7 @@ export default function MemoryModelEditor({
           confirmLabel="Confirm"
           cancelLabel="Cancel"
           onConfirm={() => {
-            state.clearCanvas();
+            clearCanvas();
             state.setIsSandboxMode((prev) => !prev);
             state.setShowModeToggleModal(false);
           }}

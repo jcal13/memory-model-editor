@@ -1,15 +1,15 @@
-.root {
+.callStackRoot {
   user-select: none;
 }
 
-.containerRect {
+.containerBackground {
   fill: #fafafa;
   stroke: #666666;
   stroke-width: 1;
   opacity: 0.95;
 }
 
-.title {
+.callStackTitle {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
     sans-serif;
@@ -18,25 +18,25 @@
   font-weight: 600;
 }
 
-.selectedRect {
+.selectionHighlight {
   fill: none;
   stroke: #1d4ed8;
   stroke-width: 2;
 }
 
-.markerLine {
+.dropMarker {
   fill: #1d4ed8;
 }
 
-.scrollbarGroup {
+.scrollbarContainer {
   transition: opacity 0.3s ease;
 }
 
-.track {
+.scrollbarTrack {
   fill: #e0e0e0;
 }
 
-.thumb {
+.scrollbarThumb {
   fill: #7c7c7c;
   cursor: pointer;
 }

@@ -10,38 +10,58 @@ import { CanvasElement } from "../../shared/types";
 import CanvasBox from "./CanvasBox";
 import styles from "./CallStack.module.css";
 
-const BOX_WIDTH = 200;
-const FALLBACK_H = 60;
-const GAP = 0;
+// Layout constants
+const DEFAULT_BOX_WIDTH = 200;
+const FALLBACK_BOX_HEIGHT = 60;
+const BOX_GAP = 0;
 
-const LABEL_H = 40;
-const TOP_FREE_PAD = 12;
-const BOTTOM_FREE_PAD = 12;
-const SEL_PAD_TOP = 25;
-const SEL_PAD_BOTTOM = 20;
-const TOP_PAD = TOP_FREE_PAD + SEL_PAD_TOP;
-const BOTTOM_PAD = BOTTOM_FREE_PAD + SEL_PAD_BOTTOM + 25;
+const HEADER_HEIGHT = 40;
+const TOP_FREE_PADDING = 12;
+const BOTTOM_FREE_PADDING = 12;
+const SELECTION_PADDING_TOP = 25;
+const SELECTION_PADDING_BOTTOM = 20;
+const TOP_PADDING = TOP_FREE_PADDING + SELECTION_PADDING_TOP;
+const BOTTOM_PADDING = BOTTOM_FREE_PADDING + SELECTION_PADDING_BOTTOM + 25;
 
-const TRACK_W = 5;
-const TRACK_INSET = 4;
-const THUMB_MIN_H = 30;
-const DRAG_PX = 6;
+const SCROLLBAR_WIDTH = 5;
+const SCROLLBAR_INSET = 4;
+const SCROLLBAR_THUMB_MIN_HEIGHT = 30;
+const DRAG_THRESHOLD_PX = 6;
 
-const Y_OFFSET = 30;
+const VERTICAL_OFFSET = 30;
 
-interface Props {
+interface CallStackProps {
   frames: CanvasElement[];
   selected: CanvasElement | null;
-  onSelect: (el: CanvasElement) => void;
-  onReorder: (from: number, to: number) => void;
+  onSelect: (element: CanvasElement) => void;
+  onReorder: (fromIndex: number, toIndex: number) => void;
   x?: number;
   y?: number;
   width?: number;
 }
 
-const MemoCanvasBox = React.memo(CanvasBox);
+interface BoxSize {
+  w: number;
+  h: number;
+}
 
-const CallStack: React.FC<Props> = ({
+interface DragState {
+  from: number;
+  startY: number;
+  ghost: SVGGElement;
+  origT: string;
+  active: boolean;
+}
+
+interface LayoutItem {
+  f: CanvasElement;
+  yLocal: number;
+  h: number;
+}
+
+const MemoizedCanvasBox = React.memo(CanvasBox);
+
+const CallStack: React.FC<CallStackProps> = ({
   frames,
   selected,
   onSelect,
@@ -50,314 +70,398 @@ const CallStack: React.FC<Props> = ({
   y = 80,
   width = 230,
 }) => {
-  const clipId = useId();
+  const clipPathId = useId();
 
-  const [viewportH, setViewportH] = useState(
-    typeof window === "undefined" ? 800 : window.innerHeight - 110
-  );
+  // Viewport height management
+  const [viewportHeight, setViewportHeight] = useState<number>(600); // Start with reasonable default
+  const [isInitialized, setIsInitialized] = useState(false);
+
   useEffect(() => {
-    const onResize = () => setViewportH(window.innerHeight - 110);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    const calculateHeight = () => {
+      const height = window.innerHeight - 110;
+      setViewportHeight(height);
+      setIsInitialized(true);
+    };
+
+    calculateHeight();
+
+    const handleResize = () => setViewportHeight(window.innerHeight - 110);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  /* order & layout */
-  const ordered = useMemo(() => [...frames], [frames]);
+  // Box size tracking
+  const [boxSizes, setBoxSizes] = useState<Record<number, BoxSize>>({});
 
-  const [boxSizes, setBoxSizes] = useState<
-    Record<number, { w: number; h: number }>
-  >({});
-  const handleSizeChange = useCallback(
-    (id: number, s: { w: number; h: number }) => {
-      if (s.w < 1 || s.h < 1) return;
-      setBoxSizes((p) =>
-        p[id]?.w === s.w && p[id]?.h === s.h ? p : { ...p, [id]: s }
+  const handleBoxSizeChange = useCallback((id: number, size: BoxSize) => {
+    if (size.w < 1 || size.h < 1) return;
+
+    setBoxSizes((prev) => {
+      const current = prev[id];
+      if (current?.w === size.w && current?.h === size.h) return prev;
+      return { ...prev, [id]: size };
+    });
+  }, []);
+
+  // Layout calculations
+  const orderedFrames = useMemo(() => [...frames], [frames]);
+
+  const maxBoxWidth = useMemo(() => {
+    return frames.reduce(
+      (max, frame) =>
+        Math.max(max, boxSizes[frame.boxId]?.w ?? DEFAULT_BOX_WIDTH),
+      DEFAULT_BOX_WIDTH
+    );
+  }, [frames, boxSizes]);
+
+  const columnWidth = Math.max(width, maxBoxWidth);
+  const columnHeight = viewportHeight - y - 10;
+  const visibleHeight =
+    columnHeight - HEADER_HEIGHT - TOP_PADDING - BOTTOM_PADDING;
+
+  const layout = useMemo((): LayoutItem[] => {
+    let yOffset = 0;
+    const baseY =
+      y + HEADER_HEIGHT + TOP_PADDING + visibleHeight - FALLBACK_BOX_HEIGHT / 2;
+
+    return orderedFrames.map((frame) => {
+      const height = (boxSizes[frame.boxId]?.h ?? FALLBACK_BOX_HEIGHT) - 15;
+      const yLocal = baseY - yOffset - height / 2 + 50;
+      yOffset += height + BOX_GAP;
+      return { f: frame, yLocal, h: height };
+    });
+  }, [orderedFrames, boxSizes, y, visibleHeight]);
+
+  const totalContentHeight = layout.reduce(
+    (acc, { h }) => acc + h + BOX_GAP - 9,
+    -BOX_GAP
+  );
+
+  // Scrolling state
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const maxScrollPosition = Math.max(0, totalContentHeight - visibleHeight);
+  const [isScrollbarVisible, setIsScrollbarVisible] = useState(false);
+  const scrollFadeTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const handleWheel: React.WheelEventHandler = useCallback(
+    (event) => {
+      if (maxScrollPosition === 0) return;
+
+      event.preventDefault();
+      setScrollPosition((current) =>
+        Math.min(maxScrollPosition, Math.max(0, current - event.deltaY))
       );
+
+      setIsScrollbarVisible(true);
+      if (scrollFadeTimer.current) clearTimeout(scrollFadeTimer.current);
+      scrollFadeTimer.current = setTimeout(
+        () => setIsScrollbarVisible(false),
+        250
+      );
+    },
+    [maxScrollPosition]
+  );
+
+  // Drag and drop state
+  const dragState = useRef<DragState | null>(null);
+  const [insertIndex, setInsertIndex] = useState<number | null>(null);
+  const [dropMarkerY, setDropMarkerY] = useState<number | null>(null);
+
+  const computeDropPosition = useCallback(
+    (ghostCenterY: number, draggedIndex: number) => {
+      const positions = layout
+        .map(({ yLocal, h }, index) => ({
+          index,
+          top: yLocal + scrollPosition + VERTICAL_OFFSET - h / 2,
+          bottom: yLocal + scrollPosition + VERTICAL_OFFSET + h / 2,
+        }))
+        .filter(({ index }) => index !== draggedIndex)
+        .sort((a, b) => a.top - b.top);
+
+      if (positions.length === 0) return null;
+
+      let gap = positions.length; // Default to after last item
+      for (let i = 0; i < positions.length; i++) {
+        if (ghostCenterY < positions[i].top) {
+          gap = i;
+          break;
+        }
+      }
+
+      const gapY = gap === 0 ? positions[0].top : positions[gap - 1].bottom;
+      return { gap, gapY };
+    },
+    [layout, scrollPosition]
+  );
+
+  const handlePointerDown = useCallback(
+    (index: number) => (event: React.PointerEvent<SVGGElement>) => {
+      dragState.current = {
+        from: index,
+        startY: event.clientY,
+        ghost: event.currentTarget,
+        origT: event.currentTarget.getAttribute("transform") || "",
+        active: false,
+      };
     },
     []
   );
 
-  const maxBoxW = useMemo(
-    () =>
-      frames.reduce(
-        (m, f) => Math.max(m, boxSizes[f.boxId]?.w ?? BOX_WIDTH),
-        BOX_WIDTH
-      ),
-    [frames, boxSizes]
-  );
-  const colW = Math.max(width, maxBoxW);
+  const handlePointerMove: React.PointerEventHandler = useCallback(
+    (event) => {
+      if (!dragState.current) return;
 
-  const columnH = viewportH - y - 10;
-  const visibleH = columnH - LABEL_H - TOP_PAD - BOTTOM_PAD;
+      const drag = dragState.current;
+      const deltaY = event.clientY - drag.startY;
 
-  const layout = useMemo(() => {
-    let offset = 0;
-    const baseY = y + LABEL_H + TOP_PAD + visibleH - FALLBACK_H / 2;
-    return ordered.map((f) => {
-      const h = (boxSizes[f.boxId]?.h ?? FALLBACK_H) - 15;
-      const yLocal = baseY - offset - h / 2 + 50;
-      offset += h + GAP;
-      return { f, yLocal, h } as const;
-    });
-  }, [ordered, boxSizes, y, visibleH]);
-
-  const totalH = layout.reduce((acc, { h }) => acc + h + GAP - 9, -GAP);
-
-  /* scrolling */
-  const [scroll, setScroll] = useState(0);
-  const maxScroll = Math.max(0, totalH - visibleH);
-  const [isScrolling, setScrolling] = useState(false);
-  const fadeTimer = useRef<NodeJS.Timeout | null>(null);
-  const onWheel: React.WheelEventHandler = (e) => {
-    if (maxScroll === 0) return;
-    e.preventDefault();
-    setScroll((s) => Math.min(maxScroll, Math.max(0, s - e.deltaY)));
-    setScrolling(true);
-    if (fadeTimer.current) clearTimeout(fadeTimer.current);
-    fadeTimer.current = setTimeout(() => setScrolling(false), 250);
-  };
-
-  type Drag = null | {
-    from: number;
-    startY: number;
-    ghost: SVGGElement;
-    origT: string;
-    active: boolean;
-  };
-  const dragRef = useRef<Drag>(null);
-  const [insertIdx, setInsertIdx] = useState<number | null>(null); // visual gap 0‥N
-  const [markerY, setMarkerY] = useState<number | null>(null);
-
-  // compute gap under ghost
-  const computeInsert = (ghostCenter: number, fromIdx: number) => {
-    const positions = layout
-      .map(({ yLocal, h }, i) => ({
-        i,
-        top: yLocal + scroll + Y_OFFSET - h / 2,
-        bottom: yLocal + scroll + Y_OFFSET + h / 2,
-      }))
-      .filter(({ i }) => i !== fromIdx)
-      .sort((a, b) => a.top - b.top);
-    if (positions.length === 0) return null;
-    let gap = positions.length; // after last by default
-    for (let g = 0; g < positions.length; g++) {
-      if (ghostCenter < positions[g].top) {
-        gap = g;
-        break;
+      // Activate drag if threshold exceeded
+      if (!drag.active && Math.abs(deltaY) > DRAG_THRESHOLD_PX) {
+        drag.active = true;
+        drag.ghost.setAttribute("opacity", "0.8");
+        drag.ghost.setPointerCapture(event.pointerId);
       }
-    }
 
-    const gapY = gap === 0 ? positions[0].top : positions[gap - 1].bottom;
-    return { gap, gapY }; // gap is visual 0‥N
-  };
+      if (!drag.active) return;
 
-  const onRowDown = (idx: number) => (e: React.PointerEvent<SVGGElement>) => {
-    dragRef.current = {
-      from: idx,
-      startY: e.clientY,
-      ghost: e.currentTarget,
-      origT: e.currentTarget.getAttribute("transform") || "",
-      active: false,
-    };
-  };
+      // Update ghost position
+      drag.ghost.setAttribute(
+        "transform",
+        `${drag.origT} translate(0 ${deltaY})`
+      );
 
-  const onRowMove: React.PointerEventHandler = (e) => {
-    if (!dragRef.current) return;
-    const st = dragRef.current;
-    const dy = e.clientY - st.startY;
+      // Calculate drop position
+      const ghostCenterY =
+        layout[drag.from].yLocal + scrollPosition + VERTICAL_OFFSET + deltaY;
+      const dropPosition = computeDropPosition(ghostCenterY, drag.from);
 
-    if (!st.active && Math.abs(dy) > DRAG_PX) {
-      st.active = true;
-      st.ghost.setAttribute("opacity", "0.8");
-      st.ghost.setPointerCapture(e.pointerId);
-    }
-    if (!st.active) return;
+      if (!dropPosition) {
+        setInsertIndex(null);
+        setDropMarkerY(null);
+        return;
+      }
 
-    st.ghost.setAttribute("transform", `${st.origT} translate(0 ${dy})`);
+      setInsertIndex(dropPosition.gap);
+      setDropMarkerY(dropPosition.gapY);
+    },
+    [layout, scrollPosition, computeDropPosition]
+  );
 
-    const ghostCenter = layout[st.from].yLocal + scroll + Y_OFFSET + dy;
-    const res = computeInsert(ghostCenter, st.from);
+  const handlePointerUp: React.PointerEventHandler = useCallback(
+    (event) => {
+      if (!dragState.current) return;
 
-    if (!res) {
-      setInsertIdx(null);
-      setMarkerY(null);
-      return;
-    }
+      const drag = dragState.current;
 
-    const { gap, gapY } = res;
-    setInsertIdx(gap);
-    setMarkerY(gapY);
-  };
+      // Reset ghost appearance
+      drag.ghost.setAttribute("transform", drag.origT);
+      drag.ghost.setAttribute("opacity", "1");
 
-  const onRowUp: React.PointerEventHandler = (e) => {
-    if (!dragRef.current) return;
-    const st = dragRef.current;
+      // Execute reorder if drag was active and has valid drop position
+      if (drag.active && insertIndex !== null) {
+        const frameCount = layout.length;
+        const targetDataIndex =
+          insertIndex === frameCount ? 0 : frameCount - 1 - insertIndex;
 
-    st.ghost.setAttribute("transform", st.origT);
-    st.ghost.setAttribute("opacity", "1");
+        if (targetDataIndex !== drag.from) {
+          onReorder(drag.from, targetDataIndex);
+        }
+      }
 
-    if (st.active && insertIdx !== null) {
-      /* ★ FIX: convert gap‑index (0‥N) → data index (0‥N‑1, 0 = bottom) */
-      const N = layout.length;
-      const targetDataIdx = insertIdx === N ? 0 : N - 1 - insertIdx; // bottom gap ⇒ 0
-      if (targetDataIdx !== st.from) onReorder(st.from, targetDataIdx);
-    }
+      // Clean up drag state
+      setInsertIndex(null);
+      setDropMarkerY(null);
+      drag.ghost.releasePointerCapture(event.pointerId);
+      dragState.current = null;
+    },
+    [insertIndex, layout.length, onReorder]
+  );
 
-    setInsertIdx(null);
-    setMarkerY(null);
-    st.ghost.releasePointerCapture(e.pointerId);
-    dragRef.current = null;
-  };
+  // Memoized elements for rendering
+  const memoizedElements = useMemo(() => {
+    const elementMap: Record<number, CanvasElement> = {};
+    orderedFrames.forEach((frame) => {
+      elementMap[frame.boxId] = { ...frame, x: 0, y: 0 };
+    });
+    return elementMap;
+  }, [orderedFrames]);
 
-  const memoEls = useMemo(() => {
-    const m: Record<number, CanvasElement> = {};
-    ordered.forEach((f) => (m[f.boxId] = { ...f, x: 0, y: 0 }));
-    return m;
-  }, [ordered]);
+  // Scrollbar calculations
+  const scrollbarTrackX = x + columnWidth - SCROLLBAR_WIDTH - SCROLLBAR_INSET;
+  const scrollbarTrackY = y + HEADER_HEIGHT - 5;
+  const scrollbarTrackHeight = TOP_PADDING + visibleHeight + BOTTOM_PADDING;
 
-  // scrollbar maths
-  const trackX = x + colW - TRACK_W - TRACK_INSET;
-  const trackY = y + LABEL_H - 5;
-  const trackH = TOP_PAD + visibleH + BOTTOM_PAD;
-  const thumbH =
-    maxScroll === 0
-      ? trackH
-      : Math.max(THUMB_MIN_H, trackH * (visibleH / totalH));
-  const thumbTravel = trackH - thumbH;
-  const thumbY =
-    trackY + (maxScroll === 0 ? 0 : (1 - scroll / maxScroll) * thumbTravel);
+  const scrollbarThumbHeight =
+    maxScrollPosition === 0
+      ? scrollbarTrackHeight
+      : Math.max(
+          SCROLLBAR_THUMB_MIN_HEIGHT,
+          scrollbarTrackHeight * (visibleHeight / totalContentHeight)
+        );
 
-  const thumbDrag = useRef(false);
-  const thumbStartY = useRef(0);
-  const thumbStartScroll = useRef(0);
+  const scrollbarThumbTravel = scrollbarTrackHeight - scrollbarThumbHeight;
+  const scrollbarThumbY =
+    scrollbarTrackY +
+    (maxScrollPosition === 0
+      ? 0
+      : (1 - scrollPosition / maxScrollPosition) * scrollbarThumbTravel);
 
-  const H_PAD = maxBoxW;
+  // Scrollbar drag state
+  const thumbDragState = useRef({
+    isDragging: false,
+    startY: 0,
+    startScroll: 0,
+  });
+
+  const horizontalPadding = maxBoxWidth;
 
   return (
-    <g className={styles.root} onWheel={onWheel}>
+    <g
+      className={styles.callStackRoot}
+      onWheel={handleWheel}
+      style={{ opacity: isInitialized ? 1 : 0 }}
+    >
       <rect
-        className={styles.containerRect}
+        className={styles.containerBackground}
         x={x}
         y={y}
-        width={colW}
-        height={columnH}
+        width={columnWidth}
+        height={columnHeight}
         rx={10}
         ry={10}
       />
 
       <text
-        className={styles.title}
-        x={x + colW / 2}
+        className={styles.callStackTitle}
+        x={x + columnWidth / 2}
         y={y + 30}
         textAnchor="middle"
       >
         Call&nbsp;Stack
       </text>
 
-      <clipPath id={clipId}>
+      <clipPath id={clipPathId}>
         <rect
-          x={x - H_PAD}
-          y={y + LABEL_H}
-          width={colW + H_PAD * 2}
-          height={TOP_PAD + visibleH + BOTTOM_PAD}
+          x={x - horizontalPadding}
+          y={y + HEADER_HEIGHT}
+          width={columnWidth + horizontalPadding * 2}
+          height={TOP_PADDING + visibleHeight + BOTTOM_PADDING}
         />
       </clipPath>
 
       <g
-        clipPath={`url(#${clipId})`}
-        transform={`translate(${x + colW / 2},0)`}
+        clipPath={`url(#${clipPathId})`}
+        transform={`translate(${x + columnWidth / 2}, 0)`}
       >
-        {layout.map(({ f, yLocal, h }, idx) => (
+        {layout.map(({ f: frame, yLocal, h: height }, index) => (
           <g
-            key={f.boxId}
-            transform={`translate(0, ${yLocal + scroll + Y_OFFSET})`}
-            cursor="grab"
-            onPointerDown={onRowDown(idx)}
-            onPointerMove={onRowMove}
-            onPointerUp={onRowUp}
+            key={frame.boxId}
+            transform={`translate(0, ${
+              yLocal + scrollPosition + VERTICAL_OFFSET
+            })`}
+            style={{ cursor: "grab" }}
+            onPointerDown={handlePointerDown(index)}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
           >
-            {selected?.boxId === f.boxId &&
+            {selected?.boxId === frame.boxId &&
               (() => {
-                const w = boxSizes[f.boxId]?.w ?? BOX_WIDTH;
+                const boxWidth = boxSizes[frame.boxId]?.w ?? DEFAULT_BOX_WIDTH;
                 return (
                   <rect
-                    className={styles.selectedRect}
-                    x={-w / 2 + 6}
-                    y={-h / 2 - SEL_PAD_TOP + 23}
-                    width={w - 14}
-                    height={h + SEL_PAD_TOP + SEL_PAD_BOTTOM - 44}
+                    className={styles.selectionHighlight}
+                    x={-boxWidth / 2 + 6}
+                    y={-height / 2 - SELECTION_PADDING_TOP + 23}
+                    width={boxWidth - 14}
+                    height={
+                      height +
+                      SELECTION_PADDING_TOP +
+                      SELECTION_PADDING_BOTTOM -
+                      44
+                    }
                     rx={6}
                     ry={6}
-                    pointerEvents="none"
+                    style={{ pointerEvents: "none" }}
                   />
                 );
               })()}
 
-            <MemoCanvasBox
-              element={memoEls[f.boxId]}
-              openInterface={() => onSelect(f)}
+            <MemoizedCanvasBox
+              element={memoizedElements[frame.boxId]}
+              openInterface={() => onSelect(frame)}
               updatePosition={() => {}}
-              onSizeChange={handleSizeChange}
-              invalidated={f.invalidated}
+              onSizeChange={handleBoxSizeChange}
+              invalidated={frame.invalidated}
             />
           </g>
         ))}
 
-        {markerY !== null && (
+        {dropMarkerY !== null && (
           <rect
-            className={styles.markerLine}
-            x={-colW / 2 + 10}
-            y={markerY - 1}
-            width={colW - 20}
+            className={styles.dropMarker}
+            x={-columnWidth / 2 + 10}
+            y={dropMarkerY - 1}
+            width={columnWidth - 20}
             height={2}
             rx={1}
             ry={1}
-            pointerEvents="none"
+            style={{ pointerEvents: "none" }}
           />
         )}
       </g>
 
-      {maxScroll > 0 && (
-        <g className={styles.scrollbarGroup} opacity={isScrolling ? 1 : 0}>
+      {maxScrollPosition > 0 && (
+        <g
+          className={styles.scrollbarContainer}
+          style={{ opacity: isScrollbarVisible ? 1 : 0 }}
+        >
           <rect
-            className={styles.track}
-            x={trackX}
-            y={trackY}
-            width={TRACK_W}
-            height={trackH}
-            rx={TRACK_W / 2}
-            ry={TRACK_W / 2}
+            className={styles.scrollbarTrack}
+            x={scrollbarTrackX}
+            y={scrollbarTrackY}
+            width={SCROLLBAR_WIDTH}
+            height={scrollbarTrackHeight}
+            rx={SCROLLBAR_WIDTH / 2}
+            ry={SCROLLBAR_WIDTH / 2}
           />
           <rect
-            className={styles.thumb}
-            x={trackX}
-            y={thumbY}
-            width={TRACK_W}
-            height={thumbH}
-            rx={TRACK_W / 2}
-            ry={TRACK_W / 2}
-            onPointerDown={(e) => {
-              thumbDrag.current = true;
-              (e.target as Element).setPointerCapture(e.pointerId);
-              thumbStartY.current = e.clientY;
-              thumbStartScroll.current = scroll;
-              setScrolling(true);
+            className={styles.scrollbarThumb}
+            x={scrollbarTrackX}
+            y={scrollbarThumbY}
+            width={SCROLLBAR_WIDTH}
+            height={scrollbarThumbHeight}
+            rx={SCROLLBAR_WIDTH / 2}
+            ry={SCROLLBAR_WIDTH / 2}
+            onPointerDown={(event) => {
+              thumbDragState.current = {
+                isDragging: true,
+                startY: event.clientY,
+                startScroll: scrollPosition,
+              };
+              (event.target as Element).setPointerCapture(event.pointerId);
+              setIsScrollbarVisible(true);
             }}
-            onPointerMove={(e) => {
-              if (!thumbDrag.current) return;
-              const dy = e.clientY - thumbStartY.current;
-              const ratio = maxScroll / thumbTravel;
-              setScroll(
-                Math.min(
-                  maxScroll,
-                  Math.max(0, thumbStartScroll.current + dy * ratio)
+            onPointerMove={(event) => {
+              if (!thumbDragState.current.isDragging) return;
+
+              const deltaY = event.clientY - thumbDragState.current.startY;
+              const scrollRatio = maxScrollPosition / scrollbarThumbTravel;
+              const newScrollPosition = Math.min(
+                maxScrollPosition,
+                Math.max(
+                  0,
+                  thumbDragState.current.startScroll + deltaY * scrollRatio
                 )
               );
+
+              setScrollPosition(newScrollPosition);
             }}
-            onPointerUp={(e) => {
-              thumbDrag.current = false;
-              (e.target as Element).releasePointerCapture(e.pointerId);
-              fadeTimer.current = setTimeout(() => setScrolling(false), 250);
+            onPointerUp={(event) => {
+              thumbDragState.current.isDragging = false;
+              (event.target as Element).releasePointerCapture(event.pointerId);
+              scrollFadeTimer.current = setTimeout(
+                () => setIsScrollbarVisible(false),
+                250
+              );
             }}
           />
         </g>

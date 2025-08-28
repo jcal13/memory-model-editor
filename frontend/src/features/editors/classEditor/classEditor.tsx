@@ -1,14 +1,14 @@
 import React, { useState, useCallback } from "react";
 import ReactDOM from "react-dom";
 import Draggable from "react-draggable";
-import ClassSelectorPanel from "./ClassSelectorPanel";
+import ClassSelectorPanel from "./ClassEditorPanel";
 import {
   useClassListSync,
   useSingleClassPanelRegistry,
-} from "../../hooks/useEffect";
-import { useClassPanelRef } from "../../hooks/useRef";
-import styles from "./ClassSelector.module.css";
-import { ClassID } from "../../../shared/types";
+} from "../hooks/useEffect";
+import { useClassPanelRef } from "../hooks/useRef";
+import styles from "./ClassEditor.module.css";
+import { ClassID } from "../../shared/types";
 
 interface Props {
   classes: ClassID[];

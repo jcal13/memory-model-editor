@@ -1,6 +1,6 @@
 import CollectionItem from "./CollectionItem";
 import CollectionAddButton from "./CollectionAddButton";
-import styles from "../BoxEditorStyles.module.css";
+import styles from "../../Editor.module.css";
 import { ID } from "../../../shared/types";
 
 /**

@@ -1,4 +1,4 @@
-import styles from "./styles/InformationTabs.module.css";
+import styles from "./InformationTabs.module.css";
 import FeedbackTab from "./feedbackTab/FeedbackTab";
 import QuestionTab from "./questionTab/QuestionTab";
 import { SubmissionResult } from "../shared/types";

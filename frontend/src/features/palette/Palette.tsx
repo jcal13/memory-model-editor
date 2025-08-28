@@ -1,5 +1,5 @@
 import PaletteBox from "./components/PaletteBox";
-import styles from "./styles/Palette.module.css";
+import styles from "./Palette.module.css";
 import { PaletteTab } from "../shared/types";
 
 /** Keys that correspond to BoxConfigs entries */

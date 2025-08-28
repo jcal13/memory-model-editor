@@ -1,4 +1,4 @@
-import styles from "../BoxEditorStyles.module.css";
+import styles from "../../Editor.module.css";
 import IdSelector from "../../idEditor/IdEditor";
 import { ID } from "../../../shared/types";
 

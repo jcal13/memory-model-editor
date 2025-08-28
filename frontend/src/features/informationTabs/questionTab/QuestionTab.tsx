@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { fetchQuestionCount, fetchQuestion } from "./FetchQuestionService";
+import {
+  fetchQuestionCount,
+  fetchQuestion,
+} from "./utils/FetchQuestionService";
 import QuestionSelector from "./components/QuestionSelector";
 import CodeBlock from "./components/CodeBlock";
 import styles from "./QuestionTab.module.css";

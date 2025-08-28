@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { CanvasElement } from "../../shared/types";
-import { buildJSONFromElements } from "../../validation/jsonBuilder";
+import { buildJSONFromElements } from "../../validationServices/jsonBuilder";
 import styles from "./DownloadOptionsButton.module.css";
 import html2canvas from "html2canvas";
 import domtoimage from "dom-to-image";

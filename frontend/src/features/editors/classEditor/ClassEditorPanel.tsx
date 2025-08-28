@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import panelStyles from "./ClassSelector.module.css";
-import boxStyles from "../BoxEditorStyles.module.css";
+import panelStyles from "./ClassEditor.module.css";
+import boxStyles from "../Editor.module.css";
 
 interface Props {
   classes: string[];

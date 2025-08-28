@@ -1,4 +1,4 @@
-import styles from "../BoxEditorStyles.module.css";
+import styles from "../BoxEditor.module.css";
 
 /**
  * Props for the ClassName component.

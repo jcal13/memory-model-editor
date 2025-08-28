@@ -129,13 +129,13 @@
   font-weight: 600;
   font-size: 0.825rem;
   border: 1px solid #d1d5db;
-  border-right: none;           
-  border-radius: 8px 0 0 8px;     
+  border-right: none;
+  border-radius: 8px 0 0 8px;
   background: #cfeafc;
   color: #1e3a8a;
   transition: background 120ms ease;
-  writing-mode: vertical-rl;   
-  direction: rtl;   
+  writing-mode: vertical-rl;
+  direction: rtl;
   text-orientation: mixed;
 }
 
@@ -157,7 +157,7 @@
 .tabBody {
   background: #ffffff;
   border: 1px solid #d1d5db;
-  border-radius: 0 8px 8px 8px;      /* open on left side */
+  border-radius: 0 8px 8px 8px; /* open on left side */
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   padding: 20px 30px;
   flex: 1;
@@ -181,8 +181,8 @@
   visibility: visible;
 }
 .tabLabel {
-  writing-mode: vertical-rl;   /* stack characters */
-  transform: rotate(180deg);   /* flip so first glyph sits inward */
+  writing-mode: vertical-rl; /* stack characters */
+  transform: rotate(180deg); /* flip so first glyph sits inward */
   transform-origin: center;
   display: inline-block;
 }

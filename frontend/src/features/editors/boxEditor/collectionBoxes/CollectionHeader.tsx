@@ -1,6 +1,6 @@
 import IdDisplay from "../../idEditor/IdDisplay";
 import { ID } from "../../../shared/types";
-import styles from "../BoxEditorStyles.module.css";
+import styles from "../../Editor.module.css";
 
 interface Props {
   element: any; // The memory element object containing an ID and kind information

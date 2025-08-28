@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import panelStyles from "./IdEditor.module.css";
-import boxStyles from "../boxEditor/BoxEditorStyles.module.css";
+import boxStyles from "../Editor.module.css";
 import { ID } from "../../shared/types";
 
 interface Props {

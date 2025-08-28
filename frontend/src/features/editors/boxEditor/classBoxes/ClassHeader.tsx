@@ -1,4 +1,4 @@
-import styles from "../BoxEditorStyles.module.css";
+import styles from "../../Editor.module.css";
 import IdDisplay from "../../idEditor/IdDisplay";
 import ClassDisplay from "./ClassDisplay";
 import { ID } from "../../../shared/types";

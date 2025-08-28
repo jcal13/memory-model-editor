@@ -1,10 +1,9 @@
-import styles from "./BoxEditorStyles.module.css";
+import styles from "../Editor.module.css";
 import PrimitiveHeader from "./primitiveBoxes/PrimitiveHeader";
 import FunctionHeader from "./functionBoxes/FunctionHeader";
 import CollectionHeader from "./collectionBoxes/CollectionHeader";
 import ClassHeader from "./classBoxes/ClassHeader";
-import { PrimitiveType } from "../../shared/types";
-import { ID } from "../../shared/types";
+import { PrimitiveType, ID } from "../../shared/types";
 
 interface Props {
   element: any; // The memory element being edited, includes its id and kind

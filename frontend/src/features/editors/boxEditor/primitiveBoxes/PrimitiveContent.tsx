@@ -1,5 +1,5 @@
 import { PrimitiveType } from "../../../shared/types";
-import styles from "../BoxEditorStyles.module.css";
+import styles from "../../Editor.module.css";
 
 /**
  * Props for the PrimitiveContent component.

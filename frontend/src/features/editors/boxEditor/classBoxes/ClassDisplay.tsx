@@ -1,5 +1,5 @@
-import styles from "../BoxEditorStyles.module.css";
-import ClassSelector from "./classSelector";
+import styles from "../../Editor.module.css";
+import ClassSelector from "../../classEditor/classEditor";
 
 /**
  * Props for the ClassDisplay component.

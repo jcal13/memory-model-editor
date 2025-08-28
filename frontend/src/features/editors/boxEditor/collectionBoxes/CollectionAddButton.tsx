@@ -1,4 +1,4 @@
-import styles from "../BoxEditorStyles.module.css";
+import styles from "../../Editor.module.css";
 
 /**
  * Props for the CollectionAddButton component.

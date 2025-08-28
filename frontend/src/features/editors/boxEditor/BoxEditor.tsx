@@ -1,4 +1,4 @@
-import styles from "./BoxEditorStyles.module.css";
+import styles from "../Editor.module.css";
 import ButtonDisplays from "./buttons/ButtonDisplays";
 import Header from "./Header";
 import Content from "./Content";

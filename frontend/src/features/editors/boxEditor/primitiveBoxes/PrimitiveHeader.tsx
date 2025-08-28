@@ -1,5 +1,5 @@
 import IdDisplay from "../../idEditor/IdDisplay";
-import styles from "../BoxEditorStyles.module.css";
+import styles from "../../Editor.module.css";
 import { ID, PrimitiveType } from "../../../shared/types";
 
 /**

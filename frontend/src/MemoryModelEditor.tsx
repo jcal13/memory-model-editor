@@ -12,7 +12,7 @@ import {
 } from "./features/shared/types";
 import SubmitButton from "./features/canvas/components/SubmitButton";
 import DownloadJsonButton from "./features/canvas/components/DownloadOptionsButton";
-import { submitCanvas } from "./features/validation/questionValidationServices";
+import { submitCanvas } from "./features/validationServices/questionValidationService";
 import InformationTabs from "./features/informationTabs/InformationTabs";
 import {
   clearCanvasStorage,

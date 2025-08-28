@@ -1,5 +1,5 @@
 import "./App.css";
-import MemoryModelEditor from "./MemoryModelEditor";
+import MemoryModelEditor from "./features/memoryModelEditor/MemoryModelEditor";
 
 function App() {
   return (

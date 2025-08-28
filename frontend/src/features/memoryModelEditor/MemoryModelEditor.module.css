@@ -1,25 +1,33 @@
-.container {
+:root {
+  --editor-background: #f3f4f6;
+  --toggle-button-width: 22px;
+  --toggle-button-height: 400px;
+  --toggle-button-radius: 8px;
+  --toggle-button-gap: 0;
+}
+
+.editorContainer {
   display: flex;
   height: 100vh;
   overflow: hidden;
   align-items: stretch;
-  background: var(--mm-editor-bg);
+  background: var(--editor-background);
 }
 
-.paletteColumn {
+.palettePanel {
   overflow-y: auto;
   height: 100%;
   min-width: 0;
 }
 
-.subContainer {
+.mainContainer {
   display: flex;
   flex: 1;
   position: relative;
   align-items: stretch;
 }
 
-.column {
+.canvasColumn {
   flex: 1;
   position: relative;
   display: flex;
@@ -30,6 +38,196 @@
   flex: 1;
   position: relative;
 }
+
+.jsonPreview {
+  position: fixed;
+  bottom: 40px;
+  right: 8px;
+  max-height: 300px;
+  max-width: 300px;
+  overflow: auto;
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+  padding: 8px;
+  font-size: 0.75rem;
+  z-index: 9999;
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.infoPanel {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: italic;
+  position: relative;
+  overflow: hidden;
+}
+
+.infoPanelResizeHandle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  cursor: col-resize;
+  z-index: 1;
+}
+
+.modeToggleSwitch {
+  position: absolute;
+  top: 35px;
+  left: 35px;
+  z-index: 10;
+  width: 100px;
+  height: 32px;
+  cursor: pointer;
+}
+
+.modeToggleInput {
+  display: none;
+}
+
+.modeToggleSlider {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #93c5fd;
+  border-radius: 9999px;
+  position: relative;
+  transition: background-color 0.2s ease;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+.modeToggleSwitch:hover .modeToggleSlider {
+  background: #60a5fa;
+}
+
+.modeToggleSlider::before {
+  content: "";
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  background: #ffffff;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.modeToggleSlider::after,
+.modeToggleInput:checked + .modeToggleSlider::after {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 70px;
+  text-align: center;
+  pointer-events: none;
+  text-transform: capitalize;
+}
+
+.modeToggleSlider::after {
+  content: "practice";
+  right: 0;
+}
+
+.modeToggleInput:checked + .modeToggleSlider::after {
+  content: "test";
+  left: 0;
+}
+
+.modeToggleInput:checked + .modeToggleSlider {
+  background: #34d399;
+  color: #065f46;
+}
+
+.modeToggleSwitch:hover .modeToggleInput:checked + .modeToggleSlider {
+  background: #10b981;
+}
+
+.modeToggleInput:checked + .modeToggleSlider::before {
+  transform: translateX(69px);
+}
+
+.paletteToggleButton {
+  align-self: center;
+  width: var(--toggle-button-width);
+  min-width: var(--toggle-button-width);
+  height: var(--toggle-button-height);
+  padding: 0;
+  margin: 0 var(--toggle-button-gap);
+
+  border-left: 0px solid #d1d5db;
+  border-top: 1px solid #d1d5db;
+  border-bottom: 1px solid #d1d5db;
+  border-right: 1px solid #d1d5db;
+  border-radius: 0 var(--toggle-button-radius) var(--toggle-button-radius) 0;
+  background: #ffffff;
+  color: #374151;
+  cursor: pointer;
+  user-select: none;
+
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
+
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: background-color 0.15s ease, box-shadow 0.15s ease,
+    transform 0.05s ease;
+  transform: translateX(-1px);
+  touch-action: manipulation;
+}
+
+.infoPanelToggleButton {
+  align-self: center;
+  width: var(--toggle-button-width);
+  min-width: var(--toggle-button-width);
+  height: var(--toggle-button-height);
+  padding: 0;
+  margin: 0 var(--toggle-button-gap);
+
+  border-left: 1px solid #d1d5db;
+  border-top: 1px solid #d1d5db;
+  border-bottom: 1px solid #d1d5db;
+  border-right: 0px solid #d1d5db;
+  border-radius: var(--toggle-button-radius) 0 0 var(--toggle-button-radius);
+  background: #ffffff;
+  color: #374151;
+  cursor: pointer;
+  user-select: none;
+
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
+
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: background-color 0.15s ease, box-shadow 0.15s ease,
+    transform 0.05s ease;
+  transform: translateX(1px);
+  z-index: 1;
+  touch-action: manipulation;
+}
+
+.paletteToggleButton:hover {
+  background: #f3f4f6;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.infoPanelToggleButton:hover {
+  background: #f3f4f6;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+/* Unused legacy styles (can be removed if not used elsewhere) */
 .toggleButton {
   position: absolute;
   top: 8px;
@@ -75,206 +273,9 @@
 }
 
 .clearCanvasButton:hover {
-  background-color: #dc2626; /* red-600 */
+  background-color: #dc2626;
 }
 
 .clearCanvasButton:active {
   transform: translateY(1px);
-}
-
-/* ───────── JSON preview ───────── */
-.jsonView {
-  position: fixed;
-  bottom: 40px;
-  right: 8px;
-  max-height: 300px;
-  max-width: 300px;
-  overflow: auto;
-  background: #f5f5f5;
-  border: 1px solid #ccc;
-  padding: 8px;
-  font-size: 0.75rem;
-  z-index: 9999;
-  text-align: left;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.placeholder {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-style: italic;
-  position: relative;
-  overflow: hidden;
-}
-
-.resizeHandle {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 5px;
-  cursor: col-resize;
-  z-index: 1;
-}
-
-.switchWrapper {
-  position: absolute;
-  top: 35px;
-  left: 35px;
-  z-index: 10;
-  width: 100px;
-  height: 32px;
-  cursor: pointer;
-}
-
-.switchInput {
-  display: none;
-}
-
-.switchSlider {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: #93c5fd;
-  border-radius: 9999px;
-  position: relative;
-  transition: background-color 0.2s ease;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #1e40af;
-}
-
-.switchWrapper:hover .switchSlider {
-  background: #60a5fa;
-}
-
-.switchSlider::before {
-  content: "";
-  position: absolute;
-  width: 28px;
-  height: 28px;
-  background: #ffffff;
-  border-radius: 50%;
-  top: 2px;
-  left: 2px;
-  transition: transform 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-}
-
-.switchSlider::after,
-.switchInput:checked + .switchSlider::after {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 70px;
-  text-align: center;
-  pointer-events: none;
-  text-transform: capitalize;
-}
-
-.switchSlider::after {
-  content: "practice";
-  right: 0;
-}
-
-.switchInput:checked + .switchSlider::after {
-  content: "test";
-  left: 0;
-}
-
-.switchInput:checked + .switchSlider {
-  background: #34d399;
-  color: #065f46;
-}
-
-.switchWrapper:hover .switchInput:checked + .switchSlider {
-  background: #10b981;
-}
-
-.switchInput:checked + .switchSlider::before {
-  transform: translateX(69px);
-}
-
-.panelTabBtnLeft {
-  align-self: center;
-  width: var(--mm-tab-w);
-  min-width: var(--mm-tab-w);
-  height: var(--mm-tab-h);
-  padding: 0;
-  margin: 0 var(--mm-tab-gap);
-
-  border-left: 0px solid #d1d5db;
-  border-top: 1px solid #d1d5db;
-  border-bottom: 1px solid #d1d5db;
-  border-right: 1px solid #d1d5db;
-  border-radius: 0 var(--mm-tab-radius) var(--mm-tab-radius) 0;
-  background: #ffffff;
-  color: #374151;
-  cursor: pointer;
-  user-select: none;
-
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  font-size: 0.95rem;
-  line-height: 1;
-
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-  transition: background-color 0.15s ease, box-shadow 0.15s ease,
-    transform 0.05s ease;
-  transform: translateX(-1px);
-  touch-action: manipulation;
-}
-
-.panelTabBtnRight {
-  align-self: center;
-  width: var(--mm-tab-w);
-  min-width: var(--mm-tab-w);
-  height: var(--mm-tab-h);
-  padding: 0;
-  margin: 0 var(--mm-tab-gap);
-
-  border-left: 1px solid #d1d5db;
-  border-top: 1px solid #d1d5db;
-  border-bottom: 1px solid #d1d5db;
-  border-right: 0px solid #d1d5db;
-  border-radius: var(--mm-tab-radius) 0 0 var(--mm-tab-radius);
-  background: #ffffff;
-  color: #374151;
-  cursor: pointer;
-  user-select: none;
-
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  font-size: 0.95rem;
-  line-height: 1;
-
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-  transition: background-color 0.15s ease, box-shadow 0.15s ease,
-    transform 0.05s ease;
-  transform: translateX(1px);
-  z-index: 1;
-  touch-action: manipulation;
-}
-
-.panelTabBtnLeft:hover {
-  background: #f3f4f6;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-}
-
-.panelTabBtnRight:hover {
-  background: #f3f4f6;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-}
-
-:root {
-  --mm-editor-bg: #f3f4f6;
-
-  --mm-tab-w: 22px;
-  --mm-tab-h: 400px;
-  --mm-tab-radius: 8px;
 }

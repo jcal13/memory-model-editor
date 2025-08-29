@@ -1,0 +1,188 @@
+/* =======================================
+   === Palette Wrapper & Background =====
+======================================= */
+
+.paletteWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 16px 10px;
+  height: 100vh;
+  background-color: #f3f4f6;
+  box-sizing: border-box;
+}
+
+/* =======================================
+   === Palette Container (Sidebar Card) ==
+======================================= */
+
+.paletteContainer {
+  width: 100%;
+  height: 100%;
+  padding: 20px 30px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #fafafa;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.paletteContainer::-webkit-scrollbar {
+  width: 8px;
+}
+.paletteContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+.paletteContainer::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+  visibility: hidden;
+}
+.paletteContainer:hover::-webkit-scrollbar-thumb {
+  visibility: visible;
+}
+
+/* =======================================
+   === Palette Title =====================
+======================================= */
+
+.paletteTitle {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 10px 0 25px 0;
+  letter-spacing: 0.25px;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 8px 0;
+  background-color: #f3f4f6;
+}
+
+/* =======================================
+   === Box List ==========================
+======================================= */
+
+.paletteBoxes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* =======================================
+   === Layout Containers =================
+======================================= */
+
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row; /* tabs (left)  |  body (right) */
+  overflow: hidden;
+  padding: 0;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+.container::-webkit-scrollbar {
+  width: 8px;
+}
+.container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.container::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 8px;
+}
+
+.containerWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 16px 0px 16px 10px;
+  width: 100%;
+  height: 100%;
+  background-color: #f3f4f6;
+  box-sizing: border-box;
+}
+
+/* =======================================
+   === Tabs ==============================
+======================================= */
+
+.tabHeaders {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-right: -1px; /* overlap border with body */
+}
+
+.tabBtn {
+  all: unset;
+  cursor: pointer;
+  position: relative;
+  padding: 12px 6px;
+  font-weight: 600;
+  font-size: 0.825rem;
+  border: 1px solid #d1d5db;
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  background: #cfeafc;
+  color: #1e3a8a;
+  transition: background 120ms ease;
+  writing-mode: vertical-rl;
+  direction: rtl;
+  text-orientation: mixed;
+}
+
+.tabBtn:hover {
+  background: #b7dcff;
+}
+
+.active {
+  background: #ffffff;
+  color: #0f172a;
+  z-index: 2;
+  border-right: 1px solid #ffffff; /* seamless connection */
+}
+
+/* =======================================
+   === Tab Body ==========================
+======================================= */
+
+.tabBody {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 0 8px 8px 8px; /* open on left side */
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  padding: 20px 30px;
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.tabBody::-webkit-scrollbar {
+  width: 8px;
+}
+.tabBody::-webkit-scrollbar-track {
+  background: transparent;
+}
+.tabBody::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+  visibility: hidden;
+}
+.tabBody:hover::-webkit-scrollbar-thumb {
+  visibility: visible;
+}
+.tabLabel {
+  writing-mode: vertical-rl; /* stack characters */
+  transform: rotate(180deg); /* flip so first glyph sits inward */
+  transform-origin: center;
+  display: inline-block;
+}

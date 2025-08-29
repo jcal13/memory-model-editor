@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useBoxDragState, useDraggableBox } from "../hooks/hooks";
-import { CanvasBoxProps } from "../utils/types";
+import { CanvasBoxProps } from "../utils/box.types";
 
 export default function CanvasBox({
   element,
@@ -27,7 +27,7 @@ export default function CanvasBox({
 
     const { width, height } = dimensions.current;
     if (width > 0 && height > 0) {
-      onSizeChange(element.boxId as number, { w: width, h: height });
+      onSizeChange(element.boxId as number, { width, height });
     }
   }, [element, onSizeChange, dimensions]);
 

@@ -7,6 +7,7 @@ import React, {
   useId,
 } from "react";
 import { CanvasElement } from "../../shared/types";
+import { BoxDimensions } from "../utils/box.types";
 import CanvasBox from "./CanvasBox";
 import styles from "./CallStack.module.css";
 
@@ -40,11 +41,6 @@ interface CallStackProps {
   width?: number;
 }
 
-interface BoxSize {
-  w: number;
-  h: number;
-}
-
 interface DragState {
   from: number;
   startY: number;
@@ -73,32 +69,34 @@ const CallStack: React.FC<CallStackProps> = ({
   const clipPathId = useId();
 
   // Viewport height management
-  const [viewportHeight, setViewportHeight] = useState<number>(600); // Start with reasonable default
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState<number>(() => {
+    // Initialize immediately with the correct height
+    return Math.max(400, window.innerHeight - 110);
+  });
 
   useEffect(() => {
-    const calculateHeight = () => {
-      const height = window.innerHeight - 110;
-      setViewportHeight(height);
-      setIsInitialized(true);
+    const handleResize = () => {
+      const newHeight = Math.max(400, window.innerHeight - 110);
+      setViewportHeight(newHeight);
     };
 
-    calculateHeight();
+    // Initial measurement after mount
+    handleResize();
 
-    const handleResize = () => setViewportHeight(window.innerHeight - 110);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Box size tracking
-  const [boxSizes, setBoxSizes] = useState<Record<number, BoxSize>>({});
+  // Box size tracking - using BoxDimensions type
+  const [boxSizes, setBoxSizes] = useState<Record<number, BoxDimensions>>({});
 
-  const handleBoxSizeChange = useCallback((id: number, size: BoxSize) => {
-    if (size.w < 1 || size.h < 1) return;
+  const handleBoxSizeChange = useCallback((id: number, size: BoxDimensions) => {
+    if (size.width < 1 || size.height < 1) return;
 
     setBoxSizes((prev) => {
       const current = prev[id];
-      if (current?.w === size.w && current?.h === size.h) return prev;
+      if (current?.width === size.width && current?.height === size.height)
+        return prev;
       return { ...prev, [id]: size };
     });
   }, []);
@@ -109,15 +107,17 @@ const CallStack: React.FC<CallStackProps> = ({
   const maxBoxWidth = useMemo(() => {
     return frames.reduce(
       (max, frame) =>
-        Math.max(max, boxSizes[frame.boxId]?.w ?? DEFAULT_BOX_WIDTH),
+        Math.max(max, boxSizes[frame.boxId]?.width ?? DEFAULT_BOX_WIDTH),
       DEFAULT_BOX_WIDTH
     );
   }, [frames, boxSizes]);
 
   const columnWidth = Math.max(width, maxBoxWidth);
-  const columnHeight = viewportHeight - y - 10;
-  const visibleHeight =
-    columnHeight - HEADER_HEIGHT - TOP_PADDING - BOTTOM_PADDING;
+  const columnHeight = Math.max(200, viewportHeight - y - 10);
+  const visibleHeight = Math.max(
+    100,
+    columnHeight - HEADER_HEIGHT - TOP_PADDING - BOTTOM_PADDING
+  );
 
   const layout = useMemo((): LayoutItem[] => {
     let yOffset = 0;
@@ -125,7 +125,8 @@ const CallStack: React.FC<CallStackProps> = ({
       y + HEADER_HEIGHT + TOP_PADDING + visibleHeight - FALLBACK_BOX_HEIGHT / 2;
 
     return orderedFrames.map((frame) => {
-      const height = (boxSizes[frame.boxId]?.h ?? FALLBACK_BOX_HEIGHT) - 15;
+      const height =
+        (boxSizes[frame.boxId]?.height ?? FALLBACK_BOX_HEIGHT) - 15;
       const yLocal = baseY - yOffset - height / 2 + 50;
       yOffset += height + BOX_GAP;
       return { f: frame, yLocal, h: height };
@@ -315,11 +316,7 @@ const CallStack: React.FC<CallStackProps> = ({
   const horizontalPadding = maxBoxWidth;
 
   return (
-    <g
-      className={styles.callStackRoot}
-      onWheel={handleWheel}
-      style={{ opacity: isInitialized ? 1 : 0 }}
-    >
+    <g className={styles.callStackRoot} onWheel={handleWheel}>
       <rect
         className={styles.containerBackground}
         x={x}
@@ -365,7 +362,8 @@ const CallStack: React.FC<CallStackProps> = ({
           >
             {selected?.boxId === frame.boxId &&
               (() => {
-                const boxWidth = boxSizes[frame.boxId]?.w ?? DEFAULT_BOX_WIDTH;
+                const boxWidth =
+                  boxSizes[frame.boxId]?.width ?? DEFAULT_BOX_WIDTH;
                 return (
                   <rect
                     className={styles.selectionHighlight}

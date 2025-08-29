@@ -1,7 +1,7 @@
 import { useRef, useEffect, useCallback } from "react";
-import { createBoxRenderer } from "../utils/BoxRenderer";
+import { createBoxRenderer } from "../utils/box.renderer";
 import { CanvasElement } from "../../shared/types";
-import { DragState, BoxDimensions } from "../utils/types";
+import { DragState, BoxDimensions } from "../utils/box.types";
 
 // Canvas refs hook
 export function useCanvasRefs() {

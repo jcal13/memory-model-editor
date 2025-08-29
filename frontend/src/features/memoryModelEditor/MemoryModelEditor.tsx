@@ -1,11 +1,13 @@
 import Canvas from "../canvas/Canvas";
 import Palette from "../palette/Palette";
 import ConfirmationModal from "./components/ConfirmationModal";
-import SubmitButton from "../canvas/components/SubmitButton";
-import DownloadJsonButton from "../canvas/components/DownloadOptionsButton";
-import ClearCanvasButton from "../canvas/components/ClearCanvasButton";
 import InformationTabs from "../informationTabs/InformationTabs";
 import styles from "./MemoryModelEditor.module.css";
+import {
+  ClearCanvasButton,
+  SubmitButton,
+  DownloadButton,
+} from "./components/CanvasButtons";
 
 import { useMemoryModelEditorState } from "./hooks/useState";
 import { useMemoryModelEditorRefs } from "./hooks/useRef";
@@ -106,7 +108,10 @@ export default function MemoryModelEditor({
               sandbox={state.isSandboxMode}
             />
 
-            <DownloadJsonButton elements={state.elements} />
+            <DownloadButton
+              elements={state.elements}
+              canvasSelector={`.${styles.canvasColumn}`}
+            />
             <SubmitButton onClick={handleCanvasSubmit} />
           </div>
 

@@ -1,53 +1,72 @@
-.column {
-  flex: 1;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-.downloadContainer {
-  position: absolute;
-  bottom: 24px;
-  left: 24px;
-  z-index: 40;
-}
-
-.downloadBtn {
-  padding: 10px 10px;
-  background-color: #38bbf8;
-  color: white;
+/* Base button styling */
+.baseButton {
+  padding: 10px 12px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
   font-size: 0.95rem;
   width: max-content;
+  transition: background-color 0.2s ease;
 }
 
-.downloadBtn:hover,
-.downloadBtn:active {
-  background-color: #23a6df;
+/* Clear Canvas Button */
+.clearButton {
+  position: absolute;
+  top: 35px;
+  right: 35px;
+  z-index: 9999;
+  background-color: #ef4444;
+  color: white;
 }
 
-.downloadBtn {
+.clearButton:hover,
+.clearButton:active {
+  background-color: #dc2626;
+  transform: translateY(1px);
+}
+
+/* Submit Button */
+.submitButton {
+  position: absolute;
+  bottom: 35px;
+  right: 35px;
+  z-index: 9999;
+  background-color: #10b981;
+  color: white;
+}
+
+.submitButton:hover,
+.submitButton:active {
+  background-color: #059669;
+}
+
+/* Download Button Container */
+.downloadContainer {
+  position: absolute;
+  bottom: 35px;
+  left: 35px;
+  z-index: 9999;
+}
+
+.downloadButton {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 10px 12px;
-  background-color: #38bbf8;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  line-height: 1;
+  background-color: #3b82f6;
+  color: white;
 }
 
-.caret {
+.downloadButton:hover {
+  background-color: #2563eb;
+}
+
+.dropdownCaret {
   font-size: 0.9em;
   opacity: 0.9;
 }
 
+/* Download Menu */
 .downloadMenu {
   position: absolute;
   bottom: calc(100% + 10px);
@@ -77,7 +96,7 @@
 }
 
 .downloadMenu button {
-  padding: 10px 10px;
+  padding: 10px;
   border: none;
   background: transparent;
   color: #111827;
@@ -85,7 +104,6 @@
   border-radius: 8px;
   font-weight: 500;
   font-size: 0.95rem;
-  line-height: 1.1;
   cursor: pointer;
 }
 

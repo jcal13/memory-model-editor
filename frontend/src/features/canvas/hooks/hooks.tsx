@@ -1,57 +1,48 @@
-import { useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import { createBoxRenderer } from "../utils/BoxRenderer";
-import { CanvasElement, SubmissionResult, Tab } from "../../shared/types";
+import { CanvasElement } from "../../shared/types";
+import { DragState, BoxDimensions } from "../utils/types";
 
-/**
- * Syncs the given ref with the current `dataType` state on every change.
- */
-export const useDataType = (
-  dataTypeRef: React.MutableRefObject<any>,
-  dataType: any
-) => {
-  useEffect(() => {
-    dataTypeRef.current = dataType;
-  }, [dataType]);
-};
+// Canvas refs hook
+export function useCanvasRefs() {
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const dragRef = useRef<HTMLDivElement | null>(null);
 
-/**
- * Syncs the given ref with the current `contentValue` state on every change.
- */
-export const useContentValue = (
-  contentValueRef: React.MutableRefObject<any>,
-  contentValue: any
-) => {
-  useEffect(() => {
-    contentValueRef.current = contentValue;
-  }, [contentValue]);
-};
+  return { svgRef, dragRef };
+}
 
-/**
- * Sets and updates the SVG viewBox based on container size.
- * Automatically adjusts on window resize.
- */
-export const useCanvasResize = (
-  svgRef: any,
-  setViewBox: (vb: string) => void
-) => {
+// Box drag state hook
+export function useBoxDragState() {
+  const gRef = useRef<SVGGElement>(null);
+  const isDragging = useRef(false); // whether the box is currently being dragged
+  const start = useRef({ x: 0, y: 0 }); // starting mouse position
+  const origin = useRef({ x: 0, y: 0 }); // original position of the box
+  const halfSize = useRef({ w: 0, h: 0 }); // half width/height of box for bounding
+
+  return { gRef, isDragging, start, origin, halfSize };
+}
+
+// Canvas resize hook
+export function useCanvasResize(
+  svgRef: React.RefObject<SVGSVGElement>,
+  setViewBox?: (viewBox: string) => void
+) {
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
 
-    const recalc = () => {
+    const handleResize = () => {
       const { width, height } = svg.getBoundingClientRect();
-      setViewBox(`0 0 ${width} ${height}`);
+      const viewBoxValue = `0 0 ${width} ${height}`;
+      svg.setAttribute("viewBox", viewBoxValue);
+      setViewBox?.(viewBoxValue);
     };
 
-    recalc();
-    window.addEventListener("resize", recalc);
-    return () => window.removeEventListener("resize", recalc);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [svgRef, setViewBox]);
-};
-
-// =========================
-// Draggable Canvas Box Hook
-// =========================
+}
 
 interface DraggableParams {
   gRef: any;
@@ -65,9 +56,7 @@ interface DraggableParams {
   invalidated?: boolean;
 }
 
-/**
- * Enables drag interaction and overlay click handling for a <g> SVG box.
- */
+// Draggable box behavior hook
 export const useDraggableBox = ({
   gRef,
   element,
@@ -210,30 +199,3 @@ export const useDraggableBox = ({
     };
   }, [element, invalidated]);
 };
-
-const LS_KEY = "canvas_key";
-
-const UI_LS_KEY = "canvas_ui_state_v3";
-
-export function loadSavedQuestionView(): string {
-  try {
-    const raw = localStorage.getItem(UI_LS_KEY);
-    if (!raw) return "root";
-    const parsed = JSON.parse(raw);
-    const v = parsed?.questionView;
-    return v === "loading" || v === "list" || v === "question" ? v : "root";
-  } catch {
-    return "root";
-  }
-}
-
-export function usePersistQuestionView(view: string) {
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(UI_LS_KEY);
-      const parsed = raw ? JSON.parse(raw) || {} : {};
-      parsed.questionView = view;
-      localStorage.setItem(UI_LS_KEY, JSON.stringify(parsed));
-    } catch {}
-  }, [view]);
-}

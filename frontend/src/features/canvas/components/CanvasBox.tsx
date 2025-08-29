@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { BoxProps } from "../utils/BoxProps";
-import { useGlobalRefs } from "../hooks/useRef";
-import { useDraggableBox } from "../hooks/useEffect";
+import { useDraggableBox, useBoxDragState } from "../hooks/hooks";
 
 interface CanvasBoxProps extends BoxProps {
   onSizeChange?: (id: number, size: { w: number; h: number }) => void;
@@ -14,7 +13,7 @@ export default function CanvasBox({
   onSizeChange,
   invalidated = false,
 }: CanvasBoxProps) {
-  const { gRef, isDragging, start, origin, halfSize } = useGlobalRefs();
+  const { gRef, isDragging, start, origin, halfSize } = useBoxDragState();
   useDraggableBox({
     gRef,
     element,

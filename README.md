@@ -4,14 +4,38 @@ A drag-and-drop application for visualizing Python memory models, designed for u
 
 ## Features
 
-- **Scratch-style canvas** - drag-and-drop blocks onto a canvas to create or edit a memory model
-- **Question bank for practice**
-  - _Build from code_: construct a full memory model diagram from a given Python snippet
-  - _Fill-in-the-blanks_: complete partially-built models to test specific concepts
-- **Custom questions** - paste your own Python code to practice new exercises
-- **Automatic grading and visual feedback** - submit a model and get detailed feedback about correctness
-- **Checkpoint validation** - insert checkpoints in questions to verify your work incrementally
-- **Export to JSON** - download your completed model as a JSON file ready for MarkUs submission
+### Interactive Canvas
+
+A Scratch-style canvas for visualizing Python memory models. Users can build diagrams by dragging and dropping blocks that represent frames, objects, and values.
+
+### Practice vs. Test Modes
+
+MemoryLab is designed to support different learning styles. Users can switch between two distinct modes to match your needs for a given exercise.
+
+- **Practice Mode**: A guided environment that provides a more structured experience with a limited options to assist with model construction.
+
+- **Test Mode**: A free-form environment with no constraints, allowing for independent model creation and self-assessment.
+
+### Practice Question Bank
+
+MemoryLab includes a built-in library of exercises for practice. The question bank currently contains two kinds of questions.
+
+- **Practice questions**: questions drawn from previous first year computer science courses at the University of Toronto.
+- **Test Questions**: questions drawn from tests from previous first year computer science courses at the University of Toronto.
+
+### Automatic Grading & Feedback
+
+After a model has been constructed, it can be submitted for automatic grading. The system provides detailed, traceable feedback on a dedicated tab, helping you understand where your model can be improved.
+
+### Export & Download Options
+
+Once a model is complete, you can save and export it. The canvas allows for downloads in multiple formats for submission on platforms like Markus or for other uses.
+
+- **JSON**: To save your model as a file that can be re-imported into MemoryLab.
+
+- **SVG**: For a high-quality, scalable vector image.
+
+- **PNG**: For a standard image file.
 
 ## Developer Instructions
 
@@ -47,3 +71,7 @@ npm run dev
 You should see the backend being run on `http://localhost:3001` in the terminal. You do not need to open this link in your browser.
 
 ![alt text](readmeUtil/image-1.png)
+
+### 4. Connect to the database
+
+To view questions in the information tab, you will need a `.env` file in the backend folder. This file must contain the connection string as `DATABASE_URL`. The `.env` file is not included in this repository.

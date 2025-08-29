@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
 import Draggable from "react-draggable";
 import { CanvasElement, BoxType, ID } from "../shared/types";
 import CanvasBox from "./components/CanvasBox";
@@ -112,42 +112,32 @@ export default function Canvas({
   onSubmit,
 }: CanvasProps) {
   const [openEditors, setOpenEditors] = useState<CanvasElement[]>([]);
-  const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(
-    null
-  );
+  const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(null);
   const [canvasHeight, setCanvasHeight] = useState<number | null>(null);
 
   const { svgRef } = useCanvasRefs();
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const lastViewBox = useRef<string>("");
 
-  // Canvas sizing and viewBox management
-  useEffect(() => {
-    const measureCanvas = () => {
-      const svg = svgRef.current;
-      if (!svg) return;
+  const initialVB =
+    typeof window !== "undefined"
+      ? `0 0 ${window.innerWidth} ${window.innerHeight}`
+      : "0 0 1920 1080";
 
-      const height = Math.max(
-        1,
-        svg.clientHeight || svg.getBoundingClientRect().height
-      );
-      const width = Math.max(
-        1,
-        svg.clientWidth || svg.getBoundingClientRect().width
-      );
+  const lastViewBox = useRef<string>(initialVB);
 
-      setCanvasHeight(height);
-      const viewBox = `0 0 ${width} ${height}`;
+  // Canvas sizing and viewBox management (pre-paint to avoid flicker)
+  useLayoutEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const height = Math.max(1, rect.height);
+    const width = Math.max(1, rect.width);
+    setCanvasHeight(height);
+    const viewBox = `0 0 ${width} ${height}`;
+    if (viewBox !== lastViewBox.current) {
       svg.setAttribute("viewBox", viewBox);
       lastViewBox.current = viewBox;
-    };
-
-    const frame1 = requestAnimationFrame(() => {
-      const frame2 = requestAnimationFrame(measureCanvas);
-      return () => cancelAnimationFrame(frame2);
-    });
-
-    return () => cancelAnimationFrame(frame1);
+    }
   }, [svgRef]);
 
   // Handle canvas width changes while preserving height
@@ -161,10 +151,7 @@ export default function Canvas({
     let previousWidth = -1;
 
     const updateWidth = () => {
-      const width = Math.max(
-        1,
-        svg.clientWidth || svg.getBoundingClientRect().width
-      );
+      const width = Math.max(1, svg.clientWidth || svg.getBoundingClientRect().width);
 
       if (width !== previousWidth) {
         previousWidth = width;
@@ -198,12 +185,10 @@ export default function Canvas({
       .filter((el) => el.kind.name !== "function" && typeof el.id === "number")
       .map((el) => el.id as number);
 
-    // Add missing IDs
     currentElementIds
       .filter((id) => !ids.includes(id))
       .forEach((id) => addId(id));
 
-    // Remove orphaned IDs
     ids
       .filter((id) => !currentElementIds.includes(id))
       .forEach((id) => removeId(id));
@@ -257,19 +242,12 @@ export default function Canvas({
   );
 
   const saveElement = useCallback(
-    (
-      boxId: number,
-      updatedId: ID,
-      updatedKind: BoxType,
-      invalidated?: boolean
-    ) => {
+    (boxId: number, updatedId: ID, updatedKind: BoxType, invalidated?: boolean) => {
       setElements((prev) =>
         prev.map((el) => {
           if (el.boxId !== boxId) return el;
           const updated = { ...el, id: updatedId, kind: updatedKind };
-          return invalidated !== undefined
-            ? { ...updated, invalidated }
-            : updated;
+          return invalidated !== undefined ? { ...updated, invalidated } : updated;
         })
       );
     },
@@ -352,7 +330,7 @@ export default function Canvas({
         <svg
           data-testid="canvas"
           ref={svgRef}
-          viewBox="0 0 100 100"
+          viewBox={lastViewBox.current}
           preserveAspectRatio="none"
           className={styles.canvas}
           style={{

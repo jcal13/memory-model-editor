@@ -63,7 +63,7 @@ function FloatingEditor({
       handle=".drag-handle"
       defaultPosition={defaultPosition}
       onMouseDown={onSelect}
-      bounds={`.${styles.canvasColumn}`}
+      bounds={`.${styles.canvasWrapper}`}
     >
       <div ref={nodeRef} className={styles.floatingEditor}>
         <Editor
@@ -372,7 +372,7 @@ export default function Canvas({
         <SubmitButton onClick={onSubmit} />
         <DownloadButton
           elements={elements}
-          canvasSelector={`.${styles.canvasColumn}`}
+          canvasSelector={`.${styles.canvasWrapper}`}
         />
       </div>
 

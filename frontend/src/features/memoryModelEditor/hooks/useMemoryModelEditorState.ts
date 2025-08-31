@@ -10,7 +10,7 @@ import {
   loadInitialCanvasData,
   loadInitialUIData,
   clearCanvasStorage,
-} from "./useEffect";
+} from "../utils/localStorage";
 
 // Layout constants
 const DEFAULT_INFO_PANEL_WIDTH = 500;
@@ -110,3 +110,5 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     setShowModeToggleModal,
   };
 }
+
+export { clearCanvasStorage };

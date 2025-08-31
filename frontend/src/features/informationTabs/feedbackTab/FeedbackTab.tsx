@@ -1,7 +1,7 @@
-import styles from "./FeedbackTab.module.css";
 import { SubmissionResult } from "../../shared/types";
+import styles from "./FeedbackTab.module.css";
 
-interface Props {
+interface FeedbackTabProps {
   submissionResults: SubmissionResult | null;
   questionSelected: boolean;
 }
@@ -9,33 +9,42 @@ interface Props {
 export default function FeedbackTab({
   submissionResults,
   questionSelected,
-}: Props) {
+}: FeedbackTabProps) {
+  const renderTitle = () => <h1 className={styles.title}>Feedback</h1>;
+
+  const renderContent = (message: string, className?: string) => (
+    <div className={styles.content}>
+      <p className={`${styles.correctnessMessage} ${className || ""}`}>
+        {message}
+      </p>
+    </div>
+  );
+
+  // No question selected
   if (!questionSelected) {
     return (
       <>
-        <h1 className={styles.title}>Feedback</h1>
-        <div className={styles.content}>
-          <p className={styles.correctnessMessage}>No question selected</p>
-        </div>
+        {renderTitle()}
+        {renderContent("No question selected")}
       </>
     );
   }
 
+  // No submission yet
   if (!submissionResults) {
     return (
       <>
-        <h1 className={styles.title}>Feedback</h1>
-        <div className={styles.content}>
-          <p className={styles.correctnessMessage}>No submission yet</p>
-        </div>
+        {renderTitle()}
+        {renderContent("No submission yet")}
       </>
     );
   }
 
+  // Correct answer
   if (submissionResults.correct) {
     return (
       <>
-        <h1 className={styles.title}>Feedback</h1>
+        {renderTitle()}
         <div className={styles.content}>
           <p className={styles.correctnessMessage}>
             Your answer is: <span className={styles.correct}>correct!</span>
@@ -45,30 +54,32 @@ export default function FeedbackTab({
     );
   }
 
+  // Incorrect answer with errors
   return (
     <div className={styles.content}>
-      <h1 className={styles.title}>Feedback</h1>
+      {renderTitle()}
       <p className={styles.correctnessMessage}>
         Your answer is: <span className={styles.incorrect}>incorrect</span>
       </p>
+
       <h2 className={styles.errorsHeading}>Errors:</h2>
       <ul className={styles.errorList}>
-        {submissionResults.errors.map((err, i) => {
-          const colonIndex = err.indexOf(":");
+        {submissionResults.errors.map((error, index) => {
+          const colonIndex = error.indexOf(":");
 
           if (colonIndex === -1) {
             return (
-              <li key={i} className={styles.errorItem}>
-                {err}
+              <li key={index} className={styles.errorItem}>
+                {error}
               </li>
             );
           }
 
-          const before = err.slice(0, colonIndex);
-          const after = err.slice(colonIndex + 1);
+          const before = error.slice(0, colonIndex);
+          const after = error.slice(colonIndex + 1);
 
           return (
-            <li key={i} className={styles.errorItem}>
+            <li key={index} className={styles.errorItem}>
               <strong>{before}</strong>: {after.trim()}
             </li>
           );

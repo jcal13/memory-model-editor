@@ -55,10 +55,17 @@
   font-size: 0.95rem;
   padding: 0.25rem 0.5rem;
   cursor: pointer;
+  transition: color 120ms ease;
 }
 
 .backBtn:hover {
   color: #1d4ed8;
+}
+
+.backBtn:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 0.25rem;
 }
 
 .questionArea {
@@ -80,15 +87,4 @@
   border-radius: 0.25rem;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.94em;
-}
-
-.codeBlock {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  overflow-x: auto;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  color: #374151;
 }

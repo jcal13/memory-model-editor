@@ -1,14 +1,17 @@
 import styles from "./QuestionSelector.module.css";
 
-interface Props {
+interface QuestionSelectorProps {
   text: string;
   onClick?: () => void;
 }
 
-const QuestionSelector: React.FC<Props> = ({ text, onClick }) => (
-  <button type="button" className={styles.selectorBtn} onClick={onClick}>
-    {text}
-  </button>
-);
-
-export default QuestionSelector;
+export default function QuestionSelector({
+  text,
+  onClick,
+}: QuestionSelectorProps) {
+  return (
+    <button type="button" className={styles.selectorBtn} onClick={onClick}>
+      {text}
+    </button>
+  );
+}

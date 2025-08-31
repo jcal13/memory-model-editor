@@ -2,7 +2,6 @@
   width: 100%;
   height: 100%;
   background-color: transparent;
-  background: transparent;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -13,7 +12,7 @@
   display: flex;
   gap: 0.25rem;
   margin-bottom: -1px;
-  padding: 0 0 0;
+  padding: 0;
 }
 
 .tabBtn {
@@ -31,22 +30,20 @@
   transition: background 120ms ease;
   font-style: normal;
 }
+
 .tabBtn:hover {
   background: #b7dcff;
 }
+
+.tabBtn:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
 .active {
   background: #ffffff;
   color: #0f172a;
   z-index: 2;
-}
-
-.content {
-  flex: 1;
-  font-size: 0.85rem;
-  color: #374151;
-  white-space: pre-wrap;
-  line-height: 1.4;
-  overflow-x: auto;
 }
 
 .containerWrapper {
@@ -63,11 +60,11 @@
 .tabBody {
   background: #ffffff;
   border: 1px solid #d1d5db;
-
   border-radius: 0px 8px 8px 8px;
   height: 100vh;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   padding: 20px 30px;
+  overflow-y: auto;
 }
 
 .hidden {

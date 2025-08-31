@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
+import React, { memo, useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
 import Draggable from "react-draggable";
 import { CanvasElement, BoxType, ID } from "../shared/types";
 import CanvasBox from "./components/CanvasBox";
@@ -98,19 +98,19 @@ interface CanvasProps {
   onSubmit: () => Promise<void>;
 }
 
-export default function Canvas({
-  elements,
-  setElements,
-  ids,
-  addId,
-  removeId,
-  classes,
-  addClasses,
-  removeClasses,
-  sandbox = true,
-  onClear,
-  onSubmit,
-}: CanvasProps) {
+function Canvas({
+   elements,
+   setElements,
+   ids,
+   addId,
+   removeId,
+   classes,
+   addClasses,
+   removeClasses,
+   sandbox = true,
+   onClear,
+   onSubmit,
+ }: CanvasProps) {
   const [openEditors, setOpenEditors] = useState<CanvasElement[]>([]);
   const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(null);
   const [canvasHeight, setCanvasHeight] = useState<number | null>(null);
@@ -478,3 +478,14 @@ function getNextElementId(ids: number[]): number {
 
   return sortedIds.length + 1;
 }
+
+const areEqual = (prev: Readonly<CanvasProps>, next: Readonly<CanvasProps>) => {
+  return (
+    prev.elements === next.elements &&
+    prev.ids === next.ids &&
+    prev.classes === next.classes &&
+    prev.sandbox === next.sandbox
+  );
+};
+
+export default memo(Canvas, areEqual);

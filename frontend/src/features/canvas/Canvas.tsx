@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
+import React, {
+  memo,
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import Draggable from "react-draggable";
 import { CanvasElement, BoxType, ID } from "../shared/types";
 import CanvasBox from "./components/CanvasBox";
@@ -98,7 +105,7 @@ interface CanvasProps {
   onSubmit: () => Promise<void>;
 }
 
-export default function Canvas({
+function Canvas({
   elements,
   setElements,
   ids,
@@ -112,7 +119,9 @@ export default function Canvas({
   onSubmit,
 }: CanvasProps) {
   const [openEditors, setOpenEditors] = useState<CanvasElement[]>([]);
-  const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(null);
+  const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(
+    null
+  );
   const [canvasHeight, setCanvasHeight] = useState<number | null>(null);
 
   const { svgRef } = useCanvasRefs();
@@ -151,7 +160,10 @@ export default function Canvas({
     let previousWidth = -1;
 
     const updateWidth = () => {
-      const width = Math.max(1, svg.clientWidth || svg.getBoundingClientRect().width);
+      const width = Math.max(
+        1,
+        svg.clientWidth || svg.getBoundingClientRect().width
+      );
 
       if (width !== previousWidth) {
         previousWidth = width;
@@ -242,12 +254,19 @@ export default function Canvas({
   );
 
   const saveElement = useCallback(
-    (boxId: number, updatedId: ID, updatedKind: BoxType, invalidated?: boolean) => {
+    (
+      boxId: number,
+      updatedId: ID,
+      updatedKind: BoxType,
+      invalidated?: boolean
+    ) => {
       setElements((prev) =>
         prev.map((el) => {
           if (el.boxId !== boxId) return el;
           const updated = { ...el, id: updatedId, kind: updatedKind };
-          return invalidated !== undefined ? { ...updated, invalidated } : updated;
+          return invalidated !== undefined
+            ? { ...updated, invalidated }
+            : updated;
         })
       );
     },
@@ -478,3 +497,14 @@ function getNextElementId(ids: number[]): number {
 
   return sortedIds.length + 1;
 }
+
+const areEqual = (prev: Readonly<CanvasProps>, next: Readonly<CanvasProps>) => {
+  return (
+    prev.elements === next.elements &&
+    prev.ids === next.ids &&
+    prev.classes === next.classes &&
+    prev.sandbox === next.sandbox
+  );
+};
+
+export default memo(Canvas, areEqual);

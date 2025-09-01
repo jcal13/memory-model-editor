@@ -8,6 +8,7 @@ export default function CanvasBox({
   updatePosition,
   onSizeChange,
   invalidated = false,
+  disableDrag = false,
 }: CanvasBoxProps) {
   const { gRef, dragState, dimensions } = useBoxDragState();
 
@@ -19,6 +20,7 @@ export default function CanvasBox({
     openInterface,
     updatePosition,
     invalidated,
+    disableDrag,
   });
 
   // Report size changes for parent components (like CallStack)

@@ -27,8 +27,9 @@ export type MemoryBox = {
 const isArrayType = (t: string) => ["list", "tuple"].includes(t);
 const isSetType = (t: string) => t === "set";
 const isDictType = (t: string) => t === "dict";
+const isObjectType = (t: string) => t === "object";
 const isContainer = (t: string) =>
-  isArrayType(t) || isSetType(t) || isDictType(t);
+  isArrayType(t) || isSetType(t) || isDictType(t) || isObjectType(t);
 
 // Given an array of MemoryBox's, construct a map of ID: MemoryBox
 // Drops boxes with no ID
@@ -245,6 +246,64 @@ function checkDict(
   }
 }
 
+// Check if the answer box is an object and compare its properties recursively
+function checkObject(
+  answerMemoryBox: MemoryBox,
+  inputMemoryBox: MemoryBox,
+  answerMap: Map<number, MemoryBox>,
+  inputMap: Map<number, MemoryBox>,
+  answerToInputMap: Map<number, { target: number; path: string }>,
+  inputToAnswerMap: Map<number, { target: number; path: string }>,
+  duplicates: Set<number>,
+  path: string,
+  errors: string[],
+  visited: Map<number, Set<number>>
+) {
+  // Check if object names match
+  if (answerMemoryBox.name !== inputMemoryBox.name) {
+    errors.push(
+      `Object name mismatch: ${path} got "${inputMemoryBox.name}", expected "${answerMemoryBox.name}"`
+    );
+    return;
+  }
+
+  const answerProps = answerMemoryBox.value as Record<string, number>;
+  const inputProps = inputMemoryBox.value as Record<string, number>;
+
+  // Check for missing properties
+  for (const prop of Object.keys(answerProps)) {
+    if (!(prop in inputProps)) {
+      errors.push(
+        `Missing object property: ${path} object "${answerMemoryBox.name}" expected property "${prop}"`
+      );
+      continue;
+    }
+
+    // Compare property values recursively
+    compareIds(
+      answerProps[prop],
+      inputProps[prop],
+      answerMap,
+      inputMap,
+      answerToInputMap,
+      inputToAnswerMap,
+      duplicates,
+      `${path}object "${answerMemoryBox.name}".${prop}→`,
+      errors,
+      visited
+    );
+  }
+
+  // Check for unexpected properties
+  for (const prop of Object.keys(inputProps)) {
+    if (!(prop in answerProps)) {
+      errors.push(
+        `Unexpected object property: ${path} object "${inputMemoryBox.name}" has unexpected property "${prop}"`
+      );
+    }
+  }
+}
+
 // Gather frames from the answer and input models, checking for mismatches
 function gatherFrames(
   answerModel: MemoryBox[],
@@ -359,6 +418,8 @@ function detectOrphans(
       e.value.forEach((c: number) => mark(c));
     else if (isDictType(e.type))
       Object.values(e.value).forEach((c) => mark(c as number));
+    else if (isObjectType(e.type))
+      Object.values(e.value).forEach((c) => mark(c as number));
   }
 
   for (const frame of inputFrames)
@@ -465,6 +526,23 @@ function compareIds(
   // Dict type box check
   if (isDictType(answerMemoryBox.type)) {
     checkDict(
+      answerMemoryBox,
+      inputMemoryBox,
+      answerMap,
+      inputMap,
+      answerToInputMap,
+      inputToAnswerMap,
+      duplicates,
+      path,
+      errors,
+      visited
+    );
+    return;
+  }
+
+  // Object type box check
+  if (isObjectType(answerMemoryBox.type)) {
+    checkObject(
       answerMemoryBox,
       inputMemoryBox,
       answerMap,

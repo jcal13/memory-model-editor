@@ -47,8 +47,6 @@ interface DragState {
   ghost: SVGGElement;
   origT: string;
   active: boolean;
-  // NEW: capture scroll position at drag start to neutralize scroll during drag
-  scrollAtDown: number;
 }
 
 interface LayoutItem {
@@ -72,6 +70,7 @@ const CallStack: React.FC<CallStackProps> = ({
 
   // Viewport height management
   const [viewportHeight, setViewportHeight] = useState<number>(() => {
+    // Initialize immediately with the correct height
     return Math.max(400, window.innerHeight - 110);
   });
 
@@ -80,16 +79,20 @@ const CallStack: React.FC<CallStackProps> = ({
       const newHeight = Math.max(400, window.innerHeight - 110);
       setViewportHeight(newHeight);
     };
+
+    // Initial measurement after mount
     handleResize();
+
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Box size tracking
+  // Box size tracking - using BoxDimensions type
   const [boxSizes, setBoxSizes] = useState<Record<number, BoxDimensions>>({});
 
   const handleBoxSizeChange = useCallback((id: number, size: BoxDimensions) => {
     if (size.width < 1 || size.height < 1) return;
+
     setBoxSizes((prev) => {
       const current = prev[id];
       if (current?.width === size.width && current?.height === size.height)
@@ -144,10 +147,12 @@ const CallStack: React.FC<CallStackProps> = ({
   const handleWheel: React.WheelEventHandler = useCallback(
     (event) => {
       if (maxScrollPosition === 0) return;
+
       event.preventDefault();
       setScrollPosition((current) =>
         Math.min(maxScrollPosition, Math.max(0, current - event.deltaY))
       );
+
       setIsScrollbarVisible(true);
       if (scrollFadeTimer.current) clearTimeout(scrollFadeTimer.current);
       scrollFadeTimer.current = setTimeout(
@@ -164,8 +169,7 @@ const CallStack: React.FC<CallStackProps> = ({
   const [dropMarkerY, setDropMarkerY] = useState<number | null>(null);
 
   const computeDropPosition = useCallback(
-    (ghostCenterViewportY: number, draggedIndex: number) => {
-      // Positions are in viewport coords (include current scrollPosition)
+    (ghostCenterY: number, draggedIndex: number) => {
       const positions = layout
         .map(({ yLocal, h }, index) => ({
           index,
@@ -179,11 +183,12 @@ const CallStack: React.FC<CallStackProps> = ({
 
       let gap = positions.length; // Default to after last item
       for (let i = 0; i < positions.length; i++) {
-        if (ghostCenterViewportY < positions[i].top) {
+        if (ghostCenterY < positions[i].top) {
           gap = i;
           break;
         }
       }
+
       const gapY = gap === 0 ? positions[0].top : positions[gap - 1].bottom;
       return { gap, gapY };
     },
@@ -198,10 +203,9 @@ const CallStack: React.FC<CallStackProps> = ({
         ghost: event.currentTarget,
         origT: event.currentTarget.getAttribute("transform") || "",
         active: false,
-        scrollAtDown: scrollPosition, // record scroll @ mousedown
       };
     },
-    [scrollPosition]
+    []
   );
 
   const handlePointerMove: React.PointerEventHandler = useCallback(
@@ -211,42 +215,32 @@ const CallStack: React.FC<CallStackProps> = ({
       const drag = dragState.current;
       const deltaY = event.clientY - drag.startY;
 
-      // How much the list has scrolled since mousedown
-      const dScroll = scrollPosition - drag.scrollAtDown;
-
-      // IMPORTANT: add dScroll, because origT already includes scrollAtDown
-      const translateY = deltaY + dScroll;
-
       // Activate drag if threshold exceeded
       if (!drag.active && Math.abs(deltaY) > DRAG_THRESHOLD_PX) {
         drag.active = true;
         drag.ghost.setAttribute("opacity", "0.8");
         drag.ghost.setPointerCapture(event.pointerId);
       }
+
       if (!drag.active) return;
 
       // Update ghost position
       drag.ghost.setAttribute(
         "transform",
-        `${drag.origT} translate(0 ${translateY})`
+        `${drag.origT} translate(0 ${deltaY})`
       );
 
-      // Calculate drop position in viewport coords
-      // Equivalent forms:
-      //   ghostCenter = yLocal + scrollAtDown + VERTICAL_OFFSET + translateY
-      // = yLocal + scrollPosition + VERTICAL_OFFSET + deltaY
+      // Calculate drop position
       const ghostCenterY =
-        layout[drag.from].yLocal +
-        scrollPosition +
-        VERTICAL_OFFSET +
-        deltaY;
-
+        layout[drag.from].yLocal + scrollPosition + VERTICAL_OFFSET + deltaY;
       const dropPosition = computeDropPosition(ghostCenterY, drag.from);
+
       if (!dropPosition) {
         setInsertIndex(null);
         setDropMarkerY(null);
         return;
       }
+
       setInsertIndex(dropPosition.gap);
       setDropMarkerY(dropPosition.gapY);
     },
@@ -256,23 +250,25 @@ const CallStack: React.FC<CallStackProps> = ({
   const handlePointerUp: React.PointerEventHandler = useCallback(
     (event) => {
       if (!dragState.current) return;
+
       const drag = dragState.current;
 
       // Reset ghost appearance
       drag.ghost.setAttribute("transform", drag.origT);
       drag.ghost.setAttribute("opacity", "1");
 
-      // Execute reorder if valid
+      // Execute reorder if drag was active and has valid drop position
       if (drag.active && insertIndex !== null) {
         const frameCount = layout.length;
         const targetDataIndex =
           insertIndex === frameCount ? 0 : frameCount - 1 - insertIndex;
+
         if (targetDataIndex !== drag.from) {
           onReorder(drag.from, targetDataIndex);
         }
       }
 
-      // Clean up
+      // Clean up drag state
       setInsertIndex(null);
       setDropMarkerY(null);
       drag.ghost.releasePointerCapture(event.pointerId);
@@ -444,9 +440,9 @@ const CallStack: React.FC<CallStackProps> = ({
             }}
             onPointerMove={(event) => {
               if (!thumbDragState.current.isDragging) return;
+
               const deltaY = event.clientY - thumbDragState.current.startY;
-              const scrollRatio =
-                maxScrollPosition / Math.max(1, scrollbarThumbTravel);
+              const scrollRatio = maxScrollPosition / scrollbarThumbTravel;
               const newScrollPosition = Math.min(
                 maxScrollPosition,
                 Math.max(
@@ -454,6 +450,7 @@ const CallStack: React.FC<CallStackProps> = ({
                   thumbDragState.current.startScroll + deltaY * scrollRatio
                 )
               );
+
               setScrollPosition(newScrollPosition);
             }}
             onPointerUp={(event) => {

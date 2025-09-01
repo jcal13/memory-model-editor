@@ -4,15 +4,17 @@ import ConfirmationModal from "./components/ConfirmationModal";
 import InformationTabs from "../informationTabs/InformationTabs";
 import styles from "./MemoryModelEditor.module.css";
 
-import { useMemoryModelEditorState } from "./hooks/useState";
+import {
+  useMemoryModelEditorState,
+  clearCanvasStorage,
+} from "./hooks/useMemoryModelEditorState";
 import { useMemoryModelEditorRefs } from "./hooks/useRef";
 import {
   useCanvasLocalStorage,
   useUILocalStorage,
-  useInfoPanelResize,
-  useCanvasSubmission,
-  clearCanvasStorage,
-} from "./hooks/useEffect";
+} from "./hooks/useLocalStorage";
+import { useInfoPanelResize } from "./hooks/useInfoPanel";
+import { useCanvasSubmission } from "./hooks/useCanvasSubmission";
 
 // Layout constants
 const MAX_INFO_PANEL_VIEWPORT_RATIO = 0.6667;
@@ -25,6 +27,7 @@ interface MemoryModelEditorProps {
 export default function MemoryModelEditor({
   sandbox = true,
 }: MemoryModelEditorProps) {
+  // State management
   const state = useMemoryModelEditorState(sandbox);
   const refs = useMemoryModelEditorRefs();
 
@@ -39,7 +42,7 @@ export default function MemoryModelEditor({
     clearCanvasStorage();
   };
 
-  const addElementId = (id: number) => {
+  const addElementId = (id: number): void => {
     state.setElementIds((prevIds) => {
       if (prevIds.includes(id)) return prevIds;
 
@@ -50,13 +53,13 @@ export default function MemoryModelEditor({
     });
   };
 
-  const removeElementId = (id: any) => {
+  const removeElementId = (id: any): void => {
     state.setElementIds((prevIds) =>
       prevIds.filter((existingId) => existingId !== id)
     );
   };
 
-  const addElementClass = (className: string) => {
+  const addElementClass = (className: string): void => {
     state.setElementClasses((prevClasses) => {
       if (prevClasses.includes(className)) return prevClasses;
 
@@ -73,12 +76,13 @@ export default function MemoryModelEditor({
     });
   };
 
-  const removeElementClass = (className: string) => {
+  const removeElementClass = (className: string): void => {
     state.setElementClasses((prevClasses) =>
       prevClasses.filter((existingClass) => existingClass !== className)
     );
   };
 
+  // Custom hooks for functionality
   const { handleCanvasSubmit } = useCanvasSubmission({
     selectedQuestionIndex: state.selectedQuestionIndex,
     selectedQuestionType: state.selectedQuestionType,
@@ -87,6 +91,7 @@ export default function MemoryModelEditor({
     setActiveInfoTab: state.setActiveInfoTab,
   });
 
+  // Info panel resize functionality
   useInfoPanelResize({
     isResizingInfoPanel: state.isResizingInfoPanel,
     isInfoPanelOpen: state.isInfoPanelOpen,
@@ -95,6 +100,7 @@ export default function MemoryModelEditor({
     setIsResizingInfoPanel: state.setIsResizingInfoPanel,
   });
 
+  // localStorage persistence
   useCanvasLocalStorage({
     elements: state.elements,
     ids: state.elementIds,
@@ -111,6 +117,7 @@ export default function MemoryModelEditor({
 
   return (
     <div className={styles.editorContainer}>
+      {/* Palette Panel */}
       <div
         className={styles.palettePanel}
         style={{
@@ -125,6 +132,7 @@ export default function MemoryModelEditor({
         />
       </div>
 
+      {/* Palette Toggle Button */}
       <button
         type="button"
         className={styles.paletteToggleButton}
@@ -135,7 +143,9 @@ export default function MemoryModelEditor({
         {state.isPaletteOpen ? "«" : "»"}
       </button>
 
+      {/* Main Container */}
       <div ref={refs.mainContainerRef} className={styles.mainContainer}>
+        {/* Canvas Column */}
         <div className={styles.canvasColumn}>
           <div className={styles.canvasArea}>
             <Canvas
@@ -154,6 +164,7 @@ export default function MemoryModelEditor({
             />
           </div>
 
+          {/* Mode Toggle Switch */}
           <label className={styles.modeToggleSwitch}>
             <input
               type="checkbox"
@@ -167,11 +178,13 @@ export default function MemoryModelEditor({
             <span className={styles.modeToggleSlider}></span>
           </label>
 
+          {/* JSON Preview */}
           {state.jsonOutput && (
             <pre className={styles.jsonPreview}>{state.jsonOutput}</pre>
           )}
         </div>
 
+        {/* Info Panel Toggle Button */}
         <button
           type="button"
           className={styles.infoPanelToggleButton}
@@ -185,6 +198,7 @@ export default function MemoryModelEditor({
           {state.isInfoPanelOpen ? "»" : "«"}
         </button>
 
+        {/* Info Panel */}
         <div
           className={styles.infoPanel}
           style={{
@@ -205,6 +219,7 @@ export default function MemoryModelEditor({
             setQuestionType={state.setSelectedQuestionType}
           />
 
+          {/* Resize Handle */}
           <div
             className={styles.infoPanelResizeHandle}
             onMouseDown={() =>
@@ -215,6 +230,7 @@ export default function MemoryModelEditor({
         </div>
       </div>
 
+      {/* Clear Canvas Modal */}
       {state.showClearCanvasModal && (
         <ConfirmationModal
           title="Clear Canvas?"
@@ -229,6 +245,7 @@ export default function MemoryModelEditor({
         />
       )}
 
+      {/* Mode Toggle Modal */}
       {state.showModeToggleModal && (
         <ConfirmationModal
           title="Switch Mode?"

@@ -1,17 +1,20 @@
 import MemoryViz from "memory-viz";
 import { BoxConfigs } from "./BoxConfigs";
+import { BoxType } from "../shared/types";
 
 /* =======================================
    === createBoxRenderer (Palette Only) ===
-   Renders a box for a given kind name using
+   Renders a box for a given box type using
    its BoxConfig definition and returns an SVG.
 ======================================= */
 
-export function createBoxRenderer(
-  kindName: keyof typeof BoxConfigs
-): SVGSVGElement {
+export function createBoxRenderer(boxType: BoxType): SVGSVGElement {
   const { MemoryModel } = MemoryViz;
-  const config = BoxConfigs[kindName];
+  const config = BoxConfigs[boxType];
+
+  if (!config) {
+    throw new Error(`Unknown box type: ${boxType}`);
+  }
 
   // Setup base config for MemoryModel
   const model = new MemoryModel({
@@ -37,8 +40,8 @@ export function createBoxRenderer(
       const bbox = svg.getBBox();
       svg.setAttribute("width", `${bbox.width + padding}`);
       svg.setAttribute("height", `${bbox.height + padding}`);
-    } catch (e) {
-      console.warn(`getBBox failed for ${kindName}`, e);
+    } catch (error) {
+      console.warn(`getBBox failed for ${boxType}:`, error);
     }
   });
 

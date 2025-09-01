@@ -1,7 +1,7 @@
 import { Highlight } from "prism-react-renderer";
 import styles from "./CodeBlock.module.css";
 
-interface Props {
+interface CodeBlockProps {
   code: string;
   language: "python" | "javascript" | "typescript" | "java" | string;
   showLineNumbers?: boolean;
@@ -13,17 +13,23 @@ export default function CodeBlock({
   language,
   showLineNumbers = true,
   startLineNumber = 1,
-}: Props) {
+}: CodeBlockProps) {
   return (
     <Highlight code={code} language={language as any} theme={undefined}>
       {({ style, tokens, getLineProps, getTokenProps }) => (
-        <pre className={styles.container} style={style} role="region">
-          {tokens.map((line, i) => {
-            const lineNumber = startLineNumber + i;
-            const lineProps = getLineProps({ line, key: i });
+        <pre
+          className={styles.container}
+          style={style}
+          role="region"
+          aria-label="Code block"
+        >
+          {tokens.map((line, index) => {
+            const lineNumber = startLineNumber + index;
+            const lineProps = getLineProps({ line, key: index });
+
             return (
               <div
-                key={i}
+                key={index}
                 className={`${styles.line} ${lineProps.className ?? ""}`}
                 {...Object.fromEntries(
                   Object.entries(lineProps).filter(
@@ -37,8 +43,11 @@ export default function CodeBlock({
                   </span>
                 )}
                 <span className={styles.code}>
-                  {line.map((token, key) => (
-                    <span key={key} {...getTokenProps({ token, key })} />
+                  {line.map((token, tokenIndex) => (
+                    <span
+                      key={tokenIndex}
+                      {...getTokenProps({ token, key: tokenIndex })}
+                    />
                   ))}
                 </span>
               </div>

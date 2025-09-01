@@ -1,22 +1,10 @@
+import React from "react";
 import PaletteBox from "./components/PaletteBox";
 import styles from "./Palette.module.css";
-import { PaletteTab } from "../shared/types";
+import { PaletteTab, BoxType } from "./shared/types";
 
-/** Keys that correspond to BoxConfigs entries */
-export type BoxType =
-  | "class"
-  | "function"
-  | "none"
-  | "int"
-  | "float"
-  | "str"
-  | "bool"
-  | "list"
-  | "tuple"
-  | "set"
-  | "dict";
-
-const ALL_TYPES = [
+// Move constants here for better organization
+const ALL_TYPES: readonly BoxType[] = [
   "function",
   "class",
   "none",
@@ -30,51 +18,80 @@ const ALL_TYPES = [
   "dict",
 ] as const;
 
-const CLASS_FN_TYPES = ["function", "class"] as const;
-const PRIMITIVE_TYPES = ["none", "int", "float", "str", "bool"] as const;
-const COLLECTION_TYPES = ["list", "tuple", "set", "dict"] as const;
+const CLASS_FN_TYPES: readonly BoxType[] = ["function", "class"] as const;
+const PRIMITIVE_TYPES: readonly BoxType[] = [
+  "none",
+  "int",
+  "float",
+  "str",
+  "bool",
+] as const;
+const COLLECTION_TYPES: readonly BoxType[] = [
+  "list",
+  "tuple",
+  "set",
+  "dict",
+] as const;
 
-interface Props {
+const TAB_BOX_MAPPING = {
+  all: ALL_TYPES,
+  classesFns: CLASS_FN_TYPES,
+  primitives: PRIMITIVE_TYPES,
+  collections: COLLECTION_TYPES,
+} as const;
+
+const TAB_LABELS = {
+  all: "All",
+  classesFns: "Classes & Functions",
+  primitives: "Primitives",
+  collections: "Collections",
+} as const;
+
+interface PaletteProps {
   activeTab: PaletteTab;
   setActive: (tab: PaletteTab) => void;
 }
 
-export default function Palette({ activeTab, setActive }: Props) {
-  const TabBtn = (tab: PaletteTab, label: string) => (
-    <button
-      key={tab}
-      type="button"
-      className={`${styles.tabBtn} ${activeTab === tab ? styles.active : ""}`}
-      onClick={() => setActive(tab)}
-    >
-      <span className={styles.tabLabel}>{label}</span>
-    </button>
-  );
+// Extract TabButton component inline
+const TabButton: React.FC<{
+  tab: PaletteTab;
+  label: string;
+  isActive: boolean;
+  onClick: (tab: PaletteTab) => void;
+}> = ({ tab, label, isActive, onClick }) => (
+  <button
+    type="button"
+    className={`${styles.tabBtn} ${isActive ? styles.active : ""}`}
+    onClick={() => onClick(tab)}
+    aria-pressed={isActive}
+  >
+    <span className={styles.tabLabel}>{label}</span>
+  </button>
+);
 
-  const boxes: readonly BoxType[] =
-    activeTab === "all"
-      ? ALL_TYPES
-      : activeTab === "classesFns"
-      ? CLASS_FN_TYPES
-      : activeTab === "primitives"
-      ? PRIMITIVE_TYPES
-      : COLLECTION_TYPES;
+export default function Palette({ activeTab, setActive }: PaletteProps) {
+  const boxes = TAB_BOX_MAPPING[activeTab];
 
   return (
     <div className={styles.containerWrapper}>
       <div className={styles.container}>
-        <div className={styles.tabHeaders}>
-          {TabBtn("all", "All")}
-          {TabBtn("classesFns", "Classes & functions")}
-          {TabBtn("primitives", "Primitives")}
-          {TabBtn("collections", "Collections")}
-        </div>
+        <nav className={styles.tabHeaders} role="tablist">
+          {(Object.keys(TAB_LABELS) as PaletteTab[]).map((tab) => (
+            <TabButton
+              key={tab}
+              tab={tab}
+              label={TAB_LABELS[tab]}
+              isActive={activeTab === tab}
+              onClick={setActive}
+            />
+          ))}
+        </nav>
 
-        <div className={styles.tabBody}>
+        <div className={styles.tabBody} role="tabpanel">
           <h3 className={styles.paletteTitle}>Palette</h3>
           <div className={styles.paletteBoxes}>
-            {boxes.map((t) => (
-              <PaletteBox key={t} boxType={t} />
+            {boxes.map((boxType) => (
+              <PaletteBox key={boxType} boxType={boxType} />
             ))}
           </div>
         </div>

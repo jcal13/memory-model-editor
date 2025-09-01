@@ -198,7 +198,7 @@ const processValueEntries = (elements: CanvasElement[]): ValueEntry[] => {
         }
 
         valueEntries.push({
-          type: kind.type,
+          type: "object",
           id: jsonId,
           name: kind.className ?? "NoClass",
           value: classVariables,

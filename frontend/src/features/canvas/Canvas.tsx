@@ -1,4 +1,11 @@
-import React, { memo, useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
+import React, {
+  memo,
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import Draggable from "react-draggable";
 import { CanvasElement, BoxType, ID } from "../shared/types";
 import CanvasBox from "./components/CanvasBox";
@@ -99,20 +106,22 @@ interface CanvasProps {
 }
 
 function Canvas({
-   elements,
-   setElements,
-   ids,
-   addId,
-   removeId,
-   classes,
-   addClasses,
-   removeClasses,
-   sandbox = true,
-   onClear,
-   onSubmit,
- }: CanvasProps) {
+  elements,
+  setElements,
+  ids,
+  addId,
+  removeId,
+  classes,
+  addClasses,
+  removeClasses,
+  sandbox = true,
+  onClear,
+  onSubmit,
+}: CanvasProps) {
   const [openEditors, setOpenEditors] = useState<CanvasElement[]>([]);
-  const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(null);
+  const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(
+    null
+  );
   const [canvasHeight, setCanvasHeight] = useState<number | null>(null);
 
   const { svgRef } = useCanvasRefs();
@@ -151,7 +160,10 @@ function Canvas({
     let previousWidth = -1;
 
     const updateWidth = () => {
-      const width = Math.max(1, svg.clientWidth || svg.getBoundingClientRect().width);
+      const width = Math.max(
+        1,
+        svg.clientWidth || svg.getBoundingClientRect().width
+      );
 
       if (width !== previousWidth) {
         previousWidth = width;
@@ -242,12 +254,19 @@ function Canvas({
   );
 
   const saveElement = useCallback(
-    (boxId: number, updatedId: ID, updatedKind: BoxType, invalidated?: boolean) => {
+    (
+      boxId: number,
+      updatedId: ID,
+      updatedKind: BoxType,
+      invalidated?: boolean
+    ) => {
       setElements((prev) =>
         prev.map((el) => {
           if (el.boxId !== boxId) return el;
           const updated = { ...el, id: updatedId, kind: updatedKind };
-          return invalidated !== undefined ? { ...updated, invalidated } : updated;
+          return invalidated !== undefined
+            ? { ...updated, invalidated }
+            : updated;
         })
       );
     },

@@ -55,6 +55,7 @@ export function useDraggableBox({
   openInterface,
   updatePosition,
   invalidated = false,
+  disableDrag = false,
 }: {
   gRef: React.RefObject<SVGGElement | null>;
   element: CanvasElement;
@@ -63,10 +64,11 @@ export function useDraggableBox({
   openInterface: (element: CanvasElement) => void;
   updatePosition: (x: number, y: number) => void;
   invalidated?: boolean;
+  disableDrag?: boolean;
 }) {
   const livePosRef = useRef({ x: element.x, y: element.y });
   const movedRef = useRef(false);
-  const CLICK_EPS = 3; 
+  const CLICK_EPS = 3;
 
   const getSvgPoint = useCallback(
     (event: MouseEvent | React.MouseEvent) => {
@@ -89,7 +91,7 @@ export function useDraggableBox({
       const dx = point.x - dragState.current.startPoint.x;
       const dy = point.y - dragState.current.startPoint.y;
       if (!movedRef.current && dx * dx + dy * dy > CLICK_EPS * CLICK_EPS) {
-        movedRef.current = true; // we’re dragging, not clicking
+        movedRef.current = true; // we're dragging, not clicking
       }
 
       const svg = gRef.current?.ownerSVGElement;
@@ -135,7 +137,7 @@ export function useDraggableBox({
     const { x, y } = livePosRef.current;
 
     requestAnimationFrame(() => {
-      updatePosition(x, y); 
+      updatePosition(x, y);
     });
   }, [handleMouseMove, updatePosition, dragState]);
 
@@ -152,7 +154,14 @@ export function useDraggableBox({
       window.addEventListener("mousemove", handleMouseMove);
       window.addEventListener("mouseup", handleMouseUp);
     },
-    [element.x, element.y, getSvgPoint, handleMouseMove, handleMouseUp, dragState]
+    [
+      element.x,
+      element.y,
+      getSvgPoint,
+      handleMouseMove,
+      handleMouseUp,
+      dragState,
+    ]
   );
 
   useEffect(() => {
@@ -171,20 +180,25 @@ export function useDraggableBox({
 
     if (invalidated) {
       const GREY = "#9CA3AF";
-      svgElement.querySelectorAll<SVGElement>("rect,path,polygon,ellipse,circle")
-        .forEach(s => {
+      svgElement
+        .querySelectorAll<SVGElement>("rect,path,polygon,ellipse,circle")
+        .forEach((s) => {
           if (!s.closest("defs") && !s.hasAttribute("data-overlay")) {
             s.style.setProperty("stroke", GREY, "important");
           }
         });
-      svgElement.querySelectorAll<SVGElement>("text,tspan")
-        .forEach(t => t.style.setProperty("fill", GREY, "important"));
+      svgElement
+        .querySelectorAll<SVGElement>("text,tspan")
+        .forEach((t) => t.style.setProperty("fill", GREY, "important"));
     }
 
     const bbox = svgElement.getBBox();
     const width = bbox.width + padding * 2;
     const height = bbox.height + padding * 2;
-    svgElement.setAttribute("viewBox", `-${padding} -${padding} ${width} ${height}`);
+    svgElement.setAttribute(
+      "viewBox",
+      `-${padding} -${padding} ${width} ${height}`
+    );
     svgElement.setAttribute("width", `${width}`);
     svgElement.setAttribute("height", `${height}`);
     dimensions.current = { width, height };
@@ -194,28 +208,47 @@ export function useDraggableBox({
       `translate(${element.x - width / 2}, ${element.y - height / 2})`
     );
 
-    const overlay = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    const overlay = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "rect"
+    );
     overlay.setAttribute("x", `-${padding}`);
     overlay.setAttribute("y", `-${padding}`);
     overlay.setAttribute("width", `${width}`);
     overlay.setAttribute("height", `${height}`);
     overlay.setAttribute("fill", "transparent");
     overlay.setAttribute("data-overlay", "true");
-    overlay.style.cursor = "grab";
+    overlay.style.cursor = disableDrag ? "pointer" : "grab";
 
     const handleClick = (ev: MouseEvent) => {
       ev.stopPropagation();
-      if (movedRef.current) return; 
+      if (movedRef.current) return;
       openInterface(element);
     };
 
-    overlay.addEventListener("mousedown", handleMouseDown as EventListener);
+    // Only add drag event listeners if drag is not disabled
+    if (!disableDrag) {
+      overlay.addEventListener("mousedown", handleMouseDown as EventListener);
+    }
     overlay.addEventListener("click", handleClick);
     svgElement.appendChild(overlay);
 
     return () => {
-      overlay.removeEventListener("mousedown", handleMouseDown as EventListener);
+      if (!disableDrag) {
+        overlay.removeEventListener(
+          "mousedown",
+          handleMouseDown as EventListener
+        );
+      }
       overlay.removeEventListener("click", handleClick);
     };
-  }, [element, invalidated, handleMouseDown, openInterface, gRef, dimensions]);
+  }, [
+    element,
+    invalidated,
+    handleMouseDown,
+    openInterface,
+    gRef,
+    dimensions,
+    disableDrag,
+  ]);
 }

@@ -18,6 +18,9 @@ export interface CanvasBoxProps {
 
   /** Whether this element has been invalidated */
   invalidated?: boolean;
+
+  /** Whether to disable drag functionality for this box */
+  disableDrag?: boolean;
 }
 
 /**

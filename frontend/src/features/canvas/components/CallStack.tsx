@@ -389,6 +389,7 @@ const CallStack: React.FC<CallStackProps> = ({
               updatePosition={() => {}}
               onSizeChange={handleBoxSizeChange}
               invalidated={frame.invalidated}
+              disableDrag={true}
             />
           </g>
         ))}

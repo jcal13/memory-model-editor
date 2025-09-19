@@ -11,7 +11,7 @@ module.exports = {
     },
   },
   devServer: (devServerConfig) => {
-    devServerConfig.allowedHosts = "all"; // or ["localhost"]
+    devServerConfig.allowedHosts = "all";
     return devServerConfig;
   },
 };

@@ -42,8 +42,17 @@ export function getCallStackBounds(
   y: number = 0, // Start from top of canvas
   width: number = 250 // Cover the callstack area (20px margin + 230px callstack width)
 ): CallStackBounds {
+  // Ensure we have a valid canvas height, falling back to window height if needed
+  let validCanvasHeight = canvasHeight;
+  
+  if (!validCanvasHeight || validCanvasHeight <= 0 || !isFinite(validCanvasHeight)) {
+    // Fallback to window dimensions if canvas height is invalid
+    validCanvasHeight = typeof window !== 'undefined' ? window.innerHeight : 1080;
+  }
+  
   // Extend the boundary from top to bottom of the canvas
-  const columnHeight = Math.max(400, canvasHeight);
+  // Use a reasonable minimum height to ensure the boundary is always functional
+  const columnHeight = Math.max(400, validCanvasHeight);
   
   return {
     x,
@@ -120,19 +129,21 @@ export function constrainPositionAwayFromCallStack(
 
   // Constrain Y position to stay within canvas bounds
   let constrainedY = position.y;
-  if (canvasBounds) {
+  if (canvasBounds && canvasBounds.width > 0 && canvasBounds.height > 0) {
     constrainedY = Math.max(elementHalfHeight, Math.min(canvasBounds.height - elementHalfHeight, position.y));
   }
 
   // Check if moving right is valid within canvas bounds
-  const rightPositionValid = !canvasBounds || (moveRight <= canvasBounds.width - elementHalfWidth && moveRight >= elementHalfWidth);
+  const rightPositionValid = !canvasBounds || 
+    (canvasBounds.width > 0 && canvasBounds.height > 0 && 
+     moveRight <= canvasBounds.width - elementHalfWidth && moveRight >= elementHalfWidth);
 
   if (rightPositionValid) {
     return { x: moveRight, y: constrainedY };
   }
 
   // If moving right would go outside canvas, constrain to the right edge of canvas
-  const constrainedX = canvasBounds ? canvasBounds.width - elementHalfWidth : moveRight;
+  const constrainedX = (canvasBounds && canvasBounds.width > 0) ? canvasBounds.width - elementHalfWidth : moveRight;
   return { x: constrainedX, y: constrainedY };
 }
 
@@ -152,36 +163,34 @@ export function smoothlyConstrainDragPosition(
   let constrainedX = position.x;
   let constrainedY = position.y;
 
-  // Apply canvas bounds first
-  if (canvasBounds) {
+  // Apply canvas bounds first, with validation
+  if (canvasBounds && canvasBounds.width > 0 && canvasBounds.height > 0) {
     constrainedX = Math.max(elementHalfWidth, Math.min(canvasBounds.width - elementHalfWidth, constrainedX));
     constrainedY = Math.max(elementHalfHeight, Math.min(canvasBounds.height - elementHalfHeight, constrainedY));
   }
 
-  // Calculate the forbidden zone boundaries
+  // Calculate the callstack boundary with padding
+  const padding = CALLSTACK_PADDING;
   const callStackLeft = callStackBounds.x;
-  const callStackRight = callStackBounds.x + callStackBounds.width;
+  const callStackRight = callStackBounds.x + callStackBounds.width + padding;
   const callStackTop = callStackBounds.y;
   const callStackBottom = callStackBounds.y + callStackBounds.height;
 
-  // Calculate where the element's edges would be
+  // Check if element would overlap with the callstack boundary (including padding)
+  // We need to check if the element's center position would cause any part of the element
+  // to enter the forbidden zone
   const elementLeft = constrainedX - elementHalfWidth;
-  const elementRight = constrainedX + elementHalfWidth;
   const elementTop = constrainedY - elementHalfHeight;
   const elementBottom = constrainedY + elementHalfHeight;
 
-  // Check if element would overlap horizontally with callstack
-  const horizontalOverlap = !(elementRight < callStackLeft || elementLeft > callStackRight);
-  
-  // Check if element would overlap vertically with callstack
+  // Check if element overlaps vertically with the callstack
   const verticalOverlap = !(elementBottom < callStackTop || elementTop > callStackBottom);
 
-  // If there would be an overlap, prevent it by constraining the position
-  if (horizontalOverlap && verticalOverlap) {
-    // Since the callstack boundary extends from top to bottom of the canvas,
-    // always move elements to the right side of the callstack
-    const padding = CALLSTACK_PADDING;
-    constrainedX = callStackBounds.x + callStackBounds.width + elementHalfWidth + padding;
+  // If there's vertical overlap and the element would enter the forbidden horizontal zone,
+  // constrain the X position to keep the element's left edge at the boundary
+  if (verticalOverlap && elementLeft < callStackRight) {
+    // Position the element so its left edge just touches the right edge of the callstack boundary
+    constrainedX = callStackRight + elementHalfWidth;
   }
 
   return { x: constrainedX, y: constrainedY };

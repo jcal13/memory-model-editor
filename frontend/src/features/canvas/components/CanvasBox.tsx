@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useBoxDragState, useDraggableBox } from "../hooks/hooks";
 import { CanvasBoxProps } from "../utils/box.types";
 import { 
@@ -38,7 +38,7 @@ export default function CanvasBox({
   }, [element, onSizeChange, dimensions]);
 
   // Auto-constraint effect: automatically move boxes away from callstack after render
-  useEffect(() => {
+  const checkAndConstrainPosition = useCallback(() => {
     if (disableDrag || !gRef.current) return;
 
     const { width, height } = dimensions.current;
@@ -64,6 +64,32 @@ export default function CanvasBox({
       updatePosition(constrainedPosition.x, constrainedPosition.y);
     }
   }, [element.x, element.y, element.kind.name, dimensions.current.width, dimensions.current.height, disableDrag, updatePosition]);
+
+  useEffect(() => {
+    checkAndConstrainPosition();
+  }, [checkAndConstrainPosition]);
+
+  // Window resize effect: re-constrain position when window size changes
+  useEffect(() => {
+    if (disableDrag || element.kind.name === "function") return;
+
+    let resizeTimeoutId: NodeJS.Timeout;
+    
+    const handleResize = () => {
+      // Debounce the resize handling to avoid excessive recalculations
+      clearTimeout(resizeTimeoutId);
+      resizeTimeoutId = setTimeout(() => {
+        checkAndConstrainPosition();
+      }, 100);
+    };
+
+    window.addEventListener("resize", handleResize);
+    
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(resizeTimeoutId);
+    };
+  }, [checkAndConstrainPosition, disableDrag, element.kind.name]);
 
   return <g ref={gRef} />;
 }

@@ -122,7 +122,7 @@ export function useDraggableBox({
       );
 
       // Apply smooth callstack boundary constraints (no teleportation during drag)
-      const callStackBounds = getCallStackBounds(vb.height);
+      const callStackBounds = getCallStackBounds(vb?.height);
       const constrainedPosition = smoothlyConstrainDragPosition(
         { x: newX, y: newY },
         { width, height },

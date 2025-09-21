@@ -17,7 +17,8 @@ code {
 [draggable="true"],
 svg [data-overlay="true"],
 svg [style*="cursor: grab"],
-svg [style*="cursor: pointer"] {
+svg [style*="cursor: pointer"],
+[style*="cursor: col-resize"] {
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;

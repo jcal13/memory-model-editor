@@ -14,6 +14,13 @@ export type {
   MemoryVizConfig,
 } from "./box.types";
 
+// Boundary utility type exports
+export type {
+  CallStackBounds,
+  Position,
+  ElementDimensions,
+} from "./boundary.helpers";
+
 // Configuration exports
 export { BOX_CONFIGS } from "./box.configs";
 
@@ -29,6 +36,16 @@ export {
   processClassVariables,
   extractDictionary,
 } from "./box.helpers";
+
+// Boundary utility function exports
+export {
+  DEFAULT_CALLSTACK_BOUNDS,
+  getCallStackBounds,
+  isElementOverlappingCallStack,
+  constrainPositionAwayFromCallStack,
+  smoothlyConstrainDragPosition,
+  CALLSTACK_PADDING,
+} from "./boundary.helpers";
 
 // Renderer exports
 export {

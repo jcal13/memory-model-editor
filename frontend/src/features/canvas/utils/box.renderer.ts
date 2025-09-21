@@ -16,6 +16,7 @@ const DEFAULT_MEMORY_VIZ_CONFIG: Partial<MemoryVizConfig> = {
   roughjs_config: {
     options: {
       fillStyle: "solid",
+      seed: 1, // Default seed for consistent rendering
     },
   },
 };
@@ -28,7 +29,7 @@ const DEFAULT_MEMORY_VIZ_CONFIG: Partial<MemoryVizConfig> = {
  */
 export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
   const { MemoryModel } = MemoryViz;
-  const { kind, id } = element;
+  const { kind, id, boxId } = element;
   const kindName = kind.name;
 
   // Get the configuration for this box type
@@ -38,11 +39,17 @@ export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
     throw new Error(`Unsupported box type: ${kindName}`);
   }
 
-  // Build MemoryViz configuration
+  // Build MemoryViz configuration with element-specific seed
   const memoryVizConfig: MemoryVizConfig = {
     ...DEFAULT_MEMORY_VIZ_CONFIG,
     obj_min_width: boxConfig.getMinWidth(),
     obj_min_height: boxConfig.getHeight(kind),
+    roughjs_config: {
+      options: {
+        fillStyle: "solid",
+        seed: boxId || 1, // Use boxId as seed for consistent rendering per element
+      },
+    },
   } as MemoryVizConfig;
 
   // Create the MemoryViz model

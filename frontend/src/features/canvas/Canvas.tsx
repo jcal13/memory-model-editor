@@ -71,6 +71,17 @@ function FloatingEditor({
       defaultPosition={defaultPosition}
       onMouseDown={onSelect}
       bounds={`.${styles.canvasWrapper}`}
+      onStart={(e) => {
+        e.stopPropagation();
+        // Prevent text selection during drag
+        document.body.style.userSelect = 'none';
+        document.body.style.webkitUserSelect = 'none';
+      }}
+      onStop={() => {
+        // Re-enable text selection after drag
+        document.body.style.userSelect = '';
+        document.body.style.webkitUserSelect = '';
+      }}
     >
       <div ref={nodeRef} className={styles.floatingEditor}>
         <Editor

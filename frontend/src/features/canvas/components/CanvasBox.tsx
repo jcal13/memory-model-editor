@@ -47,10 +47,10 @@ export default function CanvasBox({
     // Skip constraint for function elements (they belong in the callstack)
     if (element.kind.name === "function") return;
 
-    const callStackBounds = getCallStackBounds(window.innerHeight);
     const svg = gRef.current.ownerSVGElement;
     const vb = svg?.viewBox.baseVal;
     const canvasBounds = vb ? { width: vb.width, height: vb.height } : undefined;
+    const callStackBounds = getCallStackBounds(vb?.height || window.innerHeight);
 
     const constrainedPosition = constrainPositionAwayFromCallStack(
       { x: element.x, y: element.y },

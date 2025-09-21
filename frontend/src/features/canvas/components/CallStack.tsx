@@ -197,6 +197,13 @@ const CallStack: React.FC<CallStackProps> = ({
 
   const handlePointerDown = useCallback(
     (index: number) => (event: React.PointerEvent<SVGGElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // Prevent text selection during drag
+      document.body.style.userSelect = 'none';
+      document.body.style.webkitUserSelect = 'none';
+
       dragState.current = {
         from: index,
         startY: event.clientY,
@@ -252,6 +259,10 @@ const CallStack: React.FC<CallStackProps> = ({
       if (!dragState.current) return;
 
       const drag = dragState.current;
+
+      // Re-enable text selection after drag
+      document.body.style.userSelect = '';
+      document.body.style.webkitUserSelect = '';
 
       // Reset ghost appearance
       drag.ghost.setAttribute("transform", drag.origT);
@@ -431,6 +442,10 @@ const CallStack: React.FC<CallStackProps> = ({
             rx={SCROLLBAR_WIDTH / 2}
             ry={SCROLLBAR_WIDTH / 2}
             onPointerDown={(event) => {
+              // Prevent text selection during scrollbar drag
+              document.body.style.userSelect = 'none';
+              document.body.style.webkitUserSelect = 'none';
+              
               thumbDragState.current = {
                 isDragging: true,
                 startY: event.clientY,
@@ -455,6 +470,10 @@ const CallStack: React.FC<CallStackProps> = ({
               setScrollPosition(newScrollPosition);
             }}
             onPointerUp={(event) => {
+              // Re-enable text selection after scrollbar drag
+              document.body.style.userSelect = '';
+              document.body.style.webkitUserSelect = '';
+              
               thumbDragState.current.isDragging = false;
               (event.target as Element).releasePointerCapture(event.pointerId);
               scrollFadeTimer.current = setTimeout(

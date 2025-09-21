@@ -80,7 +80,17 @@ export default function IdEditor({
           <Draggable
             nodeRef={panelRef as unknown as React.RefObject<HTMLElement>}
             defaultPosition={{ x: 150, y: 150 }}
-            onStart={(e) => e.stopPropagation()}
+            onStart={(e) => {
+              e.stopPropagation();
+              // Prevent text selection during drag
+              document.body.style.userSelect = 'none';
+              document.body.style.webkitUserSelect = 'none';
+            }}
+            onStop={() => {
+              // Re-enable text selection after drag
+              document.body.style.userSelect = '';
+              document.body.style.webkitUserSelect = '';
+            }}
           >
             <div
               ref={panelRef}

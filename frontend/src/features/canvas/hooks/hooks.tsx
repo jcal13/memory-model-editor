@@ -2,6 +2,11 @@ import { useRef, useEffect, useCallback } from "react";
 import { createBoxRenderer } from "../utils/box.renderer";
 import { CanvasElement } from "../../shared/types";
 import { DragState, BoxDimensions } from "../utils/box.types";
+import { 
+  getCallStackBounds, 
+  constrainPositionAwayFromCallStack,
+  smoothlyConstrainDragPosition
+} from "../utils/boundary.helpers";
 
 // Canvas refs hook
 export function useCanvasRefs() {
@@ -105,16 +110,28 @@ export function useDraggableBox({
       const clamp = (v: number, min: number, max: number) =>
         Math.min(Math.max(v, min), max);
 
-      const newX = clamp(
+      let newX = clamp(
         dragState.current.originalPosition.x + dx,
         vb.x + halfW,
         vb.x + vb.width - halfW
       );
-      const newY = clamp(
+      let newY = clamp(
         dragState.current.originalPosition.y + dy,
         vb.y + halfH,
         vb.y + vb.height - halfH
       );
+
+      // Apply smooth callstack boundary constraints (no teleportation during drag)
+      const callStackBounds = getCallStackBounds(window.innerHeight);
+      const constrainedPosition = smoothlyConstrainDragPosition(
+        { x: newX, y: newY },
+        { width, height },
+        callStackBounds,
+        { width: vb.width, height: vb.height }
+      );
+
+      newX = constrainedPosition.x;
+      newY = constrainedPosition.y;
 
       livePosRef.current = { x: newX, y: newY };
 

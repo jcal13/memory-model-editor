@@ -24,17 +24,30 @@ export default function PaletteBox({ boxType }: PaletteBoxProps) {
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
     event.dataTransfer.setData("application/box-type", boxType);
     event.dataTransfer.effectAllowed = "move";
+    
+    // Prevent text selection during drag
+    document.body.style.userSelect = 'none';
+    document.body.style.webkitUserSelect = 'none';
+  };
+
+  /** Drag-and-drop: re-enable text selection when drag ends */
+  const handleDragEnd = () => {
+    // Re-enable text selection after drag
+    document.body.style.userSelect = '';
+    document.body.style.webkitUserSelect = '';
   };
 
   return (
     <div
       draggable
       onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       ref={containerRef}
       style={{
         cursor: "grab",
         overflow: "visible",
         display: "inline-block",
+        userSelect: "none", // Prevent selection on the element itself
       }}
       role="button"
       tabIndex={0}

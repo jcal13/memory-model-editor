@@ -24,6 +24,15 @@ export function useInfoPanelResize({
   setInfoPanelWidth,
   setIsResizingInfoPanel,
 }: UseInfoPanelResizeParams): void {
+  // Prevent text selection when resizing starts
+  useEffect(() => {
+    if (isResizingInfoPanel) {
+      // Prevent text selection during resize
+      document.body.style.userSelect = 'none';
+      document.body.style.webkitUserSelect = 'none';
+    }
+  }, [isResizingInfoPanel]);
+
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
       if (
@@ -54,6 +63,9 @@ export function useInfoPanelResize({
     const handleMouseUp = () => {
       if (isResizingInfoPanel) {
         setIsResizingInfoPanel(false);
+        // Re-enable text selection after resize
+        document.body.style.userSelect = '';
+        document.body.style.webkitUserSelect = '';
       }
     };
 

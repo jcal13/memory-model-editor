@@ -16,7 +16,10 @@ export function createBoxRenderer(boxType: BoxType): SVGSVGElement {
     throw new Error(`Unknown box type: ${boxType}`);
   }
 
-  // Setup base config for MemoryModel
+  // Generate a consistent seed based on the box type string
+  const seed = boxType.split("").reduce((acc: number, char: string) => acc + char.charCodeAt(0), 1);
+
+  // Setup base config for MemoryModel with consistent seed
   const model = new MemoryModel({
     obj_min_width: config.minWidth,
     obj_min_height: config.minHeight,
@@ -25,7 +28,12 @@ export function createBoxRenderer(boxType: BoxType): SVGSVGElement {
     double_rect_sep: 10,
     font_size: 18,
     browser: true,
-    roughjs_config: { options: { fillStyle: "solid" } },
+    roughjs_config: { 
+      options: { 
+        fillStyle: "solid",
+        seed: seed, // Use consistent seed based on box type for palette consistency
+      } 
+    },
   });
 
   // Render the box using the config's draw method

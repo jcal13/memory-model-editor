@@ -68,6 +68,7 @@ export interface MemoryVizConfig {
   roughjs_config: {
     options: {
       fillStyle: string;
+      seed?: number; // Add optional seed property for consistent rendering
     };
   };
 }

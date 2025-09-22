@@ -2,6 +2,11 @@ import { useRef, useEffect, useCallback } from "react";
 import { createBoxRenderer } from "../utils/box.renderer";
 import { CanvasElement } from "../../shared/types";
 import { DragState, BoxDimensions } from "../utils/box.types";
+import { 
+  getCallStackBounds, 
+  constrainPositionAwayFromCallStack,
+  smoothlyConstrainDragPosition
+} from "../utils/boundary.helpers";
 
 // Canvas refs hook
 export function useCanvasRefs() {
@@ -105,16 +110,28 @@ export function useDraggableBox({
       const clamp = (v: number, min: number, max: number) =>
         Math.min(Math.max(v, min), max);
 
-      const newX = clamp(
+      let newX = clamp(
         dragState.current.originalPosition.x + dx,
         vb.x + halfW,
         vb.x + vb.width - halfW
       );
-      const newY = clamp(
+      let newY = clamp(
         dragState.current.originalPosition.y + dy,
         vb.y + halfH,
         vb.y + vb.height - halfH
       );
+
+      // Apply smooth callstack boundary constraints (no teleportation during drag)
+      const callStackBounds = getCallStackBounds(vb?.height);
+      const constrainedPosition = smoothlyConstrainDragPosition(
+        { x: newX, y: newY },
+        { width, height },
+        callStackBounds,
+        { width: vb.width, height: vb.height }
+      );
+
+      newX = constrainedPosition.x;
+      newY = constrainedPosition.y;
 
       livePosRef.current = { x: newX, y: newY };
 
@@ -131,6 +148,10 @@ export function useDraggableBox({
     if (!dragState.current.isDragging) return;
     dragState.current.isDragging = false;
 
+    // Re-enable text selection after drag
+    document.body.style.userSelect = '';
+    document.body.style.webkitUserSelect = '';
+
     window.removeEventListener("mousemove", handleMouseMove);
     window.removeEventListener("mouseup", handleMouseUp);
 
@@ -146,6 +167,10 @@ export function useDraggableBox({
       event.stopPropagation();
       movedRef.current = false;
       dragState.current.isDragging = true;
+
+      // Prevent text selection during drag
+      document.body.style.userSelect = 'none';
+      document.body.style.webkitUserSelect = 'none';
 
       const p = getSvgPoint(event);
       dragState.current.startPoint = { x: p.x, y: p.y };
@@ -219,6 +244,7 @@ export function useDraggableBox({
     overlay.setAttribute("fill", "transparent");
     overlay.setAttribute("data-overlay", "true");
     overlay.style.cursor = disableDrag ? "pointer" : "grab";
+    overlay.style.userSelect = 'none';
 
     const handleClick = (ev: MouseEvent) => {
       ev.stopPropagation();

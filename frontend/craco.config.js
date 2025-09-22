@@ -3,11 +3,15 @@ module.exports = {
     configure: (config) => {
       config.resolve.fallback = {
         ...(config.resolve.fallback || {}),
-        fs:   false,
+        fs: false,
         path: false,
-        os:   false,
+        os: false,
       };
       return config;
     },
+  },
+  devServer: (devServerConfig) => {
+    devServerConfig.allowedHosts = "all";
+    return devServerConfig;
   },
 };

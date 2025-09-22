@@ -1,0 +1,112 @@
+/* Base button styling */
+.baseButton {
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  width: max-content;
+  transition: background-color 0.2s ease;
+}
+
+/* Clear Canvas Button */
+.clearButton {
+  position: absolute;
+  top: 35px;
+  right: 35px;
+  z-index: 9999;
+  background-color: #ef4444;
+  color: white;
+}
+
+.clearButton:hover,
+.clearButton:active {
+  background-color: #dc2626;
+  transform: translateY(1px);
+}
+
+/* Submit Button */
+.submitButton {
+  position: absolute;
+  bottom: 35px;
+  right: 35px;
+  z-index: 9999;
+  background-color: #10b981;
+  color: white;
+}
+
+.submitButton:hover,
+.submitButton:active {
+  background-color: #059669;
+}
+
+/* Download Button Container */
+.downloadContainer {
+  position: absolute;
+  bottom: 35px;
+  left: 35px;
+  z-index: 9999;
+}
+
+.downloadButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #3b82f6;
+  color: white;
+}
+
+.downloadButton:hover {
+  background-color: #2563eb;
+}
+
+.dropdownCaret {
+  font-size: 0.9em;
+  opacity: 0.9;
+}
+
+/* Download Menu */
+.downloadMenu {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  background-color: #ffffff;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  min-width: 180px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.downloadMenu::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 14px;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border-left: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  transform: rotate(45deg);
+}
+
+.downloadMenu button {
+  padding: 10px;
+  border: none;
+  background: transparent;
+  color: #111827;
+  text-align: left;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.downloadMenu button:hover {
+  background-color: #f3f4f6;
+}

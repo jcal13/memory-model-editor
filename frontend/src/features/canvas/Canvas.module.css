@@ -1,0 +1,37 @@
+/* Canvas wrapper - centers and styles the main canvas area */
+.canvasWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 16px;
+  height: 100vh;
+  background-color: #f3f4f6;
+  box-sizing: border-box;
+}
+
+/* Main SVG canvas */
+.canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: white;
+  border: 1px solid white;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Column layout for canvas content */
+.canvasColumn {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Floating editor overlay */
+.floatingEditor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}

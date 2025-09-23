@@ -160,7 +160,6 @@ export default function MemoryModelEditor({
               removeClasses={removeElementClass}
               sandbox={state.isSandboxMode}
               onClear={() => state.setShowClearCanvasModal(true)}
-              onSubmit={handleCanvasSubmit}
             />
           </div>
 
@@ -217,6 +216,7 @@ export default function MemoryModelEditor({
             setQuestionIndex={state.setSelectedQuestionIndex}
             questionType={state.selectedQuestionType}
             setQuestionType={state.setSelectedQuestionType}
+            onSubmit={handleCanvasSubmit}
           />
 
           {/* Resize Handle */}

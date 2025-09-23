@@ -11,11 +11,7 @@ import { CanvasElement, BoxType, ID } from "../shared/types";
 import CanvasBox from "./components/CanvasBox";
 import BoxEditor from "../editors/boxEditor/BoxEditor";
 import CallStack from "./components/CallStack";
-import {
-  ClearCanvasButton,
-  SubmitButton,
-  DownloadButton,
-} from "./components/CanvasButtons";
+import { ClearCanvasButton, DownloadButton } from "./components/CanvasButtons";
 import { useCanvasRefs } from "./hooks/hooks";
 import styles from "./Canvas.module.css";
 
@@ -74,13 +70,13 @@ function FloatingEditor({
       onStart={(e) => {
         e.stopPropagation();
         // Prevent text selection during drag
-        document.body.style.userSelect = 'none';
-        document.body.style.webkitUserSelect = 'none';
+        document.body.style.userSelect = "none";
+        document.body.style.webkitUserSelect = "none";
       }}
       onStop={() => {
         // Re-enable text selection after drag
-        document.body.style.userSelect = '';
-        document.body.style.webkitUserSelect = '';
+        document.body.style.userSelect = "";
+        document.body.style.webkitUserSelect = "";
       }}
     >
       <div ref={nodeRef} className={styles.floatingEditor}>
@@ -113,7 +109,6 @@ interface CanvasProps {
   removeClasses?: (className: string) => void;
   sandbox?: boolean;
   onClear: () => void;
-  onSubmit: () => Promise<void>;
 }
 
 function Canvas({
@@ -127,7 +122,6 @@ function Canvas({
   removeClasses,
   sandbox = true,
   onClear,
-  onSubmit,
 }: CanvasProps) {
   const [openEditors, setOpenEditors] = useState<CanvasElement[]>([]);
   const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(
@@ -399,7 +393,6 @@ function Canvas({
         </svg>
 
         <ClearCanvasButton onClick={onClear} />
-        <SubmitButton onClick={onSubmit} />
         <DownloadButton
           elements={elements}
           canvasSelector={`.${styles.canvasWrapper}`}

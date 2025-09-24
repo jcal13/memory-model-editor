@@ -11,7 +11,7 @@ interface UseCanvasSubmissionParams {
 }
 
 interface UseCanvasSubmissionReturn {
-  handleCanvasSubmit: () => Promise<void>;
+  handleCanvasSubmit: () => Promise<boolean>;
 }
 
 /**
@@ -32,13 +32,23 @@ export function useCanvasSubmission({
   const setResultsRef = useRef(setSubmissionResults);
   const setTabRef = useRef(setActiveInfoTab);
 
-  useEffect(() => { idxRef.current = selectedQuestionIndex; }, [selectedQuestionIndex]);
-  useEffect(() => { typeRef.current = selectedQuestionType; }, [selectedQuestionType]);
-  useEffect(() => { elsRef.current = elements; }, [elements]);
-  useEffect(() => { setResultsRef.current = setSubmissionResults; }, [setSubmissionResults]);
-  useEffect(() => { setTabRef.current = setActiveInfoTab; }, [setActiveInfoTab]);
+  useEffect(() => {
+    idxRef.current = selectedQuestionIndex;
+  }, [selectedQuestionIndex]);
+  useEffect(() => {
+    typeRef.current = selectedQuestionType;
+  }, [selectedQuestionType]);
+  useEffect(() => {
+    elsRef.current = elements;
+  }, [elements]);
+  useEffect(() => {
+    setResultsRef.current = setSubmissionResults;
+  }, [setSubmissionResults]);
+  useEffect(() => {
+    setTabRef.current = setActiveInfoTab;
+  }, [setActiveInfoTab]);
 
-  const handleCanvasSubmit = useCallback(async () => {
+  const handleCanvasSubmit = useCallback(async (): Promise<boolean> => {
     const index = idxRef.current;
     const qtype = typeRef.current;
     const els = elsRef.current;
@@ -47,7 +57,7 @@ export function useCanvasSubmission({
       console.warn("Cannot submit: question index or type is null");
       setResultsRef.current(null);
       setTabRef.current("feedback");
-      return;
+      return false;
     }
 
     const validElements = els.filter((el) => !el.invalidated);
@@ -56,7 +66,7 @@ export function useCanvasSubmission({
       console.warn("No valid elements to submit");
       setResultsRef.current(null);
       setTabRef.current("feedback");
-      return;
+      return false;
     }
 
     try {
@@ -64,18 +74,32 @@ export function useCanvasSubmission({
 
       if (result !== undefined) {
         setResultsRef.current(result);
+
+        // Determine if submission was correct based on result
+        const isCorrect = determineIfCorrect(result);
+
+        setTabRef.current("feedback");
+        return isCorrect;
       } else {
         console.warn("Submission returned undefined result");
         setResultsRef.current(null);
+        setTabRef.current("feedback");
+        return false;
       }
-
-      setTabRef.current("feedback");
     } catch (error) {
       console.error("Canvas submission failed:", error);
       setResultsRef.current(null);
       setTabRef.current("feedback");
+      return false;
     }
   }, []);
 
   return { handleCanvasSubmit };
+}
+
+/**
+ * Determines if the submission was correct based on SubmissionResult
+ */
+function determineIfCorrect(result: SubmissionResult): boolean {
+  return result?.correct ?? false;
 }

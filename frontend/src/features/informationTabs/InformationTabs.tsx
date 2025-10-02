@@ -12,7 +12,7 @@ interface InformationTabsProps {
   setQuestionIndex: (index: number | null) => void;
   questionType: "test" | "practice" | null;
   setQuestionType: (type: "test" | "practice" | null) => void;
-  onSubmit: () => Promise<void>;
+  onSubmit: () => Promise<boolean>;
 }
 
 /**

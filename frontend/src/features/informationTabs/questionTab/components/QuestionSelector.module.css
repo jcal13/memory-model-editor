@@ -9,7 +9,8 @@
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   cursor: pointer;
-  transition: background-color 120ms ease, box-shadow 120ms ease;
+  transition: background-color 120ms ease, box-shadow 120ms ease,
+    border-color 120ms ease;
 }
 
 .selectorBtn:hover,
@@ -20,4 +21,38 @@
 
 .selectorBtn:active {
   background-color: #e5e7eb;
+}
+
+/* Completed status - Green */
+.selectorBtn.completed {
+  background-color: #d1fae5;
+  border-color: #10b981;
+  color: #064e3b;
+}
+
+.selectorBtn.completed:hover,
+.selectorBtn.completed:focus-visible {
+  background-color: #a7f3d0;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+}
+
+.selectorBtn.completed:active {
+  background-color: #86efac;
+}
+
+/* Attempted status - Red */
+.selectorBtn.attempted {
+  background-color: #fee2e2;
+  border-color: #ef4444;
+  color: #7f1d1d;
+}
+
+.selectorBtn.attempted:hover,
+.selectorBtn.attempted:focus-visible {
+  background-color: #fecaca;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
+}
+
+.selectorBtn.attempted:active {
+  background-color: #fca5a5;
 }

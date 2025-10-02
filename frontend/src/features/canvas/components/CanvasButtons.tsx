@@ -24,25 +24,6 @@ export function ClearCanvasButton({ onClick }: ClearButtonProps) {
   );
 }
 
-// Submit Button
-interface SubmitButtonProps {
-  onClick: () => Promise<void>;
-}
-
-export function SubmitButton({ onClick }: SubmitButtonProps) {
-  return (
-    <button
-      type="button"
-      className={`${styles.baseButton} ${styles.submitButton}`}
-      onClick={onClick}
-      aria-label="Submit Canvas"
-      title="Submit Canvas"
-    >
-      Submit
-    </button>
-  );
-}
-
 // Download Options Button
 interface DownloadButtonProps {
   elements: CanvasElement[];

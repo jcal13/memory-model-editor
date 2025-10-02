@@ -26,21 +26,6 @@
   transform: translateY(1px);
 }
 
-/* Submit Button */
-.submitButton {
-  position: absolute;
-  bottom: 35px;
-  right: 35px;
-  z-index: 9999;
-  background-color: #10b981;
-  color: white;
-}
-
-.submitButton:hover,
-.submitButton:active {
-  background-color: #059669;
-}
-
 /* Download Button Container */
 .downloadContainer {
   position: absolute;

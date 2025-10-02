@@ -8,6 +8,7 @@ import QuestionSelector from "./components/QuestionSelector";
 import CodeBlock from "./components/CodeBlock";
 import styles from "./QuestionTab.module.css";
 import "prismjs/themes/prism-tomorrow.css";
+import { SubmitButton } from "./components/SubmitButton";
 
 type View = "root" | "loading" | "test" | "list" | "question" | "practice";
 type QuestionType = "test" | "practice";
@@ -28,6 +29,7 @@ interface QuestionTabProps {
   setQuestionIndex: (index: number | null) => void;
   questionType: "test" | "practice" | null;
   setQuestionType: (type: "test" | "practice" | null) => void;
+  onSubmit: () => Promise<void>;
 }
 
 /**
@@ -70,6 +72,7 @@ export default function QuestionTab({
   setQuestionIndex,
   questionType,
   setQuestionType,
+  onSubmit,
 }: QuestionTabProps) {
   const [view, setView] = useState<View>(() => loadSavedQuestionView());
   const [questionCount, setQuestionCount] = useState<number>(0);
@@ -262,6 +265,7 @@ export default function QuestionTab({
             </div>
 
             <CodeBlock code={questionData.code.join("\n")} language="python" />
+            <SubmitButton onClick={onSubmit} />
           </div>
         </>
       )}

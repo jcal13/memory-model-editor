@@ -9,6 +9,7 @@ import CodeBlock from "./components/CodeBlock";
 import styles from "./QuestionTab.module.css";
 import "prismjs/themes/prism-tomorrow.css";
 import { SubmitButton } from "./components/SubmitButton";
+import { SubmissionResult } from "../../shared/types";
 
 type View = "root" | "loading" | "test" | "list" | "question" | "practice";
 type QuestionType = "test" | "practice";
@@ -36,6 +37,7 @@ interface QuestionTabProps {
   questionType: "test" | "practice" | null;
   setQuestionType: (type: "test" | "practice" | null) => void;
   onSubmit: () => Promise<boolean>;
+  setSubmissionResults: (results: SubmissionResult | null) => void;
 }
 
 /**
@@ -110,6 +112,7 @@ export default function QuestionTab({
   questionType,
   setQuestionType,
   onSubmit,
+  setSubmissionResults,
 }: QuestionTabProps) {
   const [view, setView] = useState<View>(() => loadSavedQuestionView());
   const [questionCount, setQuestionCount] = useState<number>(0);
@@ -287,6 +290,12 @@ export default function QuestionTab({
       setView("root");
     }
   }, [view, questionType, questionIndex]);
+
+  useEffect(() => {
+    return () => {
+      setSubmissionResults(null);
+    };
+  }, [questionIndex, setSubmissionResults]);
 
   // Calculate heading
   const getHeading = (): string => {

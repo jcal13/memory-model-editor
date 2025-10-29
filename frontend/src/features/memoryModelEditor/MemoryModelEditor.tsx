@@ -164,7 +164,10 @@ export default function MemoryModelEditor({
           </div>
 
           {/* Mode Toggle Switch */}
-          <label className={styles.modeToggleSwitch}>
+          <label
+            className={styles.modeToggleSwitch}
+            data-editor-control="mode-toggle"
+          >
             <input
               type="checkbox"
               className={styles.modeToggleInput}

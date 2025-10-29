@@ -2,7 +2,6 @@ import React, { useRef, useState } from "react";
 import { CanvasElement } from "../../shared/types";
 import { buildJSONFromElements } from "../../validationServices/jsonBuilder";
 import html2canvas from "html2canvas";
-import domtoimage from "dom-to-image";
 import styles from "./CanvasButtons.module.css";
 
 // Clear Canvas Button
@@ -64,24 +63,22 @@ export function DownloadButton({
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
+  //   setIsMenuOpen(false);
+  //   await new Promise(requestAnimationFrame);
 
-  const downloadSvg = async () => {
-    setIsMenuOpen(false);
-    await new Promise(requestAnimationFrame);
+  //   const canvasNode = document.querySelector(canvasSelector);
+  //   if (!canvasNode) return;
 
-    const canvasNode = document.querySelector(canvasSelector);
-    if (!canvasNode) return;
-
-    try {
-      const dataUrl = await domtoimage.toSvg(canvasNode);
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = "canvas.svg";
-      link.click();
-    } catch (error) {
-      console.error("SVG download failed:", error);
-    }
-  };
+  //   try {
+  //     const dataUrl = await domtoimage.toSvg(canvasNode);
+  //     const link = document.createElement("a");
+  //     link.href = dataUrl;
+  //     link.download = "canvas.svg";
+  //     link.click();
+  //   } catch (error) {
+  //     console.error("SVG download failed:", error);
+  //   }
+  // };
 
   const downloadPng = async () => {
     setIsMenuOpen(false);
@@ -89,6 +86,26 @@ export function DownloadButton({
 
     const canvasNode = document.querySelector(canvasSelector) as HTMLElement;
     if (!canvasNode) return;
+
+    const downloadButton = canvasNode.querySelector(
+      `.${styles.downloadContainer}`
+    ) as HTMLElement;
+    const clearButton = canvasNode.querySelector(
+      `.${styles.clearButton}`
+    ) as HTMLElement;
+    const modeToggle = document.querySelector(
+      '[data-editor-control="mode-toggle"]'
+    ) as HTMLElement;
+
+    const elementsToHide = [downloadButton, clearButton, modeToggle].filter(
+      Boolean
+    );
+
+    const originalDisplays = elementsToHide.map((el) => el.style.display);
+
+    elementsToHide.forEach((el) => {
+      el.style.display = "none";
+    });
 
     try {
       const canvas = await html2canvas(canvasNode, {
@@ -110,6 +127,10 @@ export function DownloadButton({
       });
     } catch (error) {
       console.error("PNG download failed:", error);
+    } finally {
+      elementsToHide.forEach((el, index) => {
+        el.style.display = originalDisplays[index];
+      });
     }
   };
 
@@ -138,9 +159,6 @@ export function DownloadButton({
           onMouseEnter={handleMenuOpen}
           onMouseLeave={handleMenuClose}
         >
-          <button type="button" role="menuitem" onClick={downloadSvg}>
-            Download SVG
-          </button>
           <button type="button" role="menuitem" onClick={downloadPng}>
             Download PNG
           </button>

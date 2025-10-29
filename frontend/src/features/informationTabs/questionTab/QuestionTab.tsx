@@ -175,6 +175,10 @@ export default function QuestionTab({
     }
   }, [questionIndex, questionType, currentCanvasState]);
 
+  useEffect(() => {
+    setDoNotRemindCanvasClear(false);
+  }, []);
+
   /**
    * Updates the status of a specific question
    */
@@ -326,14 +330,6 @@ export default function QuestionTab({
     }
   };
 
-  const handleCanvasClearConfirm = () => {
-    setShowCanvasClearModal(false);
-    if (pendingNavigation) {
-      proceedWithQuestionLoad(pendingNavigation.type, pendingNavigation.index);
-      setPendingNavigation(null);
-    }
-  };
-
   const handleCanvasClearCancel = () => {
     setShowCanvasClearModal(false);
     setPendingNavigation(null);
@@ -348,21 +344,56 @@ export default function QuestionTab({
    */
   const navigateToList = async (): Promise<void> => {
     if (questionType && questionIndex !== null) {
+      const hasCanvasContent = currentCanvasState.elements.length > 0;
+      const doNotRemind = getDoNotRemindCanvasClear();
+
+      if (hasCanvasContent && !doNotRemind) {
+        saveQuestionCanvasData(questionType, questionIndex, currentCanvasState);
+
+        setPendingNavigation({ type: "list" as any, index: -1 });
+        setShowCanvasClearModal(true);
+        return;
+      }
+
       saveQuestionCanvasData(questionType, questionIndex, currentCanvasState);
     }
 
+    await proceedToList();
+  };
+
+  /**
+   * Helper function to handle actual navigation to list
+   */
+  const proceedToList = async (): Promise<void> => {
     onClearCanvas();
 
-    if (questionCount === 0 && questionType) {
+    if (questionType) {
       try {
         const count = await fetchQuestionCount(questionType);
         setQuestionCount(count);
+        setView("list");
       } catch (error) {
-        console.error("Failed to hydrate question count:", error);
+        console.error("Failed to load questions:", error);
+        setView("root");
       }
+    } else {
+      setView("root");
     }
-    setQuestionIndex(null);
-    setView("list");
+  };
+
+  const handleCanvasClearConfirm = () => {
+    setShowCanvasClearModal(false);
+    if (pendingNavigation) {
+      if (pendingNavigation.index === -1) {
+        proceedToList();
+      } else {
+        proceedWithQuestionLoad(
+          pendingNavigation.type,
+          pendingNavigation.index
+        );
+      }
+      setPendingNavigation(null);
+    }
   };
 
   // Hydrate list view

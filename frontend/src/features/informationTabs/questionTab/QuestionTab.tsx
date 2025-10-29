@@ -15,6 +15,7 @@ import {
   saveQuestionCanvasData,
   setDoNotRemindCanvasClear,
   loadQuestionCanvasData,
+  deleteQuestionCanvasData,
 } from "../../memoryModelEditor/utils/localStorage";
 import ConfirmationModal from "../../memoryModelEditor/components/ConfirmationModal";
 
@@ -138,6 +139,7 @@ export default function QuestionTab({
     type: "test" | "practice";
     index: number;
   } | null>(null);
+  const [showResetModal, setShowResetModal] = useState(false);
 
   // Refs to track hydration state
   const hydratedList = useRef<boolean>(false);
@@ -459,6 +461,26 @@ export default function QuestionTab({
     return "Questions";
   };
 
+  const handleResetQuestion = () => {
+    setShowResetModal(true);
+  };
+
+  const handleResetConfirm = () => {
+    if (questionType && questionIndex !== null) {
+      deleteQuestionCanvasData(questionType, questionIndex);
+
+      onClearCanvas();
+
+      setSubmissionResults(null);
+      updateQuestionStatus(questionType, questionIndex, "unattempted");
+    }
+    setShowResetModal(false);
+  };
+
+  const handleResetCancel = () => {
+    setShowResetModal(false);
+  };
+
   return (
     <>
       <div className={styles.wrapper}>
@@ -537,7 +559,27 @@ export default function QuestionTab({
                 code={questionData.code.join("\n")}
                 language="python"
               />
-              <SubmitButton onClick={handleSubmit} />
+
+              <div className={styles.buttonRow}>
+                <button
+                  type="button"
+                  className={styles.resetButton}
+                  onClick={handleResetQuestion}
+                  aria-label="Reset Question"
+                  title="Reset Question"
+                >
+                  Reset
+                </button>
+                <button
+                  type="button"
+                  className={styles.submitButton}
+                  onClick={handleSubmit}
+                  aria-label="Submit Canvas"
+                  title="Submit Canvas"
+                >
+                  Submit
+                </button>
+              </div>
             </div>
           </>
         )}
@@ -553,6 +595,16 @@ export default function QuestionTab({
           showCheckbox={true}
           checkboxLabel="Do not remind me again"
           onCheckboxChange={handleDoNotRemindChange}
+        />
+      )}
+      {showResetModal && (
+        <ConfirmationModal
+          title="Reset Question?"
+          message="This will clear your canvas work for this question and mark it as unattempted. This action cannot be undone."
+          confirmLabel="Reset"
+          cancelLabel="Cancel"
+          onConfirm={handleResetConfirm}
+          onCancel={handleResetCancel}
         />
       )}
     </>

@@ -230,3 +230,18 @@ export function setDoNotRemindCanvasClear(value: boolean): void {
     console.warn("Failed to save do not remind preference:", error);
   }
 }
+
+/**
+ * Deletes canvas data for a specific question
+ */
+export function deleteQuestionCanvasData(
+  type: "test" | "practice",
+  index: number
+): void {
+  try {
+    const key = getQuestionCanvasKey(type, index);
+    localStorage.removeItem(key);
+  } catch (error) {
+    console.warn("Failed to delete question canvas data:", error);
+  }
+}

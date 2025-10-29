@@ -217,6 +217,7 @@ export default function MemoryModelEditor({
             questionType={state.selectedQuestionType}
             setQuestionType={state.setSelectedQuestionType}
             onSubmit={handleCanvasSubmit}
+            setSubmissionResults={state.setSubmissionResults}
           />
 
           {/* Resize Handle */}

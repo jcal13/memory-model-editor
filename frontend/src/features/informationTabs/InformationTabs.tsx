@@ -13,6 +13,7 @@ interface InformationTabsProps {
   questionType: "test" | "practice" | null;
   setQuestionType: (type: "test" | "practice" | null) => void;
   onSubmit: () => Promise<boolean>;
+  setSubmissionResults: (results: SubmissionResult | null) => void;
 }
 
 /**
@@ -32,6 +33,7 @@ export default function InformationTabs({
   questionType,
   setQuestionType,
   onSubmit,
+  setSubmissionResults,
 }: InformationTabsProps) {
   const renderTabButton = (tab: Tab, label: string) => (
     <button
@@ -65,6 +67,7 @@ export default function InformationTabs({
               questionType={questionType}
               setQuestionType={setQuestionType}
               onSubmit={onSubmit}
+              setSubmissionResults={setSubmissionResults}
             />
           </div>
 

@@ -14,6 +14,9 @@ interface InformationTabsProps {
   setQuestionType: (type: "test" | "practice" | null) => void;
   onSubmit: () => Promise<boolean>;
   setSubmissionResults: (results: SubmissionResult | null) => void;
+  onClearCanvas: () => void;
+  onRestoreCanvas: (elements: any[], ids: number[], classes: string[]) => void;
+  currentCanvasState: { elements: any[]; ids: number[]; classes: string[] };
 }
 
 /**
@@ -34,6 +37,9 @@ export default function InformationTabs({
   setQuestionType,
   onSubmit,
   setSubmissionResults,
+  onClearCanvas,
+  onRestoreCanvas,
+  currentCanvasState,
 }: InformationTabsProps) {
   const renderTabButton = (tab: Tab, label: string) => (
     <button
@@ -68,6 +74,9 @@ export default function InformationTabs({
               setQuestionType={setQuestionType}
               onSubmit={onSubmit}
               setSubmissionResults={setSubmissionResults}
+              onClearCanvas={onClearCanvas}
+              onRestoreCanvas={onRestoreCanvas}
+              currentCanvasState={currentCanvasState}
             />
           </div>
 

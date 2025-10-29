@@ -10,6 +10,13 @@ import styles from "./QuestionTab.module.css";
 import "prismjs/themes/prism-tomorrow.css";
 import { SubmitButton } from "./components/SubmitButton";
 import { SubmissionResult } from "../../shared/types";
+import {
+  getDoNotRemindCanvasClear,
+  saveQuestionCanvasData,
+  setDoNotRemindCanvasClear,
+  loadQuestionCanvasData,
+} from "../../memoryModelEditor/utils/localStorage";
+import ConfirmationModal from "../../memoryModelEditor/components/ConfirmationModal";
 
 type View = "root" | "loading" | "test" | "list" | "question" | "practice";
 type QuestionType = "test" | "practice";
@@ -38,6 +45,9 @@ interface QuestionTabProps {
   setQuestionType: (type: "test" | "practice" | null) => void;
   onSubmit: () => Promise<boolean>;
   setSubmissionResults: (results: SubmissionResult | null) => void;
+  onClearCanvas: () => void;
+  onRestoreCanvas: (elements: any[], ids: number[], classes: string[]) => void;
+  currentCanvasState: { elements: any[]; ids: number[]; classes: string[] };
 }
 
 /**
@@ -113,6 +123,9 @@ export default function QuestionTab({
   setQuestionType,
   onSubmit,
   setSubmissionResults,
+  onClearCanvas,
+  onRestoreCanvas,
+  currentCanvasState,
 }: QuestionTabProps) {
   const [view, setView] = useState<View>(() => loadSavedQuestionView());
   const [questionCount, setQuestionCount] = useState<number>(0);
@@ -120,10 +133,19 @@ export default function QuestionTab({
   const [questionStatus, setQuestionStatus] = useState<QuestionStatusMap>(() =>
     loadQuestionStatus()
   );
+  const [showCanvasClearModal, setShowCanvasClearModal] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<{
+    type: "test" | "practice";
+    index: number;
+  } | null>(null);
 
   // Refs to track hydration state
   const hydratedList = useRef<boolean>(false);
   const hydratedQuestion = useRef<boolean>(false);
+  const previousQuestionRef = useRef<{
+    type: "test" | "practice";
+    index: number;
+  } | null>(null);
 
   // Persist view changes
   useEffect(() => {
@@ -134,6 +156,24 @@ export default function QuestionTab({
   useEffect(() => {
     persistQuestionStatus(questionStatus);
   }, [questionStatus]);
+
+  useEffect(() => {
+    // Save current canvas state when question changes
+    if (previousQuestionRef.current && currentCanvasState.elements.length > 0) {
+      const { type, index } = previousQuestionRef.current;
+      saveQuestionCanvasData(type, index, currentCanvasState);
+    }
+
+    // Update ref to current question
+    if (questionType && questionIndex !== null) {
+      previousQuestionRef.current = {
+        type: questionType,
+        index: questionIndex,
+      };
+    } else {
+      previousQuestionRef.current = null;
+    }
+  }, [questionIndex, questionType, currentCanvasState]);
 
   /**
    * Updates the status of a specific question
@@ -197,6 +237,8 @@ export default function QuestionTab({
    * Loads questions for a given type
    */
   const loadQuestions = async (questionType: QuestionType): Promise<void> => {
+    onClearCanvas();
+
     setView("loading");
     try {
       const count = await fetchQuestionCount(questionType);
@@ -219,23 +261,98 @@ export default function QuestionTab({
       return;
     }
 
+    const hasCanvasContent = currentCanvasState.elements.length > 0;
+    const doNotRemind = getDoNotRemindCanvasClear();
+    const isNavigatingFromQuestion =
+      previousQuestionRef.current !== null &&
+      previousQuestionRef.current.index !== id;
+
+    // console.log("Navigation Debug:", {
+    //   hasCanvasContent,
+    //   doNotRemind,
+    //   isNavigatingFromQuestion,
+    //   previousQuestion: previousQuestionRef.current,
+    //   targetQuestionId: id,
+    //   elementsCount: currentCanvasState.elements.length,
+    //   actualElements: currentCanvasState.elements,
+    //   actualIds: currentCanvasState.ids,
+    //   actualClasses: currentCanvasState.classes,
+    //   currentCanvasStateRef: currentCanvasState,
+    // });
+
+    if (hasCanvasContent && !doNotRemind && isNavigatingFromQuestion) {
+      const prevQuestion = previousQuestionRef.current!;
+      saveQuestionCanvasData(
+        prevQuestion.type,
+        prevQuestion.index,
+        currentCanvasState
+      );
+
+      setPendingNavigation({ type: questionType, index: id });
+      setShowCanvasClearModal(true);
+      return;
+    }
+
+    proceedWithQuestionLoad(questionType, id);
+  };
+
+  const proceedWithQuestionLoad = async (
+    type: "test" | "practice",
+    id: number
+  ): Promise<void> => {
     setView("loading");
+
+    // Clear canvas first
+    onClearCanvas();
+
     try {
-      const data = await fetchQuestion(id, questionType);
+      const data = await fetchQuestion(id, type);
       setQuestionIndex(id);
       setQuestionData(data);
       setView("question");
+
+      // Restore saved canvas state for this question if it exists
+      const savedCanvas = loadQuestionCanvasData(type, id);
+      if (savedCanvas && savedCanvas.elements.length > 0) {
+        onRestoreCanvas(
+          savedCanvas.elements,
+          savedCanvas.ids,
+          savedCanvas.classes
+        );
+      }
     } catch (error) {
       console.error("Failed to load question:", error);
       setView("list");
     }
   };
 
+  const handleCanvasClearConfirm = () => {
+    setShowCanvasClearModal(false);
+    if (pendingNavigation) {
+      proceedWithQuestionLoad(pendingNavigation.type, pendingNavigation.index);
+      setPendingNavigation(null);
+    }
+  };
+
+  const handleCanvasClearCancel = () => {
+    setShowCanvasClearModal(false);
+    setPendingNavigation(null);
+  };
+
+  const handleDoNotRemindChange = (checked: boolean) => {
+    setDoNotRemindCanvasClear(checked);
+  };
+
   /**
    * Navigates back to list view with proper hydration
    */
   const navigateToList = async (): Promise<void> => {
-    // Ensure list is hydrated if we came straight from a cold resume
+    if (questionType && questionIndex !== null) {
+      saveQuestionCanvasData(questionType, questionIndex, currentCanvasState);
+    }
+
+    onClearCanvas();
+
     if (questionCount === 0 && questionType) {
       try {
         const count = await fetchQuestionCount(questionType);
@@ -312,83 +429,101 @@ export default function QuestionTab({
   };
 
   return (
-    <div className={styles.wrapper}>
-      <h1 className={styles.title}>{getHeading()}</h1>
+    <>
+      <div className={styles.wrapper}>
+        <h1 className={styles.title}>{getHeading()}</h1>
 
-      {view === "root" && (
-        <div className={styles.selectors}>
-          <QuestionSelector
-            text="Practice Questions"
-            onClick={() => loadQuestions("practice")}
-          />
-          <QuestionSelector
-            text="Test Questions"
-            onClick={() => loadQuestions("test")}
-          />
-        </div>
-      )}
-
-      {view === "loading" && <p className={styles.loading}>Loading...</p>}
-
-      {view === "list" && (
-        <>
-          <div className={styles.backRow}>
-            <button
-              type="button"
-              onClick={() => {
-                setQuestionIndex(null);
-                setView("root");
-              }}
-              className={styles.backBtn}
-            >
-              ← Back
-            </button>
+        {view === "root" && (
+          <div className={styles.selectors}>
+            <QuestionSelector
+              text="Practice Questions"
+              onClick={() => loadQuestions("practice")}
+            />
+            <QuestionSelector
+              text="Test Questions"
+              onClick={() => loadQuestions("test")}
+            />
           </div>
+        )}
 
-          <div className={styles.scroller}>
-            <div className={styles.selectors}>
-              {Array.from({ length: questionCount }, (_, index) => {
-                const questionNum = index + 1;
-                const status = questionType
-                  ? getQuestionStatus(questionType, questionNum)
-                  : "unattempted";
+        {view === "loading" && <p className={styles.loading}>Loading...</p>}
 
-                return (
-                  <QuestionSelector
-                    key={questionNum}
-                    text={`Question ${questionNum}`}
-                    onClick={() => loadSingleQuestion(questionNum)}
-                    status={status}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        </>
-      )}
-
-      {view === "question" && questionData && (
-        <>
-          <div className={styles.backRow}>
-            <button
-              type="button"
-              onClick={navigateToList}
-              className={styles.backBtn}
-            >
-              ← Back
-            </button>
-          </div>
-
-          <div className={styles.questionArea}>
-            <div className={styles.questionText}>
-              <ReactMarkdown>{questionData.question}</ReactMarkdown>
+        {view === "list" && (
+          <>
+            <div className={styles.backRow}>
+              <button
+                type="button"
+                onClick={() => {
+                  setQuestionIndex(null);
+                  setView("root");
+                }}
+                className={styles.backBtn}
+              >
+                ← Back
+              </button>
             </div>
 
-            <CodeBlock code={questionData.code.join("\n")} language="python" />
-            <SubmitButton onClick={handleSubmit} />
-          </div>
-        </>
+            <div className={styles.scroller}>
+              <div className={styles.selectors}>
+                {Array.from({ length: questionCount }, (_, index) => {
+                  const questionNum = index + 1;
+                  const status = questionType
+                    ? getQuestionStatus(questionType, questionNum)
+                    : "unattempted";
+
+                  return (
+                    <QuestionSelector
+                      key={questionNum}
+                      text={`Question ${questionNum}`}
+                      onClick={() => loadSingleQuestion(questionNum)}
+                      status={status}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
+
+        {view === "question" && questionData && (
+          <>
+            <div className={styles.backRow}>
+              <button
+                type="button"
+                onClick={navigateToList}
+                className={styles.backBtn}
+              >
+                ← Back
+              </button>
+            </div>
+
+            <div className={styles.questionArea}>
+              <div className={styles.questionText}>
+                <ReactMarkdown>{questionData.question}</ReactMarkdown>
+              </div>
+
+              <CodeBlock
+                code={questionData.code.join("\n")}
+                language="python"
+              />
+              <SubmitButton onClick={handleSubmit} />
+            </div>
+          </>
+        )}
+      </div>
+      {showCanvasClearModal && (
+        <ConfirmationModal
+          title="Clear Canvas?"
+          message="The canvas will be cleared when navigating to a different question. Your current work will be saved and restored if you return to this question."
+          confirmLabel="Continue"
+          cancelLabel="Cancel"
+          onConfirm={handleCanvasClearConfirm}
+          onCancel={handleCanvasClearCancel}
+          showCheckbox={true}
+          checkboxLabel="Do not remind me again"
+          onCheckboxChange={handleDoNotRemindChange}
+        />
       )}
-    </div>
+    </>
   );
 }

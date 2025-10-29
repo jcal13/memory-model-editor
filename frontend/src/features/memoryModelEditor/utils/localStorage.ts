@@ -6,6 +6,9 @@ import { CanvasElement, SubmissionResult, Tab } from "../../shared/types";
 const CANVAS_STORAGE_KEY = "canvas_key";
 const UI_STORAGE_KEY = "canvas_ui_state_v3";
 
+const QUESTION_CANVAS_PREFIX = "question_canvas_";
+const DO_NOT_REMIND_KEY = "do_not_remind_canvas_clear";
+
 // Default values
 const DEFAULT_CANVAS_DATA = {
   elements: [] as CanvasElement[],
@@ -152,5 +155,78 @@ export function clearCanvasStorage(): void {
     localStorage.removeItem(CANVAS_STORAGE_KEY);
   } catch (error) {
     console.warn("Failed to clear canvas storage:", error);
+  }
+}
+
+/**
+ * Gets the storage key for a specific question's canvas
+ */
+function getQuestionCanvasKey(
+  type: "test" | "practice",
+  index: number
+): string {
+  return `${QUESTION_CANVAS_PREFIX}${type}_${index}`;
+}
+
+/**
+ * Saves canvas data for a specific question
+ */
+export function saveQuestionCanvasData(
+  type: "test" | "practice",
+  index: number,
+  data: CanvasData
+): void {
+  try {
+    const key = getQuestionCanvasKey(type, index);
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (error) {
+    console.warn("Failed to save question canvas data:", error);
+  }
+}
+
+/**
+ * Loads canvas data for a specific question
+ */
+export function loadQuestionCanvasData(
+  type: "test" | "practice",
+  index: number
+): CanvasData | null {
+  try {
+    const key = getQuestionCanvasKey(type, index);
+    const rawData = localStorage.getItem(key);
+    if (!rawData) return null;
+
+    const parsed = JSON.parse(rawData);
+    return {
+      elements: Array.isArray(parsed?.elements) ? parsed.elements : [],
+      ids: Array.isArray(parsed?.ids) ? parsed.ids : [],
+      classes: Array.isArray(parsed?.classes) ? parsed.classes : [],
+    };
+  } catch (error) {
+    console.warn("Failed to load question canvas data:", error);
+    return null;
+  }
+}
+
+/**
+ * Checks if user has opted out of canvas clear reminders
+ */
+export function getDoNotRemindCanvasClear(): boolean {
+  try {
+    const value = localStorage.getItem(DO_NOT_REMIND_KEY);
+    return value === "true";
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
+ * Sets the do not remind preference for canvas clearing
+ */
+export function setDoNotRemindCanvasClear(value: boolean): void {
+  try {
+    localStorage.setItem(DO_NOT_REMIND_KEY, value.toString());
+  } catch (error) {
+    console.warn("Failed to save do not remind preference:", error);
   }
 }

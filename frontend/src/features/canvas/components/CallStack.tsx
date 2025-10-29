@@ -144,6 +144,12 @@ const CallStack: React.FC<CallStackProps> = ({
   const [isScrollbarVisible, setIsScrollbarVisible] = useState(false);
   const scrollFadeTimer = useRef<NodeJS.Timeout | null>(null);
 
+  useEffect(() => {
+    if (scrollPosition > maxScrollPosition) {
+      setScrollPosition(maxScrollPosition);
+    }
+  }, [scrollPosition, maxScrollPosition]);
+
   const handleWheel: React.WheelEventHandler = useCallback(
     (event) => {
       if (maxScrollPosition === 0) return;
@@ -201,8 +207,8 @@ const CallStack: React.FC<CallStackProps> = ({
       event.stopPropagation();
 
       // Prevent text selection during drag
-      document.body.style.userSelect = 'none';
-      document.body.style.webkitUserSelect = 'none';
+      document.body.style.userSelect = "none";
+      document.body.style.webkitUserSelect = "none";
 
       dragState.current = {
         from: index,
@@ -261,8 +267,8 @@ const CallStack: React.FC<CallStackProps> = ({
       const drag = dragState.current;
 
       // Re-enable text selection after drag
-      document.body.style.userSelect = '';
-      document.body.style.webkitUserSelect = '';
+      document.body.style.userSelect = "";
+      document.body.style.webkitUserSelect = "";
 
       // Reset ghost appearance
       drag.ghost.setAttribute("transform", drag.origT);
@@ -443,9 +449,9 @@ const CallStack: React.FC<CallStackProps> = ({
             ry={SCROLLBAR_WIDTH / 2}
             onPointerDown={(event) => {
               // Prevent text selection during scrollbar drag
-              document.body.style.userSelect = 'none';
-              document.body.style.webkitUserSelect = 'none';
-              
+              document.body.style.userSelect = "none";
+              document.body.style.webkitUserSelect = "none";
+
               thumbDragState.current = {
                 isDragging: true,
                 startY: event.clientY,
@@ -471,9 +477,9 @@ const CallStack: React.FC<CallStackProps> = ({
             }}
             onPointerUp={(event) => {
               // Re-enable text selection after scrollbar drag
-              document.body.style.userSelect = '';
-              document.body.style.webkitUserSelect = '';
-              
+              document.body.style.userSelect = "";
+              document.body.style.webkitUserSelect = "";
+
               thumbDragState.current.isDragging = false;
               (event.target as Element).releasePointerCapture(event.pointerId);
               scrollFadeTimer.current = setTimeout(

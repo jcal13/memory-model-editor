@@ -1,10 +1,12 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useBoxDragState, useDraggableBox } from "../hooks/hooks";
 import { CanvasBoxProps } from "../utils/box.types";
 import { 
   getCallStackBounds, 
   constrainPositionAwayFromCallStack 
 } from "../utils/boundary.helpers";
+import { hasValidationErrors } from "../utils/validation";
+import ValidationTooltip from "./ValidationTooltip";
 
 export default function CanvasBox({
   element,
@@ -15,6 +17,7 @@ export default function CanvasBox({
   disableDrag = false,
 }: CanvasBoxProps) {
   const { gRef, dragState, dimensions } = useBoxDragState();
+  const [isHovered, setIsHovered] = useState(false);
 
   useDraggableBox({
     gRef,
@@ -91,5 +94,44 @@ export default function CanvasBox({
     };
   }, [checkAndConstrainPosition, disableDrag, element.kind.name]);
 
-  return <g ref={gRef} />;
+  // Hover handlers for validation tooltip
+  useEffect(() => {
+    const gElement = gRef.current;
+    if (!gElement) return;
+
+    const handleMouseEnter = () => setIsHovered(true);
+    const handleMouseLeave = () => setIsHovered(false);
+
+    gElement.addEventListener("mouseenter", handleMouseEnter);
+    gElement.addEventListener("mouseleave", handleMouseLeave);
+
+    return () => {
+      gElement.removeEventListener("mouseenter", handleMouseEnter);
+      gElement.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, [gRef]);
+
+  const showTooltip = isHovered && hasValidationErrors(element);
+
+  return (
+    <>
+      <g ref={gRef} />
+      {showTooltip && (
+        <foreignObject
+          x={element.x}
+          y={element.y - 10}
+          width="1"
+          height="1"
+          overflow="visible"
+          pointerEvents="none"
+          style={{ zIndex: 10000 }}
+        >
+          <ValidationTooltip
+            errors={element.validationErrors || []}
+            visible={showTooltip}
+          />
+        </foreignObject>
+      )}
+    </>
+  );
 }

@@ -67,7 +67,22 @@ export interface CanvasElement {
   x: number;
   y: number;
   kind: BoxType;
-  invalidated?: boolean;        
+  invalidated?: boolean;
+  validationErrors?: ValidationError[];
+  color?: string; // Optional color to apply to the element (e.g., for errors, warnings, etc.)
+}
+
+// Validation types
+export enum ValidationErrorType {
+  DANGLING_REFERENCE = 'DANGLING_REFERENCE',
+  INVALID_ID = 'INVALID_ID',
+}
+
+export interface ValidationError {
+  type: ValidationErrorType;
+  message: string;
+  field?: string; // e.g., "value[0]", "params[1]", "classVariables[2]"
+  invalidId?: number; // The specific ID that is invalid
 }
 
 export type SubmissionResult = { correct: boolean; errors: string[] } | null;
@@ -76,7 +91,13 @@ export type ID = number | "_";
 export type ClassID = string | "_";
 
 export interface BoxEditorType {
-  metadata: { id: ID; kind: BoxType; className?: ClassID };
+  metadata: { 
+    id: ID; 
+    kind: BoxType; 
+    className?: ClassID; 
+    validationErrors?: ValidationError[];
+    invalidated?: boolean;
+  };
   onSave: (id: ID, kind: BoxType) => void;
   onRemove: () => void;
   onClose: () => void;
@@ -97,4 +118,4 @@ export type PaletteTab =
   | "classesFns"
   | "primitives"
   | "collections";
-export type Tab = "feedback" | "question";
+export type Tab = "feedback" | "question" | "errors";

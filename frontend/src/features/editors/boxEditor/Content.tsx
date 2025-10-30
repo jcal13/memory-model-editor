@@ -70,6 +70,7 @@ const Content = ({
         addId={addId}
         removeId={removeId}
         sandbox={sandbox}
+        validationErrors={metadata.validationErrors}
       />
     );
   }
@@ -84,6 +85,7 @@ const Content = ({
         addId={addId}
         removeId={removeId}
         sandbox={sandbox}
+        validationErrors={metadata.validationErrors}
       />
     );
   }
@@ -98,6 +100,7 @@ const Content = ({
         addId={addId}
         removeId={removeId}
         sandbox={sandbox}
+        validationErrors={metadata.validationErrors}
       />
     );
   }
@@ -111,6 +114,7 @@ const Content = ({
         addId={addId}
         removeId={removeId}
         sandbox={sandbox}
+        validationErrors={metadata.validationErrors}
       />
     );
   }

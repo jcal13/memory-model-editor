@@ -53,3 +53,10 @@ export {
   getBoxDimensions,
   isBoxTypeSupported,
 } from "./box.renderer";
+
+// Validation exports
+export {
+  validateElements,
+  hasValidationErrors,
+  getErrorSummary,
+} from "./validation";

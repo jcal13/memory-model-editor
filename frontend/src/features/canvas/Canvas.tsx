@@ -5,6 +5,7 @@ import React, {
   useRef,
   useCallback,
   useLayoutEffect,
+  useMemo,
 } from "react";
 import Draggable from "react-draggable";
 import { CanvasElement, BoxType, ID } from "../shared/types";
@@ -13,6 +14,7 @@ import BoxEditor from "../editors/boxEditor/BoxEditor";
 import CallStack from "./components/CallStack";
 import { ClearCanvasButton, DownloadButton } from "./components/CanvasButtons";
 import { useCanvasRefs } from "./hooks/hooks";
+import { validateElements } from "./utils/validation";
 import styles from "./Canvas.module.css";
 
 const EDITOR_MAP: Record<BoxType["name"], React.FC<any>> = {
@@ -109,6 +111,7 @@ interface CanvasProps {
   removeClasses?: (className: string) => void;
   sandbox?: boolean;
   onClear: () => void;
+  onEditorOpenerReady?: (openEditor: (element: CanvasElement) => void) => void;
 }
 
 function Canvas({
@@ -122,6 +125,7 @@ function Canvas({
   removeClasses,
   sandbox = true,
   onClear,
+  onEditorOpenerReady,
 }: CanvasProps) {
   const [openEditors, setOpenEditors] = useState<CanvasElement[]>([]);
   const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(
@@ -211,6 +215,38 @@ function Canvas({
       .forEach((id) => removeId(id));
   }, [elements, ids, sandbox, addId, removeId]);
 
+  // Validate elements whenever they change
+  // Create a stable signature of elements for comparison
+  const elementsSignature = useMemo(() => {
+    return elements.map(el => 
+      `${el.boxId}-${el.id}-${el.invalidated || false}-${typeof el.kind.value === 'object' ? JSON.stringify(el.kind.value) : el.kind.value}`
+    ).join('|');
+  }, [elements]);
+
+  useEffect(() => {
+    const validatedElements = validateElements(elements);
+    
+    // Check if any validation errors have changed
+    const hasChanges = validatedElements.some((validatedEl, index) => {
+      const currentEl = elements[index];
+      if (!currentEl) return true;
+      
+      const validatedErrors = validatedEl.validationErrors;
+      const currentErrors = currentEl.validationErrors;
+      
+      // Compare validation errors
+      if (!validatedErrors && !currentErrors) return false;
+      if (!validatedErrors || !currentErrors) return true;
+      if (validatedErrors.length !== currentErrors.length) return true;
+      
+      return JSON.stringify(validatedErrors) !== JSON.stringify(currentErrors);
+    });
+
+    if (hasChanges) {
+      setElements(validatedElements);
+    }
+  }, [elementsSignature]); // Only depend on the signature, not elements directly
+
   const createPositionUpdater = useCallback(
     (boxId: number) => (x: number, y: number) => {
       setElements((prev) =>
@@ -296,6 +332,13 @@ function Canvas({
     setOpenEditors((prev) => prev.filter((el) => el.boxId !== boxId));
     setSelectedElement((prev) => (prev?.boxId === boxId ? null : prev));
   }, []);
+
+  // Expose the openElementEditor function to parent component
+  useEffect(() => {
+    if (onEditorOpenerReady) {
+      onEditorOpenerReady(openElementEditor);
+    }
+  }, [onEditorOpenerReady, openElementEditor]);
 
   const functionFrames = elements.filter((el) => el.kind.name === "function");
 

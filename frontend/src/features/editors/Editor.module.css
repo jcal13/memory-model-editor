@@ -275,6 +275,26 @@
   border-radius: 8px;
 }
 
+/* === Error Styling for Invalid IDs === */
+.errorId {
+  border: 2px solid #DC2626 !important;
+  background-color: #FEE2E2 !important;
+  animation: errorPulse 0.5s ease-in-out;
+}
+
+@keyframes errorPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
+  }
+}
+
+.errorId:hover {
+  background-color: #FECACA !important;
+}
+
 /* =======================================
    === Primitive Type Content ===
 ======================================= */

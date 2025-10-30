@@ -1,7 +1,7 @@
 import CollectionItem from "./CollectionItem";
 import CollectionAddButton from "./CollectionAddButton";
 import styles from "../../Editor.module.css";
-import { ID } from "../../../shared/types";
+import { ID, ValidationError } from "../../../shared/types";
 
 /**
  * Props for the CollectionContent component.
@@ -14,6 +14,7 @@ interface Props {
   addId: (id: ID) => void;
   removeId: (id: ID) => void;
   sandbox: boolean;
+  validationErrors?: ValidationError[]; // Validation errors for highlighting
 }
 
 /**
@@ -32,6 +33,7 @@ const CollectionContent = ({
   addId,
   removeId,
   sandbox,
+  validationErrors,
 }: Props) => {
   return (
     <div className={styles.contentContainer}>
@@ -43,6 +45,7 @@ const CollectionContent = ({
         addId={addId}
         removeId={removeId}
         sandbox={sandbox}
+        validationErrors={validationErrors}
       />
       <CollectionAddButton mode={mode} items={items} setItems={setItems} />
     </div>

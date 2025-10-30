@@ -1,6 +1,8 @@
-import { SubmissionResult, Tab } from "../shared/types";
+import { SubmissionResult, Tab, CanvasElement } from "../shared/types";
+import { MasterErrorList } from "../memoryModelEditor/utils/masterErrorList";
 import FeedbackTab from "./feedbackTab/FeedbackTab";
 import QuestionTab from "./questionTab/QuestionTab";
+import ErrorsTab from "./errorsTab/ErrorsTab";
 import styles from "./InformationTabs.module.css";
 
 interface InformationTabsProps {
@@ -13,12 +15,17 @@ interface InformationTabsProps {
   questionType: "test" | "practice" | null;
   setQuestionType: (type: "test" | "practice" | null) => void;
   onSubmit: () => Promise<boolean>;
+  masterErrorList: MasterErrorList;
+  elements: CanvasElement[];
+  setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
+  onOpenEditor: (element: CanvasElement) => void;
 }
 
 /**
- * InformationTabs renders two pill-style tabs:
+ * InformationTabs renders three pill-style tabs:
  *   • Feedback — shows submission results or sandbox notice
  *   • Question — shows the assignment / help text
+ *   • Errors — shows validation errors from the canvas
  *
  * Each tab is its own component so we can grow their UI independently.
  */
@@ -32,6 +39,10 @@ export default function InformationTabs({
   questionType,
   setQuestionType,
   onSubmit,
+  masterErrorList,
+  elements,
+  setElements,
+  onOpenEditor,
 }: InformationTabsProps) {
   const renderTabButton = (tab: Tab, label: string) => (
     <button
@@ -51,6 +62,7 @@ export default function InformationTabs({
         <nav className={styles.tabHeaders} role="tablist">
           {renderTabButton("question", "Question")}
           {renderTabButton("feedback", "Feedback")}
+          {renderTabButton("errors", "Errors")}
         </nav>
 
         <div className={styles.tabBody}>
@@ -76,6 +88,19 @@ export default function InformationTabs({
             <FeedbackTab
               submissionResults={submissionResults}
               questionSelected={questionSelected}
+            />
+          </div>
+
+          <div
+            className={activeTab === "errors" ? "" : styles.hidden}
+            role="tabpanel"
+            aria-hidden={activeTab !== "errors"}
+          >
+            <ErrorsTab 
+              masterErrorList={masterErrorList} 
+              elements={elements}
+              setElements={setElements}
+              onOpenEditor={onOpenEditor}
             />
           </div>
         </div>

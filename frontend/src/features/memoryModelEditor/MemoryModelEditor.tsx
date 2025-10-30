@@ -15,6 +15,8 @@ import {
 } from "./hooks/useLocalStorage";
 import { useInfoPanelResize } from "./hooks/useInfoPanel";
 import { useCanvasSubmission } from "./hooks/useCanvasSubmission";
+import { CanvasElement } from "../shared/types";
+import { useMemo } from "react";
 
 // Layout constants
 const MAX_INFO_PANEL_VIEWPORT_RATIO = 0.6667;
@@ -40,6 +42,17 @@ export default function MemoryModelEditor({
     state.setSubmissionResults(null);
     state.setCanvasResetKey((prev) => prev + 1);
     clearCanvasStorage();
+  };
+
+  const restoreCanvas = (
+    elements: CanvasElement[],
+    ids: number[],
+    classes: string[]
+  ): void => {
+    state.setElements(elements);
+    state.setElementIds(ids);
+    state.setElementClasses(classes);
+    state.setCanvasResetKey((prev) => prev + 1);
   };
 
   const addElementId = (id: number): void => {
@@ -114,6 +127,15 @@ export default function MemoryModelEditor({
     submissionResults: state.submissionResults,
     sandboxMode: state.isSandboxMode,
   });
+
+  const currentCanvasState = useMemo(
+    () => ({
+      elements: state.elements,
+      ids: state.elementIds,
+      classes: state.elementClasses,
+    }),
+    [state.elements, state.elementIds, state.elementClasses]
+  );
 
   return (
     <div className={styles.editorContainer}>
@@ -221,6 +243,9 @@ export default function MemoryModelEditor({
             setQuestionType={state.setSelectedQuestionType}
             onSubmit={handleCanvasSubmit}
             setSubmissionResults={state.setSubmissionResults}
+            onClearCanvas={clearCanvas}
+            onRestoreCanvas={restoreCanvas}
+            currentCanvasState={currentCanvasState}
           />
 
           {/* Resize Handle */}

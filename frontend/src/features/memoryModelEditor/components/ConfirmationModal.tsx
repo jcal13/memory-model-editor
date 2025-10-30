@@ -1,3 +1,4 @@
+import { useState } from "react";
 import styles from "./ConfirmationModal.module.css";
 
 interface ConfirmationModalProps {
@@ -7,6 +8,9 @@ interface ConfirmationModalProps {
   cancelLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
+  showCheckbox?: boolean;
+  checkboxLabel?: string;
+  onCheckboxChange?: (checked: boolean) => void;
 }
 
 export default function ConfirmationModal({
@@ -16,7 +20,11 @@ export default function ConfirmationModal({
   cancelLabel = "Cancel",
   onConfirm,
   onCancel,
+  showCheckbox,
+  checkboxLabel,
+  onCheckboxChange,
 }: ConfirmationModalProps) {
+  const [isChecked, setIsChecked] = useState(false);
   const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
     // Only close if clicking directly on the backdrop, not on child elements
     if (event.target === event.currentTarget) {
@@ -28,6 +36,17 @@ export default function ConfirmationModal({
     if (event.key === "Escape") {
       onCancel();
     }
+  };
+
+  const handleConfirm = () => {
+    if (showCheckbox && onCheckboxChange) {
+      onCheckboxChange(isChecked);
+    }
+    onConfirm();
+  };
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsChecked(event.target.checked);
   };
 
   return (
@@ -57,11 +76,23 @@ export default function ConfirmationModal({
             {message}
           </p>
 
+          {showCheckbox && checkboxLabel && (
+            <label className={styles.checkboxContainer}>
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={handleCheckboxChange}
+                className={styles.checkbox}
+              />
+              <span className={styles.checkboxLabel}>{checkboxLabel}</span>
+            </label>
+          )}
+
           <div className={styles.modalActions}>
             <button
               type="button"
               className={styles.confirmButton}
-              onClick={onConfirm}
+              onClick={handleConfirm}
               autoFocus
             >
               {confirmLabel}

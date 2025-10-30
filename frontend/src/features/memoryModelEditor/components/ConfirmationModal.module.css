@@ -42,6 +42,7 @@
   color: #1f2937;
   margin: 0;
   font-size: 1rem;
+  font-style: normal;
 }
 
 .modalContent {
@@ -51,6 +52,7 @@
   padding: 20px;
   justify-content: center;
   align-items: center;
+  font-style: normal;
 }
 
 .modalMessage {
@@ -58,6 +60,7 @@
   font-size: 0.95rem;
   text-align: center;
   margin: 0;
+  font-style: normal;
 }
 
 .modalActions {
@@ -100,4 +103,23 @@
 .confirmButton:hover {
   background-color: #dc2626;
   border-color: #dc2626;
+}
+
+.checkboxContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.checkboxLabel {
+  font-size: 0.9rem;
+  color: #374151;
 }

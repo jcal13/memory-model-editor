@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const CLOSE_BOTH_PANELS_WIDTH = 1024;
 const CLOSE_PALETTE_WIDTH = 1280;
@@ -16,9 +16,18 @@ export function useResponsivePanels({
   setIsPaletteOpen,
   setIsInfoPanelOpen,
 }: UseResponsivePanelsParams): void {
+  const lastWidthRef = useRef<number>(window.innerWidth);
+  const hasManuallyToggledRef = useRef<boolean>(false);
+
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
+      const previousWidth = lastWidthRef.current;
+      lastWidthRef.current = width;
+
+      if (previousWidth === width) return;
+
+      hasManuallyToggledRef.current = false;
 
       if (width < CLOSE_BOTH_PANELS_WIDTH) {
         if (isPaletteOpen) setIsPaletteOpen(false);
@@ -31,8 +40,6 @@ export function useResponsivePanels({
         if (!isInfoPanelOpen) setIsInfoPanelOpen(true);
       }
     };
-
-    handleResize();
 
     window.addEventListener("resize", handleResize);
 

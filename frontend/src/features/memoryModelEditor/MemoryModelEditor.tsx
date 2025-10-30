@@ -3,6 +3,7 @@ import Palette from "../palette/Palette";
 import ConfirmationModal from "./components/ConfirmationModal";
 import InformationTabs from "../informationTabs/InformationTabs";
 import styles from "./MemoryModelEditor.module.css";
+import { useResponsivePanels } from "./hooks/useResponsivePanels";
 
 import {
   useMemoryModelEditorState,
@@ -126,6 +127,13 @@ export default function MemoryModelEditor({
     questionType: state.selectedQuestionType,
     submissionResults: state.submissionResults,
     sandboxMode: state.isSandboxMode,
+  });
+
+  useResponsivePanels({
+    isPaletteOpen: state.isPaletteOpen,
+    isInfoPanelOpen: state.isInfoPanelOpen,
+    setIsPaletteOpen: state.setIsPaletteOpen,
+    setIsInfoPanelOpen: state.setIsInfoPanelOpen,
   });
 
   const currentCanvasState = useMemo(

@@ -125,7 +125,6 @@
   text-align: center;
 }
 
-/* ───────── Row that holds the auto-add button ───────── */
 .actionRow {
   padding: 12px 14px;
   border-bottom: 1px solid #e5e7eb;
@@ -146,8 +145,6 @@
 .actionRow button:hover {
   background: #1e40af;
 }
-
-/* Panel shell & header reuse previous rules, no change needed */
 
 .panel {
   width: max-content;
@@ -175,12 +172,12 @@
 }
 
 .panelShell {
-  width: max-content; /* let content set width like other editors */
+  width: max-content;
 }
 
 .idInputBox {
   flex: 2;
-  min-width: 250px; /* <-- ensure it never shrinks below this */
+  min-width: 250px;
   font-size: 1rem;
   height: 38px;
   padding: 10px 12px;
@@ -194,4 +191,9 @@
 .activeOutline {
   outline: 3px solid #3b82f6;
   outline-offset: 2px;
+}
+
+.unusedId {
+  opacity: 0.6;
+  color: #6b7280 !important;
 }

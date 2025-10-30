@@ -67,7 +67,7 @@ export interface CanvasElement {
   x: number;
   y: number;
   kind: BoxType;
-  invalidated?: boolean;        
+  invalidated?: boolean;
 }
 
 export type SubmissionResult = { correct: boolean; errors: string[] } | null;
@@ -88,13 +88,10 @@ export interface BoxEditorType {
   classes?: string[]; // List of all class names
   addClasses?: (className: string) => void;
   removeClasses?: (className: string) => void;
-  
+
   sandbox?: boolean;
+  elements?: any[];
 }
 
-export type PaletteTab =
-  | "all"
-  | "classesFns"
-  | "primitives"
-  | "collections";
+export type PaletteTab = "all" | "classesFns" | "primitives" | "collections";
 export type Tab = "feedback" | "question";

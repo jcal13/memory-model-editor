@@ -26,6 +26,7 @@ interface Props {
   ownClasses?: string; // Current class name for this box
   setOwnClassName?: (className: string) => void;
   removeClasses?: (className: string) => void;
+  elements?: any[]; // List of all memory elements for ID selection
 }
 
 /**
@@ -56,6 +57,7 @@ const Header = ({
   ownClasses = "",
   setOwnClassName = () => {},
   removeClasses = () => {},
+  elements = [],
 }: Props) => {
   const kind = element.kind.name;
 
@@ -74,6 +76,7 @@ const Header = ({
           setElementId={setElementId}
           removeId={removeId}
           sandbox={sandbox}
+          elements={elements}
         />
       )}
       {kind === "function" && (
@@ -91,6 +94,7 @@ const Header = ({
           setElementId={setElementId}
           removeId={removeId}
           sandbox={sandbox}
+          elements={elements}
         />
       )}
       {kind === "class" && (
@@ -106,6 +110,7 @@ const Header = ({
           ownClasses={ownClasses}
           setOwnClassName={setOwnClassName}
           removeClasses={removeClasses}
+          elements={elements}
         />
       )}
     </div>

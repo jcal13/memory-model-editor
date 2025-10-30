@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import ReactDOM from "react-dom";
 import Draggable from "react-draggable";
 import IdSelectorPanel from "./IdSelectorPanel";
@@ -16,6 +16,7 @@ interface Props {
   buttonClassName?: string;
   editable: boolean;
   sandbox: boolean;
+  elements?: any[];
 }
 
 export default function IdEditor({
@@ -27,6 +28,7 @@ export default function IdEditor({
   buttonClassName = "",
   editable,
   sandbox,
+  elements = [],
 }: Props) {
   const [open, setOpen] = useState(false);
   const [list, setList] = useState<ID[]>(ids);
@@ -36,6 +38,56 @@ export default function IdEditor({
   const closeSelf = useCallback(() => setOpen(false), []);
 
   useSinglePanelRegistry(open, closeSelf);
+
+  const usedIds = useMemo(() => {
+    const used = new Set<ID>();
+    elements.forEach((el: any) => {
+      if (el.id !== "_" && el.id !== null) {
+        used.add(el.id);
+      }
+
+      if (Array.isArray(el.kind?.value)) {
+        el.kind.value.forEach((id: ID) => {
+          if (id !== "_" && id !== null) used.add(id);
+        });
+      }
+
+      if (
+        el.kind?.value &&
+        typeof el.kind.value === "object" &&
+        !Array.isArray(el.kind.value)
+      ) {
+        Object.values(el.kind.value).forEach((id: any) => {
+          if (id !== "_" && id !== null) used.add(id);
+        });
+      }
+
+      if (el.kind?.params && Array.isArray(el.kind.params)) {
+        el.kind.params.forEach((param: any) => {
+          if (
+            param.targetId &&
+            param.targetId !== "_" &&
+            param.targetId !== null
+          ) {
+            used.add(param.targetId);
+          }
+        });
+      }
+
+      if (el.kind?.classVariables && Array.isArray(el.kind.classVariables)) {
+        el.kind.classVariables.forEach((variable: any) => {
+          if (
+            variable.targetId &&
+            variable.targetId !== "_" &&
+            variable.targetId !== null
+          ) {
+            used.add(variable.targetId);
+          }
+        });
+      }
+    });
+    return used;
+  }, [elements]);
 
   if (!editable) {
     return (
@@ -82,14 +134,12 @@ export default function IdEditor({
             defaultPosition={{ x: 150, y: 150 }}
             onStart={(e) => {
               e.stopPropagation();
-              // Prevent text selection during drag
-              document.body.style.userSelect = 'none';
-              document.body.style.webkitUserSelect = 'none';
+              document.body.style.userSelect = "none";
+              document.body.style.webkitUserSelect = "none";
             }}
             onStop={() => {
-              // Re-enable text selection after drag
-              document.body.style.userSelect = '';
-              document.body.style.webkitUserSelect = '';
+              document.body.style.userSelect = "";
+              document.body.style.webkitUserSelect = "";
             }}
           >
             <div
@@ -104,6 +154,7 @@ export default function IdEditor({
                 onSelect={handleSelect}
                 sandbox={sandbox}
                 onClose={closeSelf}
+                usedIds={usedIds}
               />
             </div>
           </Draggable>,

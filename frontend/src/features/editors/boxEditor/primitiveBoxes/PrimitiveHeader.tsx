@@ -19,6 +19,7 @@ interface Props {
   setElementId: (id: ID) => void;
   removeId: (id: ID) => void;
   sandbox: boolean;
+  elements?: any[];
 }
 
 const PrimitiveHeader = ({
@@ -29,6 +30,7 @@ const PrimitiveHeader = ({
   setElementId,
   removeId,
   sandbox,
+  elements = [],
 }: Props) => (
   <div className={styles.header} data-testid="primitive-header">
     <IdDisplay
@@ -38,6 +40,7 @@ const PrimitiveHeader = ({
       setElementId={setElementId}
       removeId={removeId}
       sandbox={sandbox}
+      elements={elements}
     />
   </div>
 );

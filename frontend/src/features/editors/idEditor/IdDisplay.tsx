@@ -9,6 +9,7 @@ interface Props {
   setElementId: (id: ID) => void;
   removeId: (id: ID) => void;
   sandbox: boolean;
+  elements?: any[];
 }
 
 /**
@@ -23,6 +24,7 @@ const IdDisplay = ({
   setElementId,
   removeId,
   sandbox,
+  elements = [],
 }: Props) => (
   <IdSelector // one-liner wrap
     ids={ids}
@@ -33,6 +35,7 @@ const IdDisplay = ({
     onRemove={removeId}
     editable={sandbox}
     sandbox={sandbox}
+    elements={elements}
   />
 );
 

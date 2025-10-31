@@ -151,8 +151,8 @@ export default function MemoryModelEditor({
       <div
         className={styles.palettePanel}
         style={{
-          width: state.isPaletteOpen ? undefined : 0,
-          minWidth: state.isPaletteOpen ? undefined : 0,
+          width: state.isPaletteOpen ? "280px" : 0,
+          minWidth: state.isPaletteOpen ? "280px" : 0,
           overflow: "hidden",
         }}
       >
@@ -232,7 +232,9 @@ export default function MemoryModelEditor({
 
         {/* Info Panel */}
         <div
-          className={styles.infoPanel}
+          className={`${styles.infoPanel} ${
+            state.isResizingInfoPanel ? styles.noTransition : ""
+          }`}
           style={{
             width: state.isInfoPanelOpen ? `${state.infoPanelWidth}px` : 0,
             maxWidth: MAX_INFO_PANEL_CSS_WIDTH,

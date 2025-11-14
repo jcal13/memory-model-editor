@@ -6,7 +6,7 @@ import ErrorsTab from "./errorsTab/ErrorsTab";
 import styles from "./InformationTabs.module.css";
 
 interface InformationTabsProps {
-  submissionResults: SubmissionResult;
+  submissionResults: SubmissionResult | null;
   activeTab: Tab;
   setActive: (tab: Tab) => void;
   questionSelected: boolean;

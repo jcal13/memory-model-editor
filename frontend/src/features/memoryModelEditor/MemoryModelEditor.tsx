@@ -120,6 +120,7 @@ export default function MemoryModelEditor({
     selectedQuestionIndex: state.selectedQuestionIndex,
     selectedQuestionType: state.selectedQuestionType,
     elements: state.elements,
+    setElements: state.setElements,
     setSubmissionResults: state.setSubmissionResults,
     setActiveInfoTab: state.setActiveInfoTab,
   });

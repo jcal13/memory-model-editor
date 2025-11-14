@@ -64,26 +64,14 @@ export default function FeedbackTab({
 
       <h2 className={styles.errorsHeading}>Errors:</h2>
       <ul className={styles.errorList}>
-        {submissionResults.errors.map((error, index) => {
-          const colonIndex = error.indexOf(":");
-
-          if (colonIndex === -1) {
-            return (
-              <li key={index} className={styles.errorItem}>
-                {error}
-              </li>
-            );
-          }
-
-          const before = error.slice(0, colonIndex);
-          const after = error.slice(colonIndex + 1);
-
-          return (
-            <li key={index} className={styles.errorItem}>
-              <strong>{before}</strong>: {after.trim()}
-            </li>
-          );
-        })}
+        {submissionResults.errors.map((error, index) => (
+          <li key={index} className={styles.errorItem}>
+            <strong>{error.type}</strong>: {error.message}
+            {error.elementId !== undefined && (
+              <span className={styles.elementId}> (Element ID: {error.elementId})</span>
+            )}
+          </li>
+        ))}
       </ul>
     </div>
   );

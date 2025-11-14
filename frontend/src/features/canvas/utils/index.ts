@@ -57,6 +57,6 @@ export {
 // Validation exports
 export {
   validateElements,
-  hasValidationErrors,
+  hasErrors,
   getErrorSummary,
 } from "./validation";

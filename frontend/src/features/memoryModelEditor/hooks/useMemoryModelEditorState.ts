@@ -41,7 +41,7 @@ export function useMemoryModelEditorState(sandbox: boolean) {
   const [selectedQuestionType, setSelectedQuestionType] = useState<
     "test" | "practice" | null
   >(initialUIData.questionType);
-  const [submissionResults, setSubmissionResults] = useState<SubmissionResult>(
+  const [submissionResults, setSubmissionResults] = useState<SubmissionResult | null>(
     initialUIData.submissionResults
   );
   const [isSandboxMode, setIsSandboxMode] = useState<boolean>(() =>

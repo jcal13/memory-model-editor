@@ -68,24 +68,62 @@ export interface CanvasElement {
   y: number;
   kind: BoxType;
   invalidated?: boolean;
-  validationErrors?: ValidationError[];
+  errors?: ElementError[]; // Unified error system (validation + feedback)
   color?: string; // Optional color to apply to the element (e.g., for errors, warnings, etc.)
 }
 
-// Validation types
-export enum ValidationErrorType {
-  DANGLING_REFERENCE = 'DANGLING_REFERENCE',
-  INVALID_ID = 'INVALID_ID',
+// Error types - unified system for validation and feedback errors
+export enum ErrorSource {
+  VALIDATION = 'VALIDATION', // Frontend validation errors
+  FEEDBACK = 'FEEDBACK',     // Backend submission feedback errors
 }
 
-export interface ValidationError {
-  type: ValidationErrorType;
+export enum ErrorType {
+  // Validation errors (frontend)
+  DANGLING_REFERENCE = 'DANGLING_REFERENCE',
+  INVALID_ID = 'INVALID_ID',
+  
+  // Feedback errors (backend)
+  TYPE_MISMATCH = 'TYPE_MISMATCH',
+  VALUE_MISMATCH = 'VALUE_MISMATCH',
+  MISSING_ELEMENT = 'MISSING_ELEMENT',
+  UNEXPECTED_ELEMENT = 'UNEXPECTED_ELEMENT',
+  DUPLICATE_ID = 'DUPLICATE_ID',
+  ORPHANED_ELEMENT = 'ORPHANED_ELEMENT',
+  FRAME_MISMATCH = 'FRAME_MISMATCH',
+  CALL_STACK_ORDER = 'CALL_STACK_ORDER',
+  PROPERTY_MISMATCH = 'PROPERTY_MISMATCH',
+  GENERIC_ERROR = 'GENERIC_ERROR',
+}
+
+export interface ElementError {
+  source: ErrorSource;
+  type: ErrorType;
   message: string;
   field?: string; // e.g., "value[0]", "params[1]", "classVariables[2]"
   invalidId?: number; // The specific ID that is invalid
+  severity?: 'error' | 'warning' | 'info'; // Optional severity level
 }
 
-export type SubmissionResult = { correct: boolean; errors: string[] } | null;
+// Backend feedback error format
+export interface FeedbackError {
+  type: ErrorType;
+  message: string;
+  elementId?: number | "_"; // ID of the element this error relates to
+  field?: string; // Specific field within the element
+  relatedIds?: (number | "_")[]; // Other IDs involved in the error
+  path?: string; // Path description from backend (e.g., "frame.main > var.x")
+  severity?: 'error' | 'warning' | 'info';
+}
+
+export interface SubmissionResult {
+  correct: boolean;
+  errors: FeedbackError[]; // Changed from string[] to structured errors
+}
+
+// Legacy type alias for backwards compatibility
+export type ValidationError = ElementError;
+export const ValidationErrorType = ErrorType;
 
 export type ID = number | "_";
 export type ClassID = string | "_";
@@ -95,7 +133,7 @@ export interface BoxEditorType {
     id: ID; 
     kind: BoxType; 
     className?: ClassID; 
-    validationErrors?: ValidationError[];
+    errors?: ElementError[]; // Updated to use unified error system
     invalidated?: boolean;
   };
   onSave: (id: ID, kind: BoxType) => void;

@@ -231,10 +231,10 @@ function Canvas({
       const currentEl = elements[index];
       if (!currentEl) return true;
       
-      const validatedErrors = validatedEl.validationErrors;
-      const currentErrors = currentEl.validationErrors;
+      const validatedErrors = validatedEl.errors;
+      const currentErrors = currentEl.errors;
       
-      // Compare validation errors
+      // Compare errors
       if (!validatedErrors && !currentErrors) return false;
       if (!validatedErrors || !currentErrors) return true;
       if (validatedErrors.length !== currentErrors.length) return true;

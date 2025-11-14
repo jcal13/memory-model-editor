@@ -17,7 +17,7 @@ const DEFAULT_UI_STATE = {
   activeTab: "question" as Tab,
   questionIndex: null as number | null,
   questionType: null as "test" | "practice" | null,
-  submissionResults: null as SubmissionResult,
+  submissionResults: null as SubmissionResult | null,
   sandboxMode: null as boolean | null,
 };
 
@@ -31,7 +31,7 @@ export interface UIState {
   activeTab: Tab;
   questionIndex: number | null;
   questionType: "test" | "practice" | null;
-  submissionResults: SubmissionResult;
+  submissionResults: SubmissionResult | null;
   sandboxMode: boolean | null;
 }
 
@@ -105,7 +105,7 @@ export function loadInitialUIData(): UIState {
  * @param rawResults - Raw results from localStorage
  * @returns Validated SubmissionResult or null
  */
-function validateSubmissionResults(rawResults: any): SubmissionResult {
+function validateSubmissionResults(rawResults: any): SubmissionResult | null {
   if (!rawResults || typeof rawResults !== "object") {
     return null;
   }

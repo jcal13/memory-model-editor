@@ -5,7 +5,7 @@ import {
   getCallStackBounds, 
   constrainPositionAwayFromCallStack 
 } from "../utils/boundary.helpers";
-import { hasValidationErrors } from "../utils/validation";
+import { hasErrors } from "../utils/validation";
 import ValidationTooltip from "./ValidationTooltip";
 
 export default function CanvasBox({
@@ -111,7 +111,7 @@ export default function CanvasBox({
     };
   }, [gRef]);
 
-  const showTooltip = isHovered && hasValidationErrors(element);
+  const showTooltip = isHovered && hasErrors(element);
 
   return (
     <>
@@ -127,7 +127,7 @@ export default function CanvasBox({
           style={{ zIndex: 10000 }}
         >
           <ValidationTooltip
-            errors={element.validationErrors || []}
+            errors={element.errors || []}
             visible={showTooltip}
           />
         </foreignObject>

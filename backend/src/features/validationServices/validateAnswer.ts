@@ -1,4 +1,5 @@
 import { Pool } from "pg";
+import { FeedbackError, ErrorType } from "./errorStructuring";
 
 let pool: Pool | null = null;
 function getPool(): Pool {
@@ -44,13 +45,19 @@ function ensureBijection(
   inputToAnswerMap: Map<number, { target: number; path: string }>,
   isVar: boolean,
   path: string,
-  errors: string[]
+  errors: FeedbackError[]
 ): boolean {
   // check if the answer ID is already mapped to an input ID
   if (answerToInputMap.has(answerID)) {
     const prev = answerToInputMap.get(answerID)!;
     if (prev.target !== inputID) {
-      if (!isVar) errors.push(`ID mapping conflict: ${prev.path}", "${path}`);
+      if (!isVar) errors.push({
+        type: ErrorType.GENERIC_ERROR,
+        message: `ID mapping conflict: ${prev.path}", "${path}`,
+        elementId: inputID,
+        path,
+        severity: 'error'
+      });
       return true;
     }
   }
@@ -59,7 +66,13 @@ function ensureBijection(
   if (inputToAnswerMap.has(inputID)) {
     const prev = inputToAnswerMap.get(inputID)!;
     if (prev.target !== answerID) {
-      if (!isVar) errors.push(`ID mapping conflict: ${prev.path}, ${path}`);
+      if (!isVar) errors.push({
+        type: ErrorType.GENERIC_ERROR,
+        message: `ID mapping conflict: ${prev.path}, ${path}`,
+        elementId: inputID,
+        path,
+        severity: 'error'
+      });
       return true;
     }
   }
@@ -74,12 +87,16 @@ function checkTypeMismatch(
   answerBox: MemoryBox,
   inputBox: MemoryBox,
   path: string,
-  errors: string[]
+  errors: FeedbackError[]
 ): boolean {
   if (answerBox.type !== inputBox.type) {
-    errors.push(
-      `Type mismatch: ${path} got ${inputBox.type}, expected ${answerBox.type}`
-    );
+    errors.push({
+      type: ErrorType.TYPE_MISMATCH,
+      message: `Type mismatch: ${path} got ${inputBox.type}, expected ${answerBox.type}`,
+      elementId: inputBox.id ?? undefined,
+      path,
+      severity: 'error'
+    });
     return true;
   }
   return false;
@@ -90,13 +107,17 @@ function comparePrimitives(
   answerBox: MemoryBox,
   inputBox: MemoryBox,
   path: string,
-  errors: string[]
+  errors: FeedbackError[]
 ): boolean {
   if (!isContainer(answerBox.type)) {
     if (answerBox.value !== inputBox.value) {
-      errors.push(
-        `Value mismatch: ${path} got ${inputBox.value}, expected ${answerBox.value}`
-      );
+      errors.push({
+        type: ErrorType.VALUE_MISMATCH,
+        message: `Value mismatch: ${path} got ${inputBox.value}, expected ${answerBox.value}`,
+        elementId: inputBox.id ?? undefined,
+        path,
+        severity: 'error'
+      });
     }
     return true;
   }
@@ -113,7 +134,7 @@ function checkArray(
   inputToAnswerMap: Map<number, { target: number; path: string }>,
   duplicates: Set<number>,
   path: string,
-  errors: string[],
+  errors: FeedbackError[],
   visited: Map<number, Set<number>>
 ) {
   // first check if the lengths match
@@ -123,15 +144,23 @@ function checkArray(
   // report exact missing / unexpected elements
   if (actualLen < expectedLen)
     for (let i = actualLen; i < expectedLen; i++)
-      errors.push(
-        `Missing element: ${path}[${i}] id=${answerMemoryBox.value[i]}`
-      );
+      errors.push({
+        type: ErrorType.MISSING_ELEMENT,
+        message: `Missing element: ${path}[${i}] id=${answerMemoryBox.value[i]}`,
+        elementId: inputMemoryBox.id ?? undefined, // The container that's missing elements
+        path: `${path}[${i}]`,
+        severity: 'error'
+      });
 
   if (actualLen > expectedLen)
     for (let j = expectedLen; j < actualLen; j++)
-      errors.push(
-        `Unexpected element: ${path}[${j}] id=${inputMemoryBox.value[j]}`
-      );
+      errors.push({
+        type: ErrorType.UNEXPECTED_ELEMENT,
+        message: `Unexpected element: ${path}[${j}] id=${inputMemoryBox.value[j]}`,
+        elementId: inputMemoryBox.id ?? undefined, // The container with unexpected elements
+        path: `${path}[${j}]`,
+        severity: 'error'
+      });
 
   // next, we compare each element 1:1 recursively; we do it this way because order matters
   const minLen = Math.min(expectedLen, actualLen);
@@ -161,7 +190,7 @@ function checkSet(
   inputToAnswerMap: Map<number, { target: number; path: string }>,
   duplicates: Set<number>,
   path: string,
-  errors: string[],
+  errors: FeedbackError[],
   visited: Map<number, Set<number>>
 ) {
   // we create a set of all IDs in the input set (we consider they are all initially unmatched),
@@ -170,7 +199,7 @@ function checkSet(
   for (const answerChild of answerMemoryBox.value) {
     let matched = false;
     for (const inputChild of Array.from(unmatched)) {
-      const errorsDetected: string[] = [];
+      const errorsDetected: FeedbackError[] = [];
       const clonedVisited = new Map<number, Set<number>>();
       visited.forEach((set, key) => clonedVisited.set(key, new Set(set)));
       compareIds(
@@ -192,12 +221,24 @@ function checkSet(
         break;
       }
     }
-    if (!matched) errors.push(`Missing element: ${path} id=${answerChild}`);
+    if (!matched) errors.push({
+      type: ErrorType.MISSING_ELEMENT,
+      message: `Missing element: ${path} id=${answerChild}`,
+      elementId: answerChild,
+      path,
+      severity: 'error'
+    });
   }
 
   // any IDs still in unmatched are unexpected extras supplied by the user
   for (const extraId of unmatched)
-    errors.push(`Unexpected element: ${path} id=${extraId}`);
+    errors.push({
+      type: ErrorType.UNEXPECTED_ELEMENT,
+      message: `Unexpected element: ${path} id=${extraId}`,
+      elementId: extraId as number,
+      path,
+      severity: 'error'
+    });
 }
 
 // Check if the answer box is a dict and compare keys and values recursively
@@ -210,7 +251,7 @@ function checkDict(
   inputToAnswerMap: Map<number, { target: number; path: string }>,
   duplicates: Set<number>,
   path: string,
-  errors: string[],
+  errors: FeedbackError[],
   visited: Map<number, Set<number>>
 ) {
   // iterate over every key expected by the answer
@@ -218,7 +259,14 @@ function checkDict(
     if (!(key in inputMemoryBox.value)) {
       // key missing entirely in the user dict
       const missingId = answerMemoryBox.value[key];
-      errors.push(`Missing key: ${path} key=${key}, id=${missingId}`);
+      errors.push({
+        type: ErrorType.MISSING_ELEMENT,
+        message: `Missing key: ${path} key=${key}, id=${missingId}`,
+        elementId: missingId,
+        path,
+        field: key,
+        severity: 'error'
+      });
       continue;
     }
 
@@ -241,7 +289,14 @@ function checkDict(
   for (const key of Object.keys(inputMemoryBox.value)) {
     if (!(key in answerMemoryBox.value)) {
       const extraId = inputMemoryBox.value[key];
-      errors.push(`Unexpected key: ${path} key=${key}, id=${extraId}`);
+      errors.push({
+        type: ErrorType.UNEXPECTED_ELEMENT,
+        message: `Unexpected key: ${path} key=${key}, id=${extraId}`,
+        elementId: extraId,
+        path,
+        field: key,
+        severity: 'error'
+      });
     }
   }
 }
@@ -256,14 +311,18 @@ function checkObject(
   inputToAnswerMap: Map<number, { target: number; path: string }>,
   duplicates: Set<number>,
   path: string,
-  errors: string[],
+  errors: FeedbackError[],
   visited: Map<number, Set<number>>
 ) {
   // Check if object names match
   if (answerMemoryBox.name !== inputMemoryBox.name) {
-    errors.push(
-      `Object name mismatch: ${path} got "${inputMemoryBox.name}", expected "${answerMemoryBox.name}"`
-    );
+    errors.push({
+      type: ErrorType.GENERIC_ERROR,
+      message: `Object name mismatch: ${path} got "${inputMemoryBox.name}", expected "${answerMemoryBox.name}"`,
+      elementId: inputMemoryBox.id ?? undefined,
+      path,
+      severity: 'error'
+    });
     return;
   }
 
@@ -273,9 +332,14 @@ function checkObject(
   // Check for missing properties
   for (const prop of Object.keys(answerProps)) {
     if (!(prop in inputProps)) {
-      errors.push(
-        `Missing object property: ${path} object "${answerMemoryBox.name}" expected property "${prop}"`
-      );
+      errors.push({
+        type: ErrorType.MISSING_ELEMENT,
+        message: `Missing object property: ${path} object "${answerMemoryBox.name}" expected property "${prop}"`,
+        elementId: answerMemoryBox.id ?? undefined,
+        path,
+        field: prop,
+        severity: 'error'
+      });
       continue;
     }
 
@@ -297,9 +361,14 @@ function checkObject(
   // Check for unexpected properties
   for (const prop of Object.keys(inputProps)) {
     if (!(prop in answerProps)) {
-      errors.push(
-        `Unexpected object property: ${path} object "${inputMemoryBox.name}" has unexpected property "${prop}"`
-      );
+      errors.push({
+        type: ErrorType.UNEXPECTED_ELEMENT,
+        message: `Unexpected object property: ${path} object "${inputMemoryBox.name}" has unexpected property "${prop}"`,
+        elementId: inputMemoryBox.id ?? undefined,
+        path,
+        field: prop,
+        severity: 'error'
+      });
     }
   }
 }
@@ -308,29 +377,41 @@ function checkObject(
 function gatherFrames(
   answerModel: MemoryBox[],
   inputModel: MemoryBox[],
-  errors: string[]
+  errors: FeedbackError[]
 ) {
   const answerFrames = answerModel.filter((e) => e.type === ".frame");
   const inputFrames = inputModel.filter((e) => e.type === ".frame");
 
   if (answerFrames.length !== inputFrames.length)
-    errors.push(
-      `Function count mismatch: expected ${answerFrames.length}, got ${inputFrames.length}`
-    );
+    errors.push({
+      type: ErrorType.FRAME_MISMATCH,
+      message: `Function count mismatch: expected ${answerFrames.length}, got ${inputFrames.length}`,
+      severity: 'error'
+    });
 
   const ansByName = new Map(answerFrames.map((f) => [f.name!, f]));
   const usrByName = new Map(inputFrames.map((f) => [f.name!, f]));
 
   for (const n of ansByName.keys())
-    if (!usrByName.has(n)) errors.push(`Missing function: "${n}"`);
+    if (!usrByName.has(n)) errors.push({
+      type: ErrorType.MISSING_ELEMENT,
+      message: `Missing function: "${n}"`,
+      path: `function "${n}"`,
+      severity: 'error'
+    });
   for (const n of usrByName.keys())
-    if (!ansByName.has(n)) errors.push(`Unexpected function: "${n}"`);
+    if (!ansByName.has(n)) errors.push({
+      type: ErrorType.UNEXPECTED_ELEMENT,
+      message: `Unexpected function: "${n}"`,
+      path: `function "${n}"`,
+      severity: 'error'
+    });
 
   return { answerFrames, inputFrames, ansByName, usrByName };
 }
 
 // Scan for duplicate IDs in the user model and report them
-function scanDuplicates(model: MemoryBox[], errors: string[]): Set<number> {
+function scanDuplicates(model: MemoryBox[], errors: FeedbackError[]): Set<number> {
   const dup = new Set<number>();
   const seen: Record<number, boolean> = {};
   for (const e of model)
@@ -338,7 +419,12 @@ function scanDuplicates(model: MemoryBox[], errors: string[]): Set<number> {
       if (seen[e.id]) dup.add(e.id);
       else seen[e.id] = true;
     }
-  dup.forEach((id) => errors.push(`Duplicate ID: ${id}`));
+  dup.forEach((id) => errors.push({
+    type: ErrorType.DUPLICATE_ID,
+    message: `Duplicate ID: ${id}`,
+    elementId: id,
+    severity: 'error'
+  }));
   return dup;
 }
 
@@ -351,7 +437,7 @@ function compareFrames(
   globalAnswerToInput: Map<number, { target: number; path: string }>,
   globalInputToAnswer: Map<number, { target: number; path: string }>,
   dup: Set<number>,
-  errors: string[]
+  errors: FeedbackError[]
 ) {
   const visited = new Map<number, Set<number>>();
 
@@ -365,12 +451,20 @@ function compareFrames(
     // variable-list mismatches
     for (const k of Object.keys(aVars))
       if (!(k in uVars))
-        errors.push(`Missing variable: function "${name}" expected "${k}"`);
+        errors.push({
+          type: ErrorType.MISSING_ELEMENT,
+          message: `Missing variable: function "${name}" expected "${k}"`,
+          path: `function "${name}" → var "${k}"`,
+          severity: 'error'
+        });
     for (const k of Object.keys(uVars))
       if (!(k in aVars))
-        errors.push(
-          `Unexpected variable: function "${name}" unexpected "${k}"`
-        );
+        errors.push({
+          type: ErrorType.UNEXPECTED_ELEMENT,
+          message: `Unexpected variable: function "${name}" unexpected "${k}"`,
+          path: `function "${name}" → var "${k}"`,
+          severity: 'error'
+        });
 
     // deep comparison for shared variables
     for (const k of Object.keys(aVars)) {
@@ -378,9 +472,12 @@ function compareFrames(
 
       const uid = (uVars as Record<string, any>)[k];
       if (uid === "_") {
-        errors.push(
-          `Unassigned variable: function "${name}" variable "${k}" has no assigned ID`
-        );
+        errors.push({
+          type: ErrorType.GENERIC_ERROR,
+          message: `Unassigned variable: function "${name}" variable "${k}" has no assigned ID`,
+          path: `function "${name}" → var "${k}"`,
+          severity: 'error'
+        });
         continue;
       }
 
@@ -406,7 +503,7 @@ function detectOrphans(
   inputMap: Map<number, MemoryBox>,
   model: MemoryBox[],
   answerMap: Map<number, MemoryBox>,
-  errors: string[]
+  errors: FeedbackError[]
 ) {
   const reachable = new Set<number>();
   function mark(id: number) {
@@ -429,7 +526,12 @@ function detectOrphans(
 
   for (const e of model)
     if (e.id !== null && !reachable.has(e.id) && !answerMap.has(e.id))
-      errors.push(`Unmapped box: id=${e.id}`);
+      errors.push({
+        type: ErrorType.ORPHANED_ELEMENT,
+        message: `Unmapped box: id=${e.id}`,
+        elementId: e.id,
+        severity: 'error'
+      });
 }
 
 // Compare IDs between the answer and user models
@@ -445,7 +547,7 @@ function compareIds(
   inputToAnswerMap: Map<number, { target: number; path: string }>,
   duplicates: Set<number>, // user IDs reused in two boxes
   path: string, // path to the current box, e.g. "frame 'main' → var 'a'→"
-  errors: string[], // collects error messages
+  errors: FeedbackError[], // collects error messages
   visited: Map<number, Set<number>> // map of pairs: answerID → {inputID,…}
 ) {
   // skip if this input ID is already known to be a duplicate, we report this error later
@@ -464,7 +566,12 @@ function compareIds(
   const inputMemoryBox = inputMap.get(inputID);
   if (!answerMemoryBox || !inputMemoryBox) {
     // if either ID is not found in the respective map
-    errors.push(`Unmapped ID: ${path}`);
+    errors.push({
+      type: ErrorType.ORPHANED_ELEMENT,
+      message: `Unmapped ID: ${path}`,
+      path,
+      severity: 'error'
+    });
     return;
   }
 
@@ -562,15 +669,17 @@ function compareIds(
 function checkCallStackOrder(
   answerFrames: MemoryBox[],
   inputFrames: MemoryBox[],
-  errors: string[]
+  errors: FeedbackError[]
 ) {
   // The arrays come from gatherFrames and preserve the order
   if (answerFrames.length !== inputFrames.length) return; // size already handled
   for (let i = 0; i < answerFrames.length; i++) {
     if (answerFrames[i].name !== inputFrames[i].name) {
-      errors.push(
-        "Function order mismatch: call stack order differs from expected"
-      );
+      errors.push({
+        type: ErrorType.CALL_STACK_ORDER,
+        message: "Function order mismatch: call stack order differs from expected",
+        severity: 'error'
+      });
       break;
     }
   }
@@ -611,17 +720,21 @@ export default async function validateAnswer(
   questionType: "test" | "practice"
 ): Promise<{
   correct: boolean;
-  errors: string[];
+  errors: FeedbackError[];
 }> {
   const answerModel = await fetchAnswerModel(questionType, questionId);
   if (!answerModel) {
     return {
       correct: false,
-      errors: [`Invalid question id: ${questionId}`],
+      errors: [{
+        type: ErrorType.GENERIC_ERROR,
+        message: `Invalid question id: ${questionId}`,
+        severity: 'error'
+      }],
     };
   }
 
-  const errors: string[] = [];
+  const errors: FeedbackError[] = [];
 
   // gather frames from both models
   const { answerFrames, inputFrames, ansByName, usrByName } = gatherFrames(
@@ -633,9 +746,9 @@ export default async function validateAnswer(
   // check for function + function call stack errors
   const hasFunctionErrors = errors.some(
     (e) =>
-      e.startsWith("Function count mismatch") ||
-      e.startsWith("Missing function") ||
-      e.startsWith("Unexpected function")
+      e.message.startsWith("Function count mismatch") ||
+      e.message.startsWith("Missing function") ||
+      e.message.startsWith("Unexpected function")
   );
   if (!hasFunctionErrors) {
     checkCallStackOrder(answerFrames, inputFrames, errors);

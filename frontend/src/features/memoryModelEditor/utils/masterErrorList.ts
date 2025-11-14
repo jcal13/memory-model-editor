@@ -2,17 +2,17 @@
  * Master Error List utilities for MemoryModelEditor
  * 
  * Provides types and helper functions for working with aggregated
- * validation errors across all canvas elements.
+ * errors across all canvas elements (both validation and feedback errors).
  */
 
-import { CanvasElement, ValidationError } from "../../shared/types";
+import { CanvasElement, ElementError } from "../../shared/types";
 
 /**
- * Represents an element with its associated validation errors
+ * Represents an element with its associated errors
  */
 export interface ElementErrorEntry {
   element: CanvasElement;
-  errors: ValidationError[];
+  errors: ElementError[];
 }
 
 /**
@@ -29,10 +29,10 @@ export function createMasterErrorList(elements: CanvasElement[]): MasterErrorLis
   const errorMap = new Map<number, ElementErrorEntry>();
   
   elements.forEach((element) => {
-    if (element.validationErrors && element.validationErrors.length > 0) {
+    if (element.errors && element.errors.length > 0) {
       errorMap.set(element.boxId, {
         element,
-        errors: element.validationErrors,
+        errors: element.errors,
       });
     }
   });
@@ -76,12 +76,12 @@ export function hasErrors(errorList: MasterErrorList, boxId: number): boolean {
  * Gets errors for a specific element
  * @param errorList - Master error list
  * @param boxId - Box ID to get errors for
- * @returns Array of validation errors or empty array
+ * @returns Array of errors or empty array
  */
 export function getErrorsForElement(
   errorList: MasterErrorList,
   boxId: number
-): ValidationError[] {
+): ElementError[] {
   const entry = errorList.get(boxId);
   return entry ? entry.errors : [];
 }
@@ -122,13 +122,13 @@ export function flattenErrorList(errorList: MasterErrorList): Array<{
   boxId: number;
   elementId: number | "_";
   elementType: string;
-  error: ValidationError;
+  error: ElementError;
 }> {
   const flattened: Array<{
     boxId: number;
     elementId: number | "_";
     elementType: string;
-    error: ValidationError;
+    error: ElementError;
   }> = [];
   
   errorList.forEach((entry) => {

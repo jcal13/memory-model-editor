@@ -5,12 +5,12 @@
  * such as dangling references, invalid IDs, etc.
  */
 
-import { CanvasElement, ValidationError, ValidationErrorType } from "../../shared/types";
+import { CanvasElement, ElementError, ErrorType, ErrorSource } from "../../shared/types";
 
 /**
  * Validates all canvas elements and returns them with validation errors attached
  * @param elements - Array of canvas elements to validate
- * @returns Array of elements with validationErrors populated
+ * @returns Array of elements with errors populated
  */
 export function validateElements(elements: CanvasElement[]): CanvasElement[] {
   // Create a set of all valid IDs in the canvas
@@ -31,13 +31,13 @@ export function validateElements(elements: CanvasElement[]): CanvasElement[] {
  * Validates a single canvas element for errors
  * @param element - The element to validate
  * @param validIds - Set of all valid IDs in the canvas
- * @returns Element with validationErrors populated
+ * @returns Element with errors populated
  */
 function validateElement(
   element: CanvasElement,
   validIds: Set<number>
 ): CanvasElement {
-  const errors: ValidationError[] = [];
+  const errors: ElementError[] = [];
   const kindName = element.kind.name;
 
   switch (kindName) {
@@ -49,7 +49,8 @@ function validateElement(
         element.kind.value.forEach((refId, index) => {
           if (typeof refId === "number" && !validIds.has(refId)) {
             errors.push({
-              type: ValidationErrorType.DANGLING_REFERENCE,
+              source: ErrorSource.VALIDATION,
+              type: ErrorType.DANGLING_REFERENCE,
               message: `Element at index ${index} references non-existent object with ID ${refId}`,
               field: `value[${index}]`,
               invalidId: refId,
@@ -65,7 +66,8 @@ function validateElement(
         Object.entries(element.kind.value).forEach(([key, refId]) => {
           if (typeof refId === "number" && !validIds.has(refId)) {
             errors.push({
-              type: ValidationErrorType.DANGLING_REFERENCE,
+              source: ErrorSource.VALIDATION,
+              type: ErrorType.DANGLING_REFERENCE,
               message: `Dictionary key "${key}" references non-existent object with ID ${refId}`,
               field: `value.${key}`,
               invalidId: refId,
@@ -85,7 +87,8 @@ function validateElement(
             !validIds.has(param.targetId)
           ) {
             errors.push({
-              type: ValidationErrorType.DANGLING_REFERENCE,
+              source: ErrorSource.VALIDATION,
+              type: ErrorType.DANGLING_REFERENCE,
               message: `Parameter "${param.name}" references non-existent object with ID ${param.targetId}`,
               field: `params[${index}]`,
               invalidId: param.targetId,
@@ -105,7 +108,8 @@ function validateElement(
             !validIds.has(variable.targetId)
           ) {
             errors.push({
-              type: ValidationErrorType.DANGLING_REFERENCE,
+              source: ErrorSource.VALIDATION,
+              type: ErrorType.DANGLING_REFERENCE,
               message: `Class variable "${variable.name}" references non-existent object with ID ${variable.targetId}`,
               field: `classVariables[${index}]`,
               invalidId: variable.targetId,
@@ -123,19 +127,26 @@ function validateElement(
       break;
   }
 
+  // Preserve existing feedback errors and only update validation errors
+  const existingErrors = element.errors || [];
+  const feedbackErrors = existingErrors.filter(err => err.source === ErrorSource.FEEDBACK);
+  
+  // Combine feedback errors (preserved) with new validation errors
+  const combinedErrors = [...feedbackErrors, ...errors];
+
   return {
     ...element,
-    validationErrors: errors.length > 0 ? errors : undefined,
+    errors: combinedErrors.length > 0 ? combinedErrors : undefined,
   };
 }
 
 /**
- * Checks if an element has any validation errors
+ * Checks if an element has any errors
  * @param element - The element to check
- * @returns True if the element has validation errors
+ * @returns True if the element has errors
  */
-export function hasValidationErrors(element: CanvasElement): boolean {
-  return !!element.validationErrors && element.validationErrors.length > 0;
+export function hasErrors(element: CanvasElement): boolean {
+  return !!element.errors && element.errors.length > 0;
 }
 
 /**
@@ -144,12 +155,12 @@ export function hasValidationErrors(element: CanvasElement): boolean {
  * @returns Summary error message or empty string
  */
 export function getErrorSummary(element: CanvasElement): string {
-  if (!hasValidationErrors(element)) {
+  if (!hasErrors(element)) {
     return "";
   }
 
-  const errorCount = element.validationErrors!.length;
+  const errorCount = element.errors!.length;
   return errorCount === 1
-    ? "1 validation error"
-    : `${errorCount} validation errors`;
+    ? "1 error"
+    : `${errorCount} errors`;
 }

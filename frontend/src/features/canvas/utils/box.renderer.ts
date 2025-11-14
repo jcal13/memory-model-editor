@@ -3,7 +3,7 @@ import { CanvasElement } from "../../shared/types";
 import { BOX_CONFIGS } from "./box.configs";
 import { MemoryVizConfig } from "./box.types";
 import { DEFAULT_DIMENSIONS } from "./box.helpers";
-import { hasValidationErrors } from "./validation";
+import { hasErrors } from "./validation";
 
 /**
  * Default MemoryViz configuration
@@ -40,8 +40,8 @@ export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
     throw new Error(`Unsupported box type: ${kindName}`);
   }
 
-  // Determine if element has validation errors
-  const hasErrors = hasValidationErrors(element);
+  // Determine if element has errors (validation or feedback)
+  const elementHasErrors = hasErrors(element);
 
   // Build MemoryViz configuration with element-specific seed
   const memoryVizConfig: MemoryVizConfig = {
@@ -62,8 +62,8 @@ export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
   // Draw the element using the standard method
   boxConfig.draw(model, kind, id);
 
-  // Apply error styling to the SVG if validation errors exist
-  if (hasErrors) {
+  // Apply error styling to the SVG if errors exist
+  if (elementHasErrors) {
     applyErrorStyling(model.svg, element.color);
   }
 

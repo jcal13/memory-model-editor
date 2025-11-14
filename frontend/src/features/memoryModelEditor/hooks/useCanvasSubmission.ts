@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef } from "react";
 import { CanvasElement, SubmissionResult, Tab } from "../../shared/types";
 import { submitCanvas } from "../../validationServices/questionValidationService";
+import { applyFeedbackErrors, clearFeedbackErrors } from "../utils/feedbackErrorMapper";
 
 interface UseCanvasSubmissionParams {
   selectedQuestionIndex: number | null;
   selectedQuestionType: "test" | "practice" | null;
   elements: CanvasElement[];
+  setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
   setSubmissionResults: (results: SubmissionResult | null) => void;
   setActiveInfoTab: (tab: Tab) => void;
 }
@@ -23,12 +25,14 @@ export function useCanvasSubmission({
   selectedQuestionIndex,
   selectedQuestionType,
   elements,
+  setElements,
   setSubmissionResults,
   setActiveInfoTab,
 }: UseCanvasSubmissionParams): UseCanvasSubmissionReturn {
   const idxRef = useRef(selectedQuestionIndex);
   const typeRef = useRef(selectedQuestionType);
   const elsRef = useRef(elements);
+  const setElsRef = useRef(setElements);
   const setResultsRef = useRef(setSubmissionResults);
   const setTabRef = useRef(setActiveInfoTab);
 
@@ -41,6 +45,9 @@ export function useCanvasSubmission({
   useEffect(() => {
     elsRef.current = elements;
   }, [elements]);
+  useEffect(() => {
+    setElsRef.current = setElements;
+  }, [setElements]);
   useEffect(() => {
     setResultsRef.current = setSubmissionResults;
   }, [setSubmissionResults]);
@@ -60,7 +67,11 @@ export function useCanvasSubmission({
       return false;
     }
 
-    const validElements = els.filter((el) => !el.invalidated);
+    // Clear previous feedback errors before submission
+    const clearedElements = clearFeedbackErrors(els);
+    setElsRef.current(clearedElements);
+
+    const validElements = clearedElements.filter((el) => !el.invalidated);
 
     if (validElements.length === 0) {
       console.warn("No valid elements to submit");
@@ -72,13 +83,30 @@ export function useCanvasSubmission({
     try {
       const result = await submitCanvas(validElements, index, qtype);
 
-      if (result !== undefined) {
+      if (result !== undefined && result !== null) {
         setResultsRef.current(result);
+
+        console.log('[useCanvasSubmission] Submission result:', result);
+        console.log('[useCanvasSubmission] Feedback errors count:', result.errors?.length || 0);
+
+        // Apply feedback errors to canvas elements
+        if (result.errors && result.errors.length > 0) {
+          console.log('[useCanvasSubmission] Applying feedback errors:', result.errors);
+          const elementsWithFeedback = applyFeedbackErrors(clearedElements, result.errors);
+          console.log('[useCanvasSubmission] Elements with feedback:', elementsWithFeedback.filter(el => el.errors && el.errors.length > 0));
+          setElsRef.current(elementsWithFeedback);
+        }
 
         // Determine if submission was correct based on result
         const isCorrect = determineIfCorrect(result);
 
-        setTabRef.current("feedback");
+        // Switch to errors tab if there are feedback errors, otherwise feedback tab
+        if (result.errors && result.errors.length > 0) {
+          setTabRef.current("errors");
+        } else {
+          setTabRef.current("feedback");
+        }
+
         return isCorrect;
       } else {
         console.warn("Submission returned undefined result");

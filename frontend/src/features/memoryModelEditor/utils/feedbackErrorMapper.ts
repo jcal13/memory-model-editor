@@ -46,8 +46,24 @@ export function applyFeedbackErrors(
   feedbackErrors.forEach((feedbackError) => {
     let targetElement: CanvasElement | undefined;
     
-    // Strategy 1: Use elementId if provided
-    if (feedbackError.elementId !== undefined) {
+    // Special handling for ID mapping conflicts
+    // These errors should highlight the FRAME where the conflicting variables are defined
+    // NOT the object they point to, because the fix happens in the frame
+    const isIdMappingConflict = feedbackError.type === ErrorType.GENERIC_ERROR && 
+                                 feedbackError.message?.includes('ID mapping conflict');
+    
+    if (isIdMappingConflict && feedbackError.path) {
+      // For ID mapping conflicts, always highlight the frame, not the variable's target
+      const functionMatch = feedbackError.path.match(/function\s+"([^"]+)"/);
+      if (functionMatch) {
+        const functionName = functionMatch[1];
+        targetElement = framesByNameMap.get(functionName);
+        console.log('[feedbackErrorMapper] ID mapping conflict - mapped to frame:', functionName, 'found:', !!targetElement);
+      }
+    }
+    
+    // Strategy 1: Use elementId if provided (only if not already mapped above)
+    if (!targetElement && feedbackError.elementId !== undefined) {
       const elementsWithId = elementsByIdMap.get(feedbackError.elementId);
       targetElement = elementsWithId?.[0];
       console.log('[feedbackErrorMapper] Mapped error to elementId:', feedbackError.elementId, 'found:', !!targetElement);

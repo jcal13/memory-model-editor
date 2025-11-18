@@ -70,7 +70,11 @@ export function loadInitialUIData(): UIState {
 
     // Validate and normalize each field
     const activeTab: Tab =
-      parsed?.activeTab === "feedback" ? "feedback" : "question";
+      parsed?.activeTab === "feedback" || 
+      parsed?.activeTab === "errors" || 
+      parsed?.activeTab === "question"
+        ? parsed.activeTab
+        : "question";
 
     const questionIndex =
       typeof parsed?.questionIndex === "number" ? parsed.questionIndex : null;

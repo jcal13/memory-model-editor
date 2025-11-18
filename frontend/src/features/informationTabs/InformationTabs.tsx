@@ -88,6 +88,12 @@ export default function InformationTabs({
             <FeedbackTab
               submissionResults={submissionResults}
               questionSelected={questionSelected}
+              questionIndex={questionIndex}
+              questionType={questionType}
+              masterErrorList={masterErrorList}
+              elements={elements}
+              setElements={setElements}
+              onOpenEditor={onOpenEditor}
             />
           </div>
 

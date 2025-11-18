@@ -45,7 +45,8 @@ function ensureBijection(
   inputToAnswerMap: Map<number, { target: number; path: string }>,
   isVar: boolean,
   path: string,
-  errors: FeedbackError[]
+  errors: FeedbackError[],
+  contextFrameId?: number
 ): boolean {
   // check if the answer ID is already mapped to an input ID
   if (answerToInputMap.has(answerID)) {
@@ -54,7 +55,7 @@ function ensureBijection(
       if (!isVar) errors.push({
         type: ErrorType.GENERIC_ERROR,
         message: `ID mapping conflict: ${prev.path}", "${path}`,
-        elementId: inputID,
+        elementId: contextFrameId ?? inputID, // Use frame ID if available, otherwise the conflicting object
         path,
         severity: 'error'
       });
@@ -69,7 +70,7 @@ function ensureBijection(
       if (!isVar) errors.push({
         type: ErrorType.GENERIC_ERROR,
         message: `ID mapping conflict: ${prev.path}, ${path}`,
-        elementId: inputID,
+        elementId: contextFrameId ?? inputID, // Use frame ID if available, otherwise the conflicting object
         path,
         severity: 'error'
       });
@@ -491,7 +492,8 @@ function compareFrames(
         dup,
         `function "${name}" → var "${k}"→`,
         errors,
-        visited
+        visited,
+        uFrame.id ?? undefined // Pass the frame ID for error context
       );
     }
   }
@@ -548,7 +550,8 @@ function compareIds(
   duplicates: Set<number>, // user IDs reused in two boxes
   path: string, // path to the current box, e.g. "frame 'main' → var 'a'→"
   errors: FeedbackError[], // collects error messages
-  visited: Map<number, Set<number>> // map of pairs: answerID → {inputID,…}
+  visited: Map<number, Set<number>>, // map of pairs: answerID → {inputID,…}
+  contextFrameId?: number // ID of the frame containing this variable (for error context)
 ) {
   // skip if this input ID is already known to be a duplicate, we report this error later
   if (duplicates.has(inputID)) return;
@@ -585,7 +588,8 @@ function compareIds(
       inputToAnswerMap,
       isVar,
       path,
-      errors
+      errors,
+      contextFrameId
     )
   )
     return;

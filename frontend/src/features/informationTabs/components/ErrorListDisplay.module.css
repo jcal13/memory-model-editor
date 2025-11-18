@@ -1,0 +1,162 @@
+.content {
+  text-align: left;
+  font-style: normal;
+  color: #1f2937;
+  padding: 0 8px;
+}
+
+.title {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 10px 0 25px 0;
+  letter-spacing: 0.25px;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 8px 0;
+  background-color: #f3f4f6;
+  font-style: normal;
+}
+
+/* Success state - no errors */
+.noErrorsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.successIcon {
+  font-size: 4rem;
+  color: #16a34a;
+  margin-bottom: 16px;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #d1fae5;
+  border-radius: 50%;
+}
+
+.successMessage {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #16a34a;
+  margin: 0 0 8px 0;
+}
+
+.successSubtext {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Error summary */
+.errorSummary {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 16px;
+  background-color: #fee2e2;
+  border-left: 4px solid #dc2626;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.errorCount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+.errorLabel {
+  font-size: 1.1rem;
+  color: #991b1b;
+  font-weight: 500;
+}
+
+/* Error list */
+.errorList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.errorItem {
+  padding: 16px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-left: 3px solid #dc2626;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.errorItem:hover {
+  background-color: #fee2e2;
+  border-left-width: 4px;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.1);
+  transform: translateX(2px);
+}
+
+.errorHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.errorIcon {
+  font-size: 1.25rem;
+  color: #dc2626;
+  flex-shrink: 0;
+}
+
+.elementInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  color: #1f2937;
+}
+
+.elementInfo strong {
+  color: #991b1b;
+}
+
+.elementType {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.errorMessage {
+  font-size: 0.95rem;
+  color: #991b1b;
+  line-height: 1.5;
+  margin-bottom: 8px;
+  padding-left: 32px; /* Align with icon */
+}
+
+.errorField {
+  font-size: 0.875rem;
+  color: #7f1d1d;
+  padding-left: 32px; /* Align with icon */
+  margin-top: 4px;
+}
+
+.errorField code {
+  background-color: #fee2e2;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}

@@ -100,12 +100,8 @@ export function useCanvasSubmission({
         // Determine if submission was correct based on result
         const isCorrect = determineIfCorrect(result);
 
-        // Switch to errors tab if there are feedback errors, otherwise feedback tab
-        if (result.errors && result.errors.length > 0) {
-          setTabRef.current("errors");
-        } else {
-          setTabRef.current("feedback");
-        }
+        // Switch to feedback tab to show submission results
+        setTabRef.current("feedback");
 
         return isCorrect;
       } else {

@@ -1,6 +1,6 @@
-import { MasterErrorList, flattenErrorList, getTotalErrorCount } from "../../memoryModelEditor/utils/masterErrorList";
-import { CanvasElement } from "../../shared/types";
-import styles from "./ErrorsTab.module.css";
+import { MasterErrorList, flattenErrorList } from "../../memoryModelEditor/utils/masterErrorList";
+import { CanvasElement, ErrorSource } from "../../shared/types";
+import ErrorListDisplay from "../components/ErrorListDisplay";
 
 interface ErrorsTabProps {
   masterErrorList: MasterErrorList;
@@ -16,90 +16,21 @@ export default function ErrorsTab({
   onOpenEditor 
 }: ErrorsTabProps) {
   
-  // Handle hovering over an error - highlight the associated element
-  const handleErrorHover = (elementId: number | "_", isHovering: boolean) => {
-    setElements((prevElements) =>
-      prevElements.map((el) =>
-        el.id === elementId
-          ? { ...el, color: isHovering ? "#3B82F6" : undefined }
-          : el
-      )
-    );
-  };
-  
-  // Handle clicking an error - open the editor for the associated element
-  const handleErrorClick = (elementId: number | "_") => {
-    const element = elements.find((el) => el.id === elementId);
-    if (element) {
-      onOpenEditor(element);
-    }
-  };
-  const renderTitle = () => <h1 className={styles.title}>Validation Errors</h1>;
-
-  const totalErrors = getTotalErrorCount(masterErrorList);
-
-  // No errors - success state
-  if (totalErrors === 0) {
-    return (
-      <>
-        {renderTitle()}
-        <div className={styles.content}>
-          <div className={styles.noErrorsContainer}>
-            <div className={styles.successIcon}>✓</div>
-            <p className={styles.successMessage}>
-              No validation errors detected
-            </p>
-            <p className={styles.successSubtext}>
-              Your memory model is valid and ready to submit.
-            </p>
-          </div>
-        </div>
-      </>
-    );
-  }
-
-  // Has errors - show the list
+  // Get all errors and filter for validation errors only
   const allErrors = flattenErrorList(masterErrorList);
+  const validationErrors = allErrors.filter(
+    (item) => item.error.source === ErrorSource.VALIDATION
+  );
 
   return (
-    <>
-      {renderTitle()}
-      <div className={styles.content}>
-        <div className={styles.errorSummary}>
-          <span className={styles.errorCount}>{totalErrors}</span>
-          <span className={styles.errorLabel}>
-            {totalErrors === 1 ? "error" : "errors"} found
-          </span>
-        </div>
-
-        <ul className={styles.errorList}>
-          {allErrors.map((item, index) => (
-            <li 
-              key={index} 
-              className={styles.errorItem}
-              onMouseEnter={() => handleErrorHover(item.elementId, true)}
-              onMouseLeave={() => handleErrorHover(item.elementId, false)}
-              onClick={() => handleErrorClick(item.elementId)}
-            >
-              <div className={styles.errorHeader}>
-                <span className={styles.errorIcon}>⚠</span>
-                <span className={styles.elementInfo}>
-                  <strong>Element {item.elementId}</strong>
-                  <span className={styles.elementType}>({item.elementType})</span>
-                </span>
-              </div>
-              <div className={styles.errorMessage}>
-                {item.error.message}
-              </div>
-              {item.error.field && (
-                <div className={styles.errorField}>
-                  Field: <code>{item.error.field}</code>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </>
+    <ErrorListDisplay
+      errors={validationErrors}
+      elements={elements}
+      setElements={setElements}
+      onOpenEditor={onOpenEditor}
+      title="Validation Errors"
+      emptyStateMessage="No validation errors detected"
+      emptyStateSubtext="Your memory model is valid and ready to submit."
+    />
   );
 }

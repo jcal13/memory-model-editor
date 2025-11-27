@@ -32,6 +32,33 @@ const isObjectType = (t: string) => t === "object";
 const isContainer = (t: string) =>
   isArrayType(t) || isSetType(t) || isDictType(t) || isObjectType(t);
 
+// Extract all element IDs involved in an error path for multi-element highlighting
+function extractPathElementIds(
+  path: string,
+  inputMap: Map<number, MemoryBox>,
+  framesByName: Map<string, MemoryBox>,
+  primaryElementId?: number
+): number[] {
+  const ids: number[] = [];
+  
+  // Add primary element ID if provided
+  if (primaryElementId !== undefined && primaryElementId !== null) {
+    ids.push(primaryElementId);
+  }
+  
+  // Extract frame from path: function "__main__"
+  const frameMatch = path.match(/function\s+"([^"]+)"/);
+  if (frameMatch) {
+    const frameName = frameMatch[1];
+    const frame = framesByName.get(frameName);
+    if (frame && frame.id !== null) {
+      ids.push(frame.id);
+    }
+  }
+  
+  return ids;
+}
+
 // Given an array of MemoryBox's, construct a map of ID: MemoryBox
 // Drops boxes with no ID
 const idMap = (m: MemoryBox[]) =>
@@ -88,13 +115,15 @@ function checkTypeMismatch(
   answerBox: MemoryBox,
   inputBox: MemoryBox,
   path: string,
-  errors: FeedbackError[]
+  errors: FeedbackError[],
+  contextFrameId?: number
 ): boolean {
   if (answerBox.type !== inputBox.type) {
     errors.push({
       type: ErrorType.TYPE_MISMATCH,
       message: `Type mismatch: ${path} got ${inputBox.type}, expected ${answerBox.type}`,
-      elementId: inputBox.id ?? undefined,
+      elementId: contextFrameId ?? inputBox.id ?? undefined,
+      relatedIds: inputBox.id !== null && inputBox.id !== contextFrameId ? [inputBox.id] : undefined,
       path,
       severity: 'error'
     });
@@ -108,14 +137,16 @@ function comparePrimitives(
   answerBox: MemoryBox,
   inputBox: MemoryBox,
   path: string,
-  errors: FeedbackError[]
+  errors: FeedbackError[],
+  contextFrameId?: number
 ): boolean {
   if (!isContainer(answerBox.type)) {
     if (answerBox.value !== inputBox.value) {
       errors.push({
         type: ErrorType.VALUE_MISMATCH,
         message: `Value mismatch: ${path} got ${inputBox.value}, expected ${answerBox.value}`,
-        elementId: inputBox.id ?? undefined,
+        elementId: contextFrameId ?? inputBox.id ?? undefined,
+        relatedIds: inputBox.id !== null && inputBox.id !== contextFrameId ? [inputBox.id] : undefined,
         path,
         severity: 'error'
       });
@@ -176,7 +207,8 @@ function checkArray(
       duplicates,
       `${path}[${i}]→`,
       errors,
-      visited
+      visited,
+      inputMemoryBox.id ?? undefined // Pass the container ID as context
     );
   }
 }
@@ -213,7 +245,8 @@ function checkSet(
         duplicates,
         `${path}{el}→`,
         errorsDetected,
-        clonedVisited
+        clonedVisited,
+        inputMemoryBox.id ?? undefined // Pass the container ID as context
       );
       if (errorsDetected.length === 0) {
         // after recursive comparison, if no errors were detected, there is a match for the current input ID in the set
@@ -225,7 +258,7 @@ function checkSet(
     if (!matched) errors.push({
       type: ErrorType.MISSING_ELEMENT,
       message: `Missing element: ${path} id=${answerChild}`,
-      elementId: answerChild,
+      elementId: inputMemoryBox.id ?? undefined, // The container that's missing elements
       path,
       severity: 'error'
     });
@@ -236,7 +269,7 @@ function checkSet(
     errors.push({
       type: ErrorType.UNEXPECTED_ELEMENT,
       message: `Unexpected element: ${path} id=${extraId}`,
-      elementId: extraId as number,
+      elementId: inputMemoryBox.id ?? undefined, // The container with unexpected elements
       path,
       severity: 'error'
     });
@@ -263,7 +296,7 @@ function checkDict(
       errors.push({
         type: ErrorType.MISSING_ELEMENT,
         message: `Missing key: ${path} key=${key}, id=${missingId}`,
-        elementId: missingId,
+        elementId: inputMemoryBox.id ?? undefined, // The container that's missing keys
         path,
         field: key,
         severity: 'error'
@@ -282,7 +315,8 @@ function checkDict(
       duplicates,
       `${path}[${key}]→`,
       errors,
-      visited
+      visited,
+      inputMemoryBox.id ?? undefined // Pass the container ID as context
     );
   }
 
@@ -293,7 +327,7 @@ function checkDict(
       errors.push({
         type: ErrorType.UNEXPECTED_ELEMENT,
         message: `Unexpected key: ${path} key=${key}, id=${extraId}`,
-        elementId: extraId,
+        elementId: inputMemoryBox.id ?? undefined, // The container with unexpected keys
         path,
         field: key,
         severity: 'error'
@@ -336,7 +370,7 @@ function checkObject(
       errors.push({
         type: ErrorType.MISSING_ELEMENT,
         message: `Missing object property: ${path} object "${answerMemoryBox.name}" expected property "${prop}"`,
-        elementId: answerMemoryBox.id ?? undefined,
+        elementId: inputMemoryBox.id ?? undefined, // The container that's missing properties
         path,
         field: prop,
         severity: 'error'
@@ -355,7 +389,8 @@ function checkObject(
       duplicates,
       `${path}object "${answerMemoryBox.name}".${prop}→`,
       errors,
-      visited
+      visited,
+      inputMemoryBox.id ?? undefined // Pass the container ID as context
     );
   }
 
@@ -455,6 +490,7 @@ function compareFrames(
         errors.push({
           type: ErrorType.MISSING_ELEMENT,
           message: `Missing variable: function "${name}" expected "${k}"`,
+          elementId: uFrame.id ?? undefined,
           path: `function "${name}" → var "${k}"`,
           severity: 'error'
         });
@@ -463,6 +499,7 @@ function compareFrames(
         errors.push({
           type: ErrorType.UNEXPECTED_ELEMENT,
           message: `Unexpected variable: function "${name}" unexpected "${k}"`,
+          elementId: uFrame.id ?? undefined,
           path: `function "${name}" → var "${k}"`,
           severity: 'error'
         });
@@ -595,10 +632,10 @@ function compareIds(
     return;
 
   // Type check
-  if (checkTypeMismatch(answerMemoryBox, inputMemoryBox, path, errors)) return;
+  if (checkTypeMismatch(answerMemoryBox, inputMemoryBox, path, errors, contextFrameId)) return;
 
   // Primitive check
-  if (comparePrimitives(answerMemoryBox, inputMemoryBox, path, errors)) return;
+  if (comparePrimitives(answerMemoryBox, inputMemoryBox, path, errors, contextFrameId)) return;
 
   // Array type box check
   if (isArrayType(answerMemoryBox.type)) {

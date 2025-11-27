@@ -102,6 +102,7 @@ export interface ElementError {
   message: string;
   field?: string; // e.g., "value[0]", "params[1]", "classVariables[2]"
   invalidId?: number; // The specific ID that is invalid
+  relatedElementIds?: (number | "_")[]; // All element IDs involved in this error (for multi-element highlighting)
   severity?: 'error' | 'warning' | 'info'; // Optional severity level
 }
 

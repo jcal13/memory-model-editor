@@ -5,17 +5,21 @@
   bottom: calc(100% + 12px);
   left: 50%;
   transform: translateX(-50%);
-  background: white;
+  background: rgba(255, 255, 255, 0.98);
   border: 2px solid #DC2626;
   border-radius: 8px;
   padding: 12px 14px;
   min-width: 220px;
   max-width: 320px;
+  max-height: 400px;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 8px 24px rgba(220, 38, 38, 0.25), 
               0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 10000;
-  pointer-events: none;
+  pointer-events: auto;
   animation: tooltipFadeIn 0.2s ease-out;
+  backdrop-filter: blur(8px);
 }
 
 @keyframes tooltipFadeIn {
@@ -79,6 +83,28 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 320px;
+  padding-right: 4px;
+}
+
+.tooltipContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tooltipContent::-webkit-scrollbar-track {
+  background: #FEE2E2;
+  border-radius: 3px;
+}
+
+.tooltipContent::-webkit-scrollbar-thumb {
+  background: #FCA5A5;
+  border-radius: 3px;
+}
+
+.tooltipContent::-webkit-scrollbar-thumb:hover {
+  background: #DC2626;
 }
 
 .errorItem {

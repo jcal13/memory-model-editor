@@ -84,6 +84,13 @@ export default function FeedbackTab({
     (item) => item.error.source === ErrorSource.FEEDBACK
   );
 
+  // Deduplicate errors - same error may be attached to multiple elements for canvas highlighting
+  // but should only appear once in the feedback list
+  const uniqueFeedbackErrors = feedbackErrors.filter((item, index, self) => {
+    // Keep only the first occurrence of each unique error object
+    return self.findIndex(other => other.error === item.error) === index;
+  });
+
   return (
     <>
       {renderTitle()}
@@ -93,7 +100,7 @@ export default function FeedbackTab({
         </p>
       </div>
       <ErrorListDisplay
-        errors={feedbackErrors}
+        errors={uniqueFeedbackErrors}
         elements={elements}
         setElements={setElements}
         onOpenEditor={onOpenEditor}

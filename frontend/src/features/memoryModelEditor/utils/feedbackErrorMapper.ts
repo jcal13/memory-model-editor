@@ -44,70 +44,69 @@ export function applyFeedbackErrors(
   const unmappedErrors: FeedbackError[] = [];
   
   feedbackErrors.forEach((feedbackError) => {
-    let targetElement: CanvasElement | undefined;
+    const relatedElementIds: (number | "_")[] = [];
     
-    // Special handling for ID mapping conflicts
-    // These errors should highlight the FRAME where the conflicting variables are defined
-    // NOT the object they point to, because the fix happens in the frame
-    const isIdMappingConflict = feedbackError.type === ErrorType.GENERIC_ERROR && 
-                                 feedbackError.message?.includes('ID mapping conflict');
-    
-    if (isIdMappingConflict && feedbackError.path) {
-      // For ID mapping conflicts, always highlight the frame, not the variable's target
+    // Extract ALL element IDs involved in the error chain from the path
+    if (feedbackError.path) {
+      // Step 1: Extract frame from path (if present)
       const functionMatch = feedbackError.path.match(/function\s+"([^"]+)"/);
       if (functionMatch) {
         const functionName = functionMatch[1];
-        targetElement = framesByNameMap.get(functionName);
-        console.log('[feedbackErrorMapper] ID mapping conflict - mapped to frame:', functionName, 'found:', !!targetElement);
-      }
-    }
-    
-    // Strategy 1: Use elementId if provided (only if not already mapped above)
-    if (!targetElement && feedbackError.elementId !== undefined) {
-      const elementsWithId = elementsByIdMap.get(feedbackError.elementId);
-      targetElement = elementsWithId?.[0];
-      console.log('[feedbackErrorMapper] Mapped error to elementId:', feedbackError.elementId, 'found:', !!targetElement);
-    }
-    
-    // Strategy 2: Parse path to find the most specific element
-    if (!targetElement && feedbackError.path) {
-      // Priority 1: Look for variable references in path like 'function "__main__" → var "c"'
-      // This tells us which variable (and thus which canvas element) has the issue
-      const varMatch = feedbackError.path.match(/→\s*var\s+"([^"]+)"/);
-      if (varMatch) {
-        const varName = varMatch[1];
-        // Find function frame first
-        const functionMatch = feedbackError.path.match(/function\s+"([^"]+)"/);
-        if (functionMatch) {
-          const functionName = functionMatch[1];
-          const frame = framesByNameMap.get(functionName);
-          if (frame && frame.kind.name === 'function') {
-            // Find the parameter/variable with this name
-            const param = frame.kind.params.find(p => p.name === varName);
-            if (param && param.targetId !== null) {
-              const elementsWithId = elementsByIdMap.get(param.targetId);
-              targetElement = elementsWithId?.[0];
-              console.log('[feedbackErrorMapper] Mapped error to variable:', varName, 'ID:', param.targetId, 'found:', !!targetElement);
-            }
-          }
+        const frame = framesByNameMap.get(functionName);
+        if (frame) {
+          relatedElementIds.push(frame.id);
+          console.log('[feedbackErrorMapper] Added frame to error chain:', functionName, 'ID:', frame.id);
         }
       }
       
-      // Priority 2: Extract function name from path if no variable found
-      if (!targetElement) {
-        const functionMatch = feedbackError.path.match(/function\s+"([^"]+)"/);
-        if (functionMatch) {
-          const functionName = functionMatch[1];
-          targetElement = framesByNameMap.get(functionName);
-          console.log('[feedbackErrorMapper] Mapped error to frame:', functionName, 'found:', !!targetElement);
+      // Note: We don't extract variable targets from path anymore because:
+      // 1. For nested containers (e.g., L[0][1]), extracting variable "L" would include
+      //    the wrong container (outer list instead of inner list)
+      // 2. The backend already provides the correct elementId (direct container)
+      // 3. This prevents highlighting unrelated elements with same variable name
+    }
+    
+    // Step 3: Add primary elementId if provided and not already included
+    if (feedbackError.elementId !== undefined && !relatedElementIds.includes(feedbackError.elementId)) {
+      relatedElementIds.push(feedbackError.elementId);
+      console.log('[feedbackErrorMapper] Added primary element to error chain:', feedbackError.elementId);
+    }
+    
+    // Step 4: Add any relatedIds if provided by backend
+    if (feedbackError.relatedIds) {
+      feedbackError.relatedIds.forEach((relatedId) => {
+        if (!relatedElementIds.includes(relatedId)) {
+          relatedElementIds.push(relatedId);
+          console.log('[feedbackErrorMapper] Added backend relatedId to error chain:', relatedId);
         }
+      });
+    }
+    
+    // Find the primary element to attach this error to (first element in the chain)
+    let primaryElement: CanvasElement | undefined;
+    for (const elementId of relatedElementIds) {
+      const elementsWithId = elementsByIdMap.get(elementId);
+      if (elementsWithId && elementsWithId[0]) {
+        primaryElement = elementsWithId[0];
+        break;
       }
     }
     
-    if (targetElement) {
-      const existing = errorsByElement.get(targetElement) || [];
+    if (primaryElement && relatedElementIds.length > 0) {
+      // Create ElementError with all related element IDs
+      const elementError: ElementError = {
+        source: ErrorSource.FEEDBACK,
+        type: feedbackError.type,
+        message: feedbackError.message,
+        field: feedbackError.field,
+        relatedElementIds: relatedElementIds,
+        severity: feedbackError.severity || 'error'
+      };
+      
+      const existing = errorsByElement.get(primaryElement) || [];
       existing.push(feedbackError);
-      errorsByElement.set(targetElement, existing);
+      errorsByElement.set(primaryElement, existing);
+      console.log('[feedbackErrorMapper] Attached error to primary element:', primaryElement.id, 'with', relatedElementIds.length, 'related elements');
     } else {
       console.log('[feedbackErrorMapper] Could not map error:', feedbackError);
       unmappedErrors.push(feedbackError);
@@ -125,17 +124,46 @@ export function applyFeedbackErrors(
       return element; // No feedback errors for this element
     }
 
-    console.log('[feedbackErrorMapper] Attaching', feedbackErrorsForElement.length, 'errors to element', element.id, element.kind.name === 'function' ? `(${element.kind.functionName})` : '');
+    console.log('[feedbackErrorMapper] Attaching', feedbackErrorsForElement.length, 'errors to primary element', element.id, element.kind.name === 'function' ? `(${element.kind.functionName})` : '');
     
-    // Convert feedback errors to ElementErrors
-    const mappedErrors: ElementError[] = feedbackErrorsForElement.map((feedbackError) => ({
-      source: ErrorSource.FEEDBACK,
-      type: feedbackError.type,
-      message: feedbackError.message,
-      field: feedbackError.field,
-      invalidId: undefined,
-      severity: feedbackError.severity || 'error',
-    }));
+    // Convert feedback errors to ElementErrors with relatedElementIds
+    const mappedErrors: ElementError[] = feedbackErrorsForElement.map((feedbackError) => {
+      // Extract all related element IDs from the path and backend fields
+      const relatedIds: (number | "_")[] = [];
+      
+      if (feedbackError.path) {
+        // Get frame ID from path
+        const functionMatch = feedbackError.path.match(/function\s+"([^"]+)"/);
+        if (functionMatch) {
+          const frame = framesByNameMap.get(functionMatch[1]);
+          if (frame) relatedIds.push(frame.id);
+        }
+        
+        // Note: We don't extract variable targets anymore to avoid including
+        // wrong containers in nested structures (e.g., outer list when error is in inner list)
+      }
+      
+      // Add primary elementId (the direct container provided by backend)
+      if (feedbackError.elementId !== undefined && !relatedIds.includes(feedbackError.elementId)) {
+        relatedIds.push(feedbackError.elementId);
+      }
+      
+      // Add backend-provided relatedIds (e.g., the primitive element being compared)
+      if (feedbackError.relatedIds) {
+        feedbackError.relatedIds.forEach(id => {
+          if (!relatedIds.includes(id)) relatedIds.push(id);
+        });
+      }
+      
+      return {
+        source: ErrorSource.FEEDBACK,
+        type: feedbackError.type,
+        message: feedbackError.message,
+        field: feedbackError.field,
+        relatedElementIds: relatedIds.length > 0 ? relatedIds : undefined,
+        severity: feedbackError.severity || 'error',
+      };
+    });
 
     // Merge with existing errors (validation errors)
     const existingErrors = element.errors || [];
@@ -150,33 +178,61 @@ export function applyFeedbackErrors(
       errors: [...validationErrors, ...mappedErrors],
     };
   });
+  
+  // Now attach the same errors to ALL related elements so they show as red on canvas
+  const finalElements = updatedElements.map((element) => {
+    // Check if any other elements have errors where this element is in relatedElementIds
+    const relatedErrors: ElementError[] = [];
+    
+    updatedElements.forEach((otherElement) => {
+      if (otherElement.errors) {
+        otherElement.errors.forEach((error) => {
+          if (error.source === ErrorSource.FEEDBACK && 
+              error.relatedElementIds && 
+              error.relatedElementIds.includes(element.id) &&
+              !element.errors?.includes(error)) {
+            relatedErrors.push(error);
+          }
+        });
+      }
+    });
+    
+    if (relatedErrors.length > 0) {
+      console.log('[feedbackErrorMapper] Adding', relatedErrors.length, 'related errors to element', element.id);
+      return {
+        ...element,
+        errors: [...(element.errors || []), ...relatedErrors],
+      };
+    }
+    
+    return element;
+  });
 
   // Handle unmapped errors - attach to first frame or first element as last resort
-  if (unmappedErrors.length > 0 && updatedElements.length > 0) {
+  if (unmappedErrors.length > 0 && finalElements.length > 0) {
     console.log('[feedbackErrorMapper] Attaching', unmappedErrors.length, 'unmapped errors to fallback element');
     
     // Try to find __main__ frame first, then any frame, then first element
-    let fallbackElement = updatedElements.find(el => 
+    let fallbackElement = finalElements.find(el => 
       el.kind.name === 'function' && el.kind.functionName === '__main__'
-    ) || updatedElements.find(el => el.kind.name === 'function') || updatedElements[0];
+    ) || finalElements.find(el => el.kind.name === 'function') || finalElements[0];
     
-    const fallbackIndex = updatedElements.indexOf(fallbackElement);
+    const fallbackIndex = finalElements.indexOf(fallbackElement);
     const unmappedMappedErrors: ElementError[] = unmappedErrors.map((feedbackError) => ({
       source: ErrorSource.FEEDBACK,
       type: feedbackError.type,
       message: feedbackError.message,
       field: feedbackError.field,
-      invalidId: undefined,
       severity: feedbackError.severity || 'error',
     }));
     
-    updatedElements[fallbackIndex] = {
+    finalElements[fallbackIndex] = {
       ...fallbackElement,
       errors: [...(fallbackElement.errors || []), ...unmappedMappedErrors],
     };
   }
 
-  return updatedElements;
+  return finalElements;
 }
 
 /**

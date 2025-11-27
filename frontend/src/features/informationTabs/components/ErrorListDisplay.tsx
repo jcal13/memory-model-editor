@@ -27,21 +27,53 @@ export default function ErrorListDisplay({
   emptyStateMessage = "No errors detected",
   emptyStateSubtext = "Everything looks good!",
 }: ErrorListDisplayProps) {
-  // Handle hovering over an error - highlight the associated element
-  const handleErrorHover = (elementId: number | "_", isHovering: boolean) => {
+  // Handle hovering over an error - highlight ALL elements in the error chain
+  const handleErrorHover = (hoveredError: ElementError, isHovering: boolean) => {
+    // Get all element IDs that should be highlighted for this error
+    const elementIdsToHighlight = new Set<number | "_">();
+    
+    if (hoveredError.relatedElementIds && hoveredError.relatedElementIds.length > 0) {
+      // Use the relatedElementIds from the error
+      hoveredError.relatedElementIds.forEach(id => elementIdsToHighlight.add(id));
+    } else {
+      // Fallback: find the element that has this error
+      const elementWithError = elements.find((el) =>
+        el.errors?.some((err) => err === hoveredError)
+      );
+      if (elementWithError) {
+        elementIdsToHighlight.add(elementWithError.id);
+      }
+    }
+    
+    console.log('[ErrorListDisplay] Hovering error, highlighting', elementIdsToHighlight.size, 'elements:', Array.from(elementIdsToHighlight));
+    
     setElements((prevElements) =>
       prevElements.map((el) =>
-        el.id === elementId
+        elementIdsToHighlight.has(el.id)
           ? { ...el, color: isHovering ? "#3B82F6" : undefined }
           : el
       )
     );
   };
 
-  // Handle clicking an error - open the editor for the associated element
-  const handleErrorClick = (elementId: number | "_") => {
-    const element = elements.find((el) => el.id === elementId);
+  // Handle clicking an error - open the editor for the element one layer above the deepest element
+  const handleErrorClick = (error: ElementError, fallbackElementId: number | "_") => {
+    let targetElementId: number | "_" = fallbackElementId;
+    
+    // If error has relatedElementIds, open editor for the element one layer above the deepest
+    // Example: main -> list -> [1] -> primitive
+    // We want to open the list editor (second-to-last in chain)
+    if (error.relatedElementIds && error.relatedElementIds.length > 1) {
+      // Get second-to-last element (one layer above the deepest)
+      targetElementId = error.relatedElementIds[error.relatedElementIds.length - 2];
+    } else if (error.relatedElementIds && error.relatedElementIds.length === 1) {
+      // If only one element in chain, use it
+      targetElementId = error.relatedElementIds[0];
+    }
+    
+    const element = elements.find((el) => el.id === targetElementId);
     if (element) {
+      console.log('[ErrorListDisplay] Opening editor for element', targetElementId, '(one layer above deepest)');
       onOpenEditor(element);
     }
   };
@@ -83,9 +115,9 @@ export default function ErrorListDisplay({
             <li
               key={index}
               className={styles.errorItem}
-              onMouseEnter={() => handleErrorHover(item.elementId, true)}
-              onMouseLeave={() => handleErrorHover(item.elementId, false)}
-              onClick={() => handleErrorClick(item.elementId)}
+              onMouseEnter={() => handleErrorHover(item.error, true)}
+              onMouseLeave={() => handleErrorHover(item.error, false)}
+              onClick={() => handleErrorClick(item.error, item.elementId)}
             >
               <div className={styles.errorHeader}>
                 <span className={styles.errorIcon}>⚠</span>

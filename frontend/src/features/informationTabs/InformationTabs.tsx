@@ -15,6 +15,10 @@ interface InformationTabsProps {
   questionType: "test" | "practice" | null;
   setQuestionType: (type: "test" | "practice" | null) => void;
   onSubmit: () => Promise<boolean>;
+  setSubmissionResults: (results: SubmissionResult | null) => void;
+  onClearCanvas: () => void;
+  onRestoreCanvas: (elements: any[], ids: number[], classes: string[]) => void;
+  currentCanvasState: { elements: any[]; ids: number[]; classes: string[] };
   masterErrorList: MasterErrorList;
   elements: CanvasElement[];
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
@@ -39,6 +43,10 @@ export default function InformationTabs({
   questionType,
   setQuestionType,
   onSubmit,
+  setSubmissionResults,
+  onClearCanvas,
+  onRestoreCanvas,
+  currentCanvasState,
   masterErrorList,
   elements,
   setElements,

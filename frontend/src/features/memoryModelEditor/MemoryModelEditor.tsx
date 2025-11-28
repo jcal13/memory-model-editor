@@ -285,6 +285,10 @@ export default function MemoryModelEditor({
             questionType={state.selectedQuestionType}
             setQuestionType={state.setSelectedQuestionType}
             onSubmit={handleCanvasSubmit}
+            setSubmissionResults={state.setSubmissionResults}
+            onClearCanvas={clearCanvas}
+            onRestoreCanvas={restoreCanvas}
+            currentCanvasState={currentCanvasState}
             masterErrorList={masterErrorList}
             elements={state.elements}
             setElements={state.setElements}

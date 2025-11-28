@@ -48,7 +48,62 @@ git clone https://github.com/YOUR_USERNAME/memory-model-editor.git
 cd memory-model-editor
 ```
 
-### 2. Install frontend dependencies and start frontend server
+### 2. Set up the database
+
+#### Install PostgreSQL
+
+macOS:
+
+```bash
+brew install postgresql@17
+brew services start postgresql@17
+```
+
+Ubuntu/Debian:
+
+```bash
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql
+```
+
+Windows:
+Download and install from [postgresql.org](https://www.postgresql.org/download/)
+
+#### Create the database
+
+```bash
+# Connect to PostgreSQL
+psql postgres
+
+# Create the database
+CREATE DATABASE memorylab;
+\q
+```
+
+#### Import the schema
+
+```bash
+# From the project root
+psql -d memorylab < backend/database/schema.sql
+```
+
+#### Configure environment variables
+
+```bash
+cd backend
+cp .env.example .env
+```
+
+Update the `.env` file with your database connection string:
+
+```
+DATABASE_URL=postgresql://your_username@localhost:5432/memorylab
+```
+
+Replace `your_username` with your PostgreSQL username (often your system username on macOS/Linux, or `postgres` on Windows).
+
+### 3. Install frontend dependencies and start frontend server
 
 ```bash
 cd frontend
@@ -60,7 +115,7 @@ You should see the frontend being run on `http://localhost:3000` in the terminal
 
 ![alt text](readmeUtil/image.png)
 
-### 3. Install backend dependencies and start backend server
+### 4. Install backend dependencies and start backend server
 
 ```bash
 cd backend
@@ -72,9 +127,144 @@ You should see the backend being run on `http://localhost:3001` in the terminal.
 
 ![alt text](readmeUtil/image-1.png)
 
-### 4. Connect to the database
+### 5. Adding Questions to the Database
 
-To view questions in the information tab, you will need a `.env` file in the backend folder. This file must contain the connection string as `DATABASE_URL`. The `.env` file is not included in this repository.
+The application uses two question tables:
+
+- `practice_questions`: Questions for practice mode
+- `test_questions`: Questions for test mode
+
+#### Connecting to the Database
+
+```bash
+psql -d memorylab
+```
+
+#### Adding a Practice Question
+
+```sql
+INSERT INTO practice_questions (question, code, answer, description)
+VALUES (
+    'Your question text here',
+    ARRAY['line 1 of code', 'line 2 of code', 'line 3 of code'],
+    '[{"id": 1, "type": "int", "value": 5}]'::jsonb,
+    'Optional description'
+);
+```
+
+#### Adding a Test Question
+
+```sql
+INSERT INTO test_questions (question, code, answer, description)
+VALUES (
+    'Your question text here',
+    ARRAY['line 1 of code', 'line 2 of code'],
+    '[{"id": null, "name": "__main__", "type": ".frame", "order": 1, "value": {"a": 1}}]'::jsonb,
+    '2024 midterm 1'
+);
+```
+
+#### Answer Format
+
+The `answer` field is a JSON array representing the memory model. Each element can be:
+
+Frame:
+
+```json
+{
+    "id": null,
+    "name": "__main__",
+    "type": ".frame",
+    "order": 1,
+    "value": {"variable_name": id_reference}
+}
+```
+
+Primitive (int, str, bool):
+
+```json
+{
+  "id": 1,
+  "type": "int",
+  "value": 5
+}
+```
+
+List:
+
+```json
+{
+  "id": 2,
+  "type": "list",
+  "value": [1, 2, 3]
+}
+```
+
+Object:
+
+```json
+{
+    "id": 3,
+    "name": "ClassName",
+    "type": "object",
+    "value": {"attribute": id_reference}
+}
+```
+
+#### Viewing Existing Questions
+
+```sql
+-- View all practice questions
+SELECT id, question FROM practice_questions;
+
+-- View a specific question with full details
+SELECT * FROM practice_questions WHERE id = 1;
+
+-- View all test questions
+SELECT id, question, description FROM test_questions;
+```
+
+#### Updating a Question
+
+```sql
+UPDATE practice_questions
+SET answer = '[{"id": 1, "type": "int", "value": 10}]'::jsonb
+WHERE id = 1;
+```
+
+#### Deleting a Question
+
+```sql
+DELETE FROM practice_questions WHERE id = 1;
+```
+
+## Production Deployment
+
+### Building for Production
+
+Before deploying to production, you need to compile the TypeScript code to JavaScript.
+
+#### Backend
+
+```bash
+cd backend
+npm run build
+npm start
+```
+
+- `npm run build` - Compiles TypeScript files from `src/` into JavaScript files in the `dist/` directory
+- `npm start` - Runs the compiled JavaScript code
+
+#### Frontend
+
+```bash
+cd frontend
+npm run build
+npm start
+```
+
+- `npm run build` - Creates an optimized production build
+- `npm start` - Runs the production server
 
 ## Technical Details
 

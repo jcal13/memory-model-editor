@@ -98,7 +98,7 @@ cp .env.example .env
 Update the `.env` file with your database connection string:
 
 ```
-DATABASE_URL=postgresql://your_username@localhost:5432/memorylab
+DATABASE_URL=postgresql://your_username@localhost:5432/memorylab?sslmode=disable
 ```
 
 Replace `your_username` with your PostgreSQL username (often your system username on macOS/Linux, or `postgres` on Windows).

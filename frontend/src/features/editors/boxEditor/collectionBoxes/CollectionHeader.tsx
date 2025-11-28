@@ -10,6 +10,7 @@ interface Props {
   setElementId: (id: ID) => void;
   removeId: (id: ID) => void;
   sandbox: boolean;
+  elements?: any[];
 }
 
 /**
@@ -29,6 +30,7 @@ const CollectionHeader = ({
   setElementId,
   removeId,
   sandbox,
+  elements = [],
 }: Props) => (
   <div data-testid="collection-header" className={styles.collectionHeader}>
     <IdDisplay
@@ -38,6 +40,7 @@ const CollectionHeader = ({
       setElementId={setElementId}
       removeId={removeId}
       sandbox={sandbox}
+      elements={elements}
     />
   </div>
 );

@@ -42,6 +42,7 @@ interface FloatingEditorProps {
   addClasses?: (className: string) => void;
   removeClasses?: (className: string) => void;
   sandbox: boolean;
+  elements: CanvasElement[];
 }
 
 function FloatingEditor({
@@ -59,6 +60,7 @@ function FloatingEditor({
   addClasses,
   removeClasses,
   sandbox,
+  elements,
 }: FloatingEditorProps) {
   const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -94,6 +96,7 @@ function FloatingEditor({
           addClasses={addClasses}
           removeClasses={removeClasses}
           sandbox={sandbox}
+          elements={elements}
         />
       </div>
     </Draggable>
@@ -463,6 +466,7 @@ function Canvas({
             addClasses={addClasses}
             removeClasses={removeClasses}
             sandbox={sandbox}
+            elements={elements}
           />
         );
       })}

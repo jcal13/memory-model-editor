@@ -77,6 +77,10 @@ export default function InformationTabs({
               questionType={questionType}
               setQuestionType={setQuestionType}
               onSubmit={onSubmit}
+              setSubmissionResults={setSubmissionResults}
+              onClearCanvas={onClearCanvas}
+              onRestoreCanvas={onRestoreCanvas}
+              currentCanvasState={currentCanvasState}
             />
           </div>
 

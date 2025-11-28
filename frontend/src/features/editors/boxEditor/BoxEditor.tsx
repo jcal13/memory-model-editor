@@ -38,6 +38,7 @@ const BoxEditorModule = ({
   addClasses,
   removeClasses,
   sandbox = true,
+  elements = [],
 }: BoxEditorType) => {
   // Shared hover state for remove button
   const { hoverRemove, setHoverRemove } = useGlobalStates();
@@ -103,15 +104,16 @@ const BoxEditorModule = ({
         setFunctionName={setFunctionName}
         classes={classes}
         ownClasses={ownClassName}
-        addClasses={addClasses} // <-- added
+        addClasses={addClasses}
         setOwnClassName={setOwnClassName}
-        removeClasses={removeClasses} // <-- added
+        removeClasses={removeClasses}
         ids={ids}
         addId={addId}
         ownId={ownId}
         setElementId={setOwnId}
         removeId={removeId}
         sandbox={sandbox}
+        elements={elements}
       />
 
       {/* Middle section: displays the input or editable content for the box */}

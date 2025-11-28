@@ -3,6 +3,7 @@ import Palette from "../palette/Palette";
 import ConfirmationModal from "./components/ConfirmationModal";
 import InformationTabs from "../informationTabs/InformationTabs";
 import styles from "./MemoryModelEditor.module.css";
+import { useResponsivePanels } from "./hooks/useResponsivePanels";
 
 import {
   useMemoryModelEditorState,
@@ -73,6 +74,17 @@ export default function MemoryModelEditor({
     state.setSubmissionResults(null);
     state.setCanvasResetKey((prev) => prev + 1);
     clearCanvasStorage();
+  };
+
+  const restoreCanvas = (
+    elements: CanvasElement[],
+    ids: number[],
+    classes: string[]
+  ): void => {
+    state.setElements(elements);
+    state.setElementIds(ids);
+    state.setElementClasses(classes);
+    state.setCanvasResetKey((prev) => prev + 1);
   };
 
   const addElementId = (id: number): void => {
@@ -149,14 +161,30 @@ export default function MemoryModelEditor({
     sandboxMode: state.isSandboxMode,
   });
 
+  useResponsivePanels({
+    isPaletteOpen: state.isPaletteOpen,
+    isInfoPanelOpen: state.isInfoPanelOpen,
+    setIsPaletteOpen: state.setIsPaletteOpen,
+    setIsInfoPanelOpen: state.setIsInfoPanelOpen,
+  });
+
+  const currentCanvasState = useMemo(
+    () => ({
+      elements: state.elements,
+      ids: state.elementIds,
+      classes: state.elementClasses,
+    }),
+    [state.elements, state.elementIds, state.elementClasses]
+  );
+
   return (
     <div className={styles.editorContainer}>
       {/* Palette Panel */}
       <div
         className={styles.palettePanel}
         style={{
-          width: state.isPaletteOpen ? undefined : 0,
-          minWidth: state.isPaletteOpen ? undefined : 0,
+          width: state.isPaletteOpen ? "280px" : 0,
+          minWidth: state.isPaletteOpen ? "280px" : 0,
           overflow: "hidden",
         }}
       >
@@ -199,7 +227,10 @@ export default function MemoryModelEditor({
           </div>
 
           {/* Mode Toggle Switch */}
-          <label className={styles.modeToggleSwitch}>
+          <label
+            className={styles.modeToggleSwitch}
+            data-editor-control="mode-toggle"
+          >
             <input
               type="checkbox"
               className={styles.modeToggleInput}
@@ -234,7 +265,9 @@ export default function MemoryModelEditor({
 
         {/* Info Panel */}
         <div
-          className={styles.infoPanel}
+          className={`${styles.infoPanel} ${
+            state.isResizingInfoPanel ? styles.noTransition : ""
+          }`}
           style={{
             width: state.isInfoPanelOpen ? `${state.infoPanelWidth}px` : 0,
             maxWidth: MAX_INFO_PANEL_CSS_WIDTH,

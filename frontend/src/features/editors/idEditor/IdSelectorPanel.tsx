@@ -10,6 +10,7 @@ interface Props {
   onRemove: (id: ID) => void;
   onClose: () => void;
   sandbox: boolean;
+  usedIds?: Set<ID>;
 }
 
 const IdSelectorPanel: React.FC<Props> = ({
@@ -19,7 +20,9 @@ const IdSelectorPanel: React.FC<Props> = ({
   onRemove,
   onClose,
   sandbox,
+  usedIds = new Set(),
 }) => {
+  console.log("IdSelectorPanel usedIds:", Array.from(usedIds));
   const nextId = useMemo<number>(() => {
     const nums = ids.filter((v): v is number => typeof v === "number");
     let i = 1;
@@ -65,26 +68,32 @@ const IdSelectorPanel: React.FC<Props> = ({
 
       <div className={panelStyles.content}>
         <div className={boxStyles.collectionIdContainer}>
-          {ids.map((id) => (
-            <div key={id.toString()} className={boxStyles.collectionIdBox}>
-              <button
-                type="button"
-                className={boxStyles.collectionIdNoBorder}
-                onClick={() => onSelect(id)}
-              >
-                {id}
-              </button>
-              {sandbox && (
+          {ids.map((id) => {
+            const isUsed = usedIds.has(id);
+            return (
+              <div key={id.toString()} className={boxStyles.collectionIdBox}>
                 <button
                   type="button"
-                  className={boxStyles.collectionRemoveId}
-                  onClick={() => onRemove(id)}
+                  className={`${boxStyles.collectionIdNoBorder} ${
+                    !isUsed ? panelStyles.unusedId : ""
+                  }`}
+                  onClick={() => onSelect(id)}
+                  title={!isUsed ? "This ID is currently unused" : ""}
                 >
-                  ×
+                  {id}
                 </button>
-              )}
-            </div>
-          ))}
+                {sandbox && (
+                  <button
+                    type="button"
+                    className={boxStyles.collectionRemoveId}
+                    onClick={() => onRemove(id)}
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {sandbox && ids.length === 0 && (

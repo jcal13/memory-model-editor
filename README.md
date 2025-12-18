@@ -263,7 +263,8 @@ npm run build
 npm start
 ```
 
-- `npm run build` - Creates an optimized production build in the `build/` directory
+`npm run build` - Creates an optimized production build in the build/ directory
+
 - `npm start` - Serves the production build using http-server
 
 ## Technical Details
@@ -297,3 +298,35 @@ The validation process follows a hierarchical and recursive approach, starting f
    The `comapreIds` function takes an answer ID and a user ID and performs a series of checks:
 
    - **Unmapped ID Lookup**: It verifies that both the answer ID and user ID correspond to an existing box in their respective models.
+
+   - **Bijection Enforcement**: It checks if the current ID mapping conflicts with any previously established mappings. If a conflict is found, it's a critical error.
+
+   - **Type Verification**: It confirms that the type of the user's box matches the type of the answer's box (e.g., list vs. int).
+
+   - **Primitive Value Check**: If the boxes are primitive types (int, str, bool), it performs a direct value comparison.
+
+   - **Container Comparison**: If the boxes are containers (list, set, dict), it recursively calls compareIds on their contained elements.
+
+   To prevent infinite loops in cases of circular references (e.g., a list referencing itself), it uses a visited map to track pairs of IDs that have already been checked.
+
+4. **Container-Specific Logic**
+
+   Different container types are handled with specific logic:
+
+   - **Arrays** (`checkArray`): The function checks for missing elements and unexpected elements based on length. It then performs a direct, order-sensitive comparison of each element.
+
+   - **Sets** (`checkSet`): Since sets are unordered, the function attempts to find a match for each element in the answer set within the user's set. It performs a "tentative" recursive comparison, and if no errors are found, it considers the elements a match.
+
+   - **Dictionaries** (`checkDict`): The function checks for missing keys and unexpected keys. For shared keys, it recursively compares the values (IDs) of the key-value pairs.
+
+   - **Objects** (`checkObject`): Objects represent instances with named properties. The function verifies that object names match exactly, checks for missing or unexpected properties, and recursively compares the IDs referenced by each property. Object-specific error messages indicate issues like missing properties or name mismatches.
+
+5. **Final Checks**
+
+   After the recursive traversal is complete, the function performs final checks:
+
+   - **Call Stack Order** (`checkCallStackOrder`): If the frames are correctly named, it verifies that their order matches the expected call stack.
+
+   - **Orphan Detection** (`detectOrphans`): It identifies any user boxes that are not referenced by any variables or containers, flagging them as "unmapped boxes."
+
+   The function returns a boolean correct status and a list of all detected errors. This provides detailed feedback on the submission's correctness and the specific areas that need fixing.

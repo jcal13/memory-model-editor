@@ -22,7 +22,7 @@ MemoryLab is a drag-and-drop web application designed for computer science educa
 
 - **Question Bank**: Includes built-in exercises drawn from previous first-year computer science courses and tests at the University of Toronto.
 - **Automatic Grading**: Provides detailed, traceable feedback by treating memory models as graph-isomorphism problems.
-- **Multi-Format Export**: Save models as **JSON** (for re-importing), **SVG**, or **PNG**.
+- **Multi-Format Export**: Save models as **JSON** (for re-importing or uploading to MarkUs), **SVG**, or **PNG**.
 
 ## Developer Setup (Local)
 

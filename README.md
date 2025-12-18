@@ -1,113 +1,51 @@
 # MemoryLab
 
-A drag-and-drop application for visualizing Python memory models, designed for use in computer science education. Students can build memory models by arranging blocks that represent variables, objects, functions, and values on a canvas, and submit their models for feedback.
+MemoryLab is a drag-and-drop web application designed for computer science education. It allows students to visualize Python memory models by arranging blocks representing variables, objects, functions, and values on an interactive canvas.
 
 ## Table of Contents
 
-- [Features](#features)
-  - [Interactive Canvas](#interactive-canvas)
-  - [Practice vs. Test Modes](#practice-vs-test-modes)
-  - [Practice Question Bank](#practice-question-bank)
-  - [Automatic Grading & Feedback](#automatic-grading--feedback)
-  - [Export & Download Options](#export--download-options)
-- [Developer Instructions](#developer-instructions)
-  - [1. Clone the repo](#1-clone-the-repo)
-  - [2. Set up the database](#2-set-up-the-database)
-  - [3. Install frontend dependencies and start frontend server](#3-install-frontend-dependencies-and-start-frontend-server)
-  - [4. Install backend dependencies and start backend server](#4-install-backend-dependencies-and-start-backend-server)
-  - [5. Adding Questions to the Database](#5-adding-questions-to-the-database)
+- [Key Features](#key-features)
+- [Developer Setup (Local)](#developer-setup-local)
 - [Production Deployment](#production-deployment)
-  - [Building for Production](#building-for-production)
-- [Technical Details](#technical-details)
-  - [Validation Function](#validation-function)
+- [Adding Questions to the Database](#adding-questions-to-the-database)
+- [Technical Details: Validation Algorithm](#technical-details-validation-algorithm)
+- [Automated Grading with MarkUs](#automated-grading-with-markus)
 
-## Features
+## Key Features
 
-### Interactive Canvas
+- **Interactive Canvas**: A Scratch-style interface for building memory diagrams using frames, objects, and values.
+- **Practice vs. Test Modes**:
+  - **Practice Mode**: A guided environment with structured assistance to assist with model construction.
+  - **Test Mode**: A free-form environment with no constraints for independent self-assessment.
+- **Practice Mode**: A guided environment with structured assistance to assist with model construction.
+- **Test Mode**: A free-form environment with no constraints for independent self-assessment.
 
-A Scratch-style canvas for visualizing Python memory models. Users can build diagrams by dragging and dropping blocks that represent frames, objects, and values.
+- **Question Bank**: Includes built-in exercises drawn from previous first-year computer science courses and tests at the University of Toronto.
+- **Automatic Grading**: Provides detailed, traceable feedback by treating memory models as graph-isomorphism problems.
+- **Multi-Format Export**: Save models as **JSON** (for re-importing), **SVG**, or **PNG**.
 
-### Practice vs. Test Modes
+## Developer Setup (Local)
 
-MemoryLab is designed to support different learning styles. Users can switch between two distinct modes to match your needs for a given exercise.
+Follow these steps to set up and run the development environment.
 
-- **Practice Mode**: A guided environment that provides a more structured experience with a limited options to assist with model construction.
-
-- **Test Mode**: A free-form environment with no constraints, allowing for independent model creation and self-assessment.
-
-### Practice Question Bank
-
-MemoryLab includes a built-in library of exercises for practice. The question bank currently contains two kinds of questions.
-
-- **Practice questions**: questions drawn from previous first year computer science courses at the University of Toronto.
-- **Test Questions**: questions drawn from tests from previous first year computer science courses at the University of Toronto.
-
-### Automatic Grading & Feedback
-
-After a model has been constructed, it can be submitted for automatic grading. The system provides detailed, traceable feedback on a dedicated tab, helping you understand where your model can be improved.
-
-### Export & Download Options
-
-Once a model is complete, you can save and export it. The canvas allows for downloads in multiple formats for submission on platforms like Markus or for other uses.
-
-- **JSON**: To save your model as a file that can be re-imported into MemoryLab.
-
-- **SVG**: For a high-quality, scalable vector image.
-
-- **PNG**: For a standard image file.
-
-## Developer Instructions
-
-For developers, follow these steps to set up and run the development environment:
-
-### 1. Clone the repo
+### 1. Clone the Repo
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/memory-model-editor.git
 cd memory-model-editor
 ```
 
-### 2. Set up the database
+### 2. Set up the Database
+
+MemoryLab requires **PostgreSQL 17 or above**.
 
 #### Install PostgreSQL
 
-macOS:
+- **macOS**: `brew install postgresql@17 && brew services start postgresql@17`
+- **Ubuntu/Debian**: `sudo apt update && sudo apt install postgresql-17 postgresql-contrib-17 && sudo systemctl start postgresql`
+- **Windows**: Download and install from [postgresql.org](https://www.postgresql.org/download/).
 
-```bash
-brew install postgresql@17
-brew services start postgresql@17
-```
-
-Ubuntu/Debian:
-
-```bash
-sudo apt update
-sudo apt install postgresql postgresql-contrib
-sudo systemctl start postgresql
-```
-
-Windows:
-Download and install from [postgresql.org](https://www.postgresql.org/download/)
-
-#### Create the database
-
-```bash
-# Connect to PostgreSQL
-psql postgres
-
-# Create the database
-CREATE DATABASE memorylab;
-\q
-```
-
-#### Import the schema
-
-```bash
-# From the project root
-psql -d memorylab < backend/database/schema.sql
-```
-
-#### Configure environment variables
+#### Configure Environment Variables
 
 ```bash
 cd backend
@@ -117,77 +55,86 @@ cp .env.example .env
 Update the `.env` file with your database connection string:
 
 ```
-DATABASE_URL=postgresql://your_username@localhost:5432/memorylab
+DATABASE_URL=postgresql://your_username@localhost:5432/memorylab?sslmode=disable
+NODE_ENV=development
 ```
 
-Replace `your_username` with your PostgreSQL username (often your system username on macOS/Linux, or `postgres` on Windows).
-
-### 3. Install frontend dependencies and start frontend server
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-You should see the frontend being run on `http://localhost:3000` in the terminal. You need to open this link in your browser.
-
-![alt text](readmeUtil/image.png)
-
-### 4. Install backend dependencies and start backend server
+#### Import Database and Questions
 
 ```bash
 cd backend
-npm install
-npm run dev
+npm run import-questions
 ```
 
-You should see the backend being run on `http://localhost:3001` in the terminal. You do not need to open this link in your browser.
+This command creates the database, sets up the `practice_questions` and `test_questions` tables, and imports data from the JSON files in `backend/database/`.
 
-![alt text](readmeUtil/image-1.png)
+### 3. Launch the Application
 
-### 5. Adding Questions to the Database
+| Component    | Commands                                    | URL                     |
+| ------------ | ------------------------------------------- | ----------------------- |
+| **Frontend** | `cd frontend && npm install && npm run dev` | `http://localhost:3000` |
+| **Backend**  | `cd backend && npm install && npm run dev`  | `http://localhost:3001` |
 
-The application uses two question tables:
+## Production Deployment
 
-- `practice_questions`: Questions for practice mode
-- `test_questions`: Questions for test mode
+### 1. Database Setup
 
-#### Connecting to the Database
+Ensure a PostgreSQL instance (v17+) is running on your server. For OS-specific installation steps, refer to the [Database Setup](#2-set-up-the-database) section above.
+
+#### Configure Environment Variables
 
 ```bash
-psql -d memorylab
+cd backend
+cp .env.production .env
 ```
 
-#### Adding a Practice Question
+Update the `.env` file with your database connection string:
 
-```sql
-INSERT INTO practice_questions (question, code, answer, description)
-VALUES (
-    'Your question text here',
-    ARRAY['line 1 of code', 'line 2 of code', 'line 3 of code'],
-    '[{"id": 1, "type": "int", "value": 5}]'::jsonb,
-    'Optional description'
-);
+```env
+DATABASE_URL=postgresql://username:password@hostname:5432/memorylab?sslmode=require
+NODE_ENV=production
 ```
 
-#### Adding a Test Question
+### 2. Install Dependencies and Import
 
-```sql
-INSERT INTO test_questions (question, code, answer, description)
-VALUES (
-    'Your question text here',
-    ARRAY['line 1 of code', 'line 2 of code'],
-    '[{"id": null, "name": "__main__", "type": ".frame", "order": 1, "value": {"a": 1}}]'::jsonb,
-    '2024 midterm 1'
-);
+```bash
+# Backend
+cd backend
+npm install
+npm run import-questions
 ```
 
-#### Answer Format
+```bash
+# Frontend
+cd frontend
+npm install
+```
 
-The `answer` field is a JSON array representing the memory model. Each element can be:
+### 3. Build and Start
 
-Frame:
+```bash
+# Build & Start Backend
+cd backend
+npm run build
+npm start
+```
+
+```bash
+# Build & Start Frontend
+cd frontend
+npm run build
+npm start
+```
+
+## Adding Questions to the Database
+
+1. Edit `backend/database/practiceQuestions.json` or `backend/database/testQuestions.json`.
+2. Add your new question to the array following the existing format.
+3. Run `npm run import-questions` to re-import.
+
+### Answer Format Examples
+
+**Frame:**
 
 ```json
 {
@@ -199,154 +146,78 @@ Frame:
 }
 ```
 
-Primitive (int, str, bool):
+**Primitive (int, str, bool):**
 
 ```json
-{
-  "id": 1,
-  "type": "int",
-  "value": 5
+{ "id": 1, "type": "int", "value": 5 }
+```
+
+**List:**
+
+```json
+{ "id": 2, "type": "list", "value": [1, 2, 3] }
+```
+
+## Technical Details: Validation Algorithm
+
+The validation function (`backend/src/modules/canvasEditor/validateAnswer.ts`) evaluates submissions by treating the memory model as a **graph-isomorphism problem**. The goal is to determine if the user's canvas is structurally identical to the solution.
+
+### Graph Representation
+
+- **Nodes**: Unique "boxes" (primitives, lists, or function frames).
+- **Edges**: References formed by variable names (in frames) or pointers (in containers).
+
+The function finds a single, consistent bijection (one-to-one mapping) between the user's box IDs () and the answer's box IDs ().
+
+### Core Algorithm Implementation
+
+1. **Top-Level Checks (`validateAnswer`)**: Retrieves the solution, scans for duplicate IDs, and validates the structure of function frames.
+2. **Frame and Variable Comparison (`compareFrames`)**: Iterates through frames. If a variable exists in both the solution and the submission, it calls `compareIds`.
+3. **Recursive ID Comparison (`compareIds`)**:
+
+- **Bijection Enforcement**: Checks if the current mapping conflicts with existing mappings in `answerToInputMap` and `inputToAnswerMap`.
+- **Type Verification**: Confirms types (e.g., list vs. int) match exactly.
+- **Primitive Value Check**: Direct value comparison for primitives.
+- **Circular References**: Uses a `visited` map to track pairs of IDs to prevent infinite loops in recursive structures.
+
+4. **Container-Specific Logic**:
+
+- **Arrays (`checkArray`)**: Order-sensitive comparison of elements.
+- **Sets (`checkSet`)**: Performs tentative recursive matching to find a valid mapping in unordered data.
+- **Dictionaries/Objects (`checkDict`/`checkObject`)**: Matches keys/attributes exactly and recurses on the referenced IDs.
+
+5. **Final Checks**:
+
+- **Call Stack Order**: Verifies that frames are ordered correctly.
+- **Orphan Detection**: Identifies user boxes not reached during traversal (unmapped boxes).
+
+## Automated Grading with MarkUs
+
+You can use the `validateAnswer.ts` logic to automate grading for student submissions exported as JSON.
+
+### Setup for MarkUs (WILL NEED TO CHECK)
+
+1. **Environment**: Ensure the MarkUs testing environment has Node.js and the compiled `validateAnswer.js` (from the `/dist` folder).
+2. **Grading Script**: Create a wrapper script that loads the student's exported JSON and the solution JSON from your database.
+
+```javascript
+const {
+  validateAnswer,
+} = require("./dist/modules/canvasEditor/validateAnswer");
+
+// Load files
+const studentSubmission = JSON.parse(fs.readFileSync(studentJsonPath));
+const expectedSolution = JSON.parse(fs.readFileSync(solutionJsonPath));
+
+// Run algorithm
+const result = validateAnswer(studentSubmission, expectedSolution);
+
+// Output for MarkUs
+if (result.correct) {
+  process.stdout.write("Test Passed: 100%");
+} else {
+  process.stdout.write("Errors identified:\n" + result.errors.join("\n"));
 }
 ```
 
-List:
-
-```json
-{
-  "id": 2,
-  "type": "list",
-  "value": [1, 2, 3]
-}
-```
-
-Object:
-
-```json
-{
-    "id": 3,
-    "name": "ClassName",
-    "type": "object",
-    "value": {"attribute": id_reference}
-}
-```
-
-#### Viewing Existing Questions
-
-```sql
--- View all practice questions
-SELECT id, question FROM practice_questions;
-
--- View a specific question with full details
-SELECT * FROM practice_questions WHERE id = 1;
-
--- View all test questions
-SELECT id, question, description FROM test_questions;
-```
-
-#### Updating a Question
-
-```sql
-UPDATE practice_questions
-SET answer = '[{"id": 1, "type": "int", "value": 10}]'::jsonb
-WHERE id = 1;
-```
-
-#### Deleting a Question
-
-```sql
-DELETE FROM practice_questions WHERE id = 1;
-```
-
-## Production Deployment
-
-**Note:** Before deploying to production, make sure you have completed the [database setup](#2-set-up-the-database) steps from the Developer Instructions.
-
-### Building for Production
-
-Before deploying to production, you need to compile the TypeScript code to JavaScript.
-
-#### Backend
-
-```bash
-cd backend
-npm run build
-npm start
-```
-
-- `npm run build` - Compiles TypeScript files from `src/` into JavaScript files in the `dist/` directory
-- `npm start` - Runs the compiled JavaScript code
-
-#### Frontend
-
-```bash
-cd frontend
-npm run build
-npm start
-```
-
-- `npm run build` - Creates an optimized production build in the `build/` directory
-- `npm start` - Serves the production build using http-server
-
-## Technical Details
-
-### Validation Function
-
-The validation function, located in backend/src/modules/canvasEditor/validateAnswer.ts, is a core component for evaluating user submissions in the memory model editor. It operates by treating the validation task as a graph-isomorphism problem. The goal is to determine if the user's canvas, representing a directed graph, is structurally identical to the correct answer's graph.
-
-#### Graph Representation
-
-- **Nodes**: Each unique "box" in the memory model (e.g., a primitive, a list, or a function frame) is a node.
-
-- **Edges**: A reference from one box to another—whether by variable name (in a frame) or by ID (in a container like a list)—forms a directed edge.
-
-The function's primary objective is to find a single, consistent bijection (a one-to-one mapping) between the IDs of the user's boxes and the IDs of the answer's boxes. This mapping, if found, proves the two graphs are structurally equivalent.
-
-#### Core Algorithm
-
-The validation process follows a hierarchical and recursive approach, starting from the top-level frames and traversing down through all referenced boxes. The process maintains two maps, answerToInputMap and inputToAnswerMap, to keep track of the ID bijection and prevent circular references.
-
-1. **Top-Level Checks** (`validateAnswer`)
-
-   The `validateAnswer` function checks if a user's submitted answer is correct by comparing it to a stored answer. It first retrieves the correct solution from a database based on the provided question ID. It then performs a series of checks on the user's input, including scanning for duplicate IDs and validating the structure of the function frames. After these preliminary checks, it begins a detailed, recursive comparison of the graph-like structure of the user's submission against the correct answer to ensure they are identical.
-
-2. **Frame and Variable Comparison** (`compareFrames`)
-
-   The `compareFrames` function compares function frames between the correct answer and the user's submission. It loops through each frame and checks for missing variables or unexpected variables. If a variable is found in both frames, the function proceeds to a deeper, recursive comparison of the linked boxes by calling the compareIds function.
-
-3. **Recursive ID Comparison** (`compareIds`)
-
-   The `comapreIds` function takes an answer ID and a user ID and performs a series of checks:
-
-   - **Unmapped ID Lookup**: It verifies that both the answer ID and user ID correspond to an existing box in their respective models.
-
-   - **Bijection Enforcement**: It checks if the current ID mapping conflicts with any previously established mappings. If a conflict is found, it's a critical error.
-
-   - **Type Verification**: It confirms that the type of the user's box matches the type of the answer's box (e.g., list vs. int).
-
-   - **Primitive Value Check**: If the boxes are primitive types (int, str, bool), it performs a direct value comparison.
-
-   - **Container Comparison**: If the boxes are containers (list, set, dict), it recursively calls compareIds on their contained elements.
-
-   To prevent infinite loops in cases of circular references (e.g., a list referencing itself), it uses a visited map to track pairs of IDs that have already been checked.
-
-4. **Container-Specific Logic**
-
-   Different container types are handled with specific logic:
-
-   - **Arrays** (`checkArray`): The function checks for missing elements and unexpected elements based on length. It then performs a direct, order-sensitive comparison of each element.
-
-   - **Sets** (`checkSet`): Since sets are unordered, the function attempts to find a match for each element in the answer set within the user's set. It performs a "tentative" recursive comparison, and if no errors are found, it considers the elements a match.
-
-   - **Dictionaries** (`checkDict`): The function checks for missing keys and unexpected keys. For shared keys, it recursively compares the values (IDs) of the key-value pairs.
-
-   - **Objects** (`checkObject`): Objects represent instances with named properties. The function verifies that object names match exactly, checks for missing or unexpected properties, and recursively compares the IDs referenced by each property. Object-specific error messages indicate issues like missing properties or name mismatches.
-
-5. **Final Checks**
-
-   After the recursive traversal is complete, the function performs final checks:
-
-   - **Call Stack Order** (`checkCallStackOrder`): If the frames are correctly named, it verifies that their order matches the expected call stack.
-
-   - **Orphan Detection** (`detectOrphans`): It identifies any user boxes that are not referenced by any variables or containers, flagging them as "unmapped boxes."
-
-   The function returns a boolean correct status and a list of all detected errors. This provides detailed feedback on the submission's correctness and the specific areas that need fixing.
+3. **Feedback**: The `result.errors` array provides specific reasons for failure, which can be piped directly into the MarkUs feedback file.

@@ -17,7 +17,7 @@
   "scripts": {
     "dev": "craco start",
     "build": "craco build",
-    "start": "serve -s build",
+    "start": "http-server build -p 3000 -a localhost --proxy http://localhost:3000?",
     "test": "jest --watch",
     "eject": "craco eject"
   },
@@ -50,6 +50,7 @@
     "@types/node": "^16.18.126",
     "@types/react": "^19.1.4",
     "@types/react-dom": "^19.1.5",
+    "http-server": "^14.1.1",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
@@ -58,7 +59,6 @@
     "prism-themes": "^1.9.0",
     "prismjs": "^1.30.0",
     "react-markdown": "^10.1.0",
-    "serve": "^14.2.4",
     "ts-jest": "^29.1.1"
   },
   "proxy": "http://localhost:3000",

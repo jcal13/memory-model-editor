@@ -1,0 +1,942 @@
+[
+  {
+    "id": 1,
+    "question": "A `Fries` object calls `Food.update_price` through inheritance. Draw the memory model before `update_price` returns.",
+    "code": [
+      "[class Food:",
+      "def __init__(self, n: str, p: int) -> None:",
+      "self.name = n",
+      "self.price = p",
+      "",
+      "def update_price(self, new_price: int) -> None:",
+      "\\\"\\\"\\\"Update this Food’s price to new_price.\\\"\\\"\\\"",
+      "price = self.price",
+      "price = new_price",
+      "",
+      "class Fries(Food):",
+      "def __init__(self, p: int) -> None:",
+      "Food.__init__(self, 'fries', p)",
+      "",
+      "class Menu:",
+      "def __init__(self, items: list[Food]) -> None:",
+      "self.items = items",
+      "",
+      "if __name__ == '__main__':",
+      "f = Fries(5)",
+      "menu = Menu([f])",
+      "f.update_price(7)]"
+    ],
+    "answer": [
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "f": 4,
+          "menu": 5
+        }
+      },
+      {
+        "id": null,
+        "name": "Food.update_price",
+        "type": ".frame",
+        "order": 5,
+        "value": {
+          "self": 4,
+          "price": 3,
+          "new_price": 3
+        }
+      },
+      {
+        "id": 1,
+        "type": "str",
+        "value": "fries"
+      },
+      {
+        "id": 2,
+        "type": "int",
+        "value": 5
+      },
+      {
+        "id": 3,
+        "type": "int",
+        "value": 7
+      },
+      {
+        "id": 4,
+        "name": "Fries",
+        "type": "object",
+        "value": {
+          "name": 1,
+          "price": 2
+        }
+      },
+      {
+        "id": 6,
+        "type": "list",
+        "value": [
+          4
+        ]
+      },
+      {
+        "id": 5,
+        "name": "Menu",
+        "type": "object",
+        "value": {
+          "items": 6
+        }
+      }
+    ],
+    "description": "2023 midterm 1"
+  },
+  {
+    "id": 2,
+    "question": "This recursive constructor builds a `RecursiveList` for `7` and `hi`. Draw every function and object created during execution of `main`.",
+    "code": [
+      "[class RecursiveList:",
+      "def __init__(self, items: list) -> None:",
+      "if items == []:",
+      "self._first, self._rest = None, None",
+      "return",
+      "self._first = items[0]",
+      "self._rest = RecursiveList(items[1:])",
+      "",
+      "if __name__ == '__main__':",
+      "rec_lst = RecursiveList([7, 'hi'])]"
+    ],
+    "answer": [
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "rec_lst": 10
+        }
+      },
+      {
+        "id": null,
+        "name": "RecursiveList.__init__",
+        "type": ".frame",
+        "order": 2,
+        "value": {
+          "self": 10,
+          "items": 11
+        }
+      },
+      {
+        "id": null,
+        "name": "RecursiveList.__init__",
+        "type": ".frame",
+        "order": 3,
+        "value": {
+          "self": 20,
+          "items": 22
+        }
+      },
+      {
+        "id": null,
+        "name": "RecursiveList.__init__",
+        "type": ".frame",
+        "order": 4,
+        "value": {
+          "self": 30,
+          "items": 33
+        }
+      },
+      {
+        "id": 1,
+        "type": "int",
+        "value": 7
+      },
+      {
+        "id": 2,
+        "type": "str",
+        "value": "hi"
+      },
+      {
+        "id": 6,
+        "type": "None",
+        "value": null
+      },
+      {
+        "id": 11,
+        "type": "list",
+        "value": [
+          1,
+          2
+        ]
+      },
+      {
+        "id": 22,
+        "type": "list",
+        "value": [
+          2
+        ]
+      },
+      {
+        "id": 33,
+        "type": "list",
+        "value": []
+      },
+      {
+        "id": 10,
+        "name": "RecursiveList",
+        "type": "object",
+        "value": {
+          "_rest": 20,
+          "_first": 1
+        }
+      },
+      {
+        "id": 20,
+        "name": "RecursiveList",
+        "type": "object",
+        "value": {
+          "_rest": 30,
+          "_first": 2
+        }
+      },
+      {
+        "id": 30,
+        "name": "RecursiveList",
+        "type": "object",
+        "value": {
+          "_rest": 6,
+          "_first": 6
+        }
+      }
+    ],
+    "description": "2024 final"
+  },
+  {
+    "id": 3,
+    "question": "Nested helper functions append `v` plus one to a shared list then return. Draw the memory model before `a_fun` returns.",
+    "code": [
+      "[def a_fun(lst: list[int], v: int) -> None:",
+      "x = v + 1",
+      "lst.append(x)",
+      "",
+      "def y_fun(d: list[int]) -> int:",
+      "a_fun(d, 3)",
+      "return d[-1]",
+      "",
+      "def have_fun(lst: list[int]) -> int:",
+      "return y_fun(lst)",
+      "",
+      "if __name__ == '__main__':",
+      "a = [1, 2, 3]",
+      "b = a",
+      "print(have_fun(a))",
+      "print(b)]"
+    ],
+    "answer": [
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "a": 148,
+          "b": 148
+        }
+      },
+      {
+        "id": null,
+        "name": "have_fun",
+        "type": ".frame",
+        "order": 2,
+        "value": {
+          "lst": 148
+        }
+      },
+      {
+        "id": null,
+        "name": "y_fun",
+        "type": ".frame",
+        "order": 3,
+        "value": {
+          "d": 148
+        }
+      },
+      {
+        "id": null,
+        "name": "a_fun",
+        "type": ".frame",
+        "order": 4,
+        "value": {
+          "v": 3,
+          "x": 4,
+          "lst": 148
+        }
+      },
+      {
+        "id": 1,
+        "type": "int",
+        "value": 1
+      },
+      {
+        "id": 2,
+        "type": "int",
+        "value": 2
+      },
+      {
+        "id": 3,
+        "type": "int",
+        "value": 3
+      },
+      {
+        "id": 4,
+        "type": "int",
+        "value": 4
+      },
+      {
+        "id": 148,
+        "type": "list",
+        "value": [
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+    ],
+    "description": "2024 midterm 1"
+  },
+  {
+    "id": 4,
+    "question": "duplicate` makes a shallow copy of an outer matrix list. Draw the memory model after `duplicate` returns to `main`.",
+    "code": [
+      "[def duplicate(matrix: list[list[int]]) -> list[list[int]]:",
+      "answer = []",
+      "for item in matrix:",
+      "answer.append(item)",
+      "return answer",
+      "",
+      "if __name__ == '__main__':",
+      "m1 = [[1, 2], [3, 4]]",
+      "m2 = duplicate(m1)]"
+    ],
+    "answer": [
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "m1": 101,
+          "m2": 104
+        }
+      },
+      {
+        "id": 50,
+        "type": "int",
+        "value": 1
+      },
+      {
+        "id": 60,
+        "type": "int",
+        "value": 2
+      },
+      {
+        "id": 70,
+        "type": "int",
+        "value": 3
+      },
+      {
+        "id": 80,
+        "type": "int",
+        "value": 4
+      },
+      {
+        "id": 102,
+        "type": "list",
+        "value": [
+          50,
+          60
+        ]
+      },
+      {
+        "id": 103,
+        "type": "list",
+        "value": [
+          70,
+          80
+        ]
+      },
+      {
+        "id": 101,
+        "type": "list",
+        "value": [
+          102,
+          103
+        ]
+      },
+      {
+        "id": 104,
+        "type": "list",
+        "value": [
+          102,
+          103
+        ]
+      }
+    ],
+    "description": "2017 final"
+  },
+  {
+    "id": 5,
+    "question": "`filter_queue` removes values below `minimum` and reassigns `q` inside the function. Draw the memory model just before `filter_queue` returns.",
+    "code": [
+      "[def filter_queue(q: Queue[int], minimum: int) -> None:",
+      "\\\"\\\"\\\"Remove all items from <q> that are less than <minimum>.\\\"\\\"\\\"",
+      "temp_queue = Queue()",
+      "while not q.is_empty():",
+      "value = q.dequeue()",
+      "if value >= minimum:",
+      "temp_queue.enqueue(value)",
+      "q = temp_queue",
+      "",
+      "if __name__ == '__main__':",
+      "q = Queue()",
+      "q.enqueue(2)",
+      "q.enqueue(21)",
+      "q.enqueue(5)",
+      "q.enqueue(1)",
+      "filter_queue(q, 10)]"
+    ],
+    "answer": [
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "q": 90
+        }
+      },
+      {
+        "id": null,
+        "name": "filter_queue",
+        "type": ".frame",
+        "order": 2,
+        "value": {
+          "q": 95,
+          "value": 83,
+          "minimum": 67,
+          "temp_queue": 95
+        }
+      },
+      {
+        "id": 67,
+        "type": "int",
+        "value": 10
+      },
+      {
+        "id": 80,
+        "type": "int",
+        "value": 2
+      },
+      {
+        "id": 81,
+        "type": "int",
+        "value": 21
+      },
+      {
+        "id": 82,
+        "type": "int",
+        "value": 5
+      },
+      {
+        "id": 83,
+        "type": "int",
+        "value": 1
+      },
+      {
+        "id": 100,
+        "type": "list",
+        "value": []
+      },
+      {
+        "id": 90,
+        "name": "Queue",
+        "type": "object",
+        "value": {
+          "_items": 100
+        }
+      },
+      {
+        "id": 105,
+        "type": "list",
+        "value": [
+          81
+        ]
+      },
+      {
+        "id": 95,
+        "name": "Queue",
+        "type": "object",
+        "value": {
+          "_items": 105
+        }
+      }
+    ],
+    "description": "2017 midterm 1"
+  },
+  {
+    "id": 6,
+    "question": "`mystery` aliases list via `c`, mutates it, then rebinds local `b` to a new list. Draw the memory model before `mystery` returns.",
+    "code": [
+      "[def mystery(a: int, b: list[int]) -> None:",
+      "c = b",
+      "c.append(a)",
+      "a = a + 1",
+      "b = [5]",
+      "",
+      "if __name__ == '__main__':",
+      "my_num = 100",
+      "my_lst = [7]",
+      "mystery(my_num, my_lst)]"
+    ],
+    "answer": [
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "my_lst": 99,
+          "my_num": 1
+        }
+      },
+      {
+        "id": null,
+        "name": "mystery",
+        "type": ".frame",
+        "order": 2,
+        "value": {
+          "a": 4,
+          "b": 100,
+          "c": 99
+        }
+      },
+      {
+        "id": 1,
+        "type": "int",
+        "value": 100
+      },
+      {
+        "id": 2,
+        "type": "int",
+        "value": 7
+      },
+      {
+        "id": 3,
+        "type": "int",
+        "value": 5
+      },
+      {
+        "id": 4,
+        "type": "int",
+        "value": 101
+      },
+      {
+        "id": 99,
+        "type": "list",
+        "value": [
+          2,
+          1
+        ]
+      },
+      {
+        "id": 100,
+        "type": "list",
+        "value": [
+          3
+        ]
+      }
+    ],
+    "description": "2018 midterm"
+  },
+  {
+    "id": 7,
+    "question": "`copy_of` builds a shallow copy of a tic‑tac‑toe board. Draw the memory model before `copy_of` returns.",
+    "code": [
+      "[from typing import Any, List",
+      "",
+      "def copy_of(lst: List[Any]) -> List[Any]:",
+      "new_lst: List[Any] = []",
+      "for item in lst:",
+      "new_lst.append(item)",
+      "return new_lst",
+      "",
+      "if __name__ == '__main__':",
+      "board = [['O', 'O', ''],",
+      "['O', 'X', 'X'],",
+      "['X', '', 'X']]",
+      "temp_board = copy_of(board)]"
+    ],
+    "answer": [
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "board": 100
+        }
+      },
+      {
+        "id": null,
+        "name": "copy_of",
+        "type": ".frame",
+        "order": 2,
+        "value": {
+          "lst": 100,
+          "item": 30,
+          "new_lst": 200
+        }
+      },
+      {
+        "id": 1,
+        "type": "str",
+        "value": "O"
+      },
+      {
+        "id": 2,
+        "type": "str",
+        "value": ""
+      },
+      {
+        "id": 3,
+        "type": "str",
+        "value": "X"
+      },
+      {
+        "id": 10,
+        "type": "list",
+        "value": [
+          1,
+          1,
+          2
+        ]
+      },
+      {
+        "id": 20,
+        "type": "list",
+        "value": [
+          1,
+          3,
+          3
+        ]
+      },
+      {
+        "id": 30,
+        "type": "list",
+        "value": [
+          3,
+          2,
+          3
+        ]
+      },
+      {
+        "id": 100,
+        "type": "list",
+        "value": [
+          10,
+          20,
+          30
+        ]
+      },
+      {
+        "id": 200,
+        "type": "list",
+        "value": [
+          10,
+          20,
+          30
+        ]
+      }
+    ],
+    "description": "2019 midterm 1"
+  },
+  {
+    "id": 8,
+    "question": "`append_sometimes` appends `2` to sublists that lack it using aliasing. Draw the memory model before `append_sometimes` returns.",
+    "code": [
+      "[from typing import List",
+      "",
+      "def append_sometimes(lst: List[List[int]], new: int) -> List[List[int]]:",
+      "\\\"\\\"\\\"Return a new list equal to <lst>, with <new> appended to each",
+      "sub‑list that doesn’t already contain it.\\\"\\\"\\\"",
+      "answer = lst",
+      "for item in answer:",
+      "if new not in item:",
+      "item.append(new)",
+      "return answer",
+      "",
+      "if __name__ == '__main__':",
+      "lst1 = [[1, 2], [3], [4, 5]]",
+      "new_lst1 = append_sometimes(lst1, 2)]"
+    ],
+    "answer": [
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "lst1": 100
+        }
+      },
+      {
+        "id": null,
+        "name": "append_sometimes",
+        "type": ".frame",
+        "order": 2,
+        "value": {
+          "lst": 100,
+          "new": 2,
+          "item": 30,
+          "answer": 100
+        }
+      },
+      {
+        "id": 1,
+        "type": "int",
+        "value": 1
+      },
+      {
+        "id": 2,
+        "type": "int",
+        "value": 2
+      },
+      {
+        "id": 3,
+        "type": "int",
+        "value": 3
+      },
+      {
+        "id": 4,
+        "type": "int",
+        "value": 4
+      },
+      {
+        "id": 5,
+        "type": "int",
+        "value": 5
+      },
+      {
+        "id": 10,
+        "type": "list",
+        "value": [
+          1,
+          2
+        ]
+      },
+      {
+        "id": 20,
+        "type": "list",
+        "value": [
+          3,
+          2
+        ]
+      },
+      {
+        "id": 30,
+        "type": "list",
+        "value": [
+          4,
+          5,
+          2
+        ]
+      },
+      {
+        "id": 100,
+        "type": "list",
+        "value": [
+          10,
+          20,
+          30
+        ]
+      }
+    ],
+    "description": "2019 midterm 2"
+  },
+  {
+    "id": 9,
+    "question": "Two `BagOfStuff` objects share the same list which is mutated after the first construction. Draw the memory model before the `assert` executes.",
+    "code": [
+      "[class BagOfStuff:",
+      "def __init__(self, stuff: list[str]) -> None:",
+      "self.stuff = stuff",
+      "",
+      "if __name__ == '__main__':",
+      "some_stuff = ['wallet', 'phone', 'keys']",
+      "my_stuff = BagOfStuff(some_stuff)",
+      "some_stuff.append('snacks')",
+      "your_stuff = BagOfStuff(some_stuff)",
+      "assert len(my_stuff.stuff) == 3 and len(your_stuff.stuff) == 4]"
+    ],
+    "answer": [
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "my_stuff": 20,
+          "some_stuff": 10,
+          "your_stuff": 30
+        }
+      },
+      {
+        "id": 20,
+        "name": "BagOfStuff",
+        "type": "object",
+        "value": {
+          "stuff": 10
+        }
+      },
+      {
+        "id": 30,
+        "name": "BagOfStuff",
+        "type": "object",
+        "value": {
+          "stuff": 10
+        }
+      },
+      {
+        "id": 10,
+        "type": "list",
+        "value": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "id": 1,
+        "type": "str",
+        "value": "wallet"
+      },
+      {
+        "id": 2,
+        "type": "str",
+        "value": "phone"
+      },
+      {
+        "id": 3,
+        "type": "str",
+        "value": "keys"
+      },
+      {
+        "id": 4,
+        "type": "str",
+        "value": "snacks"
+      }
+    ],
+    "description": "2019 midterm 3"
+  },
+  {
+    "id": 10,
+    "question": "`do_something` appends ninety‑nine to each inner list accessed through an alias. Draw the memory model after `do_something` is popped.",
+    "code": [
+      "[from typing import List",
+      "",
+      "def do_something(lst: List[List[int]]) -> None:",
+      "for sublst in lst:",
+      "sublst.append(99)",
+      "",
+      "if __name__ == '__main__':",
+      "original_lst = [[1, 2, 3], [4, 5, 6]]",
+      "lst_copy = [original_lst[0], original_lst[1]]",
+      "do_something(lst_copy)]"
+    ],
+    "answer": [
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "lst_copy": 40,
+          "original_lst": 30
+        }
+      },
+      {
+        "id": 1,
+        "type": "int",
+        "value": 1
+      },
+      {
+        "id": 2,
+        "type": "int",
+        "value": 2
+      },
+      {
+        "id": 3,
+        "type": "int",
+        "value": 3
+      },
+      {
+        "id": 4,
+        "type": "int",
+        "value": 4
+      },
+      {
+        "id": 5,
+        "type": "int",
+        "value": 5
+      },
+      {
+        "id": 6,
+        "type": "int",
+        "value": 6
+      },
+      {
+        "id": 7,
+        "type": "int",
+        "value": 99
+      },
+      {
+        "id": 10,
+        "type": "list",
+        "value": [
+          1,
+          2,
+          3,
+          7
+        ]
+      },
+      {
+        "id": 20,
+        "type": "list",
+        "value": [
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      {
+        "id": 30,
+        "type": "list",
+        "value": [
+          10,
+          20
+        ]
+      },
+      {
+        "id": 40,
+        "type": "list",
+        "value": [
+          10,
+          20
+        ]
+      }
+    ],
+    "description": "2022 final"
+  }
+]

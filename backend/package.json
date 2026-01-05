@@ -7,7 +7,8 @@
     "dev": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "jest --watch"
+    "test": "jest --watch",
+    "import-questions": "ts-node src/scripts/import-questions.ts"
   },
   "keywords": [],
   "author": "",

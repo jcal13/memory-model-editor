@@ -4,25 +4,6 @@ MemoryLab is a drag-and-drop web application designed for computer science educa
 
 ## Table of Contents
 
-- [Features](#features)
-  - [Interactive Canvas](#interactive-canvas)
-  - [Practice vs. Test Modes](#practice-vs-test-modes)
-  - [Practice Question Bank](#practice-question-bank)
-  - [Automatic Grading & Feedback](#automatic-grading--feedback)
-  - [Export & Download Options](#export--download-options)
-- [Developer Instructions](#developer-instructions)
-  - [1. Clone the repo](#1-clone-the-repo)
-  - [2. Set up the database](#2-set-up-the-database)
-  - [3. Install frontend dependencies and start frontend server](#3-install-frontend-dependencies-and-start-frontend-server)
-  - [4. Install backend dependencies and start backend server](#4-install-backend-dependencies-and-start-backend-server)
-  - [5. Adding Questions to the Database](#5-adding-questions-to-the-database)
-- [Production Deployment](#production-deployment)
-  - [Building for Production](#building-for-production)
-- [Technical Details](#technical-details)
-  - [Validation Function](#validation-function)
-
-## Features
-
 - [Key Features](#key-features)
 - [Developer Setup (Local)](#developer-setup-local)
 - [Production Deployment](#production-deployment)

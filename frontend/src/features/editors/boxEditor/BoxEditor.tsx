@@ -89,10 +89,6 @@ const BoxEditorModule = ({
   );
   return (
     <div ref={moduleRef} className={`drag-handle ${styles.boxEditorModule}`}>
-      <button className={styles.removeItem} onClick={onClose}>
-        ×
-      </button>
-      
       {/* Top section: displays type-specific headers (id, selector, name) */}
       <Header
         element={metadata}

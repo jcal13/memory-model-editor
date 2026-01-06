@@ -17,9 +17,6 @@ MemoryLab is a drag-and-drop web application designed for computer science educa
 - **Practice vs. Test Modes**:
   - **Practice Mode**: A guided environment with structured assistance to assist with model construction.
   - **Test Mode**: A free-form environment with no constraints for independent self-assessment.
-- **Practice Mode**: A guided environment with structured assistance to assist with model construction.
-- **Test Mode**: A free-form environment with no constraints for independent self-assessment.
-
 - **Question Bank**: Includes built-in exercises drawn from previous first-year computer science courses and tests at the University of Toronto.
 - **Automatic Grading**: Provides detailed, traceable feedback by treating memory models as graph-isomorphism problems.
 - **Multi-Format Export**: Save models as **JSON** (for re-importing or uploading to MarkUs), **SVG**, or **PNG**.
@@ -174,30 +171,23 @@ The function finds a single, consistent bijection (one-to-one mapping) between t
 1. **Top-Level Checks (`validateAnswer`)**: Retrieves the solution, scans for duplicate IDs, and validates the structure of function frames.
 2. **Frame and Variable Comparison (`compareFrames`)**: Iterates through frames. If a variable exists in both the solution and the submission, it calls `compareIds`.
 3. **Recursive ID Comparison (`compareIds`)**:
-
-- **Bijection Enforcement**: Checks if the current mapping conflicts with existing mappings in `answerToInputMap` and `inputToAnswerMap`.
-- **Type Verification**: Confirms types (e.g., list vs. int) match exactly.
-- **Primitive Value Check**: Direct value comparison for primitives.
-- **Circular References**: Uses a `visited` map to track pairs of IDs to prevent infinite loops in recursive structures.
-
-**Note:** Before deploying to production, make sure you have completed the [database setup](#2-set-up-the-database) steps from the Developer Instructions.
-
-### Building for Production
-
-- **Arrays (`checkArray`)**: Order-sensitive comparison of elements.
-- **Sets (`checkSet`)**: Performs tentative recursive matching to find a valid mapping in unordered data.
-- **Dictionaries/Objects (`checkDict`/`checkObject`)**: Matches keys/attributes exactly and recurses on the referenced IDs.
-
+   - **Bijection Enforcement**: Checks if the current mapping conflicts with existing mappings in `answerToInputMap` and `inputToAnswerMap`.
+   - **Type Verification**: Confirms types (e.g., list vs. int) match exactly.
+   - **Primitive Value Check**: Direct value comparison for primitives.
+   - **Circular References**: Uses a `visited` map to track pairs of IDs to prevent infinite loops in recursive structures.
+4. **Collection Checks**:
+   - **Arrays (`checkArray`)**: Order-sensitive comparison of elements.
+   - **Sets (`checkSet`)**: Performs tentative recursive matching to find a valid mapping in unordered data.
+   - **Dictionaries/Objects (`checkDict`/`checkObject`)**: Matches keys/attributes exactly and recurses on the referenced IDs.
 5. **Final Checks**:
-
-- **Call Stack Order**: Verifies that frames are ordered correctly.
-- **Orphan Detection**: Identifies user boxes not reached during traversal (unmapped boxes).
+   - **Call Stack Order**: Verifies that frames are ordered correctly.
+   - **Orphan Detection**: Identifies user boxes not reached during traversal (unmapped boxes).
 
 ## Automated Grading with MarkUs
 
 You can use the `validateAnswer.ts` logic to automate grading for student submissions exported as JSON.
 
-### Setup for MarkUs (WILL NEED TO CHECK)
+### Setup for MarkUs
 
 1. **Environment**: Ensure the MarkUs testing environment has Node.js and the compiled `validateAnswer.js` (from the `/dist` folder).
 2. **Grading Script**: Create a wrapper script that loads the student's exported JSON and the solution JSON from your database.

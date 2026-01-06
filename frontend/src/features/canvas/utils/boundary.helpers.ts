@@ -24,10 +24,10 @@ export interface ElementDimensions {
  * and from top to bottom of canvas to prevent any elements from being placed to the left
  */
 export const DEFAULT_CALLSTACK_BOUNDS: CallStackBounds = {
-  x: 0, // Boundary starts at left edge of canvas
-  y: 0, // Boundary starts at top of canvas
-  width: 250, // Extends to cover the callstack area (20px margin + 230px callstack width)
-  height: 400, // Will be dynamically calculated based on canvas height
+  x: 0,
+  y: 0,
+  width: 225,
+  height: 400,
 };
 
 /**
@@ -38,22 +38,25 @@ export const DEFAULT_CALLSTACK_BOUNDS: CallStackBounds = {
  */
 export function getCallStackBounds(
   canvasHeight: number = window.innerHeight,
-  x: number = 0, // Start from left edge of canvas
-  y: number = 0, // Start from top of canvas
-  width: number = 250 // Cover the callstack area (20px margin + 230px callstack width)
+  x: number = 0,
+  y: number = 0,
+  width: number = 225
 ): CallStackBounds {
   // Ensure we have a valid canvas height, falling back to window height if needed
   let validCanvasHeight = canvasHeight;
-  
-  if (!validCanvasHeight || validCanvasHeight <= 0 || !isFinite(validCanvasHeight)) {
-    // Fallback to window dimensions if canvas height is invalid
-    validCanvasHeight = typeof window !== 'undefined' ? window.innerHeight : 1080;
+
+  if (
+    !validCanvasHeight ||
+    validCanvasHeight <= 0 ||
+    !isFinite(validCanvasHeight)
+  ) {
+    validCanvasHeight =
+      typeof window !== "undefined" ? window.innerHeight : 1080;
   }
-  
+
   // Extend the boundary from top to bottom of the canvas
-  // Use a reasonable minimum height to ensure the boundary is always functional
   const columnHeight = Math.max(400, validCanvasHeight);
-  
+
   return {
     x,
     y,
@@ -104,6 +107,8 @@ export function isElementOverlappingCallStack(
   );
 }
 
+export const CALLSTACK_PADDING = 10;
+
 /**
  * Constrains a position to avoid overlapping with the callstack
  * Returns the nearest valid position if the original position would cause overlap
@@ -116,7 +121,9 @@ export function constrainPositionAwayFromCallStack(
   callStackBounds: CallStackBounds,
   canvasBounds?: { width: number; height: number }
 ): Position {
-  if (!isElementOverlappingCallStack(position, elementDimensions, callStackBounds)) {
+  if (
+    !isElementOverlappingCallStack(position, elementDimensions, callStackBounds)
+  ) {
     return position;
   }
 
@@ -125,25 +132,35 @@ export function constrainPositionAwayFromCallStack(
   const padding = CALLSTACK_PADDING;
 
   // Since the callstack boundary extends from top to bottom, always move to the right
-  const moveRight = callStackBounds.x + callStackBounds.width + elementHalfWidth + padding;
+  const moveRight =
+    callStackBounds.x + callStackBounds.width + elementHalfWidth + padding;
 
   // Constrain Y position to stay within canvas bounds
   let constrainedY = position.y;
   if (canvasBounds && canvasBounds.width > 0 && canvasBounds.height > 0) {
-    constrainedY = Math.max(elementHalfHeight, Math.min(canvasBounds.height - elementHalfHeight, position.y));
+    constrainedY = Math.max(
+      elementHalfHeight,
+      Math.min(canvasBounds.height - elementHalfHeight, position.y)
+    );
   }
 
   // Check if moving right is valid within canvas bounds
-  const rightPositionValid = !canvasBounds || 
-    (canvasBounds.width > 0 && canvasBounds.height > 0 && 
-     moveRight <= canvasBounds.width - elementHalfWidth && moveRight >= elementHalfWidth);
+  const rightPositionValid =
+    !canvasBounds ||
+    (canvasBounds.width > 0 &&
+      canvasBounds.height > 0 &&
+      moveRight <= canvasBounds.width - elementHalfWidth &&
+      moveRight >= elementHalfWidth);
 
   if (rightPositionValid) {
     return { x: moveRight, y: constrainedY };
   }
 
   // If moving right would go outside canvas, constrain to the right edge of canvas
-  const constrainedX = (canvasBounds && canvasBounds.width > 0) ? canvasBounds.width - elementHalfWidth : moveRight;
+  const constrainedX =
+    canvasBounds && canvasBounds.width > 0
+      ? canvasBounds.width - elementHalfWidth
+      : moveRight;
   return { x: constrainedX, y: constrainedY };
 }
 
@@ -165,8 +182,14 @@ export function smoothlyConstrainDragPosition(
 
   // Apply canvas bounds first, with validation
   if (canvasBounds && canvasBounds.width > 0 && canvasBounds.height > 0) {
-    constrainedX = Math.max(elementHalfWidth, Math.min(canvasBounds.width - elementHalfWidth, constrainedX));
-    constrainedY = Math.max(elementHalfHeight, Math.min(canvasBounds.height - elementHalfHeight, constrainedY));
+    constrainedX = Math.max(
+      elementHalfWidth,
+      Math.min(canvasBounds.width - elementHalfWidth, constrainedX)
+    );
+    constrainedY = Math.max(
+      elementHalfHeight,
+      Math.min(canvasBounds.height - elementHalfHeight, constrainedY)
+    );
   }
 
   // Calculate the callstack boundary with padding
@@ -177,14 +200,14 @@ export function smoothlyConstrainDragPosition(
   const callStackBottom = callStackBounds.y + callStackBounds.height;
 
   // Check if element would overlap with the callstack boundary (including padding)
-  // We need to check if the element's center position would cause any part of the element
-  // to enter the forbidden zone
   const elementLeft = constrainedX - elementHalfWidth;
   const elementTop = constrainedY - elementHalfHeight;
   const elementBottom = constrainedY + elementHalfHeight;
 
   // Check if element overlaps vertically with the callstack
-  const verticalOverlap = !(elementBottom < callStackTop || elementTop > callStackBottom);
+  const verticalOverlap = !(
+    elementBottom < callStackTop || elementTop > callStackBottom
+  );
 
   // If there's vertical overlap and the element would enter the forbidden horizontal zone,
   // constrain the X position to keep the element's left edge at the boundary
@@ -195,8 +218,3 @@ export function smoothlyConstrainDragPosition(
 
   return { x: constrainedX, y: constrainedY };
 }
-
-/**
- * Gets the padding around the callstack for boundary calculations
- */
-export const CALLSTACK_PADDING = 10;

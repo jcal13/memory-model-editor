@@ -10,17 +10,14 @@ export const BOX_STYLES = {
   box_type: { fill: "#fff", fillStyle: "solid" },
 } as const;
 
-/**
- * Default dimensions for boxes
- */
 export const DEFAULT_DIMENSIONS = {
-  MIN_WIDTH: 170,
-  MAX_WIDTH: 203,
-  MIN_HEIGHT: 90,
-  MAX_HEIGHT: 200,
-  PRIMITIVE_WIDTH: 170,
-  STANDARD_WIDTH: 190,
-  SET_WIDTH: 203,
+  MIN_WIDTH: 153,
+  MAX_WIDTH: 183,
+  MIN_HEIGHT: 78,
+  MAX_HEIGHT: 180,
+  PRIMITIVE_WIDTH: 153,
+  STANDARD_WIDTH: 171,
+  SET_WIDTH: 183,
 } as const;
 
 /**
@@ -32,14 +29,12 @@ export const DEFAULT_DIMENSIONS = {
  */
 export function extractValues(kind: any): (number | "_")[] {
   if (Array.isArray(kind.value)) {
-    // Handle list/tuple/set values
     return kind.value
       .map((v: any) => (v === "_" ? "_" : Number(v)))
       .filter((v: any) => v === "_" || !isNaN(v as number));
   }
 
   if (kind.value && typeof kind.value === "object") {
-    // Handle dict values
     return Object.values(kind.value)
       .map((v: any) => Number(v))
       .filter((v) => !isNaN(v as number));
@@ -71,9 +66,8 @@ export function makeUniqueKey(raw: unknown, used: Set<string>): string {
   const base = typeof raw === "string" ? raw : "";
   let key = base;
 
-  // Add invisible characters until we have a unique key
   while (used.has(key)) {
-    key += "\u200B"; // Zero-width space
+    key += "\u200B";
   }
 
   used.add(key);
@@ -81,8 +75,6 @@ export function makeUniqueKey(raw: unknown, used: Set<string>): string {
 }
 
 /**
- * Calculates the height for sequence-type boxes (list, tuple, set)
- *
  * @param kind - The kind object
  * @param emptyHeight - Height when empty
  * @param filledHeight - Height when containing items
@@ -90,61 +82,60 @@ export function makeUniqueKey(raw: unknown, used: Set<string>): string {
  */
 export function getSequenceHeight(
   kind: any,
-  emptyHeight: number = 100,
-  filledHeight: number = 140
+  emptyHeight: number = 78,
+  filledHeight: number = 126
 ): number {
   const values = extractValues(kind);
   return values.length > 0 ? filledHeight : emptyHeight;
 }
 
 /**
- * Processes function parameters into a props object
+ * Processes function parameters into the format expected by MemoryViz
  *
- * @param params - Array of parameter objects
- * @returns Object mapping parameter names to their target IDs
+ * @param params - Array of parameter objects with key-value pairs
+ * @returns Processed parameters object
  */
-export function processFunctionParams(
-  params: any[] = []
-): Record<string, number | "_"> {
+export function processFunctionParams(params: any[]): Record<string, any> {
+  if (!Array.isArray(params)) return {};
+
   const used = new Set<string>();
-  const props: Record<string, number | "_"> = {};
-
-  params.forEach((param: any) => {
-    const key = makeUniqueKey(param.name, used);
-    props[key] = normalizeId(param.targetId);
-  });
-
-  return props;
+  return params.reduce((acc, param) => {
+    const key = makeUniqueKey(param.key, used);
+    acc[key] = normalizeId(param.value);
+    return acc;
+  }, {} as Record<string, any>);
 }
 
 /**
- * Processes class variables into a props object
+ * Processes class variables into the format expected by MemoryViz
  *
- * @param classVariables - Array of class variable objects
- * @returns Object mapping variable names to their target IDs
+ * @param variables - Array of variable objects with key-value pairs
+ * @returns Processed variables object
  */
-export function processClassVariables(
-  classVariables: any[] = []
-): Record<string, number | "_"> {
+export function processClassVariables(variables: any[]): Record<string, any> {
+  if (!Array.isArray(variables)) return {};
+
   const used = new Set<string>();
-  const props: Record<string, number | "_"> = {};
-
-  classVariables.forEach((variable: any) => {
-    const key = makeUniqueKey(variable.name, used);
-    props[key] = normalizeId(variable.targetId);
-  });
-
-  return props;
+  return variables.reduce((acc, variable) => {
+    const key = makeUniqueKey(variable.key, used);
+    acc[key] = normalizeId(variable.value);
+    return acc;
+  }, {} as Record<string, any>);
 }
 
 /**
- * Safely extracts a dictionary object from kind.value
+ * Extracts and processes dictionary key-value pairs
  *
- * @param kind - The kind object
- * @returns Dictionary object or empty object
+ * @param kind - The kind object containing dictionary data
+ * @returns Processed dictionary object
  */
 export function extractDictionary(kind: any): Record<string, any> {
-  return typeof kind.value === "object" && !Array.isArray(kind.value)
-    ? kind.value
-    : {};
+  if (!kind.pairs || !Array.isArray(kind.pairs)) return {};
+
+  const used = new Set<string>();
+  return kind.pairs.reduce((acc: Record<string, any>, pair: any) => {
+    const key = makeUniqueKey(pair.key, used);
+    acc[key] = normalizeId(pair.value);
+    return acc;
+  }, {} as Record<string, any>);
 }

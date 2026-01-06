@@ -71,11 +71,9 @@ export function loadInitialUIData(): UIState {
 
     const parsed = JSON.parse(rawData);
 
-    // Validate and normalize each field
+    // Validate and normalize each field - removed "errors" validation
     const activeTab: Tab =
-      parsed?.activeTab === "feedback" || 
-      parsed?.activeTab === "errors" || 
-      parsed?.activeTab === "question"
+      parsed?.activeTab === "feedback" || parsed?.activeTab === "question"
         ? parsed.activeTab
         : "question";
 
@@ -108,17 +106,14 @@ export function loadInitialUIData(): UIState {
 }
 
 /**
- * Validates and normalizes submission results from storage
- * @param rawResults - Raw results from localStorage
- * @returns Validated SubmissionResult or null
+ * Validates submission results from localStorage
  */
 function validateSubmissionResults(rawResults: any): SubmissionResult | null {
-  if (!rawResults || typeof rawResults !== "object") {
-    return null;
-  }
+  if (!rawResults || typeof rawResults !== "object") return null;
+  if (typeof rawResults.correct !== "boolean") return null;
 
   return {
-    correct: Boolean(rawResults.correct),
+    correct: rawResults.correct,
     errors: Array.isArray(rawResults.errors)
       ? rawResults.errors
       : Array.isArray(rawResults.messages)
@@ -248,4 +243,48 @@ export function deleteQuestionCanvasData(
   } catch (error) {
     console.warn("Failed to delete question canvas data:", error);
   }
+}
+
+/**
+ * Exported for backwards compatibility
+ */
+export function getQuestionStorageKey(
+  questionType: "test" | "practice",
+  questionIndex: number
+): string {
+  return getQuestionCanvasKey(questionType, questionIndex);
+}
+
+/**
+ * Alias for backwards compatibility
+ */
+export function saveQuestionCanvas(
+  questionType: "test" | "practice",
+  questionIndex: number,
+  elements: CanvasElement[],
+  ids: number[],
+  classes: string[]
+): void {
+  saveQuestionCanvasData(questionType, questionIndex, {
+    elements,
+    ids,
+    classes,
+  });
+}
+
+/**
+ * Alias for backwards compatibility
+ */
+export function loadQuestionCanvas(
+  questionType: "test" | "practice",
+  questionIndex: number
+): CanvasData | null {
+  return loadQuestionCanvasData(questionType, questionIndex);
+}
+
+/**
+ * Alias for backwards compatibility - use saveUIState instead
+ */
+export function saveUIData(state: UIState): void {
+  saveUIState(state);
 }

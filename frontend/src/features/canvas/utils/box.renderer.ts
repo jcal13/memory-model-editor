@@ -5,19 +5,16 @@ import { MemoryVizConfig } from "./box.types";
 import { DEFAULT_DIMENSIONS } from "./box.helpers";
 import { hasErrors } from "./validation";
 
-/**
- * Default MemoryViz configuration
- */
 const DEFAULT_MEMORY_VIZ_CONFIG: Partial<MemoryVizConfig> = {
-  prop_min_width: 60,
-  prop_min_height: 40,
+  prop_min_width: 54,
+  prop_min_height: 36,
   double_rect_sep: 10,
-  font_size: 18,
+  font_size: 17,
   browser: true,
   roughjs_config: {
     options: {
       fillStyle: "solid",
-      seed: 1, // Default seed for consistent rendering
+      seed: 1,
     },
   },
 };
@@ -51,7 +48,7 @@ export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
     roughjs_config: {
       options: {
         fillStyle: "solid",
-        seed: boxId || 1, // Use boxId as seed for consistent rendering per element
+        seed: boxId || 1,
       },
     },
   } as MemoryVizConfig;
@@ -77,40 +74,21 @@ export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
  * @param customColor - Optional custom color to use instead of default red
  */
 function applyErrorStyling(svg: SVGSVGElement, customColor?: string): void {
-  // Default colors (subtle reddish-gray tint)
-  const DEFAULT_ERROR_STROKE = "#D97676"; // Muted red-gray for stroke
-  const DEFAULT_ERROR_FILL = "#F5E5E5"; // Very light reddish tint for fill
-  const DEFAULT_ERROR_TEXT = "#A85858"; // Muted red-brown for text
-  
-  // Use custom color if provided, otherwise use defaults
-  let strokeColor: string;
-  let fillColor: string;
-  let textColor: string;
-  
-  if (customColor) {
-    // If custom color provided, use it for stroke and derive lighter shades
-    strokeColor = customColor;
-    fillColor = lightenColor(customColor, 0.9); // Very light tint
-    textColor = darkenColor(customColor, 0.3); // Darker for text
-  } else {
-    strokeColor = DEFAULT_ERROR_STROKE;
-    fillColor = DEFAULT_ERROR_FILL;
-    textColor = DEFAULT_ERROR_TEXT;
-  }
-  
-  // Style all rectangles, paths, and shapes (boxes)
+  const errorColor = customColor || "#DC2626";
+
+  const strokeColor = errorColor;
+  const fillColor = lightenColor(errorColor, 0.9);
+  const textColor = darkenColor(errorColor, 0.3);
+
   const shapes = svg.querySelectorAll<SVGElement>(
-    "rect:not([data-text-bg]), path, polygon"
+    "path, rect, circle, ellipse, line, polyline, polygon"
   );
   shapes.forEach((shape) => {
-    // Skip elements inside defs (patterns, etc.)
     if (shape.closest("defs")) return;
 
-    // Apply stroke color
     shape.style.setProperty("stroke", strokeColor, "important");
     shape.style.setProperty("stroke-width", "2", "important");
-    
-    // Apply fill for container boxes
+
     if (shape.tagName === "rect" || shape.classList.contains("container")) {
       shape.style.setProperty("fill", fillColor, "important");
     }
@@ -130,16 +108,18 @@ function applyErrorStyling(svg: SVGSVGElement, customColor?: string): void {
  * @returns Lightened hex color
  */
 function lightenColor(color: string, amount: number): string {
-  const hex = color.replace('#', '');
+  const hex = color.replace("#", "");
   const r = parseInt(hex.substring(0, 2), 16);
   const g = parseInt(hex.substring(2, 4), 16);
   const b = parseInt(hex.substring(4, 6), 16);
-  
+
   const newR = Math.round(r + (255 - r) * amount);
   const newG = Math.round(g + (255 - g) * amount);
   const newB = Math.round(b + (255 - b) * amount);
-  
-  return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+
+  return `#${newR.toString(16).padStart(2, "0")}${newG
+    .toString(16)
+    .padStart(2, "0")}${newB.toString(16).padStart(2, "0")}`;
 }
 
 /**
@@ -149,16 +129,18 @@ function lightenColor(color: string, amount: number): string {
  * @returns Darkened hex color
  */
 function darkenColor(color: string, amount: number): string {
-  const hex = color.replace('#', '');
+  const hex = color.replace("#", "");
   const r = parseInt(hex.substring(0, 2), 16);
   const g = parseInt(hex.substring(2, 4), 16);
   const b = parseInt(hex.substring(4, 6), 16);
-  
+
   const newR = Math.round(r * (1 - amount));
   const newG = Math.round(g * (1 - amount));
   const newB = Math.round(b * (1 - amount));
-  
-  return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+
+  return `#${newR.toString(16).padStart(2, "0")}${newG
+    .toString(16)
+    .padStart(2, "0")}${newB.toString(16).padStart(2, "0")}`;
 }
 
 /**

@@ -11,15 +11,14 @@ import { BoxDimensions } from "../utils/box.types";
 import CanvasBox from "./CanvasBox";
 import styles from "./CallStack.module.css";
 
-// Layout constants
-const DEFAULT_BOX_WIDTH = 200;
+const DEFAULT_BOX_WIDTH = 180;
 const FALLBACK_BOX_HEIGHT = 60;
 const BOX_GAP = 0;
 
 const HEADER_HEIGHT = 40;
-const TOP_FREE_PADDING = 12;
-const BOTTOM_FREE_PADDING = 12;
-const SELECTION_PADDING_TOP = 25;
+const TOP_FREE_PADDING = 5;
+const BOTTOM_FREE_PADDING = -12;
+const SELECTION_PADDING_TOP = -25;
 const SELECTION_PADDING_BOTTOM = 20;
 const TOP_PADDING = TOP_FREE_PADDING + SELECTION_PADDING_TOP;
 const BOTTOM_PADDING = BOTTOM_FREE_PADDING + SELECTION_PADDING_BOTTOM + 25;
@@ -64,13 +63,12 @@ const CallStack: React.FC<CallStackProps> = ({
   onReorder,
   x = 20,
   y = 80,
-  width = 230,
+  width = 205,
 }) => {
   const clipPathId = useId();
 
   // Viewport height management
   const [viewportHeight, setViewportHeight] = useState<number>(() => {
-    // Initialize immediately with the correct height
     return Math.max(400, window.innerHeight - 110);
   });
 
@@ -80,14 +78,13 @@ const CallStack: React.FC<CallStackProps> = ({
       setViewportHeight(newHeight);
     };
 
-    // Initial measurement after mount
     handleResize();
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Box size tracking - using BoxDimensions type
+  // Box size tracking
   const [boxSizes, setBoxSizes] = useState<Record<number, BoxDimensions>>({});
 
   const handleBoxSizeChange = useCallback((id: number, size: BoxDimensions) => {
@@ -121,21 +118,19 @@ const CallStack: React.FC<CallStackProps> = ({
 
   const layout = useMemo((): LayoutItem[] => {
     let yOffset = 0;
-    const baseY =
-      y + HEADER_HEIGHT + TOP_PADDING + visibleHeight - FALLBACK_BOX_HEIGHT / 2;
+    const baseY = y + HEADER_HEIGHT + TOP_PADDING + visibleHeight;
 
     return orderedFrames.map((frame) => {
-      const height =
-        (boxSizes[frame.boxId]?.height ?? FALLBACK_BOX_HEIGHT) - 15;
-      const yLocal = baseY - yOffset - height / 2 + 50;
+      const height = boxSizes[frame.boxId]?.height ?? FALLBACK_BOX_HEIGHT;
+      const yLocal = baseY - yOffset - height / 2;
       yOffset += height + BOX_GAP;
       return { f: frame, yLocal, h: height };
     });
   }, [orderedFrames, boxSizes, y, visibleHeight]);
 
   const totalContentHeight = layout.reduce(
-    (acc, { h }) => acc + h + BOX_GAP - 9,
-    -BOX_GAP
+    (acc, { h }) => acc + h + BOX_GAP,
+    0
   );
 
   // Scrolling state
@@ -384,15 +379,10 @@ const CallStack: React.FC<CallStackProps> = ({
                 return (
                   <rect
                     className={styles.selectionHighlight}
-                    x={-boxWidth / 2 + 6}
-                    y={-height / 2 - SELECTION_PADDING_TOP + 23}
-                    width={boxWidth - 14}
-                    height={
-                      height +
-                      SELECTION_PADDING_TOP +
-                      SELECTION_PADDING_BOTTOM -
-                      44
-                    }
+                    x={-boxWidth / 2 + 1}
+                    y={-height / 2 + 2}
+                    width={boxWidth - 4}
+                    height={height - 6}
                     rx={6}
                     ry={6}
                     style={{ pointerEvents: "none" }}

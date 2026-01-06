@@ -153,6 +153,36 @@
   z-index: 2;
 }
 
+.deleteVariableButton {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  background-color: #ef4444;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  font-weight: 400;
+  flex-shrink: 0;
+  line-height: 1;
+  padding: 0;
+}
+
+.deleteVariableButton:hover {
+  background-color: #dc2626;
+  transform: scale(1.1);
+}
+
+.deleteVariableButton::before {
+  content: "×";
+  display: block;
+}
+
 .idSelectButtonWrapper {
   position: relative;
 }
@@ -177,7 +207,8 @@
 
 .pairItem {
   display: flex;
-  gap: 16px;
+  gap: 10px;
+  align-items: center;
 }
 
 /* =======================================

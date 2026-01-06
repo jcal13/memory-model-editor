@@ -52,20 +52,24 @@ const CollectionItem = ({
                   ids={ids}
                   onAdd={addId}
                   onSelect={(picked) =>
-                    setItems((prev) => prev.map((v, i) => (i === idx ? picked : v)))
+                    setItems((prev) =>
+                      prev.map((v, i) => (i === idx ? picked : v))
+                    )
                   }
                   onRemove={removeId}
-                  buttonClassName={`${styles.collectionIdBox} ${hasError ? styles.errorId : ""}`}
+                  buttonClassName={`${styles.collectionIdBox} ${
+                    hasError ? styles.errorId : ""
+                  }`}
                   editable={true}
                   sandbox={sandbox}
                 />
               </FieldValidationTooltip>
               <button
-                className={styles.collectionRemoveId}
+                className={styles.deleteVariableButton}
                 onClick={() => removeItem(idx)}
-              >
-                ×
-              </button>
+                title="Delete item"
+                aria-label="Delete item"
+              />
             </div>
           );
         })}
@@ -95,7 +99,9 @@ const CollectionItem = ({
                       prev.map((p, i) => (i === idx ? [picked, p[1]] : p))
                     )
                   }
-                  buttonClassName={`${styles.collectionIdBox} ${keyHasError ? styles.errorId : ""}`}
+                  buttonClassName={`${styles.collectionIdBox} ${
+                    keyHasError ? styles.errorId : ""
+                  }`}
                   editable={true}
                   sandbox={sandbox}
                 />
@@ -116,17 +122,19 @@ const CollectionItem = ({
                       prev.map((p, i) => (i === idx ? [p[0], picked] : p))
                     )
                   }
-                  buttonClassName={`${styles.collectionIdBox} ${valHasError ? styles.errorId : ""}`}
+                  buttonClassName={`${styles.collectionIdBox} ${
+                    valHasError ? styles.errorId : ""
+                  }`}
                   editable={true}
                   sandbox={sandbox}
                 />
               </FieldValidationTooltip>
               <button
-                className={styles.collectionRemoveId}
+                className={styles.deleteVariableButton}
                 onClick={() => removeItem(idx)}
-              >
-                ×
-              </button>
+                title="Delete pair"
+                aria-label="Delete pair"
+              />
             </div>
           </div>
         );

@@ -83,18 +83,20 @@ const ClassContent = ({
                       onAdd={addId}
                       onSelect={(id) => setTargetId(idx, id)}
                       onRemove={removeId}
-                      buttonClassName={`${styles.collectionIdBox} ${hasError ? styles.errorId : ""}`}
+                      buttonClassName={`${styles.collectionIdBox} ${
+                        hasError ? styles.errorId : ""
+                      }`}
                       sandbox={sandbox}
                       editable={true}
                     />
                   </FieldValidationTooltip>
-                  <button
-                    onClick={() => removeVariable(idx)}
-                    className={styles.collectionRemoveId}
-                  >
-                    ×
-                  </button>
                 </div>
+                <button
+                  onClick={() => removeVariable(idx)}
+                  className={styles.deleteVariableButton}
+                  title="Delete variable"
+                  aria-label="Delete variable"
+                />
               </div>
             );
           })}

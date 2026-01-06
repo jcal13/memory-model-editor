@@ -1,10 +1,9 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { CanvasElement } from "../shared/types";
 import Canvas from "../canvas/Canvas";
 import Palette from "../palette/Palette";
-import ConfirmationModal from "./components/ConfirmationModal";
 import InformationTabs from "../informationTabs/InformationTabs";
-import styles from "./MemoryModelEditor.module.css";
-import { useResponsivePanels } from "./hooks/useResponsivePanels";
-
+import ConfirmationModal from "./components/ConfirmationModal";
 import {
   useMemoryModelEditorState,
   clearCanvasStorage,
@@ -16,19 +15,17 @@ import {
 } from "./hooks/useLocalStorage";
 import { useInfoPanelResize } from "./hooks/useInfoPanel";
 import { useCanvasSubmission } from "./hooks/useCanvasSubmission";
-import { useMemo, useEffect, useState, useCallback } from "react";
-import { ValidationError, CanvasElement } from "../shared/types";
-import { 
-  createMasterErrorList, 
-  MasterErrorList,
+import { useResponsivePanels } from "./hooks/useResponsivePanels";
+import {
+  createMasterErrorList,
   getTotalErrorCount,
   getElementsWithErrorsCount,
-  flattenErrorList
+  flattenErrorList,
+  MasterErrorList,
 } from "./utils/masterErrorList";
+import styles from "./MemoryModelEditor.module.css";
 
-// Layout constants
-const MAX_INFO_PANEL_VIEWPORT_RATIO = 0.6667;
-const MAX_INFO_PANEL_CSS_WIDTH = `${MAX_INFO_PANEL_VIEWPORT_RATIO * 100}vw`;
+const MAX_INFO_PANEL_CSS_WIDTH = "min(600px, 45vw)";
 
 interface MemoryModelEditorProps {
   sandbox?: boolean;
@@ -42,11 +39,16 @@ export default function MemoryModelEditor({
   const refs = useMemoryModelEditorRefs();
 
   // Store the openEditor function from Canvas
-  const [openEditor, setOpenEditor] = useState<((element: CanvasElement) => void) | null>(null);
-  
-  const handleEditorOpenerReady = useCallback((opener: (element: CanvasElement) => void) => {
-    setOpenEditor(() => opener);
-  }, []);
+  const [openEditor, setOpenEditor] = useState<
+    ((element: CanvasElement) => void) | null
+  >(null);
+
+  const handleEditorOpenerReady = useCallback(
+    (opener: (element: CanvasElement) => void) => {
+      setOpenEditor(() => opener);
+    },
+    []
+  );
 
   // Master error list - aggregates all validation errors from all elements
   const masterErrorList: MasterErrorList = useMemo(() => {
@@ -55,7 +57,7 @@ export default function MemoryModelEditor({
 
   // Debug: Expose master error list to window for development
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       (window as any).masterErrorList = {
         errorMap: masterErrorList,
         totalErrors: getTotalErrorCount(masterErrorList),
@@ -99,8 +101,94 @@ export default function MemoryModelEditor({
   };
 
   const removeElementId = (id: any): void => {
+    // Remove the ID from the ID list
     state.setElementIds((prevIds) =>
       prevIds.filter((existingId) => existingId !== id)
+    );
+
+    // Replace all references to this ID with "_" in canvas elements
+    state.setElements((prevElements) =>
+      prevElements.map((element) => {
+        let updatedElement = element;
+
+        // If this element itself has the deleted ID, set it to "_"
+        if (element.id === id) {
+          updatedElement = { ...element, id: "_" };
+        }
+
+        // Handle function parameters
+        if (
+          updatedElement.kind.name === "function" &&
+          updatedElement.kind.params
+        ) {
+          return {
+            ...updatedElement,
+            kind: {
+              ...updatedElement.kind,
+              params: updatedElement.kind.params.map((param: any) =>
+                param.targetId === id ? { ...param, targetId: "_" } : param
+              ),
+            },
+          };
+        }
+
+        // Handle class variables
+        if (
+          updatedElement.kind.name === "class" &&
+          updatedElement.kind.classVariables
+        ) {
+          return {
+            ...updatedElement,
+            kind: {
+              ...updatedElement.kind,
+              classVariables: updatedElement.kind.classVariables.map(
+                (variable: any) =>
+                  variable.targetId === id
+                    ? { ...variable, targetId: "_" }
+                    : variable
+              ),
+            },
+          };
+        }
+
+        // Handle list, tuple, set
+        if (
+          (updatedElement.kind.name === "list" ||
+            updatedElement.kind.name === "tuple" ||
+            updatedElement.kind.name === "set") &&
+          Array.isArray(updatedElement.kind.value)
+        ) {
+          return {
+            ...updatedElement,
+            kind: {
+              ...updatedElement.kind,
+              value: updatedElement.kind.value.map((refId: any) =>
+                refId === id ? "_" : refId
+              ),
+            },
+          };
+        }
+
+        // Handle dict (key-value pairs)
+        if (updatedElement.kind.name === "dict" && updatedElement.kind.value) {
+          const updatedDict: Record<string, any> = {};
+          Object.entries(updatedElement.kind.value).forEach(([key, value]) => {
+            const newKey = key === String(id) ? "_" : key;
+            const newValue = value === id ? "_" : value;
+            updatedDict[newKey] = newValue;
+          });
+          return {
+            ...updatedElement,
+            kind: {
+              ...updatedElement.kind,
+              value: updatedDict,
+            },
+          };
+        }
+
+        // Return the element (potentially with updated id)
+        return updatedElement;
+      })
     );
   };
 

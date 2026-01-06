@@ -1,0 +1,144 @@
+/* Validation Tooltip Styles */
+
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.98);
+  border: 2px solid #DC2626;
+  border-radius: 8px;
+  padding: 12px 14px;
+  min-width: 220px;
+  max-width: 320px;
+  max-height: 400px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.25), 
+              0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10000;
+  pointer-events: auto;
+  animation: tooltipFadeIn 0.2s ease-out;
+  backdrop-filter: blur(8px);
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.tooltipArrow {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #DC2626;
+}
+
+.tooltipArrow::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: -7px;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 7px solid white;
+}
+
+.tooltipHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #FCA5A5;
+}
+
+.tooltipIcon {
+  width: 16px;
+  height: 16px;
+  color: #DC2626;
+  flex-shrink: 0;
+}
+
+.tooltipTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #991B1B;
+}
+
+.tooltipContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 320px;
+  padding-right: 4px;
+}
+
+.tooltipContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tooltipContent::-webkit-scrollbar-track {
+  background: #FEE2E2;
+  border-radius: 3px;
+}
+
+.tooltipContent::-webkit-scrollbar-thumb {
+  background: #FCA5A5;
+  border-radius: 3px;
+}
+
+.tooltipContent::-webkit-scrollbar-thumb:hover {
+  background: #DC2626;
+}
+
+.errorItem {
+  padding: 4px 0;
+}
+
+.errorItem:not(:last-child) {
+  border-bottom: 1px solid #FEE2E2;
+  padding-bottom: 8px;
+}
+
+.errorMessage {
+  font-size: 0.8125rem;
+  color: #7F1D1D;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.errorDetail {
+  font-size: 0.75rem;
+  color: #991B1B;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.invalidId {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-weight: 700;
+  color: #7F1D1D;
+  background-color: #FEE2E2;
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid #FCA5A5;
+  font-size: 0.75rem;
+}

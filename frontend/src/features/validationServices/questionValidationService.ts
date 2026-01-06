@@ -39,6 +39,9 @@ export async function submitCanvas(
       payload
     );
 
+    console.log('[questionValidationService] Backend response:', response.data);
+    console.log('[questionValidationService] Response errors:', response.data.errors);
+
     return response.data;
   } catch (error) {
     // Enhanced error handling

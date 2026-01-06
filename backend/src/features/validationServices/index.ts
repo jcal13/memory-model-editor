@@ -11,7 +11,7 @@ router.post("/submit", async (req, res) => {
   console.log("User submission is", result.correct ? "Correct" : "Incorrect");
   if (!result.correct) {
     console.log("Errors:");
-    result.errors.forEach((err: string) => console.log(" -", err));
+    result.errors.forEach((err) => console.log(" -", err.message));
   }
 
   res.status(200).json(result);

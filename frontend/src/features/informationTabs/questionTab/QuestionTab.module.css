@@ -20,10 +20,10 @@
 
 .title {
   text-align: center;
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: #1f2937;
-  margin: 10px 0 25px 0;
+  margin: 8px 0 18px 0;
   letter-spacing: 0.25px;
   border-bottom: 1px solid #e5e7eb;
   padding: 8px 0;
@@ -44,7 +44,7 @@
 .backRow {
   width: 100%;
   text-align: left;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.6rem;
 }
 
 .backBtn {
@@ -52,7 +52,7 @@
   border: none;
   color: #2563eb;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   padding: 0.25rem 0.5rem;
   cursor: pointer;
   transition: color 120ms ease;
@@ -75,8 +75,8 @@
 }
 
 .questionText {
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
+  font-size: 1rem;
+  margin-bottom: 0.875rem;
   color: #111827;
 }
 
@@ -88,19 +88,20 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.94em;
 }
+
 .buttonRow {
   display: flex;
-  gap: 12px;
-  margin-top: 1.5rem;
+  gap: 10px;
+  margin-top: 1.25rem;
 }
 
 .resetButton {
-  padding: 10px 20px;
+  padding: 8px 16px;
   border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   flex: 1;
   transition: all 0.2s ease;
   background-color: #ffffff;
@@ -115,12 +116,12 @@
 }
 
 .submitButton {
-  padding: 10px 20px;
+  padding: 8px 16px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   flex: 1;
   transition: all 0.2s ease;
   background-color: #10b981;

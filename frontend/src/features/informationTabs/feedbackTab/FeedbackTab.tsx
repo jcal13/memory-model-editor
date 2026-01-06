@@ -1,90 +1,138 @@
-import { SubmissionResult } from "../../shared/types";
+import {
+  SubmissionResult,
+  CanvasElement,
+  ErrorSource,
+} from "../../shared/types";
+import {
+  MasterErrorList,
+  flattenErrorList,
+} from "../../memoryModelEditor/utils/masterErrorList";
+import ErrorListDisplay from "../components/ErrorListDisplay";
 import styles from "./FeedbackTab.module.css";
 
 interface FeedbackTabProps {
   submissionResults: SubmissionResult | null;
   questionSelected: boolean;
+  questionIndex: number | null;
+  questionType: "test" | "practice" | null;
+  masterErrorList: MasterErrorList;
+  elements: CanvasElement[];
+  setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
+  onOpenEditor: (element: CanvasElement) => void;
+  isSandboxMode: boolean;
 }
 
 export default function FeedbackTab({
   submissionResults,
   questionSelected,
+  questionIndex,
+  questionType,
+  masterErrorList,
+  elements,
+  setElements,
+  onOpenEditor,
+  isSandboxMode,
 }: FeedbackTabProps) {
-  const renderTitle = () => <h1 className={styles.title}>Feedback</h1>;
+  const renderTitle = () => {
+    let questionName = "";
+    if (questionType && questionIndex !== null) {
+      const typeLabel = questionType === "test" ? "Test" : "Practice";
+      questionName = ` - ${typeLabel} Question ${questionIndex}`;
+    }
 
-  const renderContent = (message: string, className?: string) => (
-    <div className={styles.content}>
-      <p className={`${styles.correctnessMessage} ${className || ""}`}>
-        {message}
-      </p>
+    return <h1 className={styles.title}>Feedback{questionName}</h1>;
+  };
+
+  const renderEmptyState = (
+    icon: string,
+    message: string,
+    subtext?: string
+  ) => (
+    <div className={styles.emptyState}>
+      <div className={styles.emptyIcon}>{icon}</div>
+      <p className={styles.emptyMessage}>{message}</p>
+      {subtext && <p className={styles.emptySubtext}>{subtext}</p>}
     </div>
   );
 
-  // No question selected
   if (!questionSelected) {
     return (
       <>
         {renderTitle()}
-        {renderContent("No question selected")}
-      </>
-    );
-  }
-
-  // No submission yet
-  if (!submissionResults) {
-    return (
-      <>
-        {renderTitle()}
-        {renderContent("No submission yet")}
-      </>
-    );
-  }
-
-  // Correct answer
-  if (submissionResults.correct) {
-    return (
-      <>
-        {renderTitle()}
         <div className={styles.content}>
-          <p className={styles.correctnessMessage}>
-            Your answer is: <span className={styles.correct}>correct!</span>
-          </p>
+          {renderEmptyState(
+            "📋",
+            "No question selected",
+            "Select a question to get started"
+          )}
         </div>
       </>
     );
   }
 
-  // Incorrect answer with errors
+  if (!submissionResults) {
+    return (
+      <>
+        {renderTitle()}
+        <div className={styles.content}>
+          {renderEmptyState(
+            "📝",
+            "No submission yet",
+            "Submit your answer to see feedback"
+          )}
+        </div>
+      </>
+    );
+  }
+
+  if (submissionResults.correct) {
+    return (
+      <>
+        {renderTitle()}
+        <div className={styles.content}>
+          <div className={styles.resultBanner + " " + styles.correct}>
+            <svg
+              className={styles.resultIcon}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span className={styles.resultText}>Your answer is correct!</span>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  const allErrors = flattenErrorList(masterErrorList);
+  const feedbackErrors = allErrors.filter(
+    (item) => item.error.source === ErrorSource.FEEDBACK
+  );
+
+  const uniqueFeedbackErrors = feedbackErrors.filter((item, index, self) => {
+    return self.findIndex((other) => other.error === item.error) === index;
+  });
+
   return (
-    <div className={styles.content}>
+    <>
       {renderTitle()}
-      <p className={styles.correctnessMessage}>
-        Your answer is: <span className={styles.incorrect}>incorrect</span>
-      </p>
-
-      <h2 className={styles.errorsHeading}>Errors:</h2>
-      <ul className={styles.errorList}>
-        {submissionResults.errors.map((error, index) => {
-          const colonIndex = error.indexOf(":");
-
-          if (colonIndex === -1) {
-            return (
-              <li key={index} className={styles.errorItem}>
-                {error}
-              </li>
-            );
-          }
-
-          const before = error.slice(0, colonIndex);
-          const after = error.slice(colonIndex + 1);
-
-          return (
-            <li key={index} className={styles.errorItem}>
-              <strong>{before}</strong>: {after.trim()}
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+      <ErrorListDisplay
+        errors={uniqueFeedbackErrors}
+        elements={elements}
+        setElements={setElements}
+        onOpenEditor={onOpenEditor}
+        showTitle={false}
+        emptyStateMessage="No feedback errors"
+        emptyStateSubtext="All feedback has been addressed."
+        isSandboxMode={isSandboxMode}
+      />
+    </>
   );
 }

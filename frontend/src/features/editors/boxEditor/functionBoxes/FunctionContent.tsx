@@ -1,6 +1,8 @@
 import styles from "../../Editor.module.css";
-import { ID } from "../../../shared/types";
+import { ID, ValidationError } from "../../../shared/types";
 import IdSelector from "../../idEditor/IdEditor";
+import { isIdInvalid, getErrorsForId } from "../../utils/validationHelpers";
+import FieldValidationTooltip from "../FieldValidationTooltip";
 
 /**
  * Props for the FunctionContent component.
@@ -12,6 +14,7 @@ interface Props {
   addId: (id: ID) => void;
   removeId: (id: ID) => void;
   sandbox: boolean;
+  validationErrors?: ValidationError[]; // Validation errors for highlighting
 }
 
 /**
@@ -31,6 +34,7 @@ const FunctionContent = ({
   addId,
   removeId,
   sandbox,
+  validationErrors,
 }: Props) => {
   // Add a new empty parameter to the list
   const addParam = () =>
@@ -60,34 +64,42 @@ const FunctionContent = ({
     <div className={styles.contentContainer}>
       {functionParams.length > 0 && (
         <div className={styles.ItemContainer}>
-          {functionParams.map((p: any, idx: any) => (
-            <div key={idx} className={styles.pairItem}>
-              <input
-                placeholder="var"
-                value={p.name}
-                onChange={(e) => changeName(idx, e.target.value)}
-                className={styles.variableNameBox}
-              />
-              <div className={styles.idSelectButtonWrapper}>
-                <IdSelector
-                  currentId={p.targetId}
-                  ids={ids}
-                  onAdd={addId}
-                  onSelect={(id) => setTargetId(idx, id)}
-                  onRemove={removeId}
-                  buttonClassName={styles.collectionIdBox}
-                  sandbox={sandbox}
-                  editable={true}
+          {functionParams.map((p: any, idx: any) => {
+            const hasError = isIdInvalid(validationErrors, p.targetId);
+            const fieldErrors = getErrorsForId(validationErrors, p.targetId);
+            return (
+              <div key={idx} className={styles.pairItem}>
+                <input
+                  placeholder="var"
+                  value={p.name}
+                  onChange={(e) => changeName(idx, e.target.value)}
+                  className={styles.variableNameBox}
                 />
+                <div className={styles.idSelectButtonWrapper}>
+                  <FieldValidationTooltip errors={fieldErrors}>
+                    <IdSelector
+                      currentId={p.targetId}
+                      ids={ids}
+                      onAdd={addId}
+                      onSelect={(id) => setTargetId(idx, id)}
+                      onRemove={removeId}
+                      buttonClassName={`${styles.collectionIdBox} ${
+                        hasError ? styles.errorId : ""
+                      }`}
+                      sandbox={sandbox}
+                      editable={true}
+                    />
+                  </FieldValidationTooltip>
+                </div>
                 <button
                   onClick={() => removeParam(idx)}
-                  className={styles.collectionRemoveId}
-                >
-                  ×
-                </button>
+                  className={styles.deleteVariableButton}
+                  title="Delete variable"
+                  aria-label="Delete variable"
+                />
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
       <div>

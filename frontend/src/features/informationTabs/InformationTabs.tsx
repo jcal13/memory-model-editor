@@ -1,10 +1,11 @@
-import { SubmissionResult, Tab } from "../shared/types";
+import { SubmissionResult, Tab, CanvasElement } from "../shared/types";
+import { MasterErrorList } from "../memoryModelEditor/utils/masterErrorList";
 import FeedbackTab from "./feedbackTab/FeedbackTab";
 import QuestionTab from "./questionTab/QuestionTab";
 import styles from "./InformationTabs.module.css";
 
 interface InformationTabsProps {
-  submissionResults: SubmissionResult;
+  submissionResults: SubmissionResult | null;
   activeTab: Tab;
   setActive: (tab: Tab) => void;
   questionSelected: boolean;
@@ -17,15 +18,13 @@ interface InformationTabsProps {
   onClearCanvas: () => void;
   onRestoreCanvas: (elements: any[], ids: number[], classes: string[]) => void;
   currentCanvasState: { elements: any[]; ids: number[]; classes: string[] };
+  masterErrorList: MasterErrorList;
+  elements: CanvasElement[];
+  setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
+  onOpenEditor: (element: CanvasElement) => void;
+  isSandboxMode: boolean;
 }
 
-/**
- * InformationTabs renders two pill-style tabs:
- *   • Feedback — shows submission results or sandbox notice
- *   • Question — shows the assignment / help text
- *
- * Each tab is its own component so we can grow their UI independently.
- */
 export default function InformationTabs({
   submissionResults,
   activeTab,
@@ -40,6 +39,11 @@ export default function InformationTabs({
   onClearCanvas,
   onRestoreCanvas,
   currentCanvasState,
+  masterErrorList,
+  elements,
+  setElements,
+  onOpenEditor,
+  isSandboxMode,
 }: InformationTabsProps) {
   const renderTabButton = (tab: Tab, label: string) => (
     <button
@@ -88,6 +92,13 @@ export default function InformationTabs({
             <FeedbackTab
               submissionResults={submissionResults}
               questionSelected={questionSelected}
+              questionIndex={questionIndex}
+              questionType={questionType}
+              masterErrorList={masterErrorList}
+              elements={elements}
+              setElements={setElements}
+              onOpenEditor={onOpenEditor}
+              isSandboxMode={isSandboxMode}
             />
           </div>
         </div>

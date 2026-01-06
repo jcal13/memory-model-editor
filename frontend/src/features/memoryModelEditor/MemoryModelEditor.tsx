@@ -16,8 +16,15 @@ import {
 } from "./hooks/useLocalStorage";
 import { useInfoPanelResize } from "./hooks/useInfoPanel";
 import { useCanvasSubmission } from "./hooks/useCanvasSubmission";
-import { CanvasElement } from "../shared/types";
-import { useMemo } from "react";
+import { useMemo, useEffect, useState, useCallback } from "react";
+import { ValidationError, CanvasElement } from "../shared/types";
+import {
+  createMasterErrorList,
+  MasterErrorList,
+  getTotalErrorCount,
+  getElementsWithErrorsCount,
+  flattenErrorList,
+} from "./utils/masterErrorList";
 
 // Layout constants
 const MAX_INFO_PANEL_VIEWPORT_RATIO = 0.6667;
@@ -33,6 +40,35 @@ export default function MemoryModelEditor({
   // State management
   const state = useMemoryModelEditorState(sandbox);
   const refs = useMemoryModelEditorRefs();
+
+  // Store the openEditor function from Canvas
+  const [openEditor, setOpenEditor] = useState<
+    ((element: CanvasElement) => void) | null
+  >(null);
+
+  const handleEditorOpenerReady = useCallback(
+    (opener: (element: CanvasElement) => void) => {
+      setOpenEditor(() => opener);
+    },
+    []
+  );
+
+  // Master error list - aggregates all validation errors from all elements
+  const masterErrorList: MasterErrorList = useMemo(() => {
+    return createMasterErrorList(state.elements);
+  }, [state.elements]);
+
+  // Debug: Expose master error list to window for development
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      (window as any).masterErrorList = {
+        errorMap: masterErrorList,
+        totalErrors: getTotalErrorCount(masterErrorList),
+        elementsWithErrors: getElementsWithErrorsCount(masterErrorList),
+        flatList: flattenErrorList(masterErrorList),
+      };
+    }
+  }, [masterErrorList]);
 
   // Canvas management functions
   const clearCanvas = (): void => {
@@ -101,6 +137,7 @@ export default function MemoryModelEditor({
     selectedQuestionIndex: state.selectedQuestionIndex,
     selectedQuestionType: state.selectedQuestionType,
     elements: state.elements,
+    setElements: state.setElements,
     setSubmissionResults: state.setSubmissionResults,
     setActiveInfoTab: state.setActiveInfoTab,
   });
@@ -190,6 +227,7 @@ export default function MemoryModelEditor({
               removeClasses={removeElementClass}
               sandbox={state.isSandboxMode}
               onClear={() => state.setShowClearCanvasModal(true)}
+              onEditorOpenerReady={handleEditorOpenerReady}
             />
           </div>
 
@@ -256,6 +294,11 @@ export default function MemoryModelEditor({
             onClearCanvas={clearCanvas}
             onRestoreCanvas={restoreCanvas}
             currentCanvasState={currentCanvasState}
+            masterErrorList={masterErrorList}
+            elements={state.elements}
+            setElements={state.setElements}
+            onOpenEditor={openEditor || (() => {})}
+            isSandboxMode={state.isSandboxMode}
           />
 
           {/* Resize Handle */}

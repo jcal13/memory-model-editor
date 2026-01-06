@@ -167,7 +167,7 @@ The validation function (`backend/src/modules/canvasEditor/validateAnswer.ts`) e
 - **Nodes**: Unique "boxes" (primitives, lists, or function frames).
 - **Edges**: References formed by variable names (in frames) or pointers (in containers).
 
-The function finds a single, consistent bijection (one-to-one mapping) between the user's box IDs () and the answer's box IDs ().
+The function finds a single, consistent bijection (one-to-one mapping) between the user's box IDs and the answer's box IDs.
 
 ### Core Algorithm Implementation
 

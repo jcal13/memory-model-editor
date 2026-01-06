@@ -22,6 +22,7 @@ interface InformationTabsProps {
   elements: CanvasElement[];
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
   onOpenEditor: (element: CanvasElement) => void;
+  isSandboxMode: boolean;
 }
 
 export default function InformationTabs({
@@ -42,6 +43,7 @@ export default function InformationTabs({
   elements,
   setElements,
   onOpenEditor,
+  isSandboxMode,
 }: InformationTabsProps) {
   const renderTabButton = (tab: Tab, label: string) => (
     <button
@@ -96,6 +98,7 @@ export default function InformationTabs({
               elements={elements}
               setElements={setElements}
               onOpenEditor={onOpenEditor}
+              isSandboxMode={isSandboxMode}
             />
           </div>
         </div>

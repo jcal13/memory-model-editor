@@ -19,6 +19,7 @@ interface FeedbackTabProps {
   elements: CanvasElement[];
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
   onOpenEditor: (element: CanvasElement) => void;
+  isSandboxMode: boolean;
 }
 
 export default function FeedbackTab({
@@ -30,9 +31,9 @@ export default function FeedbackTab({
   elements,
   setElements,
   onOpenEditor,
+  isSandboxMode,
 }: FeedbackTabProps) {
   const renderTitle = () => {
-    // Build question name if available
     let questionName = "";
     if (questionType && questionIndex !== null) {
       const typeLabel = questionType === "test" ? "Test" : "Practice";
@@ -54,14 +55,13 @@ export default function FeedbackTab({
     </div>
   );
 
-  // No question selected
   if (!questionSelected) {
     return (
       <>
         {renderTitle()}
         <div className={styles.content}>
           {renderEmptyState(
-            "📝",
+            "📋",
             "No question selected",
             "Select a question to get started"
           )}
@@ -70,7 +70,6 @@ export default function FeedbackTab({
     );
   }
 
-  // No submission yet
   if (!submissionResults) {
     return (
       <>
@@ -86,7 +85,6 @@ export default function FeedbackTab({
     );
   }
 
-  // Correct answer
   if (submissionResults.correct) {
     return (
       <>
@@ -113,17 +111,12 @@ export default function FeedbackTab({
     );
   }
 
-  // Incorrect answer - show feedback errors using ErrorListDisplay
-  // Get all errors and filter for feedback errors only
   const allErrors = flattenErrorList(masterErrorList);
   const feedbackErrors = allErrors.filter(
     (item) => item.error.source === ErrorSource.FEEDBACK
   );
 
-  // Deduplicate errors - same error may be attached to multiple elements for canvas highlighting
-  // but should only appear once in the feedback list
   const uniqueFeedbackErrors = feedbackErrors.filter((item, index, self) => {
-    // Keep only the first occurrence of each unique error object
     return self.findIndex((other) => other.error === item.error) === index;
   });
 
@@ -138,6 +131,7 @@ export default function FeedbackTab({
         showTitle={false}
         emptyStateMessage="No feedback errors"
         emptyStateSubtext="All feedback has been addressed."
+        isSandboxMode={isSandboxMode}
       />
     </>
   );

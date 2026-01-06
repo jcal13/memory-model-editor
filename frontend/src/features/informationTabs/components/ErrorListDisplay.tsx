@@ -17,6 +17,7 @@ interface ErrorListDisplayProps {
   showTitle?: boolean;
   emptyStateMessage?: string;
   emptyStateSubtext?: string;
+  isSandboxMode?: boolean;
 }
 
 export default function ErrorListDisplay({
@@ -28,25 +29,22 @@ export default function ErrorListDisplay({
   showTitle = true,
   emptyStateMessage = "No errors detected",
   emptyStateSubtext = "Everything looks good!",
+  isSandboxMode = false,
 }: ErrorListDisplayProps) {
-  // Handle hovering over an error - highlight ALL elements in the error chain
   const handleErrorHover = (
     hoveredError: ElementError,
     isHovering: boolean
   ) => {
-    // Get all element IDs that should be highlighted for this error
     const elementIdsToHighlight = new Set<number | "_">();
 
     if (
       hoveredError.relatedElementIds &&
       hoveredError.relatedElementIds.length > 0
     ) {
-      // Use the relatedElementIds from the error
       hoveredError.relatedElementIds.forEach((id) =>
         elementIdsToHighlight.add(id)
       );
     } else {
-      // Fallback: find the element that has this error
       const elementWithError = elements.find((el) =>
         el.errors?.some((err) => err === hoveredError)
       );
@@ -54,13 +52,6 @@ export default function ErrorListDisplay({
         elementIdsToHighlight.add(elementWithError.id);
       }
     }
-
-    console.log(
-      "[ErrorListDisplay] Hovering error, highlighting",
-      elementIdsToHighlight.size,
-      "elements:",
-      Array.from(elementIdsToHighlight)
-    );
 
     setElements((prevElements) =>
       prevElements.map((el) =>
@@ -71,71 +62,66 @@ export default function ErrorListDisplay({
     );
   };
 
-  // Handle clicking an error - open the editor for the element one layer above the deepest element
   const handleErrorClick = (
     error: ElementError,
     fallbackElementId: number | "_"
   ) => {
     let targetElementId: number | "_" = fallbackElementId;
 
-    // If error has relatedElementIds, open editor for the element one layer above the deepest
-    // Example: main -> list -> [1] -> primitive
-    // We want to open the list editor (second-to-last in chain)
     if (error.relatedElementIds && error.relatedElementIds.length > 1) {
-      // Get second-to-last element (one layer above the deepest)
       targetElementId =
         error.relatedElementIds[error.relatedElementIds.length - 2];
     } else if (
       error.relatedElementIds &&
       error.relatedElementIds.length === 1
     ) {
-      // If only one element in chain, use it
       targetElementId = error.relatedElementIds[0];
     }
 
     const element = elements.find((el) => el.id === targetElementId);
     if (element) {
-      console.log(
-        "[ErrorListDisplay] Opening editor for element",
-        targetElementId,
-        "(one layer above deepest)"
-      );
       onOpenEditor(element);
     }
   };
 
-  const parseErrorMessage = (message: string, elementType: string) => {
-    let displayMessage = message;
+  const processErrorMessage = (
+    message: string,
+    isSandboxMode: boolean
+  ): string => {
+    if (!isSandboxMode) {
+      return message;
+    }
+
+    let processed = message;
+
+    processed = processed.replace(/expected\s+[^,]+,\s+got\s+/gi, "got ");
+    processed = processed.replace(/,?\s*expected\s+[^,]+$/gi, "");
+    processed = processed.replace(/(Missing function):\s*"[^"]+"/gi, "$1");
+    processed = processed.replace(/expected\s+"[^"]+"/gi, "");
+
+    return processed.trim();
+  };
+
+  const parseErrorMessage = (
+    message: string,
+    elementType: string,
+    isSandboxMode: boolean
+  ) => {
+    let displayMessage = processErrorMessage(message, isSandboxMode);
     let errorType = "";
-    let functionName = "";
-    let variableName = "";
-
-    const functionMatch = message.match(/function "([^"]+)"/);
-    if (functionMatch) {
-      functionName = functionMatch[1];
-    }
-
-    const variableMatch = message.match(
-      /expected "([^"]+)"|unexpected "([^"]+)"/
-    );
-    if (variableMatch) {
-      variableName = variableMatch[1] || variableMatch[2];
-    }
 
     if (message.includes("Missing variable")) {
       errorType = "Missing variable";
-      displayMessage = `Function "${functionName}" is missing variable "${variableName}"`;
     } else if (message.includes("Unexpected variable")) {
       errorType = "Unexpected variable";
-      displayMessage = `Function "${functionName}" has unexpected variable "${variableName}"`;
     } else if (message.includes("Function count mismatch")) {
       errorType = "Function count mismatch";
-      const countMatch = message.match(/expected (\d+), got (\d+)/);
-      if (countMatch) {
-        displayMessage = `Expected ${countMatch[1]} function frames, but found ${countMatch[2]}`;
-      }
-    } else if (message.includes("Incorrect value")) {
+    } else if (message.includes("Missing function")) {
+      errorType = "Missing element";
+    } else if (message.includes("Value mismatch")) {
       errorType = "Incorrect value";
+    } else if (message.includes("Type mismatch")) {
+      errorType = "Type mismatch";
     } else if (message.includes("Missing")) {
       errorType = "Missing element";
     } else if (message.includes("Unexpected")) {
@@ -144,7 +130,7 @@ export default function ErrorListDisplay({
       errorType = "Error";
     }
 
-    return { displayMessage, errorType, functionName, variableName };
+    return { displayMessage, errorType };
   };
 
   const renderTitle = () =>
@@ -152,7 +138,6 @@ export default function ErrorListDisplay({
 
   const totalErrors = errors.length;
 
-  // No errors - success state
   if (totalErrors === 0) {
     return (
       <>
@@ -168,7 +153,6 @@ export default function ErrorListDisplay({
     );
   }
 
-  // Has errors - show the list
   return (
     <>
       {renderTitle()}
@@ -184,7 +168,8 @@ export default function ErrorListDisplay({
           {errors.map((item, index) => {
             const { displayMessage, errorType } = parseErrorMessage(
               item.error.message,
-              item.elementType
+              item.elementType,
+              isSandboxMode
             );
 
             return (

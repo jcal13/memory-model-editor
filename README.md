@@ -183,7 +183,7 @@ The function finds a single, consistent bijection (one-to-one mapping) between t
    - **Call Stack Order**: Verifies that frames are ordered correctly.
    - **Orphan Detection**: Identifies user boxes not reached during traversal (unmapped boxes).
 
-## Automated Grading with MarkUs
+## Automated Grading with MarkUs (WILL NEED TO CHECK)
 
 You can use the `validateAnswer.ts` logic to automate grading for student submissions exported as JSON.
 

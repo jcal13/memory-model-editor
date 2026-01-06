@@ -100,12 +100,11 @@ export function processFunctionParams(params: any[]): Record<string, any> {
 
   const used = new Set<string>();
   return params.reduce((acc, param) => {
-    const key = makeUniqueKey(param.key, used);
-    acc[key] = normalizeId(param.value);
+    const key = makeUniqueKey(param.name, used);
+    acc[key] = normalizeId(param.targetId);
     return acc;
   }, {} as Record<string, any>);
 }
-
 /**
  * Processes class variables into the format expected by MemoryViz
  *

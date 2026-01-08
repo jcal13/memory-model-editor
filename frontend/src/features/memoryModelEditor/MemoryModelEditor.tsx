@@ -287,6 +287,9 @@ export default function MemoryModelEditor({
             className={styles.modeToggleSwitch}
             data-editor-control="mode-toggle"
           >
+            <span className={styles.modeToggleLabel}>
+              {state.isSandboxMode ? "Sandbox" : "Practice"}
+            </span>
             <input
               type="checkbox"
               className={styles.modeToggleInput}
@@ -296,7 +299,9 @@ export default function MemoryModelEditor({
                 state.setShowModeToggleModal(true);
               }}
             />
-            <span className={styles.modeToggleSlider}></span>
+            <div className={styles.modeToggleSliderWrapper}>
+              <span className={styles.modeToggleSlider}></span>
+            </div>
           </label>
 
           {/* JSON Preview */}

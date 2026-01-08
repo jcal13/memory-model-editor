@@ -2,6 +2,7 @@ import Canvas from "../canvas/Canvas";
 import Palette from "../palette/Palette";
 import ConfirmationModal from "./components/ConfirmationModal";
 import InformationTabs from "../informationTabs/InformationTabs";
+import PanelToggleButtons from "./components/PanelToggleButtons";
 import styles from "./MemoryModelEditor.module.css";
 import { useResponsivePanels } from "./hooks/useResponsivePanels";
 
@@ -14,16 +15,12 @@ import {
   useCanvasLocalStorage,
   useUILocalStorage,
 } from "./hooks/useLocalStorage";
-import { useInfoPanelResize } from "./hooks/useInfoPanel";
 import { useCanvasSubmission } from "./hooks/useCanvasSubmission";
 import { useMemo, useEffect, useState, useCallback } from "react";
-import { ValidationError, CanvasElement } from "../shared/types";
+import { CanvasElement } from "../shared/types";
 import {
   createMasterErrorList,
   MasterErrorList,
-  getTotalErrorCount,
-  getElementsWithErrorsCount,
-  flattenErrorList,
 } from "./utils/masterErrorList";
 
 // Layout constants
@@ -32,6 +29,7 @@ const MAX_INFO_PANEL_CSS_WIDTH = `${MAX_INFO_PANEL_VIEWPORT_RATIO * 100}vw`;
 const MIN_PALETTE_WIDTH = 200;
 const MAX_PALETTE_WIDTH = 400;
 const DEFAULT_PALETTE_WIDTH = 280;
+const SNAP_CLOSE_THRESHOLD = 100;
 
 interface MemoryModelEditorProps {
   sandbox?: boolean;
@@ -136,14 +134,6 @@ export default function MemoryModelEditor({
     setActiveInfoTab: state.setActiveInfoTab,
   });
 
-  useInfoPanelResize({
-    isResizingInfoPanel: state.isResizingInfoPanel,
-    isInfoPanelOpen: state.isInfoPanelOpen,
-    mainContainerRef: refs.mainContainerRef,
-    setInfoPanelWidth: state.setInfoPanelWidth,
-    setIsResizingInfoPanel: state.setIsResizingInfoPanel,
-  });
-
   useCanvasLocalStorage({
     elements: state.elements,
     ids: state.elementIds,
@@ -183,7 +173,7 @@ export default function MemoryModelEditor({
 
     const handleMouseMove = (e: MouseEvent) => {
       const newWidth = Math.max(
-        MIN_PALETTE_WIDTH,
+        0, // Allow going to 0 for snap detection
         Math.min(MAX_PALETTE_WIDTH, e.clientX)
       );
 
@@ -202,7 +192,16 @@ export default function MemoryModelEditor({
     };
 
     const handleMouseUp = () => {
-      setPaletteWidth(tempPaletteWidth);
+      if (tempPaletteWidth < SNAP_CLOSE_THRESHOLD) {
+        state.setIsPaletteOpen(false);
+        setPaletteWidth(DEFAULT_PALETTE_WIDTH);
+        setTempPaletteWidth(DEFAULT_PALETTE_WIDTH);
+      } else {
+        const finalWidth = Math.max(MIN_PALETTE_WIDTH, tempPaletteWidth);
+        setPaletteWidth(finalWidth);
+        setTempPaletteWidth(finalWidth);
+      }
+
       setIsResizingPalette(false);
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
@@ -224,10 +223,73 @@ export default function MemoryModelEditor({
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, [isResizingPalette, tempPaletteWidth]);
+  }, [isResizingPalette, tempPaletteWidth, state]);
+
+  useEffect(() => {
+    if (!state.isResizingInfoPanel) return;
+
+    const handleMouseMove = (event: MouseEvent) => {
+      if (!refs.mainContainerRef.current) return;
+
+      const containerRect =
+        refs.mainContainerRef.current.getBoundingClientRect();
+      const newWidth = containerRect.right - event.clientX;
+
+      const maxWidthBasedOnViewport =
+        window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO;
+      const maxAllowedWidth = Math.min(
+        containerRect.width - 100,
+        maxWidthBasedOnViewport
+      );
+
+      if (newWidth <= maxAllowedWidth) {
+        state.setInfoPanelWidth(Math.max(0, newWidth));
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (state.infoPanelWidth < SNAP_CLOSE_THRESHOLD) {
+        state.setIsInfoPanelOpen(false);
+        state.setInfoPanelWidth(500);
+      } else {
+        const finalWidth = Math.max(100, state.infoPanelWidth);
+        state.setInfoPanelWidth(finalWidth);
+      }
+
+      state.setIsResizingInfoPanel(false);
+      document.body.style.userSelect = "";
+      document.body.style.webkitUserSelect = "";
+    };
+
+    document.body.style.userSelect = "none";
+    document.body.style.webkitUserSelect = "none";
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+      document.body.style.userSelect = "";
+      document.body.style.webkitUserSelect = "";
+    };
+  }, [
+    state.isResizingInfoPanel,
+    state.infoPanelWidth,
+    state,
+    refs.mainContainerRef,
+  ]);
 
   return (
     <div className={styles.editorContainer}>
+      {/* Panel Toggle Buttons - shows when panels are closed */}
+      <PanelToggleButtons
+        isPaletteOpen={state.isPaletteOpen}
+        isInfoPanelOpen={state.isInfoPanelOpen}
+        onTogglePalette={() => state.setIsPaletteOpen(true)}
+        onToggleInfoPanel={() => state.setIsInfoPanelOpen(true)}
+      />
+
       {/* Palette Panel */}
       {state.isPaletteOpen && (
         <div

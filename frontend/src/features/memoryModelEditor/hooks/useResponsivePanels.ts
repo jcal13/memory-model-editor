@@ -17,7 +17,8 @@ export function useResponsivePanels({
   setIsInfoPanelOpen,
 }: UseResponsivePanelsParams): void {
   const lastWidthRef = useRef<number>(window.innerWidth);
-  const hasManuallyToggledRef = useRef<boolean>(false);
+  const userHasClosedPaletteRef = useRef<boolean>(false);
+  const userHasClosedInfoRef = useRef<boolean>(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -27,17 +28,36 @@ export function useResponsivePanels({
 
       if (previousWidth === width) return;
 
-      hasManuallyToggledRef.current = false;
+      if (
+        !isPaletteOpen &&
+        previousWidth >= CLOSE_PALETTE_WIDTH &&
+        width >= CLOSE_PALETTE_WIDTH
+      ) {
+        userHasClosedPaletteRef.current = true;
+      }
+      if (
+        !isInfoPanelOpen &&
+        previousWidth >= CLOSE_BOTH_PANELS_WIDTH &&
+        width >= CLOSE_BOTH_PANELS_WIDTH
+      ) {
+        userHasClosedInfoRef.current = true;
+      }
 
       if (width < CLOSE_BOTH_PANELS_WIDTH) {
         if (isPaletteOpen) setIsPaletteOpen(false);
         if (isInfoPanelOpen) setIsInfoPanelOpen(false);
       } else if (width < CLOSE_PALETTE_WIDTH) {
         if (isPaletteOpen) setIsPaletteOpen(false);
-        if (!isInfoPanelOpen) setIsInfoPanelOpen(true);
+        if (!isInfoPanelOpen && !userHasClosedInfoRef.current) {
+          setIsInfoPanelOpen(true);
+        }
       } else {
-        if (!isPaletteOpen) setIsPaletteOpen(true);
-        if (!isInfoPanelOpen) setIsInfoPanelOpen(true);
+        if (!isPaletteOpen && !userHasClosedPaletteRef.current) {
+          setIsPaletteOpen(true);
+        }
+        if (!isInfoPanelOpen && !userHasClosedInfoRef.current) {
+          setIsInfoPanelOpen(true);
+        }
       }
     };
 
@@ -47,4 +67,16 @@ export function useResponsivePanels({
       window.removeEventListener("resize", handleResize);
     };
   }, [isPaletteOpen, isInfoPanelOpen, setIsPaletteOpen, setIsInfoPanelOpen]);
+
+  useEffect(() => {
+    if (isPaletteOpen) {
+      userHasClosedPaletteRef.current = false;
+    }
+  }, [isPaletteOpen]);
+
+  useEffect(() => {
+    if (isInfoPanelOpen) {
+      userHasClosedInfoRef.current = false;
+    }
+  }, [isInfoPanelOpen]);
 }

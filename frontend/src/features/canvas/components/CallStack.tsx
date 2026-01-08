@@ -13,7 +13,7 @@ import styles from "./CallStack.module.css";
 
 const DEFAULT_BOX_WIDTH = 180;
 const FALLBACK_BOX_HEIGHT = 60;
-const BOX_GAP = 0;
+const BOX_GAP = -10;
 
 const HEADER_HEIGHT = 40;
 const TOP_FREE_PADDING = 5;
@@ -29,6 +29,10 @@ const SCROLLBAR_THUMB_MIN_HEIGHT = 30;
 const DRAG_THRESHOLD_PX = 6;
 
 const VERTICAL_OFFSET = 30;
+
+const TOP_CONTROLS_HEIGHT = 120;
+const DOWNLOAD_BUTTON_BOTTOM = 35;
+const BUTTON_HEIGHT = 38;
 
 interface CallStackProps {
   frames: CanvasElement[];
@@ -62,27 +66,25 @@ const CallStack: React.FC<CallStackProps> = ({
   onSelect,
   onReorder,
   x = 20,
-  y = 80,
+  y = 90,
   width = 205,
 }) => {
   const clipPathId = useId();
 
   // Viewport height management
   const [viewportHeight, setViewportHeight] = useState<number>(() => {
-    return Math.max(400, window.innerHeight - 110);
+    return window.innerHeight;
   });
 
-  useEffect(() => {
-    const handleResize = () => {
-      const newHeight = Math.max(400, window.innerHeight - 110);
-      setViewportHeight(newHeight);
-    };
+  const [centeredY, setCenteredY] = useState<number>(() => {
+    const topSpace = TOP_CONTROLS_HEIGHT;
+    const bottomSpace = DOWNLOAD_BUTTON_BOTTOM + BUTTON_HEIGHT;
+    const availableHeight = window.innerHeight - topSpace - bottomSpace;
+    const callStackHeight = window.innerHeight - topSpace - bottomSpace - 20;
+    return topSpace + (availableHeight - callStackHeight) / 2;
+  });
 
-    handleResize();
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const yPosition = y;
 
   // Box size tracking
   const [boxSizes, setBoxSizes] = useState<Record<number, BoxDimensions>>({});
@@ -110,7 +112,8 @@ const CallStack: React.FC<CallStackProps> = ({
   }, [frames, boxSizes]);
 
   const columnWidth = Math.max(width, maxBoxWidth);
-  const columnHeight = Math.max(200, viewportHeight - y - 10);
+  const columnHeight =
+    viewportHeight - yPosition - (DOWNLOAD_BUTTON_BOTTOM + BUTTON_HEIGHT) - 30;
   const visibleHeight = Math.max(
     100,
     columnHeight - HEADER_HEIGHT - TOP_PADDING - BOTTOM_PADDING
@@ -118,7 +121,7 @@ const CallStack: React.FC<CallStackProps> = ({
 
   const layout = useMemo((): LayoutItem[] => {
     let yOffset = 0;
-    const baseY = y + HEADER_HEIGHT + TOP_PADDING + visibleHeight;
+    const baseY = yPosition + HEADER_HEIGHT + TOP_PADDING + visibleHeight;
 
     return orderedFrames.map((frame) => {
       const height = boxSizes[frame.boxId]?.height ?? FALLBACK_BOX_HEIGHT;
@@ -126,7 +129,7 @@ const CallStack: React.FC<CallStackProps> = ({
       yOffset += height + BOX_GAP;
       return { f: frame, yLocal, h: height };
     });
-  }, [orderedFrames, boxSizes, y, visibleHeight]);
+  }, [orderedFrames, boxSizes, yPosition, visibleHeight]);
 
   const totalContentHeight = layout.reduce(
     (acc, { h }) => acc + h + BOX_GAP,
@@ -182,7 +185,7 @@ const CallStack: React.FC<CallStackProps> = ({
 
       if (positions.length === 0) return null;
 
-      let gap = positions.length; // Default to after last item
+      let gap = positions.length;
       for (let i = 0; i < positions.length; i++) {
         if (ghostCenterY < positions[i].top) {
           gap = i;
@@ -201,7 +204,6 @@ const CallStack: React.FC<CallStackProps> = ({
       event.preventDefault();
       event.stopPropagation();
 
-      // Prevent text selection during drag
       document.body.style.userSelect = "none";
       document.body.style.webkitUserSelect = "none";
 
@@ -223,7 +225,6 @@ const CallStack: React.FC<CallStackProps> = ({
       const drag = dragState.current;
       const deltaY = event.clientY - drag.startY;
 
-      // Activate drag if threshold exceeded
       if (!drag.active && Math.abs(deltaY) > DRAG_THRESHOLD_PX) {
         drag.active = true;
         drag.ghost.setAttribute("opacity", "0.8");
@@ -232,13 +233,11 @@ const CallStack: React.FC<CallStackProps> = ({
 
       if (!drag.active) return;
 
-      // Update ghost position
       drag.ghost.setAttribute(
         "transform",
         `${drag.origT} translate(0 ${deltaY})`
       );
 
-      // Calculate drop position
       const ghostCenterY =
         layout[drag.from].yLocal + scrollPosition + VERTICAL_OFFSET + deltaY;
       const dropPosition = computeDropPosition(ghostCenterY, drag.from);
@@ -261,15 +260,12 @@ const CallStack: React.FC<CallStackProps> = ({
 
       const drag = dragState.current;
 
-      // Re-enable text selection after drag
       document.body.style.userSelect = "";
       document.body.style.webkitUserSelect = "";
 
-      // Reset ghost appearance
       drag.ghost.setAttribute("transform", drag.origT);
       drag.ghost.setAttribute("opacity", "1");
 
-      // Execute reorder if drag was active and has valid drop position
       if (drag.active && insertIndex !== null) {
         const frameCount = layout.length;
         const targetDataIndex =
@@ -280,7 +276,6 @@ const CallStack: React.FC<CallStackProps> = ({
         }
       }
 
-      // Clean up drag state
       setInsertIndex(null);
       setDropMarkerY(null);
       drag.ghost.releasePointerCapture(event.pointerId);
@@ -289,7 +284,6 @@ const CallStack: React.FC<CallStackProps> = ({
     [insertIndex, layout.length, onReorder]
   );
 
-  // Memoized elements for rendering
   const memoizedElements = useMemo(() => {
     const elementMap: Record<number, CanvasElement> = {};
     orderedFrames.forEach((frame) => {
@@ -300,7 +294,7 @@ const CallStack: React.FC<CallStackProps> = ({
 
   // Scrollbar calculations
   const scrollbarTrackX = x + columnWidth - SCROLLBAR_WIDTH - SCROLLBAR_INSET;
-  const scrollbarTrackY = y + HEADER_HEIGHT - 5;
+  const scrollbarTrackY = yPosition + HEADER_HEIGHT - 5;
   const scrollbarTrackHeight = TOP_PADDING + visibleHeight + BOTTOM_PADDING;
 
   const scrollbarThumbHeight =
@@ -318,7 +312,6 @@ const CallStack: React.FC<CallStackProps> = ({
       ? 0
       : (1 - scrollPosition / maxScrollPosition) * scrollbarThumbTravel);
 
-  // Scrollbar drag state
   const thumbDragState = useRef({
     isDragging: false,
     startY: 0,
@@ -332,7 +325,7 @@ const CallStack: React.FC<CallStackProps> = ({
       <rect
         className={styles.containerBackground}
         x={x}
-        y={y}
+        y={yPosition}
         width={columnWidth}
         height={columnHeight}
         rx={10}
@@ -342,7 +335,7 @@ const CallStack: React.FC<CallStackProps> = ({
       <text
         className={styles.callStackTitle}
         x={x + columnWidth / 2}
-        y={y + 30}
+        y={yPosition + 30}
         textAnchor="middle"
       >
         Call&nbsp;Stack
@@ -351,7 +344,7 @@ const CallStack: React.FC<CallStackProps> = ({
       <clipPath id={clipPathId}>
         <rect
           x={x - horizontalPadding}
-          y={y + HEADER_HEIGHT}
+          y={yPosition + HEADER_HEIGHT}
           width={columnWidth + horizontalPadding * 2}
           height={TOP_PADDING + visibleHeight + BOTTOM_PADDING}
         />
@@ -438,7 +431,6 @@ const CallStack: React.FC<CallStackProps> = ({
             rx={SCROLLBAR_WIDTH / 2}
             ry={SCROLLBAR_WIDTH / 2}
             onPointerDown={(event) => {
-              // Prevent text selection during scrollbar drag
               document.body.style.userSelect = "none";
               document.body.style.webkitUserSelect = "none";
 
@@ -466,7 +458,6 @@ const CallStack: React.FC<CallStackProps> = ({
               setScrollPosition(newScrollPosition);
             }}
             onPointerUp={(event) => {
-              // Re-enable text selection after scrollbar drag
               document.body.style.userSelect = "";
               document.body.style.webkitUserSelect = "";
 

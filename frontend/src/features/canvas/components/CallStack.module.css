@@ -7,11 +7,6 @@
   stroke: #d1d5db;
   stroke-width: 1.5;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.08));
-  transition: stroke 0.2s ease;
-}
-
-.containerBackground:hover {
-  stroke: #9ca3af;
 }
 
 .callStackTitle {

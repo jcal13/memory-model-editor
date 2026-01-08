@@ -1,12 +1,10 @@
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback } from "react";
 import { useBoxDragState, useDraggableBox } from "../hooks/hooks";
 import { CanvasBoxProps } from "../utils/box.types";
-import { 
-  getCallStackBounds, 
-  constrainPositionAwayFromCallStack 
+import {
+  getCallStackBounds,
+  constrainPositionAwayFromCallStack,
 } from "../utils/boundary.helpers";
-import { hasErrors } from "../utils/validation";
-import ValidationTooltip from "./ValidationTooltip";
 
 export default function CanvasBox({
   element,
@@ -17,7 +15,6 @@ export default function CanvasBox({
   disableDrag = false,
 }: CanvasBoxProps) {
   const { gRef, dragState, dimensions } = useBoxDragState();
-  const [isHovered, setIsHovered] = useState(false);
 
   useDraggableBox({
     gRef,
@@ -52,8 +49,12 @@ export default function CanvasBox({
 
     const svg = gRef.current.ownerSVGElement;
     const vb = svg?.viewBox.baseVal;
-    const canvasBounds = vb ? { width: vb.width, height: vb.height } : undefined;
-    const callStackBounds = getCallStackBounds(vb?.height || window.innerHeight);
+    const canvasBounds = vb
+      ? { width: vb.width, height: vb.height }
+      : undefined;
+    const callStackBounds = getCallStackBounds(
+      vb?.height || window.innerHeight
+    );
 
     const constrainedPosition = constrainPositionAwayFromCallStack(
       { x: element.x, y: element.y },
@@ -63,10 +64,21 @@ export default function CanvasBox({
     );
 
     // Only update position if it actually changed
-    if (constrainedPosition.x !== element.x || constrainedPosition.y !== element.y) {
+    if (
+      constrainedPosition.x !== element.x ||
+      constrainedPosition.y !== element.y
+    ) {
       updatePosition(constrainedPosition.x, constrainedPosition.y);
     }
-  }, [element.x, element.y, element.kind.name, dimensions.current.width, dimensions.current.height, disableDrag, updatePosition]);
+  }, [
+    element.x,
+    element.y,
+    element.kind.name,
+    dimensions.current.width,
+    dimensions.current.height,
+    disableDrag,
+    updatePosition,
+  ]);
 
   useEffect(() => {
     checkAndConstrainPosition();
@@ -77,7 +89,7 @@ export default function CanvasBox({
     if (disableDrag || element.kind.name === "function") return;
 
     let resizeTimeoutId: NodeJS.Timeout;
-    
+
     const handleResize = () => {
       // Debounce the resize handling to avoid excessive recalculations
       clearTimeout(resizeTimeoutId);
@@ -87,62 +99,12 @@ export default function CanvasBox({
     };
 
     window.addEventListener("resize", handleResize);
-    
+
     return () => {
       window.removeEventListener("resize", handleResize);
       clearTimeout(resizeTimeoutId);
     };
   }, [checkAndConstrainPosition, disableDrag, element.kind.name]);
 
-  // Hover handlers for validation tooltip
-  useEffect(() => {
-    const gElement = gRef.current;
-    if (!gElement) return;
-
-    const handleMouseEnter = () => setIsHovered(true);
-    const handleMouseLeave = (e: MouseEvent) => {
-      // Check if mouse is moving to the tooltip foreignObject
-      const relatedTarget = e.relatedTarget as Element;
-      if (relatedTarget?.tagName === 'foreignObject' || 
-          relatedTarget?.closest('.validationTooltipContainer')) {
-        return; // Don't hide if moving to tooltip
-      }
-      setIsHovered(false);
-    };
-
-    gElement.addEventListener("mouseenter", handleMouseEnter);
-    gElement.addEventListener("mouseleave", handleMouseLeave);
-
-    return () => {
-      gElement.removeEventListener("mouseenter", handleMouseEnter);
-      gElement.removeEventListener("mouseleave", handleMouseLeave as EventListener);
-    };
-  }, [gRef]);
-
-  const showTooltip = isHovered && hasErrors(element);
-
-  return (
-    <>
-      <g ref={gRef} />
-      {showTooltip && (
-        <foreignObject
-          className="validationTooltipContainer"
-          x={element.x}
-          y={element.y - 10}
-          width="1"
-          height="1"
-          overflow="visible"
-          pointerEvents="auto"
-          style={{ zIndex: 99999 }}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          <ValidationTooltip
-            errors={element.errors || []}
-            visible={showTooltip}
-          />
-        </foreignObject>
-      )}
-    </>
-  );
+  return <g ref={gRef} />;
 }

@@ -95,7 +95,7 @@
   border-left: 3px solid #dc2626;
   border-radius: 6px;
   transition: all 0.2s ease;
-  cursor: pointer;
+  cursor: default;
 }
 
 .errorItem:hover {

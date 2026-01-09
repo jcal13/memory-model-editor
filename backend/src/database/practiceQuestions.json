@@ -195,7 +195,7 @@
       },
       {
         "id": 5,
-        "type": "list",
+        "type": "set",
         "value": [1, 2, 3, 4]
       }
     ],
@@ -207,7 +207,7 @@
     "code": [
       "lst = [[1, 2], [3, 4]]",
       "for item in lst:",
-      "list.append(item, 88)"
+      "    list.append(item, 88)"
     ],
     "answer": [
       {
@@ -354,7 +354,7 @@
   {
     "id": 10,
     "question": "`s2` aliases string `s` then `s` is sliced from index two onward creating a new string object. Draw the memory model after slicing.",
-    "code": ["s = \\\"hello\\\"", "s2 = s", "s = s[2:]"],
+    "code": ["s = \"hello\"", "s2 = s", "s = s[2:]"],
     "answer": [
       {
         "id": null,
@@ -485,7 +485,7 @@
   },
   {
     "id": 13,
-    "question": "Lists`x` and `y` alias the same object then the element at index one is changed to one hundred. Draw the resulting memory model.",
+    "question": "Lists `x` and `y` alias the same object then the element at index one is changed to one hundred. Draw the resulting memory model.",
     "code": ["x = [1, 2, 3]", "y = x", "y[1] = 100"],
     "answer": [
       {
@@ -645,7 +645,7 @@
   {
     "id": 16,
     "question": "Loop variable item is rebound to eighty eight but the inner lists remain unchanged. Draw the memory model after the loop.",
-    "code": ["L = [[1, 2], [3, 4]]", "for item in L:", "item = 88"],
+    "code": ["L = [[1, 2], [3, 4]]", "for item in L:", "    item = 88"],
     "answer": [
       {
         "id": null,
@@ -653,7 +653,8 @@
         "type": ".frame",
         "order": 1,
         "value": {
-          "L": 8
+          "L": 8,
+          "item": 5
         },
         "inactive": false
       },

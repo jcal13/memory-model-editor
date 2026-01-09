@@ -22,6 +22,8 @@ import {
   createMasterErrorList,
   MasterErrorList,
 } from "./utils/masterErrorList";
+// Import BoxType from palette instead of shared
+import { BoxType } from "../palette/shared/types";
 
 // Layout constants
 const MAX_INFO_PANEL_VIEWPORT_RATIO = 0.6667;
@@ -51,6 +53,8 @@ export default function MemoryModelEditor({
   const [tempPaletteWidth, setTempPaletteWidth] = useState<number>(
     DEFAULT_PALETTE_WIDTH
   );
+
+  const [currentQuestionData, setCurrentQuestionData] = useState<any>(null);
 
   const handleEditorOpenerReady = useCallback(
     (opener: (element: CanvasElement) => void) => {
@@ -125,6 +129,62 @@ export default function MemoryModelEditor({
     );
   };
 
+  const getRequiredBoxTypes = useCallback((questionData: any): BoxType[] => {
+    if (!questionData?.answer || !Array.isArray(questionData.answer)) {
+      return [];
+    }
+
+    const requiredTypes = new Set<BoxType>();
+
+    const hasFrames = questionData.answer.some(
+      (box: any) => box.type === ".frame"
+    );
+    if (hasFrames) {
+      requiredTypes.add("function" as BoxType);
+    }
+
+    questionData.answer.forEach((box: any) => {
+      const boxType = box.type;
+
+      switch (boxType) {
+        case ".frame":
+          break;
+        case "int":
+          requiredTypes.add("int" as BoxType);
+          break;
+        case "float":
+          requiredTypes.add("float" as BoxType);
+          break;
+        case "str":
+          requiredTypes.add("str" as BoxType);
+          break;
+        case "bool":
+          requiredTypes.add("bool" as BoxType);
+          break;
+        case "None":
+          requiredTypes.add("none" as BoxType);
+          break;
+        case "list":
+          requiredTypes.add("list" as BoxType);
+          break;
+        case "tuple":
+          requiredTypes.add("tuple" as BoxType);
+          break;
+        case "set":
+          requiredTypes.add("set" as BoxType);
+          break;
+        case "dict":
+          requiredTypes.add("dict" as BoxType);
+          break;
+        case ".class":
+          requiredTypes.add("class" as BoxType);
+          break;
+      }
+    });
+
+    return Array.from(requiredTypes);
+  }, []);
+
   const { handleCanvasSubmit } = useCanvasSubmission({
     selectedQuestionIndex: state.selectedQuestionIndex,
     selectedQuestionType: state.selectedQuestionType,
@@ -172,10 +232,7 @@ export default function MemoryModelEditor({
     const UPDATE_INTERVAL = 50;
 
     const handleMouseMove = (e: MouseEvent) => {
-      const newWidth = Math.max(
-        0, // Allow going to 0 for snap detection
-        Math.min(MAX_PALETTE_WIDTH, e.clientX)
-      );
+      const newWidth = Math.max(0, Math.min(MAX_PALETTE_WIDTH, e.clientX));
 
       setTempPaletteWidth(newWidth);
 
@@ -242,55 +299,33 @@ export default function MemoryModelEditor({
         maxWidthBasedOnViewport
       );
 
-      if (newWidth <= maxAllowedWidth) {
-        state.setInfoPanelWidth(Math.max(0, newWidth));
+      if (newWidth >= 100 && newWidth <= maxAllowedWidth) {
+        state.setInfoPanelWidth(newWidth);
       }
     };
 
     const handleMouseUp = () => {
-      if (state.infoPanelWidth < SNAP_CLOSE_THRESHOLD) {
-        state.setIsInfoPanelOpen(false);
-        state.setInfoPanelWidth(500);
-      } else {
-        const finalWidth = Math.max(100, state.infoPanelWidth);
-        state.setInfoPanelWidth(finalWidth);
-      }
-
       state.setIsResizingInfoPanel(false);
-      document.body.style.userSelect = "";
-      document.body.style.webkitUserSelect = "";
     };
 
-    document.body.style.userSelect = "none";
-    document.body.style.webkitUserSelect = "none";
-
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-      document.body.style.userSelect = "";
-      document.body.style.webkitUserSelect = "";
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [
-    state.isResizingInfoPanel,
-    state.infoPanelWidth,
-    state,
-    refs.mainContainerRef,
-  ]);
+  }, [state, refs.mainContainerRef]);
 
   return (
     <div className={styles.editorContainer}>
-      {/* Panel Toggle Buttons - shows when panels are closed */}
       <PanelToggleButtons
         isPaletteOpen={state.isPaletteOpen}
         isInfoPanelOpen={state.isInfoPanelOpen}
-        onTogglePalette={() => state.setIsPaletteOpen(true)}
-        onToggleInfoPanel={() => state.setIsInfoPanelOpen(true)}
+        onTogglePalette={() => state.setIsPaletteOpen((prev) => !prev)}
+        onToggleInfoPanel={() => state.setIsInfoPanelOpen((prev) => !prev)}
       />
 
-      {/* Palette Panel */}
       {state.isPaletteOpen && (
         <div
           className={`${styles.palettePanel} ${
@@ -312,10 +347,15 @@ export default function MemoryModelEditor({
             <Palette
               activeTab={state.activePaletteTab}
               setActive={state.setActivePaletteTab}
+              requiredBoxes={
+                state.isSandboxMode && currentQuestionData
+                  ? getRequiredBoxTypes(currentQuestionData)
+                  : undefined
+              }
+              isPracticeMode={state.isSandboxMode}
             />
           </div>
 
-          {/* Palette Resize Handle */}
           <div
             className={styles.paletteResizeHandle}
             onMouseDown={() => setIsResizingPalette(true)}
@@ -323,9 +363,7 @@ export default function MemoryModelEditor({
         </div>
       )}
 
-      {/* Main Container */}
       <div ref={refs.mainContainerRef} className={styles.mainContainer}>
-        {/* Canvas Column */}
         <div className={styles.canvasColumn}>
           <div className={styles.canvasArea}>
             <Canvas
@@ -344,13 +382,12 @@ export default function MemoryModelEditor({
             />
           </div>
 
-          {/* Mode Toggle Switch */}
           <label
             className={styles.modeToggleSwitch}
             data-editor-control="mode-toggle"
           >
             <span className={styles.modeToggleLabel}>
-              {state.isSandboxMode ? "Sandbox" : "Practice"}
+              {state.isSandboxMode ? "Practice" : "Test"}
             </span>
             <input
               type="checkbox"
@@ -366,17 +403,15 @@ export default function MemoryModelEditor({
             </div>
           </label>
 
-          {/* JSON Preview */}
           {state.jsonOutput && (
             <pre className={styles.jsonPreview}>{state.jsonOutput}</pre>
           )}
         </div>
 
-        {/* Info Panel */}
         {state.isInfoPanelOpen && (
           <div
             className={`${styles.infoPanel} ${
-              state.isResizingInfoPanel ? styles.noTransition : ""
+              state.isResizingInfoPanel ? styles.resizing : styles.noTransition
             }`}
             style={{
               width: `${state.infoPanelWidth}px`,
@@ -402,9 +437,9 @@ export default function MemoryModelEditor({
               setElements={state.setElements}
               onOpenEditor={openEditor || (() => {})}
               isSandboxMode={state.isSandboxMode}
+              onQuestionDataChange={setCurrentQuestionData}
             />
 
-            {/* Info Panel Resize Handle */}
             <div
               className={styles.infoPanelResizeHandle}
               onMouseDown={() => state.setIsResizingInfoPanel(true)}
@@ -413,7 +448,6 @@ export default function MemoryModelEditor({
         )}
       </div>
 
-      {/* Clear Canvas Modal */}
       {state.showClearCanvasModal && (
         <ConfirmationModal
           title="Clear Canvas?"
@@ -428,7 +462,6 @@ export default function MemoryModelEditor({
         />
       )}
 
-      {/* Mode Toggle Modal */}
       {state.showModeToggleModal && (
         <ConfirmationModal
           title="Switch Mode?"

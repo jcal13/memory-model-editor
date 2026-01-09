@@ -50,6 +50,8 @@ const TAB_LABELS = {
 interface PaletteProps {
   activeTab: PaletteTab;
   setActive: (tab: PaletteTab) => void;
+  requiredBoxes?: BoxType[];
+  isPracticeMode?: boolean;
 }
 
 // Extract TabButton component inline
@@ -69,8 +71,29 @@ const TabButton: React.FC<{
   </button>
 );
 
-export default function Palette({ activeTab, setActive }: PaletteProps) {
-  const boxes = TAB_BOX_MAPPING[activeTab];
+function filterBoxesByRequired(
+  boxes: readonly BoxType[],
+  requiredBoxes?: BoxType[]
+): BoxType[] {
+  if (!requiredBoxes || requiredBoxes.length === 0) {
+    return [...boxes];
+  }
+
+  return boxes.filter((boxType) => requiredBoxes.includes(boxType));
+}
+
+export default function Palette({
+  activeTab,
+  setActive,
+  requiredBoxes,
+  isPracticeMode = false,
+}: PaletteProps) {
+  const allBoxes = TAB_BOX_MAPPING[activeTab];
+
+  const boxes =
+    isPracticeMode && requiredBoxes
+      ? filterBoxesByRequired(allBoxes, requiredBoxes)
+      : allBoxes;
 
   return (
     <div className={styles.containerWrapper}>

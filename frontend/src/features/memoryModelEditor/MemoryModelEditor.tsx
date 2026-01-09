@@ -2,6 +2,7 @@ import Canvas from "../canvas/Canvas";
 import Palette from "../palette/Palette";
 import ConfirmationModal from "./components/ConfirmationModal";
 import InformationTabs from "../informationTabs/InformationTabs";
+import PanelToggleButtons from "./components/PanelToggleButtons";
 import styles from "./MemoryModelEditor.module.css";
 import { useResponsivePanels } from "./hooks/useResponsivePanels";
 
@@ -14,21 +15,23 @@ import {
   useCanvasLocalStorage,
   useUILocalStorage,
 } from "./hooks/useLocalStorage";
-import { useInfoPanelResize } from "./hooks/useInfoPanel";
 import { useCanvasSubmission } from "./hooks/useCanvasSubmission";
 import { useMemo, useEffect, useState, useCallback } from "react";
-import { ValidationError, CanvasElement } from "../shared/types";
+import { CanvasElement } from "../shared/types";
 import {
   createMasterErrorList,
   MasterErrorList,
-  getTotalErrorCount,
-  getElementsWithErrorsCount,
-  flattenErrorList,
 } from "./utils/masterErrorList";
+// Import BoxType from palette instead of shared
+import { BoxType } from "../palette/shared/types";
 
 // Layout constants
 const MAX_INFO_PANEL_VIEWPORT_RATIO = 0.6667;
 const MAX_INFO_PANEL_CSS_WIDTH = `${MAX_INFO_PANEL_VIEWPORT_RATIO * 100}vw`;
+const MIN_PALETTE_WIDTH = 200;
+const MAX_PALETTE_WIDTH = 400;
+const DEFAULT_PALETTE_WIDTH = 280;
+const SNAP_CLOSE_THRESHOLD = 100;
 
 interface MemoryModelEditorProps {
   sandbox?: boolean;
@@ -37,14 +40,21 @@ interface MemoryModelEditorProps {
 export default function MemoryModelEditor({
   sandbox = true,
 }: MemoryModelEditorProps) {
-  // State management
   const state = useMemoryModelEditorState(sandbox);
   const refs = useMemoryModelEditorRefs();
-
-  // Store the openEditor function from Canvas
   const [openEditor, setOpenEditor] = useState<
     ((element: CanvasElement) => void) | null
   >(null);
+
+  const [paletteWidth, setPaletteWidth] = useState<number>(
+    DEFAULT_PALETTE_WIDTH
+  );
+  const [isResizingPalette, setIsResizingPalette] = useState<boolean>(false);
+  const [tempPaletteWidth, setTempPaletteWidth] = useState<number>(
+    DEFAULT_PALETTE_WIDTH
+  );
+
+  const [currentQuestionData, setCurrentQuestionData] = useState<any>(null);
 
   const handleEditorOpenerReady = useCallback(
     (opener: (element: CanvasElement) => void) => {
@@ -53,30 +63,14 @@ export default function MemoryModelEditor({
     []
   );
 
-  // Master error list - aggregates all validation errors from all elements
-  const masterErrorList: MasterErrorList = useMemo(() => {
-    return createMasterErrorList(state.elements);
-  }, [state.elements]);
-
-  // Debug: Expose master error list to window for development
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      (window as any).masterErrorList = {
-        errorMap: masterErrorList,
-        totalErrors: getTotalErrorCount(masterErrorList),
-        elementsWithErrors: getElementsWithErrorsCount(masterErrorList),
-        flatList: flattenErrorList(masterErrorList),
-      };
-    }
-  }, [masterErrorList]);
-
-  // Canvas management functions
-  const clearCanvas = (): void => {
+  const clearCanvas = () => {
     state.setElements([]);
     state.setElementIds([]);
     state.setElementClasses([]);
-    state.setJsonOutput("");
+    state.setSelectedQuestionIndex(null);
+    state.setSelectedQuestionType(null);
     state.setSubmissionResults(null);
+    state.setActiveInfoTab("question");
     state.setCanvasResetKey((prev) => prev + 1);
     clearCanvasStorage();
   };
@@ -85,17 +79,19 @@ export default function MemoryModelEditor({
     elements: CanvasElement[],
     ids: number[],
     classes: string[]
-  ): void => {
+  ) => {
     state.setElements(elements);
     state.setElementIds(ids);
     state.setElementClasses(classes);
-    state.setCanvasResetKey((prev) => prev + 1);
   };
+
+  const masterErrorList: MasterErrorList = useMemo(
+    () => createMasterErrorList(state.elements),
+    [state.elements]
+  );
 
   const addElementId = (id: number): void => {
     state.setElementIds((prevIds) => {
-      if (prevIds.includes(id)) return prevIds;
-
       const insertIndex = prevIds.findIndex((existingId) => existingId > id);
       return insertIndex === -1
         ? [...prevIds, id]
@@ -103,16 +99,17 @@ export default function MemoryModelEditor({
     });
   };
 
-  const removeElementId = (id: any): void => {
-    state.setElementIds((prevIds) =>
-      prevIds.filter((existingId) => existingId !== id)
-    );
+  const removeElementId = (id: number | "_"): void => {
+    if (typeof id === "number") {
+      state.setElementIds((prevIds) =>
+        prevIds.filter((existingId) => existingId !== id)
+      );
+    }
   };
 
   const addElementClass = (className: string): void => {
     state.setElementClasses((prevClasses) => {
       if (prevClasses.includes(className)) return prevClasses;
-
       const insertIndex = prevClasses.findIndex(
         (existingClass) => existingClass.localeCompare(className) > 0
       );
@@ -132,7 +129,62 @@ export default function MemoryModelEditor({
     );
   };
 
-  // Custom hooks for functionality
+  const getRequiredBoxTypes = useCallback((questionData: any): BoxType[] => {
+    if (!questionData?.answer || !Array.isArray(questionData.answer)) {
+      return [];
+    }
+
+    const requiredTypes = new Set<BoxType>();
+
+    const hasFrames = questionData.answer.some(
+      (box: any) => box.type === ".frame"
+    );
+    if (hasFrames) {
+      requiredTypes.add("function" as BoxType);
+    }
+
+    questionData.answer.forEach((box: any) => {
+      const boxType = box.type;
+
+      switch (boxType) {
+        case ".frame":
+          break;
+        case "int":
+          requiredTypes.add("int" as BoxType);
+          break;
+        case "float":
+          requiredTypes.add("float" as BoxType);
+          break;
+        case "str":
+          requiredTypes.add("str" as BoxType);
+          break;
+        case "bool":
+          requiredTypes.add("bool" as BoxType);
+          break;
+        case "None":
+          requiredTypes.add("none" as BoxType);
+          break;
+        case "list":
+          requiredTypes.add("list" as BoxType);
+          break;
+        case "tuple":
+          requiredTypes.add("tuple" as BoxType);
+          break;
+        case "set":
+          requiredTypes.add("set" as BoxType);
+          break;
+        case "dict":
+          requiredTypes.add("dict" as BoxType);
+          break;
+        case ".class":
+          requiredTypes.add("class" as BoxType);
+          break;
+      }
+    });
+
+    return Array.from(requiredTypes);
+  }, []);
+
   const { handleCanvasSubmit } = useCanvasSubmission({
     selectedQuestionIndex: state.selectedQuestionIndex,
     selectedQuestionType: state.selectedQuestionType,
@@ -142,16 +194,6 @@ export default function MemoryModelEditor({
     setActiveInfoTab: state.setActiveInfoTab,
   });
 
-  // Info panel resize functionality
-  useInfoPanelResize({
-    isResizingInfoPanel: state.isResizingInfoPanel,
-    isInfoPanelOpen: state.isInfoPanelOpen,
-    mainContainerRef: refs.mainContainerRef,
-    setInfoPanelWidth: state.setInfoPanelWidth,
-    setIsResizingInfoPanel: state.setIsResizingInfoPanel,
-  });
-
-  // localStorage persistence
   useCanvasLocalStorage({
     elements: state.elements,
     ids: state.elementIds,
@@ -182,37 +224,146 @@ export default function MemoryModelEditor({
     [state.elements, state.elementIds, state.elementClasses]
   );
 
+  useEffect(() => {
+    if (!isResizingPalette) return;
+
+    let animationFrameId: number;
+    let lastUpdateTime = 0;
+    const UPDATE_INTERVAL = 50;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const newWidth = Math.max(0, Math.min(MAX_PALETTE_WIDTH, e.clientX));
+
+      setTempPaletteWidth(newWidth);
+
+      const now = Date.now();
+      if (now - lastUpdateTime >= UPDATE_INTERVAL) {
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+        }
+        animationFrameId = requestAnimationFrame(() => {
+          setPaletteWidth(newWidth);
+          lastUpdateTime = now;
+        });
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (tempPaletteWidth < SNAP_CLOSE_THRESHOLD) {
+        state.setIsPaletteOpen(false);
+        setPaletteWidth(DEFAULT_PALETTE_WIDTH);
+        setTempPaletteWidth(DEFAULT_PALETTE_WIDTH);
+      } else {
+        const finalWidth = Math.max(MIN_PALETTE_WIDTH, tempPaletteWidth);
+        setPaletteWidth(finalWidth);
+        setTempPaletteWidth(finalWidth);
+      }
+
+      setIsResizingPalette(false);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+
+    document.body.style.userSelect = "none";
+    document.body.style.cursor = "col-resize";
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, [isResizingPalette, tempPaletteWidth, state]);
+
+  useEffect(() => {
+    if (!state.isResizingInfoPanel) return;
+
+    const handleMouseMove = (event: MouseEvent) => {
+      if (!refs.mainContainerRef.current) return;
+
+      const containerRect =
+        refs.mainContainerRef.current.getBoundingClientRect();
+      const newWidth = containerRect.right - event.clientX;
+
+      const maxWidthBasedOnViewport =
+        window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO;
+      const maxAllowedWidth = Math.min(
+        containerRect.width - 100,
+        maxWidthBasedOnViewport
+      );
+
+      if (newWidth >= 100 && newWidth <= maxAllowedWidth) {
+        state.setInfoPanelWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      state.setIsResizingInfoPanel(false);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [state, refs.mainContainerRef]);
+
   return (
     <div className={styles.editorContainer}>
-      {/* Palette Panel */}
-      <div
-        className={styles.palettePanel}
-        style={{
-          width: state.isPaletteOpen ? "280px" : 0,
-          minWidth: state.isPaletteOpen ? "280px" : 0,
-          overflow: "hidden",
-        }}
-      >
-        <Palette
-          activeTab={state.activePaletteTab}
-          setActive={state.setActivePaletteTab}
-        />
-      </div>
+      <PanelToggleButtons
+        isPaletteOpen={state.isPaletteOpen}
+        isInfoPanelOpen={state.isInfoPanelOpen}
+        onTogglePalette={() => state.setIsPaletteOpen((prev) => !prev)}
+        onToggleInfoPanel={() => state.setIsInfoPanelOpen((prev) => !prev)}
+      />
 
-      {/* Palette Toggle Button */}
-      <button
-        type="button"
-        className={styles.paletteToggleButton}
-        onClick={() => state.setIsPaletteOpen((prev) => !prev)}
-        title={state.isPaletteOpen ? "Hide palette" : "Show palette"}
-        aria-label={state.isPaletteOpen ? "Hide palette" : "Show palette"}
-      >
-        {state.isPaletteOpen ? "«" : "»"}
-      </button>
+      {state.isPaletteOpen && (
+        <div
+          className={`${styles.palettePanel} ${
+            isResizingPalette ? styles.resizing : ""
+          }`}
+          style={{
+            width: `${isResizingPalette ? tempPaletteWidth : paletteWidth}px`,
+            minWidth: `${
+              isResizingPalette ? tempPaletteWidth : paletteWidth
+            }px`,
+          }}
+        >
+          <div
+            className={styles.paletteContent}
+            style={{
+              width: `${paletteWidth}px`,
+            }}
+          >
+            <Palette
+              activeTab={state.activePaletteTab}
+              setActive={state.setActivePaletteTab}
+              requiredBoxes={
+                state.isSandboxMode && currentQuestionData
+                  ? getRequiredBoxTypes(currentQuestionData)
+                  : undefined
+              }
+              isPracticeMode={state.isSandboxMode}
+            />
+          </div>
 
-      {/* Main Container */}
+          <div
+            className={styles.paletteResizeHandle}
+            onMouseDown={() => setIsResizingPalette(true)}
+          />
+        </div>
+      )}
+
       <div ref={refs.mainContainerRef} className={styles.mainContainer}>
-        {/* Canvas Column */}
         <div className={styles.canvasColumn}>
           <div className={styles.canvasArea}>
             <Canvas
@@ -231,11 +382,13 @@ export default function MemoryModelEditor({
             />
           </div>
 
-          {/* Mode Toggle Switch */}
           <label
             className={styles.modeToggleSwitch}
             data-editor-control="mode-toggle"
           >
+            <span className={styles.modeToggleLabel}>
+              {state.isSandboxMode ? "Practice" : "Test"}
+            </span>
             <input
               type="checkbox"
               className={styles.modeToggleInput}
@@ -245,74 +398,56 @@ export default function MemoryModelEditor({
                 state.setShowModeToggleModal(true);
               }}
             />
-            <span className={styles.modeToggleSlider}></span>
+            <div className={styles.modeToggleSliderWrapper}>
+              <span className={styles.modeToggleSlider}></span>
+            </div>
           </label>
 
-          {/* JSON Preview */}
           {state.jsonOutput && (
             <pre className={styles.jsonPreview}>{state.jsonOutput}</pre>
           )}
         </div>
 
-        {/* Info Panel Toggle Button */}
-        <button
-          type="button"
-          className={styles.infoPanelToggleButton}
-          onClick={() => {
-            state.setIsResizingInfoPanel(false);
-            state.setIsInfoPanelOpen((prev) => !prev);
-          }}
-          title={state.isInfoPanelOpen ? "Hide info" : "Show info"}
-          aria-label={state.isInfoPanelOpen ? "Hide info" : "Show info"}
-        >
-          {state.isInfoPanelOpen ? "»" : "«"}
-        </button>
-
-        {/* Info Panel */}
-        <div
-          className={`${styles.infoPanel} ${
-            state.isResizingInfoPanel ? styles.noTransition : ""
-          }`}
-          style={{
-            width: state.isInfoPanelOpen ? `${state.infoPanelWidth}px` : 0,
-            maxWidth: MAX_INFO_PANEL_CSS_WIDTH,
-            overflow: "hidden",
-            position: "relative",
-          }}
-        >
-          <InformationTabs
-            submissionResults={state.submissionResults}
-            activeTab={state.activeInfoTab}
-            setActive={state.setActiveInfoTab}
-            questionSelected={state.selectedQuestionIndex !== null}
-            questionIndex={state.selectedQuestionIndex}
-            setQuestionIndex={state.setSelectedQuestionIndex}
-            questionType={state.selectedQuestionType}
-            setQuestionType={state.setSelectedQuestionType}
-            onSubmit={handleCanvasSubmit}
-            setSubmissionResults={state.setSubmissionResults}
-            onClearCanvas={clearCanvas}
-            onRestoreCanvas={restoreCanvas}
-            currentCanvasState={currentCanvasState}
-            masterErrorList={masterErrorList}
-            elements={state.elements}
-            setElements={state.setElements}
-            onOpenEditor={openEditor || (() => {})}
-            isSandboxMode={state.isSandboxMode}
-          />
-
-          {/* Resize Handle */}
+        {state.isInfoPanelOpen && (
           <div
-            className={styles.infoPanelResizeHandle}
-            onMouseDown={() =>
-              state.isInfoPanelOpen && state.setIsResizingInfoPanel(true)
-            }
-            style={{ pointerEvents: state.isInfoPanelOpen ? "auto" : "none" }}
-          />
-        </div>
+            className={`${styles.infoPanel} ${
+              state.isResizingInfoPanel ? styles.resizing : styles.noTransition
+            }`}
+            style={{
+              width: `${state.infoPanelWidth}px`,
+              maxWidth: MAX_INFO_PANEL_CSS_WIDTH,
+            }}
+          >
+            <InformationTabs
+              submissionResults={state.submissionResults}
+              activeTab={state.activeInfoTab}
+              setActive={state.setActiveInfoTab}
+              questionSelected={state.selectedQuestionIndex !== null}
+              questionIndex={state.selectedQuestionIndex}
+              setQuestionIndex={state.setSelectedQuestionIndex}
+              questionType={state.selectedQuestionType}
+              setQuestionType={state.setSelectedQuestionType}
+              onSubmit={handleCanvasSubmit}
+              setSubmissionResults={state.setSubmissionResults}
+              onClearCanvas={clearCanvas}
+              onRestoreCanvas={restoreCanvas}
+              currentCanvasState={currentCanvasState}
+              masterErrorList={masterErrorList}
+              elements={state.elements}
+              setElements={state.setElements}
+              onOpenEditor={openEditor || (() => {})}
+              isSandboxMode={state.isSandboxMode}
+              onQuestionDataChange={setCurrentQuestionData}
+            />
+
+            <div
+              className={styles.infoPanelResizeHandle}
+              onMouseDown={() => state.setIsResizingInfoPanel(true)}
+            />
+          </div>
+        )}
       </div>
 
-      {/* Clear Canvas Modal */}
       {state.showClearCanvasModal && (
         <ConfirmationModal
           title="Clear Canvas?"
@@ -327,7 +462,6 @@ export default function MemoryModelEditor({
         />
       )}
 
-      {/* Mode Toggle Modal */}
       {state.showModeToggleModal && (
         <ConfirmationModal
           title="Switch Mode?"

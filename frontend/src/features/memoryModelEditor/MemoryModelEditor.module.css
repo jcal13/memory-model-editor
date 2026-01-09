@@ -1,9 +1,7 @@
 :root {
   --editor-background: #f3f4f6;
-  --toggle-button-width: 22px;
-  --toggle-button-height: 400px;
-  --toggle-button-radius: 8px;
-  --toggle-button-gap: 0;
+  --resize-handle-width: 8px;
+  --resize-handle-hover-width: 4px;
 }
 
 .editorContainer {
@@ -16,48 +14,56 @@
 }
 
 .palettePanel {
-  overflow-y: auto;
+  overflow: hidden;
   height: 100%;
   flex-shrink: 0;
-  min-width: 0;
-  transition: width 0.2s ease, min-width 0.2s ease;
-}
-
-.paletteToggleButton {
-  align-self: center;
-  width: var(--toggle-button-width);
-  min-width: var(--toggle-button-width);
-  height: var(--toggle-button-height);
-  padding: 0;
-  margin: 0 var(--toggle-button-gap);
-  border-left: 0;
-  border-top: 1px solid #d1d5db;
-  border-bottom: 1px solid #d1d5db;
-  border-right: 1px solid #d1d5db;
-  border-radius: 0 var(--toggle-button-radius) var(--toggle-button-radius) 0;
-  background: #ffffff;
-  color: #374151;
-  cursor: pointer;
-  user-select: none;
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  font-size: 0.95rem;
-  line-height: 1;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-  transition: background-color 0.15s ease, box-shadow 0.15s ease,
-    transform 0.05s ease;
-  transform: translateX(-1px);
-  z-index: 100;
-  touch-action: manipulation;
-  pointer-events: auto;
   position: relative;
-  flex-shrink: 0;
+  transition: none;
 }
 
-.paletteToggleButton:hover {
-  background: #f3f4f6;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+.palettePanel.resizing {
+  overflow: hidden;
+}
+
+.paletteContent {
+  height: 100%;
+  overflow-y: auto;
+  transition: none;
+}
+
+.paletteResizeHandle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--resize-handle-width);
+  cursor: col-resize;
+  z-index: 1000;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.paletteResizeHandle:hover {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.paletteResizeHandle:hover::after {
+  content: "";
+  position: absolute;
+  right: 50%;
+  top: 50%;
+  transform: translate(50%, -50%);
+  width: var(--resize-handle-hover-width);
+  height: 40px;
+  background: rgba(59, 130, 246, 0.6);
+  border-radius: 2px;
+}
+
+.paletteResizeHandle:active {
+  background: rgba(59, 130, 246, 0.25);
 }
 
 .mainContainer {
@@ -90,48 +96,11 @@
   position: relative;
   overflow: hidden;
   height: 100%;
-  transition: width 0.2s ease;
+  transition: width 0.1s ease;
 }
 
 .infoPanel.noTransition {
   transition: none !important;
-}
-
-.infoPanelToggleButton {
-  align-self: center;
-  width: var(--toggle-button-width);
-  min-width: var(--toggle-button-width);
-  height: var(--toggle-button-height);
-  padding: 0;
-  margin: 0 var(--toggle-button-gap);
-  border-left: 1px solid #d1d5db;
-  border-top: 1px solid #d1d5db;
-  border-bottom: 1px solid #d1d5db;
-  border-right: 0;
-  border-radius: var(--toggle-button-radius) 0 0 var(--toggle-button-radius);
-  background: #ffffff;
-  color: #374151;
-  cursor: pointer;
-  user-select: none;
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  font-size: 0.95rem;
-  line-height: 1;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-  transition: background-color 0.15s ease, box-shadow 0.15s ease,
-    transform 0.05s ease;
-  transform: translateX(1px);
-  z-index: 100;
-  touch-action: manipulation;
-  pointer-events: auto;
-  position: relative;
-  flex-shrink: 0;
-}
-
-.infoPanelToggleButton:hover {
-  background: #f3f4f6;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 }
 
 .infoPanelResizeHandle {
@@ -139,107 +108,134 @@
   left: 0;
   top: 0;
   bottom: 0;
-  width: 5px;
+  width: var(--resize-handle-width);
   cursor: col-resize;
-  z-index: 1;
+  z-index: 1000;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  transition: background-color 0.2s ease;
 }
 
 .infoPanelResizeHandle:hover {
-  background: rgba(59, 130, 246, 0.2);
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.infoPanelResizeHandle:hover::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--resize-handle-hover-width);
+  height: 40px;
+  background: rgba(59, 130, 246, 0.6);
+  border-radius: 2px;
+}
+
+.infoPanelResizeHandle:active {
+  background: rgba(59, 130, 246, 0.25);
 }
 
 .modeToggleSwitch {
   position: absolute;
   top: 35px;
   left: 35px;
-  z-index: 10;
-  width: 100px;
-  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
+  background: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.modeToggleSwitch:hover {
+  background-color: #f9fafb;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  border-color: #9ca3af;
+}
+
+.modeToggleSwitch:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.modeToggleLabel {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1f2937;
+  min-width: 65px;
+  text-align: left;
 }
 
 .modeToggleInput {
-  display: none;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.modeToggleSliderWrapper {
+  position: relative;
+  width: 48px;
+  height: 24px;
 }
 
 .modeToggleSlider {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: #93c5fd;
-  border-radius: 9999px;
-  position: relative;
-  transition: background-color 0.2s ease;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #1e40af;
-}
-
-.modeToggleSwitch:hover .modeToggleSlider {
-  background: #60a5fa;
-}
-
-.modeToggleSlider::before {
-  content: "";
   position: absolute;
-  width: 28px;
-  height: 28px;
-  background: #ffffff;
-  border-radius: 50%;
-  top: 2px;
-  left: 2px;
-  transition: transform 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-}
-
-.modeToggleSlider::after {
-  content: "practice";
-  position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-  width: 70px;
-  text-align: center;
-  pointer-events: none;
-  text-transform: capitalize;
-}
-
-.modeToggleInput:checked + .modeToggleSlider {
-  background: #34d399;
-  color: #065f46;
-}
-
-.modeToggleSwitch:hover .modeToggleInput:checked + .modeToggleSlider {
-  background: #10b981;
-}
-
-.modeToggleInput:checked + .modeToggleSlider::before {
-  transform: translateX(69px);
-}
-
-.modeToggleInput:checked + .modeToggleSlider::after {
-  content: "test";
+  cursor: pointer;
+  top: 0;
   left: 0;
-  right: auto;
+  right: 0;
+  bottom: 0;
+  background-color: #10b981;
+  border-radius: 24px;
+  transition: background-color 0.3s ease;
+}
+
+.modeToggleSlider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.modeToggleInput:checked + .modeToggleSliderWrapper .modeToggleSlider {
+  background-color: #3b82f6;
+}
+
+.modeToggleInput:checked + .modeToggleSliderWrapper .modeToggleSlider:before {
+  transform: translateX(24px);
 }
 
 .jsonPreview {
-  position: fixed;
-  bottom: 40px;
-  right: 8px;
-  max-height: 300px;
-  max-width: 300px;
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  max-width: 600px;
+  max-height: 200px;
+  background: rgba(17, 24, 39, 0.95);
+  color: #10b981;
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  padding: 12px;
+  border-radius: 6px;
   overflow: auto;
-  background: #f5f5f5;
-  border: 1px solid #ccc;
-  padding: 8px;
-  font-size: 0.75rem;
-  z-index: 9999;
-  text-align: left;
-  white-space: pre-wrap;
-  word-break: break-word;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  white-space: pre;
 }

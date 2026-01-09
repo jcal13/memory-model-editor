@@ -1,0 +1,47 @@
+.toggleButton {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #d1d5db;
+  cursor: pointer;
+  z-index: 9998;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  color: #6b7280;
+}
+
+.toggleButton:hover {
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  color: #3b82f6;
+  width: 28px;
+}
+
+.toggleButton:active {
+  background: #f9fafb;
+  transform: translateY(-50%) scale(0.98);
+}
+
+.toggleButton svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.leftToggle {
+  left: 0;
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+}
+
+.rightToggle {
+  right: 0;
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+}

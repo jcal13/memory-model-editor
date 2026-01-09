@@ -56,32 +56,10 @@ export default function ErrorListDisplay({
     setElements((prevElements) =>
       prevElements.map((el) =>
         elementIdsToHighlight.has(el.id)
-          ? { ...el, color: isHovering ? "#3B82F6" : undefined }
+          ? { ...el, color: isHovering ? "#DC2626" : undefined } // Changed to RED
           : el
       )
     );
-  };
-
-  const handleErrorClick = (
-    error: ElementError,
-    fallbackElementId: number | "_"
-  ) => {
-    let targetElementId: number | "_" = fallbackElementId;
-
-    if (error.relatedElementIds && error.relatedElementIds.length > 1) {
-      targetElementId =
-        error.relatedElementIds[error.relatedElementIds.length - 2];
-    } else if (
-      error.relatedElementIds &&
-      error.relatedElementIds.length === 1
-    ) {
-      targetElementId = error.relatedElementIds[0];
-    }
-
-    const element = elements.find((el) => el.id === targetElementId);
-    if (element) {
-      onOpenEditor(element);
-    }
   };
 
   const processErrorMessage = (
@@ -178,7 +156,6 @@ export default function ErrorListDisplay({
                 className={styles.errorItem}
                 onMouseEnter={() => handleErrorHover(item.error, true)}
                 onMouseLeave={() => handleErrorHover(item.error, false)}
-                onClick={() => handleErrorClick(item.error, item.elementId)}
               >
                 <div className={styles.errorHeader}>
                   <span className={styles.errorIcon}>⚠</span>

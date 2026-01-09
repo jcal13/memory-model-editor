@@ -23,6 +23,7 @@ interface InformationTabsProps {
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
   onOpenEditor: (element: CanvasElement) => void;
   isSandboxMode: boolean;
+  onQuestionDataChange?: (data: any) => void;
 }
 
 export default function InformationTabs({
@@ -44,6 +45,7 @@ export default function InformationTabs({
   setElements,
   onOpenEditor,
   isSandboxMode,
+  onQuestionDataChange,
 }: InformationTabsProps) {
   const renderTabButton = (tab: Tab, label: string) => (
     <button
@@ -56,6 +58,14 @@ export default function InformationTabs({
       {label}
     </button>
   );
+
+  const handleSubmit = async () => {
+    const success = await onSubmit();
+    if (success) {
+      setActive("feedback");
+    }
+    return success;
+  };
 
   return (
     <div className={styles.containerWrapper}>
@@ -76,11 +86,12 @@ export default function InformationTabs({
               setQuestionIndex={setQuestionIndex}
               questionType={questionType}
               setQuestionType={setQuestionType}
-              onSubmit={onSubmit}
+              onSubmit={handleSubmit}
               setSubmissionResults={setSubmissionResults}
               onClearCanvas={onClearCanvas}
               onRestoreCanvas={onRestoreCanvas}
               currentCanvasState={currentCanvasState}
+              onQuestionDataChange={onQuestionDataChange}
             />
           </div>
 
@@ -91,13 +102,13 @@ export default function InformationTabs({
           >
             <FeedbackTab
               submissionResults={submissionResults}
-              questionSelected={questionSelected}
-              questionIndex={questionIndex}
-              questionType={questionType}
               masterErrorList={masterErrorList}
               elements={elements}
               setElements={setElements}
               onOpenEditor={onOpenEditor}
+              questionSelected={questionSelected}
+              questionIndex={questionIndex}
+              questionType={questionType}
               isSandboxMode={isSandboxMode}
             />
           </div>

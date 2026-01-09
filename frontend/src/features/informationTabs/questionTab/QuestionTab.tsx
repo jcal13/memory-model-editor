@@ -8,7 +8,6 @@ import QuestionSelector from "./components/QuestionSelector";
 import CodeBlock from "./components/CodeBlock";
 import styles from "./QuestionTab.module.css";
 import "prismjs/themes/prism-tomorrow.css";
-import { SubmitButton } from "./components/SubmitButton";
 import { SubmissionResult } from "../../shared/types";
 import {
   getDoNotRemindCanvasClear,
@@ -23,7 +22,6 @@ type View = "root" | "loading" | "test" | "list" | "question" | "practice";
 type QuestionType = "test" | "practice";
 type QuestionStatus = "unattempted" | "attempted" | "completed";
 
-// Constants
 const UI_STORAGE_KEY = "uiState";
 const QUESTION_STATUS_KEY = "questionStatus";
 const VALID_VIEWS: View[] = [
@@ -49,32 +47,22 @@ interface QuestionTabProps {
   onClearCanvas: () => void;
   onRestoreCanvas: (elements: any[], ids: number[], classes: string[]) => void;
   currentCanvasState: { elements: any[]; ids: number[]; classes: string[] };
+  onQuestionDataChange?: (data: any) => void;
 }
 
-/**
- * Loads saved question view from localStorage
- */
 function loadSavedQuestionView(): View {
   try {
     const rawData = localStorage.getItem(UI_STORAGE_KEY);
     if (!rawData) return "root";
-
     const parsed = JSON.parse(rawData) ?? {};
     const view = parsed?.questionView as View | undefined;
-
-    if (!view || !VALID_VIEWS.includes(view)) {
-      return "root";
-    }
-
+    if (!view || !VALID_VIEWS.includes(view)) return "root";
     return view === "loading" ? "root" : view;
   } catch {
     return "root";
   }
 }
 
-/**
- * Persists question view to localStorage
- */
 function persistQuestionView(view: View): void {
   try {
     const rawData = localStorage.getItem(UI_STORAGE_KEY);
@@ -86,9 +74,6 @@ function persistQuestionView(view: View): void {
   }
 }
 
-/**
- * Loads question status from localStorage
- */
 function loadQuestionStatus(): QuestionStatusMap {
   try {
     const rawData = localStorage.getItem(QUESTION_STATUS_KEY);
@@ -99,9 +84,6 @@ function loadQuestionStatus(): QuestionStatusMap {
   }
 }
 
-/**
- * Persists question status to localStorage
- */
 function persistQuestionStatus(statusMap: QuestionStatusMap): void {
   try {
     localStorage.setItem(QUESTION_STATUS_KEY, JSON.stringify(statusMap));
@@ -110,9 +92,6 @@ function persistQuestionStatus(statusMap: QuestionStatusMap): void {
   }
 }
 
-/**
- * Gets the storage key for a specific question
- */
 function getQuestionKey(type: QuestionType, index: number): string {
   return `${type}_${index}`;
 }
@@ -127,6 +106,7 @@ export default function QuestionTab({
   onClearCanvas,
   onRestoreCanvas,
   currentCanvasState,
+  onQuestionDataChange,
 }: QuestionTabProps) {
   const [view, setView] = useState<View>(() => loadSavedQuestionView());
   const [questionCount, setQuestionCount] = useState<number>(0);
@@ -141,7 +121,6 @@ export default function QuestionTab({
   } | null>(null);
   const [showResetModal, setShowResetModal] = useState(false);
 
-  // Refs to track hydration state
   const hydratedList = useRef<boolean>(false);
   const hydratedQuestion = useRef<boolean>(false);
   const previousQuestionRef = useRef<{
@@ -149,24 +128,20 @@ export default function QuestionTab({
     index: number;
   } | null>(null);
 
-  // Persist view changes
   useEffect(() => {
     persistQuestionView(view);
   }, [view]);
 
-  // Persist status changes
   useEffect(() => {
     persistQuestionStatus(questionStatus);
   }, [questionStatus]);
 
   useEffect(() => {
-    // Save current canvas state when question changes
     if (previousQuestionRef.current && currentCanvasState.elements.length > 0) {
       const { type, index } = previousQuestionRef.current;
       saveQuestionCanvasData(type, index, currentCanvasState);
     }
 
-    // Update ref to current question
     if (questionType && questionIndex !== null) {
       previousQuestionRef.current = {
         type: questionType,
@@ -181,24 +156,21 @@ export default function QuestionTab({
     setDoNotRemindCanvasClear(false);
   }, []);
 
-  /**
-   * Updates the status of a specific question
-   */
+  useEffect(() => {
+    if (view !== "question" && onQuestionDataChange) {
+      onQuestionDataChange(null);
+    }
+  }, [view, onQuestionDataChange]);
+
   const updateQuestionStatus = (
     type: QuestionType,
     index: number,
     status: QuestionStatus
-  ): void => {
+  ) => {
     const key = getQuestionKey(type, index);
-    setQuestionStatus((prev) => ({
-      ...prev,
-      [key]: status,
-    }));
+    setQuestionStatus((prev) => ({ ...prev, [key]: status }));
   };
 
-  /**
-   * Gets the status of a specific question
-   */
   const getQuestionStatus = (
     type: QuestionType,
     index: number
@@ -207,31 +179,17 @@ export default function QuestionTab({
     return questionStatus[key] || "unattempted";
   };
 
-  /**
-   * Marks current question as attempted when navigating to it
-   */
-  const markQuestionAsAttempted = (type: QuestionType, index: number): void => {
-    const currentStatus = getQuestionStatus(type, index);
-    if (currentStatus === "unattempted") {
-      updateQuestionStatus(type, index, "attempted");
-    }
-  };
-
-  /**
-   * Handles submission and marks question based on result
-   */
-  const handleSubmit = async (): Promise<void> => {
+  const handleSubmit = async () => {
     if (questionType && questionIndex !== null) {
       try {
-        const isCorrect = await onSubmit();
+        const success = await onSubmit();
         updateQuestionStatus(
           questionType,
           questionIndex,
-          isCorrect ? "completed" : "attempted"
+          success ? "completed" : "attempted"
         );
       } catch (error) {
         console.error("Error during submission:", error);
-        // Mark as attempted if submission fails
         updateQuestionStatus(questionType, questionIndex, "attempted");
       }
     } else {
@@ -239,12 +197,8 @@ export default function QuestionTab({
     }
   };
 
-  /**
-   * Loads questions for a given type
-   */
   const loadQuestions = async (questionType: QuestionType): Promise<void> => {
     onClearCanvas();
-
     setView("loading");
     try {
       const count = await fetchQuestionCount(questionType);
@@ -258,9 +212,6 @@ export default function QuestionTab({
     }
   };
 
-  /**
-   * Loads a single question by ID
-   */
   const loadSingleQuestion = async (id: number): Promise<void> => {
     if (!questionType) {
       setView("root");
@@ -272,19 +223,6 @@ export default function QuestionTab({
     const isNavigatingFromQuestion =
       previousQuestionRef.current !== null &&
       previousQuestionRef.current.index !== id;
-
-    // console.log("Navigation Debug:", {
-    //   hasCanvasContent,
-    //   doNotRemind,
-    //   isNavigatingFromQuestion,
-    //   previousQuestion: previousQuestionRef.current,
-    //   targetQuestionId: id,
-    //   elementsCount: currentCanvasState.elements.length,
-    //   actualElements: currentCanvasState.elements,
-    //   actualIds: currentCanvasState.ids,
-    //   actualClasses: currentCanvasState.classes,
-    //   currentCanvasStateRef: currentCanvasState,
-    // });
 
     if (hasCanvasContent && !doNotRemind && isNavigatingFromQuestion) {
       const prevQuestion = previousQuestionRef.current!;
@@ -303,32 +241,83 @@ export default function QuestionTab({
   };
 
   const proceedWithQuestionLoad = async (
-    type: "test" | "practice",
+    type: QuestionType,
     id: number
   ): Promise<void> => {
-    setView("loading");
+    hydratedQuestion.current = false;
+    setQuestionData(null);
 
-    // Clear canvas first
-    onClearCanvas();
+    setView("loading");
 
     try {
       const data = await fetchQuestion(id, type);
+
+      setQuestionType(type);
       setQuestionIndex(id);
       setQuestionData(data);
+
+      if (onQuestionDataChange) {
+        onQuestionDataChange(data);
+      }
+
       setView("question");
 
-      // Restore saved canvas state for this question if it exists
-      const savedCanvas = loadQuestionCanvasData(type, id);
-      if (savedCanvas && savedCanvas.elements.length > 0) {
-        onRestoreCanvas(
-          savedCanvas.elements,
-          savedCanvas.ids,
-          savedCanvas.classes
-        );
-      }
+      setTimeout(() => {
+        const savedCanvas = loadQuestionCanvasData(type, id);
+        if (savedCanvas && savedCanvas.elements.length > 0) {
+          onRestoreCanvas(
+            savedCanvas.elements,
+            savedCanvas.ids,
+            savedCanvas.classes
+          );
+        } else {
+          onRestoreCanvas([], [], []);
+        }
+      }, 0);
     } catch (error) {
       console.error("Failed to load question:", error);
       setView("list");
+    }
+  };
+
+  const navigateToList = async (): Promise<void> => {
+    if (questionType && questionIndex !== null) {
+      const hasCanvasContent = currentCanvasState.elements.length > 0;
+      const doNotRemind = getDoNotRemindCanvasClear();
+
+      if (hasCanvasContent && !doNotRemind) {
+        saveQuestionCanvasData(questionType, questionIndex, currentCanvasState);
+        setPendingNavigation({ type: "list" as any, index: -1 });
+        setShowCanvasClearModal(true);
+        return;
+      }
+
+      saveQuestionCanvasData(questionType, questionIndex, currentCanvasState);
+    }
+
+    setQuestionIndex(null);
+    setQuestionData(null);
+    hydratedQuestion.current = false;
+    onRestoreCanvas([], [], []);
+    setView("list");
+  };
+
+  const handleCanvasClearConfirm = () => {
+    setShowCanvasClearModal(false);
+    if (pendingNavigation) {
+      if (pendingNavigation.index === -1) {
+        setQuestionIndex(null);
+        setQuestionData(null);
+        hydratedQuestion.current = false;
+        onRestoreCanvas([], [], []);
+        setView("list");
+      } else {
+        proceedWithQuestionLoad(
+          pendingNavigation.type,
+          pendingNavigation.index
+        );
+      }
+      setPendingNavigation(null);
     }
   };
 
@@ -341,64 +330,6 @@ export default function QuestionTab({
     setDoNotRemindCanvasClear(checked);
   };
 
-  /**
-   * Navigates back to list view with proper hydration
-   */
-  const navigateToList = async (): Promise<void> => {
-    if (questionType && questionIndex !== null) {
-      const hasCanvasContent = currentCanvasState.elements.length > 0;
-      const doNotRemind = getDoNotRemindCanvasClear();
-
-      if (hasCanvasContent && !doNotRemind) {
-        saveQuestionCanvasData(questionType, questionIndex, currentCanvasState);
-
-        setPendingNavigation({ type: "list" as any, index: -1 });
-        setShowCanvasClearModal(true);
-        return;
-      }
-
-      saveQuestionCanvasData(questionType, questionIndex, currentCanvasState);
-    }
-
-    await proceedToList();
-  };
-
-  /**
-   * Helper function to handle actual navigation to list
-   */
-  const proceedToList = async (): Promise<void> => {
-    onClearCanvas();
-
-    if (questionType) {
-      try {
-        const count = await fetchQuestionCount(questionType);
-        setQuestionCount(count);
-        setView("list");
-      } catch (error) {
-        console.error("Failed to load questions:", error);
-        setView("root");
-      }
-    } else {
-      setView("root");
-    }
-  };
-
-  const handleCanvasClearConfirm = () => {
-    setShowCanvasClearModal(false);
-    if (pendingNavigation) {
-      if (pendingNavigation.index === -1) {
-        proceedToList();
-      } else {
-        proceedWithQuestionLoad(
-          pendingNavigation.type,
-          pendingNavigation.index
-        );
-      }
-      setPendingNavigation(null);
-    }
-  };
-
-  // Hydrate list view
   useEffect(() => {
     if (view === "list" && questionType && !hydratedList.current) {
       hydratedList.current = true;
@@ -411,7 +342,6 @@ export default function QuestionTab({
     }
   }, [view, questionType]);
 
-  // Hydrate question view
   useEffect(() => {
     if (
       view === "question" &&
@@ -425,21 +355,17 @@ export default function QuestionTab({
         try {
           const data = await fetchQuestion(questionIndex, questionType);
           setQuestionData(data);
+
+          if (onQuestionDataChange) {
+            onQuestionDataChange(data);
+          }
         } catch (error) {
           console.error("Failed to hydrate question:", error);
           setView("list");
         }
       })();
     }
-  }, [view, questionType, questionIndex, questionData]);
-
-  // Validate view state
-  useEffect(() => {
-    if (view === "list" && !questionType) setView("root");
-    if (view === "question" && (!questionType || questionIndex === null)) {
-      setView("root");
-    }
-  }, [view, questionType, questionIndex]);
+  }, [view, questionType, questionIndex, questionData, onQuestionDataChange]);
 
   useEffect(() => {
     return () => {
@@ -447,7 +373,6 @@ export default function QuestionTab({
     };
   }, [questionIndex, setSubmissionResults]);
 
-  // Calculate heading
   const getHeading = (): string => {
     if (view === "question" && questionIndex !== null) {
       return `Question ${questionIndex}`;
@@ -468,9 +393,7 @@ export default function QuestionTab({
   const handleResetConfirm = () => {
     if (questionType && questionIndex !== null) {
       deleteQuestionCanvasData(questionType, questionIndex);
-
       onClearCanvas();
-
       setSubmissionResults(null);
       updateQuestionStatus(questionType, questionIndex, "unattempted");
     }
@@ -584,6 +507,7 @@ export default function QuestionTab({
           </>
         )}
       </div>
+
       {showCanvasClearModal && (
         <ConfirmationModal
           title="Clear Canvas?"
@@ -597,6 +521,7 @@ export default function QuestionTab({
           onCheckboxChange={handleDoNotRemindChange}
         />
       )}
+
       {showResetModal && (
         <ConfirmationModal
           title="Reset Question?"

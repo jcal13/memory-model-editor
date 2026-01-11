@@ -4,27 +4,27 @@
     "question": "A `Fries` object calls `Food.update_price` through inheritance. Draw the memory model before `update_price` returns.",
     "code": [
       "class Food:",
-      "def __init__(self, n: str, p: int) -> None:",
-      "self.name = n",
-      "self.price = p",
+      "    def __init__(self, n: str, p: int) -> None:",
+      "        self.name = n",
+      "        self.price = p",
       "",
-      "def update_price(self, new_price: int) -> None:",
-      "\\\"\\\"\\\"Update this Food's price to new_price.\\\"\\\"\\\"",
-      "price = self.price",
-      "price = new_price",
+      "    def update_price(self, new_price: int) -> None:",
+      "        \"\"\"Update this Food's price to new_price.\"\"\"",
+      "        price = self.price",
+      "        price = new_price",
       "",
       "class Fries(Food):",
-      "def __init__(self, p: int) -> None:",
-      "Food.__init__(self, 'fries', p)",
+      "    def __init__(self, p: int) -> None:",
+      "        Food.__init__(self, 'fries', p)",
       "",
       "class Menu:",
-      "def __init__(self, items: list[Food]) -> None:",
-      "self.items = items",
+      "    def __init__(self, items: list[Food]) -> None:",
+      "        self.items = items",
       "",
       "if __name__ == '__main__':",
-      "f = Fries(5)",
-      "menu = Menu([f])",
-      "f.update_price(7)"
+      "    f = Fries(5)",
+      "    menu = Menu([f])",
+      "    f.update_price(7)"
     ],
     "answer": [
       {
@@ -93,15 +93,15 @@
     "question": "This recursive constructor builds a `RecursiveList` for `7` and `hi`. Draw every function and object created during execution of `main`.",
     "code": [
       "class RecursiveList:",
-      "def __init__(self, items: list) -> None:",
-      "if items == []:",
-      "self._first, self._rest = None, None",
-      "return",
-      "self._first = items[0]",
-      "self._rest = RecursiveList(items[1:])",
+      "    def __init__(self, items: list) -> None:",
+      "        if items == []:",
+      "            self._first, self._rest = None, None",
+      "            return",
+      "        self._first = items[0]",
+      "        self._rest = RecursiveList(items[1:])",
       "",
       "if __name__ == '__main__':",
-      "rec_lst = RecursiveList([7, 'hi'])"
+      "    rec_lst = RecursiveList([7, 'hi'])"
     ],
     "answer": [
       {
@@ -208,21 +208,21 @@
     "question": "Nested helper functions append `v` plus one to a shared list then return. Draw the memory model before `a_fun` returns.",
     "code": [
       "def a_fun(lst: list[int], v: int) -> None:",
-      "x = v + 1",
-      "lst.append(x)",
+      "    x = v + 1",
+      "    lst.append(x)",
       "",
       "def y_fun(d: list[int]) -> int:",
-      "a_fun(d, 3)",
-      "return d[-1]",
+      "    a_fun(d, 3)",
+      "    return d[-1]",
       "",
       "def have_fun(lst: list[int]) -> int:",
-      "return y_fun(lst)",
+      "    return y_fun(lst)",
       "",
       "if __name__ == '__main__':",
-      "a = [1, 2, 3]",
-      "b = a",
-      "print(have_fun(a))",
-      "print(b)"
+      "    a = [1, 2, 3]",
+      "    b = a",
+      "    print(have_fun(a))",
+      "    print(b)"
     ],
     "answer": [
       {
@@ -294,17 +294,17 @@
   },
   {
     "id": 4,
-    "question": "duplicate` makes a shallow copy of an outer matrix list. Draw the memory model after `duplicate` returns to `main`.",
+    "question": "`duplicate` makes a shallow copy of an outer matrix list. Draw the memory model after `duplicate` returns to `main`.",
     "code": [
       "def duplicate(matrix: list[list[int]]) -> list[list[int]]:",
-      "answer = []",
-      "for item in matrix:",
-      "answer.append(item)",
-      "return answer",
+      "    answer = []",
+      "    for item in matrix:",
+      "        answer.append(item)",
+      "    return answer",
       "",
       "if __name__ == '__main__':",
-      "m1 = [[1, 2], [3, 4]]",
-      "m2 = duplicate(m1)"
+      "    m1 = [[1, 2], [3, 4]]",
+      "    m2 = duplicate(m1)"
     ],
     "answer": [
       {
@@ -365,21 +365,21 @@
     "question": "`filter_queue` removes values below `minimum` and reassigns `q` inside the function. Draw the memory model just before `filter_queue` returns.",
     "code": [
       "def filter_queue(q: Queue[int], minimum: int) -> None:",
-      "\\\"\\\"\\\"Remove all items from <q> that are less than <minimum>.\\\"\\\"\\\"",
-      "temp_queue = Queue()",
-      "while not q.is_empty():",
-      "value = q.dequeue()",
-      "if value >= minimum:",
-      "temp_queue.enqueue(value)",
-      "q = temp_queue",
+      "    \"\"\"Remove all items from <q> that are less than <minimum>.\"\"\"",
+      "    temp_queue = Queue()",
+      "    while not q.is_empty():",
+      "        value = q.dequeue()",
+      "        if value >= minimum:",
+      "            temp_queue.enqueue(value)",
+      "    q = temp_queue",
       "",
       "if __name__ == '__main__':",
-      "q = Queue()",
-      "q.enqueue(2)",
-      "q.enqueue(21)",
-      "q.enqueue(5)",
-      "q.enqueue(1)",
-      "filter_queue(q, 10)"
+      "    q = Queue()",
+      "    q.enqueue(2)",
+      "    q.enqueue(21)",
+      "    q.enqueue(5)",
+      "    q.enqueue(1)",
+      "    filter_queue(q, 10)"
     ],
     "answer": [
       {
@@ -462,15 +462,15 @@
     "question": "`mystery` aliases list via `c`, mutates it, then rebinds local `b` to a new list. Draw the memory model before `mystery` returns.",
     "code": [
       "def mystery(a: int, b: list[int]) -> None:",
-      "c = b",
-      "c.append(a)",
-      "a = a + 1",
-      "b = [5]",
+      "    c = b",
+      "    c.append(a)",
+      "    a = a + 1",
+      "    b = [5]",
       "",
       "if __name__ == '__main__':",
-      "my_num = 100",
-      "my_lst = [7]",
-      "mystery(my_num, my_lst)"
+      "    my_num = 100",
+      "    my_lst = [7]",
+      "    mystery(my_num, my_lst)"
     ],
     "answer": [
       {
@@ -534,16 +534,16 @@
       "from typing import Any, List",
       "",
       "def copy_of(lst: List[Any]) -> List[Any]:",
-      "new_lst: List[Any] = []",
-      "for item in lst:",
-      "new_lst.append(item)",
-      "return new_lst",
+      "    new_lst: List[Any] = []",
+      "    for item in lst:",
+      "        new_lst.append(item)",
+      "    return new_lst",
       "",
       "if __name__ == '__main__':",
-      "board = [['O', 'O', ''],",
-      "['O', 'X', 'X'],",
-      "['X', '', 'X']]",
-      "temp_board = copy_of(board)"
+      "    board = [['O', 'O', ''],",
+      "             ['O', 'X', 'X'],",
+      "             ['X', '', 'X']]",
+      "    temp_board = copy_of(board)"
     ],
     "answer": [
       {
@@ -616,17 +616,17 @@
       "from typing import List",
       "",
       "def append_sometimes(lst: List[List[int]], new: int) -> List[List[int]]:",
-      "\\\"\\\"\\\"Return a new list equal to <lst>, with <new> appended to each",
-      "sub‑list that doesn't already contain it.\\\"\\\"\\\"",
-      "answer = lst",
-      "for item in answer:",
-      "if new not in item:",
-      "item.append(new)",
-      "return answer",
+      "    \"\"\"Return a new list equal to <lst>, with <new> appended to each",
+      "    sub‑list that doesn't already contain it.\"\"\"",
+      "    answer = lst",
+      "    for item in answer:",
+      "        if new not in item:",
+      "            item.append(new)",
+      "    return answer",
       "",
       "if __name__ == '__main__':",
-      "lst1 = [[1, 2], [3], [4, 5]]",
-      "new_lst1 = append_sometimes(lst1, 2)"
+      "    lst1 = [[1, 2], [3], [4, 5]]",
+      "    new_lst1 = append_sometimes(lst1, 2)"
     ],
     "answer": [
       {
@@ -703,15 +703,15 @@
     "question": "Two `BagOfStuff` objects share the same list which is mutated after the first construction. Draw the memory model before the `assert` executes.",
     "code": [
       "class BagOfStuff:",
-      "def __init__(self, stuff: list[str]) -> None:",
-      "self.stuff = stuff",
+      "    def __init__(self, stuff: list[str]) -> None:",
+      "        self.stuff = stuff",
       "",
       "if __name__ == '__main__':",
-      "some_stuff = ['wallet', 'phone', 'keys']",
-      "my_stuff = BagOfStuff(some_stuff)",
-      "some_stuff.append('snacks')",
-      "your_stuff = BagOfStuff(some_stuff)",
-      "assert len(my_stuff.stuff) == 3 and len(your_stuff.stuff) == 4"
+      "    some_stuff = ['wallet', 'phone', 'keys']",
+      "    my_stuff = BagOfStuff(some_stuff)",
+      "    some_stuff.append('snacks')",
+      "    your_stuff = BagOfStuff(some_stuff)",
+      "    assert len(my_stuff.stuff) == 3 and len(your_stuff.stuff) == 4"
     ],
     "answer": [
       {
@@ -776,13 +776,13 @@
       "from typing import List",
       "",
       "def do_something(lst: List[List[int]]) -> None:",
-      "for sublst in lst:",
-      "sublst.append(99)",
+      "    for sublst in lst:",
+      "        sublst.append(99)",
       "",
       "if __name__ == '__main__':",
-      "original_lst = [[1, 2, 3], [4, 5, 6]]",
-      "lst_copy = [original_lst[0], original_lst[1]]",
-      "do_something(lst_copy)"
+      "    original_lst = [[1, 2, 3], [4, 5, 6]]",
+      "    lst_copy = [original_lst[0], original_lst[1]]",
+      "    do_something(lst_copy)"
     ],
     "answer": [
       {

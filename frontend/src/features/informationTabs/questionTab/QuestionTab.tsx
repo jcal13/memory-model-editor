@@ -37,6 +37,14 @@ interface QuestionStatusMap {
   [key: string]: QuestionStatus;
 }
 
+interface QuestionData {
+  id: number;
+  question: string;
+  code: string[];
+  answer: unknown;
+  topics?: string[] | null;
+}
+
 interface QuestionTabProps {
   questionIndex: number | null;
   setQuestionIndex: (index: number | null) => void;
@@ -110,7 +118,7 @@ export default function QuestionTab({
 }: QuestionTabProps) {
   const [view, setView] = useState<View>(() => loadSavedQuestionView());
   const [questionCount, setQuestionCount] = useState<number>(0);
-  const [questionData, setQuestionData] = useState<any>(null);
+  const [questionData, setQuestionData] = useState<QuestionData | null>(null);
   const [questionStatus, setQuestionStatus] = useState<QuestionStatusMap>(() =>
     loadQuestionStatus()
   );
@@ -250,7 +258,7 @@ export default function QuestionTab({
     setView("loading");
 
     try {
-      const data = await fetchQuestion(id, type);
+      const data = await fetchQuestion<QuestionData>(id, type);
 
       setQuestionType(type);
       setQuestionIndex(id);
@@ -353,7 +361,10 @@ export default function QuestionTab({
       hydratedQuestion.current = true;
       (async () => {
         try {
-          const data = await fetchQuestion(questionIndex, questionType);
+          const data = await fetchQuestion<QuestionData>(
+            questionIndex,
+            questionType
+          );
           setQuestionData(data);
 
           if (onQuestionDataChange) {
@@ -474,6 +485,28 @@ export default function QuestionTab({
             </div>
 
             <div className={styles.questionArea}>
+              <details className={styles.topicsSection}>
+                <summary className={styles.topicsSummary}>Topics</summary>
+                <div className={styles.topicsContent}>
+                  {(questionData.topics ?? []).length > 0 ? (
+                    <div className={styles.topicChips}>
+                      {(questionData.topics ?? []).map((topic, index) => (
+                        <span
+                          key={`${topic}-${index}`}
+                          className={styles.topicChip}
+                        >
+                          {topic}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className={styles.topicsEmpty}>
+                      No topics listed yet.
+                    </p>
+                  )}
+                </div>
+              </details>
+
               <div className={styles.questionText}>
                 <ReactMarkdown>{questionData.question}</ReactMarkdown>
               </div>

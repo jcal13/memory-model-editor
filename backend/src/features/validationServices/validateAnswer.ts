@@ -268,7 +268,8 @@ function checkSet(
   for (const extraId of unmatched)
     errors.push({
       type: ErrorType.UNEXPECTED_ELEMENT,
-      message: `Unexpected element: ${path} id=${extraId}`,
+      message: `The set with id4 TODO has an unexpected element id=${extraId}`,//TODO
+      // message: `Unexpected element: ${path} id=${extraId}`,
       elementId: inputMemoryBox.id ?? undefined, // The container with unexpected elements
       path,
       severity: 'error'
@@ -489,7 +490,8 @@ function compareFrames(
       if (!(k in uVars))
         errors.push({
           type: ErrorType.MISSING_ELEMENT,
-          message: `Missing variable: function "${name}" expected "${k}"`,
+          message: `Function "${name}" is missing a variable expected "${k}"`,
+          // message: `Missing variable: function "${name}" expected "${k}"`,
           elementId: uFrame.id ?? undefined,
           path: `function "${name}" → var "${k}"`,
           severity: 'error'

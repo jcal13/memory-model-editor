@@ -185,13 +185,16 @@ export function structureError(message: string): FeedbackError {
     };
   }
 
+  // Pattern: "Function \"name\" is missing a variable expected \"var\""
   // Pattern: "Missing variable: function \"name\" expected \"var\""
-  const missingVarFuncMatch = message.match(/Missing variable: function "(.+?)" expected "(.+?)"/i);
+  const missingVarFuncMatch = message.match(/Function "(.+?)" is missing a variable expected "(.+?)"/i);
+  // const missingVarFuncMatch = message.match(/Missing variable: function "(.+?)" expected "(.+?)"/i);
+  
   if (missingVarFuncMatch) {
     return {
       type: ErrorType.MISSING_ELEMENT,
       message,
-      path: `${missingVarFuncMatch[1]}.${missingVarFuncMatch[2]}`,
+      path: `${missingVarFuncMatch[1]}.${missingVarFuncMatch[2]}`, // TODO might need to adjust with new message
       severity: 'error',
     };
   }

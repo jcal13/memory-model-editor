@@ -268,8 +268,7 @@ function checkSet(
   for (const extraId of unmatched)
     errors.push({
       type: ErrorType.UNEXPECTED_ELEMENT,
-      message: `The set with id4 TODO has an unexpected element id=${extraId}`,//TODO
-      // message: `Unexpected element: ${path} id=${extraId}`,
+      message: `Unexpected element: ${path} id=${extraId}`,
       elementId: inputMemoryBox.id ?? undefined, // The container with unexpected elements
       path,
       severity: 'error'
@@ -610,7 +609,8 @@ function compareIds(
     // if either ID is not found in the respective map
     errors.push({
       type: ErrorType.ORPHANED_ELEMENT,
-      message: `Unmapped ID: ${path}`,
+      // Remove → from end of path (if it is there)
+      message: `Unmapped ID: ${path.endsWith('→') ? path.slice(0, -1) : path}`,
       path,
       severity: 'error'
     });

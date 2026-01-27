@@ -91,7 +91,7 @@ export default function ErrorListDisplay({
     let displayMessage = processErrorMessage(message, isSandboxMode);
     let errorType = "";
 
-    if (message.includes("missing a variable")) {
+    if (message.includes("Missing variable")) {
       errorType = "Missing variable";
     } else if (message.includes("Unexpected variable")) {
       errorType = "Unexpected variable";

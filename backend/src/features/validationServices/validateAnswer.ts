@@ -489,8 +489,7 @@ function compareFrames(
       if (!(k in uVars))
         errors.push({
           type: ErrorType.MISSING_ELEMENT,
-          message: `Function "${name}" is missing a variable expected "${k}"`,
-          // message: `Missing variable: function "${name}" expected "${k}"`,
+          message: `Missing variable: function "${name}" expected "${k}"`,
           elementId: uFrame.id ?? undefined,
           path: `function "${name}" → var "${k}"`,
           severity: 'error'

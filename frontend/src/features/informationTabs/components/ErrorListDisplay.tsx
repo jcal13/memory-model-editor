@@ -72,7 +72,7 @@ export default function ErrorListDisplay({
 
     let processed = message;
 
-    // Do not trim messages that have "unexpected" in it
+    // Do not edit messages that have "unexpected" in it
     if (!message.toLowerCase().includes("unexpected")) {
       processed = processed.replace(/expected\s+[^,]+,\s+got\s+/gi, "got ");
       processed = processed.replace(/,?\s*expected\s+[^,]+$/gi, "");

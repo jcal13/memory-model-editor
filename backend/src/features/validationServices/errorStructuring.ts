@@ -187,7 +187,6 @@ export function structureError(message: string): FeedbackError {
 
   // Pattern: "Missing variable: function \"name\" expected \"var\""
   const missingVarFuncMatch = message.match(/Missing variable: function "(.+?)" expected "(.+?)"/i);
-
   if (missingVarFuncMatch) {
     return {
       type: ErrorType.MISSING_ELEMENT,

@@ -11,6 +11,7 @@ interface Question {
   code: string[];
   answer: any;
   description: string | null;
+  topics: string[];
 }
 
 async function createDatabaseIfNotExists() {
@@ -23,6 +24,11 @@ async function createDatabaseIfNotExists() {
   const dbUrl = new URL(
     connectionString.replace("postgresql://", "postgres://")
   );
+  if (dbUrl.username && !dbUrl.password) {
+    console.warn(
+      "WARNING: DATABASE_URL does not include a password. If your Postgres instance requires SCRAM/password auth, use the form: postgresql://user:password@host:5432/db"
+    );
+  }
   const targetDb = dbUrl.pathname.slice(1);
 
   dbUrl.pathname = "/postgres";
@@ -43,6 +49,11 @@ async function createDatabaseIfNotExists() {
     }
   } catch (error) {
     console.error("ERROR: Failed to create database:", error);
+    if (error instanceof Error && /password must be a string/i.test(error.message)) {
+      console.error(
+        "HINT: Your DATABASE_URL is missing a password. Update it to include user:password (see .env.example/README)."
+      );
+    }
     throw error;
   } finally {
     await adminPool.end();
@@ -58,7 +69,8 @@ async function createTablesIfNotExist(pool: Pool) {
         question TEXT,
         code TEXT[],
         answer JSONB,
-        description TEXT
+        description TEXT,
+        topics TEXT[]
     );
 
     CREATE TABLE IF NOT EXISTS test_questions (
@@ -66,7 +78,8 @@ async function createTablesIfNotExist(pool: Pool) {
         question TEXT,
         code TEXT[],
         answer JSONB,
-        description TEXT
+        description TEXT,
+        topics TEXT[]
     );
 
     CREATE INDEX IF NOT EXISTS idx_practice_questions_id ON practice_questions(id);
@@ -74,6 +87,12 @@ async function createTablesIfNotExist(pool: Pool) {
   `;
 
   await pool.query(schemaSQL);
+  await pool.query(
+    "ALTER TABLE practice_questions ADD COLUMN IF NOT EXISTS topics TEXT[]"
+  );
+  await pool.query(
+    "ALTER TABLE test_questions ADD COLUMN IF NOT EXISTS topics TEXT[]"
+  );
   console.log("Tables created or already exist");
 }
 
@@ -126,9 +145,15 @@ async function importQuestions() {
     console.log("Importing practice questions...");
     for (const q of practiceQuestions) {
       await pool.query(
-        `INSERT INTO practice_questions (question, code, answer, description)
-         VALUES ($1, $2, $3, $4)`,
-        [q.question, q.code, JSON.stringify(q.answer), q.description]
+        `INSERT INTO practice_questions (question, code, answer, description, topics)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [
+          q.question,
+          q.code,
+          JSON.stringify(q.answer),
+          q.description,
+          q.topics ?? [],
+        ]
       );
       console.log(`  Imported practice question ${q.id}`);
     }
@@ -136,9 +161,15 @@ async function importQuestions() {
     console.log("\nImporting test questions...");
     for (const q of testQuestions) {
       await pool.query(
-        `INSERT INTO test_questions (question, code, answer, description)
-         VALUES ($1, $2, $3, $4)`,
-        [q.question, q.code, JSON.stringify(q.answer), q.description]
+        `INSERT INTO test_questions (question, code, answer, description, topics)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [
+          q.question,
+          q.code,
+          JSON.stringify(q.answer),
+          q.description,
+          q.topics ?? [],
+        ]
       );
       console.log(`  Imported test question ${q.id}`);
     }

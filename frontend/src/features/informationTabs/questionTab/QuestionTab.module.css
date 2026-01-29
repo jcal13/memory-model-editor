@@ -89,6 +89,66 @@
   font-size: 0.94em;
 }
 
+.topicsSection {
+  margin: 0 0 1rem 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+  overflow: hidden;
+}
+
+.topicsSummary {
+  cursor: pointer;
+  padding: 0.6rem 0.85rem;
+  font-weight: 600;
+  color: #111827;
+  background: #f3f4f6;
+  list-style: none;
+  user-select: none;
+}
+
+.topicsSummary::-webkit-details-marker {
+  display: none;
+}
+
+.topicsSummary::before {
+  content: "▸";
+  display: inline-block;
+  margin-right: 0.5rem;
+  transition: transform 0.15s ease;
+}
+
+.topicsSection[open] .topicsSummary::before {
+  transform: rotate(90deg);
+}
+
+.topicsContent {
+  padding: 0.6rem 0.85rem 0.85rem;
+}
+
+.topicChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.topicChip {
+  background: #e0f2fe;
+  color: #0c4a6e;
+  border: 1px solid #bae6fd;
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.topicsEmpty {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
 .buttonRow {
   display: flex;
   gap: 10px;

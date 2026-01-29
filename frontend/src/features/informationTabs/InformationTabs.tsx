@@ -92,6 +92,7 @@ export default function InformationTabs({
               onRestoreCanvas={onRestoreCanvas}
               currentCanvasState={currentCanvasState}
               onQuestionDataChange={onQuestionDataChange}
+              isSandboxMode={isSandboxMode}
             />
           </div>
 

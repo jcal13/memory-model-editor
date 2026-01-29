@@ -110,7 +110,7 @@ export default function InformationTabs({
               questionSelected={questionSelected}
               questionIndex={questionIndex}
               questionType={questionType}
-              isSandboxMode={isSandboxMode}
+              isSandboxMode={!isSandboxMode}
             />
           </div>
         </div>

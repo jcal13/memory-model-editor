@@ -376,7 +376,7 @@ export default function MemoryModelEditor({
               classes={state.elementClasses}
               addClasses={addElementClass}
               removeClasses={removeElementClass}
-              sandbox={state.isSandboxMode}
+              sandbox={!state.isSandboxMode}
               onClear={() => state.setShowClearCanvasModal(true)}
               onEditorOpenerReady={handleEditorOpenerReady}
             />

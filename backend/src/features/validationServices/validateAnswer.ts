@@ -608,7 +608,8 @@ function compareIds(
     // if either ID is not found in the respective map
     errors.push({
       type: ErrorType.ORPHANED_ELEMENT,
-      message: `Unmapped ID: ${path}`,
+      // Remove → from end of path (if it is there)
+      message: `Unmapped ID: ${path.endsWith('→') ? path.slice(0, -1) : path}`,
       path,
       severity: 'error'
     });

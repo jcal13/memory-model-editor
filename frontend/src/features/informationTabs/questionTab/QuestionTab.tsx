@@ -56,6 +56,7 @@ interface QuestionTabProps {
   onRestoreCanvas: (elements: any[], ids: number[], classes: string[]) => void;
   currentCanvasState: { elements: any[]; ids: number[]; classes: string[] };
   onQuestionDataChange?: (data: any) => void;
+  isSandboxMode: boolean;
 }
 
 function loadSavedQuestionView(): View {
@@ -115,6 +116,7 @@ export default function QuestionTab({
   onRestoreCanvas,
   currentCanvasState,
   onQuestionDataChange,
+  isSandboxMode,
 }: QuestionTabProps) {
   const [view, setView] = useState<View>(() => loadSavedQuestionView());
   const [questionCount, setQuestionCount] = useState<number>(0);
@@ -169,6 +171,17 @@ export default function QuestionTab({
       onQuestionDataChange(null);
     }
   }, [view, onQuestionDataChange]);
+
+  useEffect(() => {
+    setView("root");
+    setQuestionData(null);
+    setQuestionIndex(null);
+    setQuestionType(null);
+    hydratedList.current = false;
+    hydratedQuestion.current = false;
+    previousQuestionRef.current = null;
+    persistQuestionView("root");
+  }, [isSandboxMode, setQuestionIndex, setQuestionType]);
 
   const updateQuestionStatus = (
     type: QuestionType,

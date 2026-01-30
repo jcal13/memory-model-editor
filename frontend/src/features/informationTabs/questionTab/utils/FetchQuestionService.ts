@@ -1,8 +1,8 @@
 import axios from "axios";
 
 // Configuration
-const API_DEV_URL = "http://localhost:3001";
-
+const API_URL = process.env.NODE_ENV === 'production' 
+  ? ""  : "http://localhost:3001";
 /**
  * Fetches a specific question by ID and type
  * @param id - Question ID
@@ -15,7 +15,7 @@ export async function fetchQuestion<T = any>(
 ): Promise<T> {
   try {
     const response = await axios.get(
-      `${API_DEV_URL}/questions/${type}questions/${id}`
+      `${API_URL}/questions/${type}questions/${id}`
     );
     return response.data as T;
   } catch (error) {
@@ -35,7 +35,7 @@ export async function fetchQuestionCount(
   type: "test" | "practice"
 ): Promise<number> {
   try {
-    const url = `${API_DEV_URL}/questions/${type}questions`;
+    const url = `${API_URL}/questions/${type}questions`;
     const response = await axios.post(url);
     return response.data.count as number;
   } catch (error) {

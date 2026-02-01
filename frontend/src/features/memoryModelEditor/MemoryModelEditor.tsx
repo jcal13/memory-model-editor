@@ -494,7 +494,7 @@ export default function MemoryModelEditor({
       {state.showModeToggleModal && (
         <ConfirmationModal
           title="Switch Mode?"
-          message="Switching modes will clear the canvas. Continue?"
+          message="Switching modes will clear the canvas. Your current work will be saved and restored if you return to this question."
           confirmLabel="Confirm"
           cancelLabel="Cancel"
           onConfirm={() => {

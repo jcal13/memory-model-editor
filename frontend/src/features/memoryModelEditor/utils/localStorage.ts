@@ -30,6 +30,22 @@ export interface CanvasData {
   classes: string[];
 }
 
+export function normalizeCanvasData(raw: unknown): CanvasData {
+  if (!raw || typeof raw !== "object") return DEFAULT_CANVAS_DATA;
+
+  const parsed = raw as {
+    elements?: unknown;
+    ids?: unknown;
+    classes?: unknown;
+  };
+
+  return {
+    elements: Array.isArray(parsed.elements) ? parsed.elements : [],
+    ids: Array.isArray(parsed.ids) ? parsed.ids : [],
+    classes: Array.isArray(parsed.classes) ? parsed.classes : [],
+  };
+}
+
 export interface UIState {
   activeTab: Tab;
   questionIndex: number | null;
@@ -48,12 +64,7 @@ export function loadInitialCanvasData(): CanvasData {
     if (!rawData) return DEFAULT_CANVAS_DATA;
 
     const parsed = JSON.parse(rawData);
-
-    return {
-      elements: Array.isArray(parsed?.elements) ? parsed.elements : [],
-      ids: Array.isArray(parsed?.ids) ? parsed.ids : [],
-      classes: Array.isArray(parsed?.classes) ? parsed.classes : [],
-    };
+    return normalizeCanvasData(parsed);
   } catch (error) {
     console.warn("Failed to load canvas data from localStorage:", error);
     return DEFAULT_CANVAS_DATA;
@@ -196,15 +207,26 @@ export function loadQuestionCanvasData(
     if (!rawData) return null;
 
     const parsed = JSON.parse(rawData);
-    return {
-      elements: Array.isArray(parsed?.elements) ? parsed.elements : [],
-      ids: Array.isArray(parsed?.ids) ? parsed.ids : [],
-      classes: Array.isArray(parsed?.classes) ? parsed.classes : [],
-    };
+    return normalizeCanvasData(parsed);
   } catch (error) {
     console.warn("Failed to load question canvas data:", error);
     return null;
   }
+}
+
+/**
+ * Resolves a question canvas state from localStorage with an optional fallback.
+ * LocalStorage takes precedence; fallback is used only if no saved state exists.
+ */
+export function resolveQuestionCanvasData(
+  type: "test" | "practice",
+  index: number,
+  fallback?: CanvasData | null
+): CanvasData {
+  const saved = loadQuestionCanvasData(type, index);
+  if (saved) return saved;
+
+  return normalizeCanvasData(fallback);
 }
 
 /**

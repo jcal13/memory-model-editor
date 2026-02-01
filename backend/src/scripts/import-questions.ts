@@ -12,6 +12,11 @@ interface Question {
   answer: any;
   description: string | null;
   topics: string[];
+  canvasConfig?: {
+    elements: any[];
+    ids: number[];
+    classes: string[];
+  } | null;
 }
 
 async function createDatabaseIfNotExists() {
@@ -70,7 +75,8 @@ async function createTablesIfNotExist(pool: Pool) {
         code TEXT[],
         answer JSONB,
         description TEXT,
-        topics TEXT[]
+        topics TEXT[],
+        canvas_config JSONB
     );
 
     CREATE TABLE IF NOT EXISTS test_questions (
@@ -79,7 +85,8 @@ async function createTablesIfNotExist(pool: Pool) {
         code TEXT[],
         answer JSONB,
         description TEXT,
-        topics TEXT[]
+        topics TEXT[],
+        canvas_config JSONB
     );
 
     CREATE INDEX IF NOT EXISTS idx_practice_questions_id ON practice_questions(id);
@@ -92,6 +99,12 @@ async function createTablesIfNotExist(pool: Pool) {
   );
   await pool.query(
     "ALTER TABLE test_questions ADD COLUMN IF NOT EXISTS topics TEXT[]"
+  );
+  await pool.query(
+    "ALTER TABLE practice_questions ADD COLUMN IF NOT EXISTS canvas_config JSONB"
+  );
+  await pool.query(
+    "ALTER TABLE test_questions ADD COLUMN IF NOT EXISTS canvas_config JSONB"
   );
   console.log("Tables created or already exist");
 }
@@ -145,14 +158,15 @@ async function importQuestions() {
     console.log("Importing practice questions...");
     for (const q of practiceQuestions) {
       await pool.query(
-        `INSERT INTO practice_questions (question, code, answer, description, topics)
-         VALUES ($1, $2, $3, $4, $5)`,
+        `INSERT INTO practice_questions (question, code, answer, description, topics, canvas_config)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
         [
           q.question,
           q.code,
           JSON.stringify(q.answer),
           q.description,
           q.topics ?? [],
+          q.canvasConfig ?? null,
         ]
       );
       console.log(`  Imported practice question ${q.id}`);
@@ -161,14 +175,15 @@ async function importQuestions() {
     console.log("\nImporting test questions...");
     for (const q of testQuestions) {
       await pool.query(
-        `INSERT INTO test_questions (question, code, answer, description, topics)
-         VALUES ($1, $2, $3, $4, $5)`,
+        `INSERT INTO test_questions (question, code, answer, description, topics, canvas_config)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
         [
           q.question,
           q.code,
           JSON.stringify(q.answer),
           q.description,
           q.topics ?? [],
+          q.canvasConfig ?? null,
         ]
       );
       console.log(`  Imported test question ${q.id}`);

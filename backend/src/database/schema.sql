@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS practice_questions (
     question TEXT,
     code TEXT[],
     answer JSONB,
-    description TEXT
+    description TEXT,
+    canvas_config JSONB
 );
 
 -- Test Questions Table
@@ -13,7 +14,8 @@ CREATE TABLE IF NOT EXISTS test_questions (
     question TEXT,
     code TEXT[],
     answer JSONB,
-    description TEXT
+    description TEXT,
+    canvas_config JSONB
 );
 
 CREATE INDEX IF NOT EXISTS idx_practice_questions_id ON practice_questions(id);

@@ -95,7 +95,36 @@
       "Methods",
       "Objects",
       "Frames"
-    ]
+    ],
+    "canvasConfig": {
+      "elements": [
+        {
+          "boxId": 0,
+          "id": "_",
+          "x": 0,
+          "y": 0,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "value": null,
+            "functionName": "__main__",
+            "params": [
+              {
+                "name": "f",
+                "targetId": "_"
+              },
+              {
+                "name": "menu",
+                "targetId": "_"
+              }
+            ],
+            "order": 1
+          }
+        }
+      ],
+      "ids": [],
+      "classes": []
+    }
   },
   {
     "id": 2,

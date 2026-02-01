@@ -31,6 +31,7 @@ type QuestionRow = {
   code: string[]; // text[]
   answer: unknown; // jsonb
   topics: string[] | null; // text[]
+  canvasConfig: unknown | null; // jsonb
 };
 
 router.post("/practicequestions", async (_req: Request, res: Response) => {
@@ -54,7 +55,7 @@ router.get("/practicequestions/:id", async (req: Request, res: Response) => {
 
   try {
     const { rows } = await getPool().query<QuestionRow>(
-      "SELECT id, question, code, answer, topics FROM practice_questions WHERE id = $1",
+      'SELECT id, question, code, answer, topics, canvas_config AS "canvasConfig" FROM practice_questions WHERE id = $1',
       [id]
     );
     if (rows.length === 0) {
@@ -89,7 +90,7 @@ router.get("/testquestions/:id", async (req: Request, res: Response) => {
 
   try {
     const { rows } = await getPool().query<QuestionRow>(
-      "SELECT id, question, code, answer, topics FROM test_questions WHERE id = $1",
+      'SELECT id, question, code, answer, topics, canvas_config AS "canvasConfig" FROM test_questions WHERE id = $1',
       [id]
     );
     if (rows.length === 0) {

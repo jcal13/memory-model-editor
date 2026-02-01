@@ -10,11 +10,12 @@ import styles from "./QuestionTab.module.css";
 import "prismjs/themes/prism-tomorrow.css";
 import { SubmissionResult } from "../../shared/types";
 import {
+  CanvasData,
+  deleteQuestionCanvasData,
   getDoNotRemindCanvasClear,
+  resolveQuestionCanvasData,
   saveQuestionCanvasData,
   setDoNotRemindCanvasClear,
-  loadQuestionCanvasData,
-  deleteQuestionCanvasData,
 } from "../../memoryModelEditor/utils/localStorage";
 import ConfirmationModal from "../../memoryModelEditor/components/ConfirmationModal";
 
@@ -43,6 +44,7 @@ interface QuestionData {
   code: string[];
   answer: unknown;
   topics?: string[] | null;
+  canvasConfig?: CanvasData | null;
 }
 
 interface QuestionTabProps {
@@ -284,16 +286,16 @@ export default function QuestionTab({
       setView("question");
 
       setTimeout(() => {
-        const savedCanvas = loadQuestionCanvasData(type, id);
-        if (savedCanvas && savedCanvas.elements.length > 0) {
-          onRestoreCanvas(
-            savedCanvas.elements,
-            savedCanvas.ids,
-            savedCanvas.classes
-          );
-        } else {
-          onRestoreCanvas([], [], []);
-        }
+        const resolvedCanvas = resolveQuestionCanvasData(
+          type,
+          id,
+          data.canvasConfig ?? null
+        );
+        onRestoreCanvas(
+          resolvedCanvas.elements,
+          resolvedCanvas.ids,
+          resolvedCanvas.classes
+        );
       }, 0);
     } catch (error) {
       console.error("Failed to load question:", error);
@@ -417,7 +419,16 @@ export default function QuestionTab({
   const handleResetConfirm = () => {
     if (questionType && questionIndex !== null) {
       deleteQuestionCanvasData(questionType, questionIndex);
-      onClearCanvas();
+      const resolvedCanvas = resolveQuestionCanvasData(
+        questionType,
+        questionIndex,
+        questionData?.canvasConfig ?? null
+      );
+      onRestoreCanvas(
+        resolvedCanvas.elements,
+        resolvedCanvas.ids,
+        resolvedCanvas.classes
+      );
       setSubmissionResults(null);
       updateQuestionStatus(questionType, questionIndex, "unattempted");
     }

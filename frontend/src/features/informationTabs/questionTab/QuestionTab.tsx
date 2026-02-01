@@ -447,11 +447,19 @@ export default function QuestionTab({
         {view === "root" && (
           <div className={styles.selectors}>
             <QuestionSelector
+              variant="category"
               text="Practice Questions"
+              subtitle="Sharpen your skills"
+              icon="✏️"
+              categoryType="practice"
               onClick={() => loadQuestions("practice")}
             />
             <QuestionSelector
+              variant="category"
               text="Test Questions"
+              subtitle="Put your knowledge to the test"
+              icon="📝"
+              categoryType="test"
               onClick={() => loadQuestions("test")}
             />
           </div>
@@ -475,7 +483,7 @@ export default function QuestionTab({
             </div>
 
             <div className={styles.scroller}>
-              <div className={styles.selectors}>
+              <div className={styles.questionGrid}>
                 {Array.from({ length: questionCount }, (_, index) => {
                   const questionNum = index + 1;
                   const status = questionType
@@ -485,7 +493,7 @@ export default function QuestionTab({
                   return (
                     <QuestionSelector
                       key={questionNum}
-                      text={`Question ${questionNum}`}
+                      text={`Q${questionNum}`}
                       onClick={() => loadSingleQuestion(questionNum)}
                       status={status}
                     />

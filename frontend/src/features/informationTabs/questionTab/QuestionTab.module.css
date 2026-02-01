@@ -36,6 +36,13 @@
   gap: 0.5rem;
 }
 
+.questionGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-start;
+}
+
 .loading {
   margin-top: 1rem;
   color: #6b7280;

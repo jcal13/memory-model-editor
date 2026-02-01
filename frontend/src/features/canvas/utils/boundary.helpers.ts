@@ -1,6 +1,10 @@
 /**
  * Boundary utility functions for preventing canvas elements from overlapping with the callstack
+ * and resolving overlap between elements when loading configurations.
  */
+
+import { CanvasElement } from "../../shared/types";
+import { getBoxDimensions } from "./box.renderer";
 
 export interface CallStackBounds {
   x: number;
@@ -217,4 +221,84 @@ export function smoothlyConstrainDragPosition(
   }
 
   return { x: constrainedX, y: constrainedY };
+}
+
+/**
+ * Checks if two axis-aligned bounding boxes overlap.
+ * Positions are center-based coordinates.
+ */
+function doBoxesOverlap(
+  posA: Position,
+  dimA: ElementDimensions,
+  posB: Position,
+  dimB: ElementDimensions,
+  padding: number = CALLSTACK_PADDING
+): boolean {
+  const aLeft = posA.x - dimA.width / 2 - padding;
+  const aRight = posA.x + dimA.width / 2 + padding;
+  const aTop = posA.y - dimA.height / 2 - padding;
+  const aBottom = posA.y + dimA.height / 2 + padding;
+
+  const bLeft = posB.x - dimB.width / 2;
+  const bRight = posB.x + dimB.width / 2;
+  const bTop = posB.y - dimB.height / 2;
+  const bBottom = posB.y + dimB.height / 2;
+
+  return !(aRight < bLeft || aLeft > bRight || aBottom < bTop || aTop > bBottom);
+}
+
+/**
+ * Spreads out overlapping non-function elements so they don't stack on top of each other.
+ * Function elements are left untouched (they live in the callstack).
+ * Returns a new array with adjusted positions.
+ */
+export function spreadOverlappingElements(
+  elements: CanvasElement[]
+): CanvasElement[] {
+  if (elements.length <= 1) return elements;
+
+  // Separate function elements (callstack) from non-function elements (canvas)
+  const functionElements = elements.filter((el) => el.kind.name === "function");
+  const canvasElements = elements
+    .filter((el) => el.kind.name !== "function")
+    .map((el) => ({ ...el }));
+
+  if (canvasElements.length <= 1) {
+    return [...functionElements, ...canvasElements];
+  }
+
+  // Get dimensions for each canvas element
+  const dims = canvasElements.map((el) => getBoxDimensions(el));
+
+  // Iteratively resolve overlaps (simple greedy approach)
+  const maxIterations = canvasElements.length * 3;
+  for (let iter = 0; iter < maxIterations; iter++) {
+    let hadOverlap = false;
+
+    for (let i = 0; i < canvasElements.length; i++) {
+      for (let j = i + 1; j < canvasElements.length; j++) {
+        const posA = { x: canvasElements[i].x, y: canvasElements[i].y };
+        const posB = { x: canvasElements[j].x, y: canvasElements[j].y };
+
+        if (!doBoxesOverlap(posA, dims[i], posB, dims[j])) continue;
+
+        hadOverlap = true;
+
+        // Nudge element j to the right of element i
+        const nudgeX =
+          posA.x + dims[i].width / 2 + dims[j].width / 2 + CALLSTACK_PADDING;
+
+        canvasElements[j] = { ...canvasElements[j], x: nudgeX };
+      }
+    }
+
+    if (!hadOverlap) break;
+  }
+
+  // Preserve original ordering by rebuilding based on original indices
+  const resultMap = new Map<number, CanvasElement>();
+  for (const el of functionElements) resultMap.set(el.boxId, el);
+  for (const el of canvasElements) resultMap.set(el.boxId, el);
+
+  return elements.map((orig) => resultMap.get(orig.boxId)!);
 }

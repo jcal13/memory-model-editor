@@ -22,6 +22,7 @@ import {
   createMasterErrorList,
   MasterErrorList,
 } from "./utils/masterErrorList";
+import { spreadOverlappingElements } from "../canvas/utils/boundary.helpers";
 // Import BoxType from palette instead of shared
 import { BoxType } from "../palette/shared/types";
 
@@ -80,7 +81,7 @@ export default function MemoryModelEditor({
     ids: number[],
     classes: string[]
   ) => {
-    state.setElements(elements);
+    state.setElements(spreadOverlappingElements(elements));
     state.setElementIds(ids);
     state.setElementClasses(classes);
   };

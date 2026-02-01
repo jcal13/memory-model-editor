@@ -9,6 +9,7 @@ import CodeBlock from "./components/CodeBlock";
 import styles from "./QuestionTab.module.css";
 import "prismjs/themes/prism-tomorrow.css";
 import { SubmissionResult } from "../../shared/types";
+import type { QuestionView } from "../../memoryModelEditor/utils/localStorage";
 import {
   CanvasData,
   deleteQuestionCanvasData,
@@ -19,11 +20,10 @@ import {
 } from "../../memoryModelEditor/utils/localStorage";
 import ConfirmationModal from "../../memoryModelEditor/components/ConfirmationModal";
 
-type View = "root" | "loading" | "test" | "list" | "question" | "practice";
-type QuestionType = "test" | "practice";
+type View = "root" | "loading" | "test" | "list" | "question" | "practice" | "prep";
+type QuestionType = "test" | "practice" | "prep";
 type QuestionStatus = "unattempted" | "attempted" | "completed";
 
-const UI_STORAGE_KEY = "uiState";
 const QUESTION_STATUS_KEY = "questionStatus";
 const VALID_VIEWS: View[] = [
   "root",
@@ -32,6 +32,7 @@ const VALID_VIEWS: View[] = [
   "list",
   "question",
   "practice",
+  "prep",
 ];
 
 interface QuestionStatusMap {
@@ -50,8 +51,10 @@ interface QuestionData {
 interface QuestionTabProps {
   questionIndex: number | null;
   setQuestionIndex: (index: number | null) => void;
-  questionType: "test" | "practice" | null;
-  setQuestionType: (type: "test" | "practice" | null) => void;
+  questionType: "test" | "practice" | "prep" | null;
+  setQuestionType: (type: "test" | "practice" | "prep" | null) => void;
+  questionView: QuestionView;
+  setQuestionView: (view: QuestionView) => void;
   onSubmit: () => Promise<boolean>;
   setSubmissionResults: (results: SubmissionResult | null) => void;
   onClearCanvas: () => void;
@@ -59,30 +62,6 @@ interface QuestionTabProps {
   currentCanvasState: { elements: any[]; ids: number[]; classes: string[] };
   onQuestionDataChange?: (data: any) => void;
   isSandboxMode: boolean;
-}
-
-function loadSavedQuestionView(): View {
-  try {
-    const rawData = localStorage.getItem(UI_STORAGE_KEY);
-    if (!rawData) return "root";
-    const parsed = JSON.parse(rawData) ?? {};
-    const view = parsed?.questionView as View | undefined;
-    if (!view || !VALID_VIEWS.includes(view)) return "root";
-    return view === "loading" ? "root" : view;
-  } catch {
-    return "root";
-  }
-}
-
-function persistQuestionView(view: View): void {
-  try {
-    const rawData = localStorage.getItem(UI_STORAGE_KEY);
-    const parsed = rawData ? JSON.parse(rawData) ?? {} : {};
-    parsed.questionView = view;
-    localStorage.setItem(UI_STORAGE_KEY, JSON.stringify(parsed));
-  } catch (error) {
-    console.warn("Failed to persist question view:", error);
-  }
 }
 
 function loadQuestionStatus(): QuestionStatusMap {
@@ -112,6 +91,8 @@ export default function QuestionTab({
   setQuestionIndex,
   questionType,
   setQuestionType,
+  questionView: questionViewProp,
+  setQuestionView,
   onSubmit,
   setSubmissionResults,
   onClearCanvas,
@@ -120,7 +101,9 @@ export default function QuestionTab({
   onQuestionDataChange,
   isSandboxMode,
 }: QuestionTabProps) {
-  const [view, setView] = useState<View>(() => loadSavedQuestionView());
+  const [view, setView] = useState<View>(
+    () => (VALID_VIEWS.includes(questionViewProp as View) && questionViewProp !== "loading" ? (questionViewProp as View) : "root")
+  );
   const [questionCount, setQuestionCount] = useState<number>(0);
   const [questionData, setQuestionData] = useState<QuestionData | null>(null);
   const [questionStatus, setQuestionStatus] = useState<QuestionStatusMap>(() =>
@@ -128,7 +111,7 @@ export default function QuestionTab({
   );
   const [showCanvasClearModal, setShowCanvasClearModal] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<{
-    type: "test" | "practice";
+    type: "test" | "practice" | "prep";
     index: number;
   } | null>(null);
   const [showResetModal, setShowResetModal] = useState(false);
@@ -136,13 +119,15 @@ export default function QuestionTab({
   const hydratedList = useRef<boolean>(false);
   const hydratedQuestion = useRef<boolean>(false);
   const previousQuestionRef = useRef<{
-    type: "test" | "practice";
+    type: "test" | "practice" | "prep";
     index: number;
   } | null>(null);
 
   useEffect(() => {
-    persistQuestionView(view);
-  }, [view]);
+    if (view !== "loading") {
+      setQuestionView(view as QuestionView);
+    }
+  }, [view, setQuestionView]);
 
   useEffect(() => {
     persistQuestionStatus(questionStatus);
@@ -179,11 +164,11 @@ export default function QuestionTab({
     setQuestionData(null);
     setQuestionIndex(null);
     setQuestionType(null);
+    setQuestionView("root");
     hydratedList.current = false;
     hydratedQuestion.current = false;
     previousQuestionRef.current = null;
-    persistQuestionView("root");
-  }, [isSandboxMode, setQuestionIndex, setQuestionType]);
+  }, [isSandboxMode, setQuestionIndex, setQuestionType, setQuestionView]);
 
   const updateQuestionStatus = (
     type: QuestionType,
@@ -269,6 +254,7 @@ export default function QuestionTab({
   ): Promise<void> => {
     hydratedQuestion.current = false;
     setQuestionData(null);
+    setSubmissionResults(null);
 
     setView("loading");
 
@@ -393,12 +379,6 @@ export default function QuestionTab({
     }
   }, [view, questionType, questionIndex, questionData, onQuestionDataChange]);
 
-  useEffect(() => {
-    return () => {
-      setSubmissionResults(null);
-    };
-  }, [questionIndex, setSubmissionResults]);
-
   const getHeading = (): string => {
     if (view === "question" && questionIndex !== null) {
       return `Question ${questionIndex}`;
@@ -408,6 +388,9 @@ export default function QuestionTab({
     }
     if (view === "list" && questionType === "practice") {
       return "Practice Questions";
+    }
+    if (view === "list" && questionType === "prep") {
+      return "CSC148 Prep Questions";
     }
     return "Questions";
   };
@@ -447,12 +430,28 @@ export default function QuestionTab({
         {view === "root" && (
           <div className={styles.selectors}>
             <QuestionSelector
+              variant="category"
               text="Practice Questions"
+              subtitle="Sharpen your skills"
+              icon="✏️"
+              categoryType="practice"
               onClick={() => loadQuestions("practice")}
             />
             <QuestionSelector
+              variant="category"
               text="Test Questions"
+              subtitle="Put your knowledge to the test"
+              icon="📝"
+              categoryType="test"
               onClick={() => loadQuestions("test")}
+            />
+            <QuestionSelector
+              variant="category"
+              text="CSC148 Prep Questions"
+              subtitle=""
+              icon="🔗"
+              categoryType="prep"
+              onClick={() => loadQuestions("prep")}
             />
           </div>
         )}
@@ -475,7 +474,7 @@ export default function QuestionTab({
             </div>
 
             <div className={styles.scroller}>
-              <div className={styles.selectors}>
+              <div className={styles.questionGrid}>
                 {Array.from({ length: questionCount }, (_, index) => {
                   const questionNum = index + 1;
                   const status = questionType
@@ -485,7 +484,7 @@ export default function QuestionTab({
                   return (
                     <QuestionSelector
                       key={questionNum}
-                      text={`Question ${questionNum}`}
+                      text={`Q${questionNum}`}
                       onClick={() => loadSingleQuestion(questionNum)}
                       status={status}
                     />

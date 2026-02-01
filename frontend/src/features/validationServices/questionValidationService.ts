@@ -7,7 +7,7 @@ const API_DEV_URL = "http://localhost:3001";
 const SUBMIT_ENDPOINT = "/canvasEditor/submit";
 
 // Types
-export type QuestionType = "test" | "practice";
+export type QuestionType = "test" | "practice" | "prep";
 
 export interface SubmissionPayload {
   model: ReturnType<typeof buildJSONFromElements>;

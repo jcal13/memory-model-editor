@@ -7,18 +7,18 @@
   transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.98);
   border: 2px solid #DC2626;
-  border-radius: 8px;
-  padding: 12px 14px;
+  border-radius: 10px;
+  padding: 10px 12px;
   min-width: 220px;
   max-width: 320px;
   max-height: 400px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.25), 
-              0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.15),
+              0 1px 4px rgba(0, 0, 0, 0.06);
   z-index: 10000;
   pointer-events: auto;
-  animation: tooltipFadeIn 0.2s ease-out;
+  animation: tooltipFadeIn 160ms ease-out;
   backdrop-filter: blur(8px);
 }
 

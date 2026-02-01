@@ -11,7 +11,7 @@ const API_URL = process.env.NODE_ENV === 'production'
  */
 export async function fetchQuestion<T = any>(
   id: number,
-  type: "test" | "practice"
+  type: "test" | "practice" | "prep"
 ): Promise<T> {
   try {
     const response = await axios.get(
@@ -32,7 +32,7 @@ export async function fetchQuestion<T = any>(
  * @returns Promise with question count
  */
 export async function fetchQuestionCount(
-  type: "test" | "practice"
+  type: "test" | "practice" | "prep"
 ): Promise<number> {
   try {
     const url = `${API_URL}/questions/${type}questions`;

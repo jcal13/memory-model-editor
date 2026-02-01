@@ -1,58 +1,173 @@
-.selectorBtn {
-  display: inline-block;
-  padding: 0.6rem 1.2rem;
-  margin: 0.25rem;
-  font-size: 1rem;
+/* ── Category buttons (Practice Questions / Test Questions) ── */
+.categoryBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.875rem 1.1rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #1f2937;
-  background-color: #f9fafb;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
+  color: #1e293b;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background-color 120ms ease, box-shadow 120ms ease,
-    border-color 120ms ease;
+  transition: all 160ms ease;
+  text-align: left;
+  position: relative;
 }
 
-.selectorBtn:hover,
-.selectorBtn:focus-visible {
-  background-color: #f3f4f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+.categoryBtn::after {
+  content: "\203A";
+  position: absolute;
+  right: 1rem;
+  font-size: 1.2rem;
+  color: #cbd5e1;
+  transition: transform 160ms ease, color 160ms ease;
+}
+
+.categoryBtn:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.categoryBtn:hover::after {
+  transform: translateX(2px);
+  color: #94a3b8;
+}
+
+.categoryBtn:active {
+  background: #f8fafc;
+}
+
+.categoryBtn:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.categoryIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 8px;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+
+.categoryIcon.practice {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.categoryIcon.test {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.categoryIcon.prep {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.categoryLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.categoryTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.categorySubtitle {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: #94a3b8;
+}
+
+/* ── Question number buttons ── */
+.selectorBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 3rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #475569;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 160ms ease;
+  position: relative;
+  white-space: nowrap;
+}
+
+.selectorBtn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
 }
 
 .selectorBtn:active {
-  background-color: #e5e7eb;
+  transform: translateY(0);
+  box-shadow: none;
 }
 
-/* Completed status - Green */
+.selectorBtn:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Status dot */
+.statusDot {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.statusDot.unattempted {
+  background: #d1d5db;
+}
+
+.statusDot.attempted {
+  background: #f97316;
+}
+
+.statusDot.completed {
+  background: #10b981;
+}
+
+/* Completed status */
 .selectorBtn.completed {
-  background-color: #d1fae5;
-  border-color: #10b981;
-  color: #064e3b;
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
 }
 
-.selectorBtn.completed:hover,
-.selectorBtn.completed:focus-visible {
-  background-color: #a7f3d0;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+.selectorBtn.completed:hover {
+  background: #d1fae5;
+  border-color: #6ee7b7;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
 }
 
-.selectorBtn.completed:active {
-  background-color: #86efac;
-}
-
-/* Attempted status - Red */
+/* Attempted status */
 .selectorBtn.attempted {
-  background-color: #fee2e2;
-  border-color: #ef4444;
-  color: #7f1d1d;
+  background: #fff7ed;
+  border-color: #fed7aa;
+  color: #9a3412;
 }
 
-.selectorBtn.attempted:hover,
-.selectorBtn.attempted:focus-visible {
-  background-color: #fecaca;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
-}
-
-.selectorBtn.attempted:active {
-  background-color: #fca5a5;
+.selectorBtn.attempted:hover {
+  background: #ffedd5;
+  border-color: #fdba74;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.1);
 }

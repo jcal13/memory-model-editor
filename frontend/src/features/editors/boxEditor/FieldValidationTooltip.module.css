@@ -11,9 +11,9 @@
   transform: translateX(-50%);
   background: white;
   border: 2px solid #DC2626;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 8px 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   z-index: 1000;
   min-width: 200px;
   max-width: 300px;

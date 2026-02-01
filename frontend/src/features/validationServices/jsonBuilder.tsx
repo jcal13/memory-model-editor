@@ -193,8 +193,13 @@ const processValueEntries = (elements: CanvasElement[]): ValueEntry[] => {
         const classVariables: Record<string, number | null> = {};
 
         for (const variable of kind.classVariables || []) {
-          const key = makeUniqueKey(variable.name, usedKeys);
-          classVariables[key] = normalizeId(variable.targetId);
+          // Support both formats: { name, targetId } (editor) and { key, value } (preloaded config)
+          const v = variable as { name?: string; targetId?: unknown; key?: string; value?: unknown };
+          const propName = v.name ?? v.key ?? "";
+          const targetId = v.targetId ?? v.value;
+          if (typeof propName !== "string" || !propName.trim()) continue; // Skip empty/invalid names
+          const key = makeUniqueKey(propName, usedKeys);
+          classVariables[key] = normalizeId(targetId);
         }
 
         valueEntries.push({

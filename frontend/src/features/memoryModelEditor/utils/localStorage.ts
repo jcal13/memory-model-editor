@@ -19,7 +19,7 @@ const DEFAULT_CANVAS_DATA = {
 const DEFAULT_UI_STATE = {
   activeTab: "question" as Tab,
   questionIndex: null as number | null,
-  questionType: null as "test" | "practice" | null,
+  questionType: null as "test" | "practice" | "prep" | null,
   submissionResults: null as SubmissionResult | null,
   sandboxMode: null as boolean | null,
 };
@@ -46,12 +46,16 @@ export function normalizeCanvasData(raw: unknown): CanvasData {
   };
 }
 
+export type QuestionView = "root" | "loading" | "test" | "list" | "question" | "practice" | "prep";
+
 export interface UIState {
   activeTab: Tab;
   questionIndex: number | null;
-  questionType: "test" | "practice" | null;
+  questionType: "test" | "practice" | "prep" | null;
   submissionResults: SubmissionResult | null;
   sandboxMode: boolean | null;
+  questionView?: QuestionView;
+  isInfoPanelOpen?: boolean;
 }
 
 /**
@@ -92,7 +96,7 @@ export function loadInitialUIData(): UIState {
       typeof parsed?.questionIndex === "number" ? parsed.questionIndex : null;
 
     const questionType =
-      parsed?.questionType === "test" || parsed?.questionType === "practice"
+      parsed?.questionType === "test" || parsed?.questionType === "practice" || parsed?.questionType === "prep"
         ? parsed.questionType
         : null;
 
@@ -103,12 +107,23 @@ export function loadInitialUIData(): UIState {
     const sandboxMode =
       typeof parsed?.sandboxMode === "boolean" ? parsed.sandboxMode : null;
 
+    const validViews = ["root", "loading", "test", "list", "question", "practice", "prep"];
+    const questionView =
+      typeof parsed?.questionView === "string" && validViews.includes(parsed.questionView) && parsed.questionView !== "loading"
+        ? parsed.questionView
+        : undefined;
+
+    const isInfoPanelOpen =
+      typeof parsed?.isInfoPanelOpen === "boolean" ? parsed.isInfoPanelOpen : undefined;
+
     return {
       activeTab,
       questionIndex,
       questionType,
       submissionResults,
       sandboxMode,
+      questionView,
+      isInfoPanelOpen,
     };
   } catch (error) {
     console.warn("Failed to load UI data from localStorage:", error);
@@ -172,7 +187,7 @@ export function clearCanvasStorage(): void {
  * Gets the storage key for a specific question's canvas
  */
 function getQuestionCanvasKey(
-  type: "test" | "practice",
+  type: "test" | "practice" | "prep",
   index: number
 ): string {
   return `${QUESTION_CANVAS_PREFIX}${type}_${index}`;
@@ -182,7 +197,7 @@ function getQuestionCanvasKey(
  * Saves canvas data for a specific question
  */
 export function saveQuestionCanvasData(
-  type: "test" | "practice",
+  type: "test" | "practice" | "prep",
   index: number,
   data: CanvasData
 ): void {
@@ -198,7 +213,7 @@ export function saveQuestionCanvasData(
  * Loads canvas data for a specific question
  */
 export function loadQuestionCanvasData(
-  type: "test" | "practice",
+  type: "test" | "practice" | "prep",
   index: number
 ): CanvasData | null {
   try {
@@ -219,7 +234,7 @@ export function loadQuestionCanvasData(
  * LocalStorage takes precedence; fallback is used only if no saved state exists.
  */
 export function resolveQuestionCanvasData(
-  type: "test" | "practice",
+  type: "test" | "practice" | "prep",
   index: number,
   fallback?: CanvasData | null
 ): CanvasData {
@@ -256,7 +271,7 @@ export function setDoNotRemindCanvasClear(value: boolean): void {
  * Deletes canvas data for a specific question
  */
 export function deleteQuestionCanvasData(
-  type: "test" | "practice",
+  type: "test" | "practice" | "prep",
   index: number
 ): void {
   try {
@@ -271,7 +286,7 @@ export function deleteQuestionCanvasData(
  * Exported for backwards compatibility
  */
 export function getQuestionStorageKey(
-  questionType: "test" | "practice",
+  questionType: "test" | "practice" | "prep",
   questionIndex: number
 ): string {
   return getQuestionCanvasKey(questionType, questionIndex);
@@ -281,7 +296,7 @@ export function getQuestionStorageKey(
  * Alias for backwards compatibility
  */
 export function saveQuestionCanvas(
-  questionType: "test" | "practice",
+  questionType: "test" | "practice" | "prep",
   questionIndex: number,
   elements: CanvasElement[],
   ids: number[],
@@ -298,7 +313,7 @@ export function saveQuestionCanvas(
  * Alias for backwards compatibility
  */
 export function loadQuestionCanvas(
-  questionType: "test" | "practice",
+  questionType: "test" | "practice" | "prep",
   questionIndex: number
 ): CanvasData | null {
   return loadQuestionCanvasData(questionType, questionIndex);

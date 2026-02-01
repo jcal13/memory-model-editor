@@ -1,10 +1,10 @@
 .errorContainer {
   background-color: #FEF2F2;
   border: 1px solid #FCA5A5;
-  border-radius: 6px;
-  padding: 12px;
+  border-radius: 8px;
+  padding: 10px;
   margin: 8px 0;
-  animation: slideIn 0.2s ease-out;
+  animation: slideIn 160ms ease-out;
 }
 
 @keyframes slideIn {

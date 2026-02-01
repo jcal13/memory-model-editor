@@ -89,8 +89,19 @@ async function createTablesIfNotExist(pool: Pool) {
         canvas_config JSONB
     );
 
+    CREATE TABLE IF NOT EXISTS prep_questions (
+        id BIGSERIAL PRIMARY KEY,
+        question TEXT,
+        code TEXT[],
+        answer JSONB,
+        description TEXT,
+        topics TEXT[],
+        canvas_config JSONB
+    );
+
     CREATE INDEX IF NOT EXISTS idx_practice_questions_id ON practice_questions(id);
     CREATE INDEX IF NOT EXISTS idx_test_questions_id ON test_questions(id);
+    CREATE INDEX IF NOT EXISTS idx_prep_questions_id ON prep_questions(id);
   `;
 
   await pool.query(schemaSQL);
@@ -101,10 +112,16 @@ async function createTablesIfNotExist(pool: Pool) {
     "ALTER TABLE test_questions ADD COLUMN IF NOT EXISTS topics TEXT[]"
   );
   await pool.query(
+    "ALTER TABLE prep_questions ADD COLUMN IF NOT EXISTS topics TEXT[]"
+  );
+  await pool.query(
     "ALTER TABLE practice_questions ADD COLUMN IF NOT EXISTS canvas_config JSONB"
   );
   await pool.query(
     "ALTER TABLE test_questions ADD COLUMN IF NOT EXISTS canvas_config JSONB"
+  );
+  await pool.query(
+    "ALTER TABLE prep_questions ADD COLUMN IF NOT EXISTS canvas_config JSONB"
   );
   console.log("Tables created or already exist");
 }
@@ -141,17 +158,28 @@ async function importQuestions() {
       fs.readFileSync(testQuestionsPath, "utf-8")
     );
 
+    const prepQuestionsPath = path.join(
+      __dirname,
+      "../database/prepQuestions.json"
+    );
+    const prepQuestions: Question[] = JSON.parse(
+      fs.readFileSync(prepQuestionsPath, "utf-8")
+    );
+
     console.log(`Found ${practiceQuestions.length} practice questions`);
     console.log(`Found ${testQuestions.length} test questions`);
+    console.log(`Found ${prepQuestions.length} prep questions`);
 
     await pool.query("BEGIN");
 
     console.log("\nClearing existing questions...");
     await pool.query("DELETE FROM practice_questions");
     await pool.query("DELETE FROM test_questions");
+    await pool.query("DELETE FROM prep_questions");
 
     await pool.query("ALTER SEQUENCE practice_questions_id_seq RESTART WITH 1");
     await pool.query("ALTER SEQUENCE test_questions_id_seq RESTART WITH 1");
+    await pool.query("ALTER SEQUENCE prep_questions_id_seq RESTART WITH 1");
 
     console.log("Cleared existing questions\n");
 
@@ -189,6 +217,23 @@ async function importQuestions() {
       console.log(`  Imported test question ${q.id}`);
     }
 
+    console.log("\nImporting prep questions...");
+    for (const q of prepQuestions) {
+      await pool.query(
+        `INSERT INTO prep_questions (question, code, answer, description, topics, canvas_config)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [
+          q.question,
+          q.code,
+          JSON.stringify(q.answer),
+          q.description,
+          q.topics ?? [],
+          q.canvasConfig ?? null,
+        ]
+      );
+      console.log(`  Imported prep question ${q.id}`);
+    }
+
     await pool.query("COMMIT");
 
     console.log("\nSuccessfully imported all questions");
@@ -199,10 +244,14 @@ async function importQuestions() {
     const testCount = await pool.query(
       "SELECT COUNT(*) as count FROM test_questions"
     );
+    const prepCount = await pool.query(
+      "SELECT COUNT(*) as count FROM prep_questions"
+    );
 
     console.log("\nFinal counts:");
     console.log(`  Practice questions: ${practiceCount.rows[0].count}`);
     console.log(`  Test questions: ${testCount.rows[0].count}`);
+    console.log(`  Prep questions: ${prepCount.rows[0].count}`);
   } catch (error) {
     await pool.query("ROLLBACK");
     console.error("\nERROR: Failed to import questions:", error);

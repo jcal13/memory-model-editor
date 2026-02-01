@@ -1,13 +1,13 @@
 /* Base button styling */
 .baseButton {
-  padding: 10px 12px;
+  padding: 8px 12px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   width: max-content;
-  transition: background-color 0.2s ease;
+  transition: all 160ms ease;
 }
 
 /* Clear Canvas Button */
@@ -20,10 +20,12 @@
   color: white;
 }
 
-.clearButton:hover,
-.clearButton:active {
+.clearButton:hover {
   background-color: #dc2626;
-  transform: translateY(1px);
+}
+
+.clearButton:active {
+  background-color: #b91c1c;
 }
 
 /* Download Button Container */
@@ -47,8 +49,8 @@
 }
 
 .dropdownCaret {
-  font-size: 0.9em;
-  opacity: 0.9;
+  font-size: 0.85em;
+  opacity: 0.8;
 }
 
 /* Download Menu */
@@ -58,13 +60,13 @@
   left: 0;
   display: flex;
   flex-direction: column;
-  padding: 6px;
+  padding: 4px;
   background-color: #ffffff;
-  color: #111827;
-  border: 1px solid #e5e7eb;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
   min-width: 180px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .downloadMenu::after {
@@ -75,23 +77,24 @@
   width: 10px;
   height: 10px;
   background: #fff;
-  border-left: 1px solid #e5e7eb;
-  border-bottom: 1px solid #e5e7eb;
+  border-left: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
   transform: rotate(45deg);
 }
 
 .downloadMenu button {
-  padding: 10px;
+  padding: 8px 10px;
   border: none;
   background: transparent;
-  color: #111827;
+  color: #1e293b;
   text-align: left;
-  border-radius: 8px;
+  border-radius: 6px;
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   cursor: pointer;
+  transition: background 160ms ease;
 }
 
 .downloadMenu button:hover {
-  background-color: #f3f4f6;
+  background-color: #f1f5f9;
 }

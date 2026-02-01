@@ -81,7 +81,7 @@ function ensureBijection(
     if (prev.target !== inputID) {
       if (!isVar) errors.push({
         type: ErrorType.GENERIC_ERROR,
-        message: `ID mapping conflict: ${prev.path}", "${path}`,
+        message: `ID mapping conflict between ${formatPathForUser(prev.path)} and ${formatPathForUser(path)}`,
         elementId: contextFrameId ?? inputID, // Use frame ID if available, otherwise the conflicting object
         path,
         severity: 'error'
@@ -96,7 +96,7 @@ function ensureBijection(
     if (prev.target !== answerID) {
       if (!isVar) errors.push({
         type: ErrorType.GENERIC_ERROR,
-        message: `ID mapping conflict: ${prev.path}, ${path}`,
+        message: `ID mapping conflict between ${formatPathForUser(prev.path)} and ${formatPathForUser(path)}`,
         elementId: contextFrameId ?? inputID, // Use frame ID if available, otherwise the conflicting object
         path,
         severity: 'error'
@@ -110,6 +110,44 @@ function ensureBijection(
   return false;
 }
 
+// .class (answer format) and object (frontend format) both represent class instances
+const isClassInstanceType = (t: string) => t === ".class" || t === "object";
+
+// None and NoneType are the same (Python representation)
+const isNoneType = (t: string) => t === "None" || t === "NoneType";
+
+// Values that represent None/null
+const isNoneValue = (v: unknown) => v === null || v === "None" || v === "null";
+
+// Converts technical path to a shorter, user-friendly description
+function formatPathForUser(path: string): string {
+  let s = path
+    .replace(/function\s+"[^"]*"\s*→\s*var\s+"([^"]+)"→/g, "$1: ")
+    .replace(/object\s+"([^"]+)"\.([^→]+)→/g, "$1.$2 → ");
+  return s.replace(/\s*→\s*$/, "").trim() || path;
+}
+
+// Map backend/internal types to user-friendly names
+const TYPE_FOR_USER: Record<string, string> = {
+  ".frame": "function",
+  ".class": "object",
+  "NoneType": "None",
+  "None": "None",
+  "object": "object",
+  "int": "int",
+  "float": "float",
+  "str": "string",
+  "bool": "bool",
+  "list": "list",
+  "tuple": "tuple",
+  "set": "set",
+  "dict": "dictionary",
+};
+
+function formatTypeForUser(t: string): string {
+  return TYPE_FOR_USER[t] ?? t;
+}
+
 // Check if the type of the answer box matches the input box
 function checkTypeMismatch(
   answerBox: MemoryBox,
@@ -118,18 +156,25 @@ function checkTypeMismatch(
   errors: FeedbackError[],
   contextFrameId?: number
 ): boolean {
-  if (answerBox.type !== inputBox.type) {
-    errors.push({
-      type: ErrorType.TYPE_MISMATCH,
-      message: `Type mismatch: ${path} got ${inputBox.type}, expected ${answerBox.type}`,
-      elementId: contextFrameId ?? inputBox.id ?? undefined,
-      relatedIds: inputBox.id !== null && inputBox.id !== contextFrameId ? [inputBox.id] : undefined,
-      path,
-      severity: 'error'
-    });
-    return true;
-  }
-  return false;
+  if (answerBox.type === inputBox.type) return false;
+  // Treat .class and object as equivalent (class instances)
+  if (isClassInstanceType(answerBox.type) && isClassInstanceType(inputBox.type)) return false;
+  // None and NoneType are the same
+  if (isNoneType(answerBox.type) && isNoneType(inputBox.type)) return false;
+  // For class instances: wrong type means ID is assigned incorrectly/incompletely, not a type error
+  const loc = formatPathForUser(path);
+  const message = isClassInstanceType(answerBox.type)
+    ? `ID incorrectly or incompletely assigned at ${loc}`
+    : `At ${loc}: expected ${formatTypeForUser(answerBox.type)}, but got ${formatTypeForUser(inputBox.type)}`;
+  errors.push({
+    type: ErrorType.TYPE_MISMATCH,
+    message,
+    elementId: contextFrameId ?? inputBox.id ?? undefined,
+    relatedIds: inputBox.id !== null && inputBox.id !== contextFrameId ? [inputBox.id] : undefined,
+    path,
+    severity: 'error'
+  });
+  return true;
 }
 
 // Check if the answer box is a primitive type and compare values
@@ -140,11 +185,22 @@ function comparePrimitives(
   errors: FeedbackError[],
   contextFrameId?: number
 ): boolean {
+  // Object/class types use structure comparison (checkObject), not value comparison
+  if (isClassInstanceType(answerBox.type)) return false;
   if (!isContainer(answerBox.type)) {
-    if (answerBox.value !== inputBox.value) {
+    const ansVal = answerBox.value;
+    const inpVal = inputBox.value;
+    const valuesMatch =
+      ansVal === inpVal ||
+      (isNoneType(answerBox.type) && isNoneValue(inpVal)) ||
+      (isNoneType(inputBox.type) && isNoneValue(ansVal));
+    if (!valuesMatch) {
+      const loc = formatPathForUser(path);
+      const expectedStr = isNoneValue(ansVal) ? "None" : String(ansVal);
+      const gotStr = isNoneValue(inpVal) ? "None" : String(inpVal);
       errors.push({
         type: ErrorType.VALUE_MISMATCH,
-        message: `Value mismatch: ${path} got ${inputBox.value}, expected ${answerBox.value}`,
+        message: `At ${loc}: expected ${expectedStr}, but got ${gotStr}`,
         elementId: contextFrameId ?? inputBox.id ?? undefined,
         relatedIds: inputBox.id !== null && inputBox.id !== contextFrameId ? [inputBox.id] : undefined,
         path,
@@ -351,9 +407,10 @@ function checkObject(
 ) {
   // Check if object names match
   if (answerMemoryBox.name !== inputMemoryBox.name) {
+    const loc = formatPathForUser(path);
     errors.push({
       type: ErrorType.GENERIC_ERROR,
-      message: `Object name mismatch: ${path} got "${inputMemoryBox.name}", expected "${answerMemoryBox.name}"`,
+      message: `At ${loc}: expected ${answerMemoryBox.name} object, but got ${inputMemoryBox.name}`,
       elementId: inputMemoryBox.id ?? undefined,
       path,
       severity: 'error'
@@ -367,9 +424,10 @@ function checkObject(
   // Check for missing properties
   for (const prop of Object.keys(answerProps)) {
     if (!(prop in inputProps)) {
+      const loc = formatPathForUser(path);
       errors.push({
         type: ErrorType.MISSING_ELEMENT,
-        message: `Missing object property: ${path} object "${answerMemoryBox.name}" expected property "${prop}"`,
+        message: `At ${loc}: ${answerMemoryBox.name} is missing the "${prop}" attribute`,
         elementId: inputMemoryBox.id ?? undefined, // The container that's missing properties
         path,
         field: prop,
@@ -394,12 +452,14 @@ function checkObject(
     );
   }
 
-  // Check for unexpected properties
+  // Check for unexpected properties (skip empty/whitespace keys - invalid from frontend)
   for (const prop of Object.keys(inputProps)) {
+    if (typeof prop !== "string" || !prop.trim()) continue;
     if (!(prop in answerProps)) {
+      const loc = formatPathForUser(path);
       errors.push({
         type: ErrorType.UNEXPECTED_ELEMENT,
-        message: `Unexpected object property: ${path} object "${inputMemoryBox.name}" has unexpected property "${prop}"`,
+        message: `At ${loc}: ${inputMemoryBox.name} has an unexpected "${prop}" attribute`,
         elementId: inputMemoryBox.id ?? undefined,
         path,
         field: prop,
@@ -421,7 +481,7 @@ function gatherFrames(
   if (answerFrames.length !== inputFrames.length)
     errors.push({
       type: ErrorType.FRAME_MISMATCH,
-      message: `Function count mismatch: expected ${answerFrames.length}, got ${inputFrames.length}`,
+      message: `Call stack should have ${answerFrames.length} function(s), but has ${inputFrames.length}`,
       severity: 'error'
     });
 
@@ -431,14 +491,14 @@ function gatherFrames(
   for (const n of ansByName.keys())
     if (!usrByName.has(n)) errors.push({
       type: ErrorType.MISSING_ELEMENT,
-      message: `Missing function: "${n}"`,
+      message: `Call stack is missing the ${n} function`,
       path: `function "${n}"`,
       severity: 'error'
     });
   for (const n of usrByName.keys())
     if (!ansByName.has(n)) errors.push({
       type: ErrorType.UNEXPECTED_ELEMENT,
-      message: `Unexpected function: "${n}"`,
+      message: `Call stack has an unexpected ${n} function`,
       path: `function "${n}"`,
       severity: 'error'
     });
@@ -489,7 +549,7 @@ function compareFrames(
       if (!(k in uVars))
         errors.push({
           type: ErrorType.MISSING_ELEMENT,
-          message: `Missing variable: function "${name}" expected "${k}"`,
+          message: `In ${name}: variable "${k}" is missing`,
           elementId: uFrame.id ?? undefined,
           path: `function "${name}" → var "${k}"`,
           severity: 'error'
@@ -498,7 +558,7 @@ function compareFrames(
       if (!(k in aVars))
         errors.push({
           type: ErrorType.UNEXPECTED_ELEMENT,
-          message: `Unexpected variable: function "${name}" unexpected "${k}"`,
+          message: `In ${name}: variable "${k}" should not be present`,
           elementId: uFrame.id ?? undefined,
           path: `function "${name}" → var "${k}"`,
           severity: 'error'
@@ -512,7 +572,7 @@ function compareFrames(
       if (uid === "_") {
         errors.push({
           type: ErrorType.GENERIC_ERROR,
-          message: `Unassigned variable: function "${name}" variable "${k}" has no assigned ID`,
+          message: `In ${name}: variable "${k}" needs to be assigned to an object`,
           path: `function "${name}" → var "${k}"`,
           severity: 'error'
         });
@@ -689,8 +749,8 @@ function compareIds(
     return;
   }
 
-  // Object type box check
-  if (isObjectType(answerMemoryBox.type)) {
+  // Object type box check (includes .class from answer format)
+  if (isObjectType(answerMemoryBox.type) || answerMemoryBox.type === ".class") {
     checkObject(
       answerMemoryBox,
       inputMemoryBox,
@@ -707,19 +767,21 @@ function compareIds(
   }
 }
 
-// Check if the call stack order matches between answer and input
+// Check if the call stack order matches between answer and input.
+// The UI displays bottom-to-top as [__main__, move_to_back]; the answer stores
+// top-to-bottom as [move_to_back, __main__]. Reverse the answer for comparison.
 function checkCallStackOrder(
   answerFrames: MemoryBox[],
   inputFrames: MemoryBox[],
   errors: FeedbackError[]
 ) {
-  // The arrays come from gatherFrames and preserve the order
   if (answerFrames.length !== inputFrames.length) return; // size already handled
-  for (let i = 0; i < answerFrames.length; i++) {
-    if (answerFrames[i].name !== inputFrames[i].name) {
+  const expectedOrder = [...answerFrames].reverse();
+  for (let i = 0; i < expectedOrder.length; i++) {
+    if (expectedOrder[i].name !== inputFrames[i].name) {
       errors.push({
         type: ErrorType.CALL_STACK_ORDER,
-        message: "Function order mismatch: call stack order differs from expected",
+        message: "Call stack functions are in the wrong order",
         severity: 'error'
       });
       break;
@@ -728,13 +790,20 @@ function checkCallStackOrder(
 }
 
 async function fetchAnswerModel(
-  questionType: "test" | "practice",
+  questionType: "test" | "practice" | "prep",
   questionId: number
 ): Promise<MemoryBox[] | null> {
   let rows: { answer: unknown }[] = [];
   if (questionType === "practice") {
     const result = await getPool().query<{ answer: unknown }>(
       "SELECT answer FROM practice_questions WHERE id = $1",
+      [questionId]
+    );
+    rows = result.rows;
+    if (rows.length === 0) return null;
+  } else if (questionType === "prep") {
+    const result = await getPool().query<{ answer: unknown }>(
+      "SELECT answer FROM prep_questions WHERE id = $1",
       [questionId]
     );
     rows = result.rows;
@@ -759,7 +828,7 @@ async function fetchAnswerModel(
 export default async function validateAnswer(
   userModel: MemoryBox[],
   questionId: number,
-  questionType: "test" | "practice"
+  questionType: "test" | "practice" | "prep"
 ): Promise<{
   correct: boolean;
   errors: FeedbackError[];

@@ -1,11 +1,11 @@
 .container {
   margin: 0;
   padding: 1rem 1.25rem;
-  border-radius: 0.5rem;
+  border-radius: 10px;
   overflow-x: auto;
-  font-size: 0.9rem;
-  line-height: 1.45;
-  background: #1e1e1e;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  background: #1e1e2e;
 }
 
 .line {

@@ -1,33 +1,36 @@
 .wrapper {
-  text-align: center;
+  text-align: left;
   font-style: normal;
 }
 
 .scroller {
   max-height: 75vh;
   overflow-y: auto;
-  padding-right: 0.25rem;
+  overflow-x: visible;
+  padding: 4px;
+  margin: -4px;
 }
 
 .scroller::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
+}
+
+.scroller::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .scroller::-webkit-scrollbar-thumb {
   background: #d1d5db;
-  border-radius: 4px;
+  border-radius: 9999px;
 }
 
 .title {
-  text-align: center;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 8px 0 18px 0;
-  letter-spacing: 0.25px;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 8px 0;
-  background-color: #f3f4f6;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 2px 0 14px 0;
+  letter-spacing: -0.01em;
+  padding: 0;
 }
 
 .selectors {
@@ -37,42 +40,51 @@
 }
 
 .questionGrid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(3.5rem, 1fr));
   gap: 0.5rem;
-  justify-content: flex-start;
 }
 
 .loading {
-  margin-top: 1rem;
-  color: #6b7280;
+  margin-top: 1.5rem;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  text-align: center;
 }
 
 .backRow {
   width: 100%;
-  text-align: left;
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.75rem;
 }
 
 .backBtn {
-  background: transparent;
-  border: none;
-  color: #2563eb;
-  font-weight: 600;
-  font-size: 0.875rem;
-  padding: 0.25rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #475569;
+  font-weight: 500;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.75rem;
   cursor: pointer;
-  transition: color 120ms ease;
+  transition: all 160ms ease;
 }
 
 .backBtn:hover {
-  color: #1d4ed8;
+  color: #1e293b;
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.backBtn:active {
+  background: #e2e8f0;
 }
 
 .backBtn:focus-visible {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
-  border-radius: 0.25rem;
 }
 
 .questionArea {
@@ -82,25 +94,26 @@
 }
 
 .questionText {
-  font-size: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
   margin-bottom: 0.875rem;
-  color: #111827;
+  color: #1e293b;
 }
 
 .questionText code {
-  background: #f3f4f6;
+  background: #f1f5f9;
   color: #e11d48;
-  padding: 0.15em 0.35em;
-  border-radius: 0.25rem;
+  padding: 0.15em 0.4em;
+  border-radius: 5px;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.94em;
+  font-size: 0.9em;
 }
 
 .topicsSection {
   margin: 0 0 1rem 0;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
-  background: #f9fafb;
+  background: #f8fafc;
   overflow: hidden;
 }
 
@@ -108,10 +121,16 @@
   cursor: pointer;
   padding: 0.6rem 0.85rem;
   font-weight: 600;
-  color: #111827;
-  background: #f3f4f6;
+  font-size: 0.85rem;
+  color: #334155;
+  background: #f1f5f9;
   list-style: none;
   user-select: none;
+  transition: background 120ms ease;
+}
+
+.topicsSummary:hover {
+  background: #e2e8f0;
 }
 
 .topicsSummary::-webkit-details-marker {
@@ -119,7 +138,7 @@
 }
 
 .topicsSummary::before {
-  content: "▸";
+  content: "\25B8";
   display: inline-block;
   margin-right: 0.5rem;
   transition: transform 0.15s ease;
@@ -136,72 +155,72 @@
 .topicChips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .topicChip {
-  background: #e0f2fe;
-  color: #0c4a6e;
-  border: 1px solid #bae6fd;
-  border-radius: 999px;
-  padding: 0.2rem 0.65rem;
-  font-size: 0.75rem;
+  background: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.73rem;
   font-weight: 600;
   letter-spacing: 0.01em;
 }
 
 .topicsEmpty {
   margin: 0;
-  color: #6b7280;
-  font-size: 0.875rem;
+  color: #94a3b8;
+  font-size: 0.85rem;
 }
 
 .buttonRow {
   display: flex;
-  gap: 10px;
+  gap: 0.5rem;
   margin-top: 1.25rem;
 }
 
 .resetButton {
-  padding: 8px 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   flex: 1;
-  transition: all 0.2s ease;
-  background-color: #ffffff;
-  color: #374151;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 160ms ease;
+  background: #ffffff;
+  color: #475569;
 }
 
 .resetButton:hover {
-  background-color: #f9fafb;
-  border-color: #9ca3af;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+.resetButton:active {
+  background: #f1f5f9;
 }
 
 .submitButton {
-  padding: 8px 16px;
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: 500;
-  font-size: 0.875rem;
+  font-weight: 600;
+  font-size: 0.85rem;
   flex: 1;
-  transition: all 0.2s ease;
-  background-color: #10b981;
-  color: white;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 160ms ease;
+  background: #10b981;
+  color: #ffffff;
 }
 
 .submitButton:hover {
-  background-color: #059669;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #059669;
 }
 
 .submitButton:active {
-  background-color: #047857;
-  transform: translateY(1px);
+  background: #047857;
 }

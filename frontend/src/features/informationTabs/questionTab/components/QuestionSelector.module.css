@@ -4,29 +4,40 @@
   align-items: center;
   gap: 0.75rem;
   width: 100%;
-  padding: 1rem 1.25rem;
-  font-size: 0.95rem;
+  padding: 0.875rem 1.1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #1e293b;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 180ms ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 160ms ease;
   text-align: left;
+  position: relative;
+}
+
+.categoryBtn::after {
+  content: "\203A";
+  position: absolute;
+  right: 1rem;
+  font-size: 1.2rem;
+  color: #cbd5e1;
+  transition: transform 160ms ease, color 160ms ease;
 }
 
 .categoryBtn:hover {
-  background: #f8fafc;
   border-color: #cbd5e1;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.categoryBtn:hover::after {
+  transform: translateX(2px);
+  color: #94a3b8;
 }
 
 .categoryBtn:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  background: #f8fafc;
 }
 
 .categoryBtn:focus-visible {
@@ -40,8 +51,8 @@
   justify-content: center;
   width: 2.25rem;
   height: 2.25rem;
-  border-radius: 0.5rem;
-  font-size: 1.1rem;
+  border-radius: 8px;
+  font-size: 1.05rem;
   flex-shrink: 0;
 }
 
@@ -62,39 +73,39 @@
 }
 
 .categoryTitle {
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: #1e293b;
 }
 
 .categorySubtitle {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 400;
   color: #94a3b8;
 }
 
-/* ── Question number pill buttons ── */
+/* ── Question number buttons ── */
 .selectorBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  min-width: 2.5rem;
-  padding: 0.5rem 0.85rem;
-  font-size: 0.8rem;
+  min-width: 3rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: #475569;
-  background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 9999px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: all 160ms ease;
   position: relative;
   white-space: nowrap;
 }
 
 .selectorBtn:hover {
-  background: #f1f5f9;
+  background: #f8fafc;
   border-color: #cbd5e1;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transform: translateY(-1px);
@@ -112,14 +123,14 @@
 
 /* Status dot */
 .statusDot {
-  width: 0.45rem;
-  height: 0.45rem;
+  width: 0.375rem;
+  height: 0.375rem;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
 .statusDot.unattempted {
-  background: #cbd5e1;
+  background: #d1d5db;
 }
 
 .statusDot.attempted {
@@ -133,25 +144,25 @@
 /* Completed status */
 .selectorBtn.completed {
   background: #ecfdf5;
-  border-color: #6ee7b7;
+  border-color: #a7f3d0;
   color: #065f46;
 }
 
 .selectorBtn.completed:hover {
   background: #d1fae5;
-  border-color: #34d399;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+  border-color: #6ee7b7;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
 }
 
 /* Attempted status */
 .selectorBtn.attempted {
   background: #fff7ed;
-  border-color: #fdba74;
+  border-color: #fed7aa;
   color: #9a3412;
 }
 
 .selectorBtn.attempted:hover {
   background: #ffedd5;
-  border-color: #fb923c;
-  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.15);
+  border-color: #fdba74;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.1);
 }

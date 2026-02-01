@@ -9,9 +9,9 @@
   padding: 24px;
   gap: 40px;
   background: #ffffff;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -41,23 +41,23 @@
   font-weight: 500;
   color: #374151;
   padding: 8px 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   background-color: #f9fafb;
   cursor: pointer;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 160ms ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .moduleIdBox:hover {
-  background-color: #f3f4f6;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+  background-color: #f1f5f9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .typeSelector {
   font-size: 0.95rem;
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   background-color: #f9fafb;
   color: #374151;
@@ -87,7 +87,7 @@
   width: 100%;
   font-size: 1rem;
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   box-sizing: border-box;
   background-color: #ffffff;
@@ -98,7 +98,7 @@
   flex: 1;
   font-size: 1rem;
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   box-sizing: border-box;
   background-color: #ffffff;
@@ -118,7 +118,7 @@
   cursor: pointer;
   height: 38px;
   width: max-content;
-  transition: background-color 0.2s ease;
+  transition: all 160ms ease;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
@@ -149,7 +149,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: background-color 0.25s ease, transform 0.2s ease;
+  transition: all 160ms ease;
   z-index: 2;
 }
 
@@ -165,7 +165,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: all 0.2s ease;
+  transition: all 160ms ease;
   font-size: 1rem;
   font-weight: 400;
   flex-shrink: 0;
@@ -255,7 +255,7 @@
   min-width: 48px;
   align-items: center;
   justify-content: center;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e2e8f0;
   background-color: #f9fafb;
   border-radius: 8px;
 }
@@ -272,7 +272,7 @@
 }
 
 .collectionIdBox:hover {
-  background-color: #f3f4f6;
+  background-color: #f1f5f9;
 }
 
 .functionIdBoxText,
@@ -301,7 +301,7 @@
   min-width: 48px;
   align-items: center;
   justify-content: center;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e2e8f0;
   background-color: #f9fafb;
   border-radius: 8px;
 }

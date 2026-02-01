@@ -1,5 +1,5 @@
 :root {
-  --editor-background: #f3f4f6;
+  --editor-background: #f1f5f9;
   --resize-handle-width: 8px;
   --resize-handle-hover-width: 4px;
 }
@@ -144,33 +144,31 @@
   left: 35px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   z-index: 1000;
-  background: white;
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   cursor: pointer;
   user-select: none;
-  transition: all 0.2s ease;
+  transition: all 160ms ease;
 }
 
 .modeToggleSwitch:hover {
-  background-color: #f9fafb;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-  border-color: #9ca3af;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .modeToggleSwitch:active {
-  transform: translateY(1px);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  background: #f8fafc;
 }
 
 .modeToggleLabel {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  color: #1f2937;
+  color: #1e293b;
   min-width: 65px;
   text-align: left;
 }
@@ -210,7 +208,7 @@
   background-color: white;
   border-radius: 50%;
   transition: transform 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .modeToggleInput:checked + .modeToggleSliderWrapper .modeToggleSlider {
@@ -228,14 +226,14 @@
   right: 16px;
   max-width: 600px;
   max-height: 200px;
-  background: rgba(17, 24, 39, 0.95);
+  background: #1e1e2e;
   color: #10b981;
-  font-family: "Courier New", monospace;
-  font-size: 12px;
-  padding: 12px;
-  border-radius: 6px;
+  font-family: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+  padding: 12px 14px;
+  border-radius: 10px;
   overflow: auto;
   z-index: 10;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   white-space: pre;
 }

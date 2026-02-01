@@ -1,8 +1,8 @@
 .content {
   text-align: left;
   font-style: normal;
-  color: #1f2937;
-  padding: 0 6px;
+  color: #1e293b;
+  padding: 0 4px;
 }
 
 .correct {
@@ -26,29 +26,29 @@
 }
 
 .title {
-  text-align: center;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 8px 0 18px 0;
-  letter-spacing: 0.25px;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 8px 0;
-  background-color: #f3f4f6;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 2px 0 14px 0;
+  letter-spacing: -0.01em;
+  border-bottom: none;
+  padding: 0;
+  background-color: transparent;
   font-style: normal;
+  text-align: left;
 }
 
 .errorsHeading {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
   font-style: normal;
 }
 
 .correctnessMessage {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 500;
-  color: #1f2937;
+  color: #1e293b;
 }
 
 /* Empty state */
@@ -58,20 +58,20 @@
 }
 
 .emptyIcon {
-  font-size: 2.5rem;
+  font-size: 2.25rem;
   margin-bottom: 10px;
 }
 
 .emptyMessage {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
-  color: #6b7280;
+  color: #64748b;
   margin: 0 0 4px 0;
 }
 
 .emptySubtext {
-  font-size: 0.8125rem;
-  color: #9ca3af;
+  font-size: 0.8rem;
+  color: #94a3b8;
   margin: 0;
 }
 
@@ -80,28 +80,28 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 16px;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
   font-weight: 500;
   margin-bottom: 16px;
 }
 
 .resultBanner.correct {
-  background: #d1fae5;
+  background: #ecfdf5;
   color: #065f46;
   border: 1px solid #a7f3d0;
 }
 
 .resultBanner.incorrect {
-  background: #fee2e2;
+  background: #fef2f2;
   color: #991b1b;
   border: 1px solid #fecaca;
 }
 
 .resultIcon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
 }
 

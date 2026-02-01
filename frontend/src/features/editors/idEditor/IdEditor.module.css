@@ -3,11 +3,11 @@
   font-weight: 500;
   color: #374151;
   padding: 8px 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   background-color: #f9fafb;
   cursor: pointer;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 160ms ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 .trigger:hover {
@@ -31,7 +31,7 @@
   border: none;
   cursor: pointer;
   width: max-content;
-  transition: background-color 0.2s ease;
+  transition: all 160ms ease;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
@@ -50,19 +50,19 @@
 .panel {
   width: 300px;
   background: #ffffff;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
 }
 
 .header {
   padding: 10px 14px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
   font-weight: 600;
-  color: #1f2937;
+  color: #0f172a;
   cursor: move;
   user-select: none;
   text-align: center;
@@ -77,7 +77,7 @@
 .form input {
   flex: 1;
   padding: 8px 10px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   font-size: 0.95rem;
 }
@@ -90,7 +90,7 @@
   border-radius: 8px;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 160ms ease;
 }
 
 .form button:hover {
@@ -111,7 +111,7 @@
   font-size: 0.95rem;
   color: #374151;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 160ms ease;
 }
 
 .list li button:hover {
@@ -127,7 +127,7 @@
 
 .actionRow {
   padding: 12px 14px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .actionRow button {
@@ -139,7 +139,7 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 160ms ease;
 }
 
 .actionRow button:hover {
@@ -149,9 +149,9 @@
 .panel {
   width: max-content;
   background: #ffffff;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -181,7 +181,7 @@
   font-size: 1rem;
   height: 38px;
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   box-sizing: border-box;
   background-color: #ffffff;

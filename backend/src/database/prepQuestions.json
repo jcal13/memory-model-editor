@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "question": "Trace the `__main__` block below. The initial memory model (before the call to `move_to_back`) is provided as preloaded boxes. Draw the memory model **immediately before** `move_to_back` returns (i.e., after the `snapshot` call inside the method).\n\nNote: `move_to_back` is a new `LinkedList` method. The `_Node` and `LinkedList` classes are as seen in class.",
+"question": "Trace the `__main__` block below. The initial memory model (before the call to `move_to_back`) is provided as preloaded boxes. Draw the memory model **immediately before** `move_to_back` returns (i.e., after the `snapshot` call inside the method).\n\nNote:\n- `move_to_back` is a new `LinkedList` method.\n- The `_Node` and `LinkedList` classes are as seen in class.\n- You are allowed to use either Practice or Test mode to complete this question.",
     "code": [
       "from __future__ import annotations",
       "",

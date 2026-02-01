@@ -22,7 +22,6 @@ const IdSelectorPanel: React.FC<Props> = ({
   sandbox,
   usedIds = new Set(),
 }) => {
-  console.log("IdSelectorPanel usedIds:", Array.from(usedIds));
   const nextId = useMemo<number>(() => {
     const nums = ids.filter((v): v is number => typeof v === "number");
     let i = 1;

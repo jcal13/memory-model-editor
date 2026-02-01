@@ -33,8 +33,21 @@ export interface FeedbackError {
  * @returns Structured feedback error
  */
 export function structureError(message: string): FeedbackError {
-  // Pattern: "Value mismatch: function "__main__" → var "a", var "a" got "x", expected "3""
-  // OR: "Value mismatch: path got value, expected value"
+  // Pattern: "At X: expected Y, but got Z" (value or type mismatch)
+  const atExpectedMatch = message.match(/^At (.+?): expected .+, but got .+$/);
+  if (atExpectedMatch) {
+    const pathPart = atExpectedMatch[1].trim();
+    const gotPart = message.replace(/^At .+?:\s*expected .+,\s*but got\s+/, '');
+    const looksLikeType = /^(int|float|str|bool|None|list|dict|tuple|set|object)$/.test(gotPart.trim());
+    return {
+      type: looksLikeType ? ErrorType.TYPE_MISMATCH : ErrorType.VALUE_MISMATCH,
+      message,
+      path: pathPart,
+      severity: 'error',
+    };
+  }
+
+  // Pattern: "Value mismatch: ..." (legacy)
   if (message.includes('Value mismatch')) {
     const pathMatch = message.match(/Value mismatch: (.+?)(?:,| got)/);
     return {
@@ -45,11 +58,44 @@ export function structureError(message: string): FeedbackError {
     };
   }
 
-  // Pattern: "Type mismatch: path got type, expected type"
+  // Pattern: "ID incorrectly or incompletely assigned at X"
+  if (message.includes('ID incorrectly or incompletely assigned')) {
+    const pathMatch = message.match(/ID incorrectly or incompletely assigned(?: at)?[:\s]*(.+)/);
+    return {
+      type: ErrorType.TYPE_MISMATCH,
+      message,
+      path: pathMatch ? pathMatch[1].trim() : undefined,
+      severity: 'error',
+    };
+  }
+
+  // Pattern: "Type mismatch: ..." (legacy)
   if (message.includes('Type mismatch')) {
     const pathMatch = message.match(/Type mismatch: (.+?) got/);
     return {
       type: ErrorType.TYPE_MISMATCH,
+      message,
+      path: pathMatch ? pathMatch[1].trim() : undefined,
+      severity: 'error',
+    };
+  }
+
+  // Pattern: "At X: Y is missing the "Z" attribute"
+  if (message.includes('is missing the') && message.includes('attribute')) {
+    const pathMatch = message.match(/^At (.+?):/);
+    return {
+      type: ErrorType.MISSING_ELEMENT,
+      message,
+      path: pathMatch ? pathMatch[1].trim() : undefined,
+      severity: 'error',
+    };
+  }
+
+  // Pattern: "At X: Y has an unexpected "Z" attribute"
+  if (message.includes('has an unexpected') && message.includes('attribute')) {
+    const pathMatch = message.match(/^At (.+?):/);
+    return {
+      type: ErrorType.UNEXPECTED_ELEMENT,
       message,
       path: pathMatch ? pathMatch[1].trim() : undefined,
       severity: 'error',

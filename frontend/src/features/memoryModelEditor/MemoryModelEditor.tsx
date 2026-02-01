@@ -207,6 +207,8 @@ export default function MemoryModelEditor({
     questionType: state.selectedQuestionType,
     submissionResults: state.submissionResults,
     sandboxMode: state.isSandboxMode,
+    questionView: state.questionView,
+    isInfoPanelOpen: state.isInfoPanelOpen,
   });
 
   useResponsivePanels({
@@ -452,6 +454,8 @@ export default function MemoryModelEditor({
               setQuestionIndex={state.setSelectedQuestionIndex}
               questionType={state.selectedQuestionType}
               setQuestionType={state.setSelectedQuestionType}
+              questionView={state.questionView}
+              setQuestionView={state.setQuestionView}
               onSubmit={handleCanvasSubmit}
               setSubmissionResults={state.setSubmissionResults}
               onClearCanvas={clearCanvas}

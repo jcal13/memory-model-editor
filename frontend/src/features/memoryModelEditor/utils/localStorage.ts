@@ -46,12 +46,16 @@ export function normalizeCanvasData(raw: unknown): CanvasData {
   };
 }
 
+export type QuestionView = "root" | "loading" | "test" | "list" | "question" | "practice" | "prep";
+
 export interface UIState {
   activeTab: Tab;
   questionIndex: number | null;
   questionType: "test" | "practice" | "prep" | null;
   submissionResults: SubmissionResult | null;
   sandboxMode: boolean | null;
+  questionView?: QuestionView;
+  isInfoPanelOpen?: boolean;
 }
 
 /**
@@ -103,12 +107,23 @@ export function loadInitialUIData(): UIState {
     const sandboxMode =
       typeof parsed?.sandboxMode === "boolean" ? parsed.sandboxMode : null;
 
+    const validViews = ["root", "loading", "test", "list", "question", "practice", "prep"];
+    const questionView =
+      typeof parsed?.questionView === "string" && validViews.includes(parsed.questionView) && parsed.questionView !== "loading"
+        ? parsed.questionView
+        : undefined;
+
+    const isInfoPanelOpen =
+      typeof parsed?.isInfoPanelOpen === "boolean" ? parsed.isInfoPanelOpen : undefined;
+
     return {
       activeTab,
       questionIndex,
       questionType,
       submissionResults,
       sandboxMode,
+      questionView,
+      isInfoPanelOpen,
     };
   } catch (error) {
     console.warn("Failed to load UI data from localStorage:", error);

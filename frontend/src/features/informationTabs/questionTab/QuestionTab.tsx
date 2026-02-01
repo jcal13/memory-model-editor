@@ -9,6 +9,7 @@ import CodeBlock from "./components/CodeBlock";
 import styles from "./QuestionTab.module.css";
 import "prismjs/themes/prism-tomorrow.css";
 import { SubmissionResult } from "../../shared/types";
+import type { QuestionView } from "../../memoryModelEditor/utils/localStorage";
 import {
   CanvasData,
   deleteQuestionCanvasData,
@@ -23,7 +24,6 @@ type View = "root" | "loading" | "test" | "list" | "question" | "practice" | "pr
 type QuestionType = "test" | "practice" | "prep";
 type QuestionStatus = "unattempted" | "attempted" | "completed";
 
-const UI_STORAGE_KEY = "uiState";
 const QUESTION_STATUS_KEY = "questionStatus";
 const VALID_VIEWS: View[] = [
   "root",
@@ -53,6 +53,8 @@ interface QuestionTabProps {
   setQuestionIndex: (index: number | null) => void;
   questionType: "test" | "practice" | "prep" | null;
   setQuestionType: (type: "test" | "practice" | "prep" | null) => void;
+  questionView: QuestionView;
+  setQuestionView: (view: QuestionView) => void;
   onSubmit: () => Promise<boolean>;
   setSubmissionResults: (results: SubmissionResult | null) => void;
   onClearCanvas: () => void;
@@ -60,30 +62,6 @@ interface QuestionTabProps {
   currentCanvasState: { elements: any[]; ids: number[]; classes: string[] };
   onQuestionDataChange?: (data: any) => void;
   isSandboxMode: boolean;
-}
-
-function loadSavedQuestionView(): View {
-  try {
-    const rawData = localStorage.getItem(UI_STORAGE_KEY);
-    if (!rawData) return "root";
-    const parsed = JSON.parse(rawData) ?? {};
-    const view = parsed?.questionView as View | undefined;
-    if (!view || !VALID_VIEWS.includes(view)) return "root";
-    return view === "loading" ? "root" : view;
-  } catch {
-    return "root";
-  }
-}
-
-function persistQuestionView(view: View): void {
-  try {
-    const rawData = localStorage.getItem(UI_STORAGE_KEY);
-    const parsed = rawData ? JSON.parse(rawData) ?? {} : {};
-    parsed.questionView = view;
-    localStorage.setItem(UI_STORAGE_KEY, JSON.stringify(parsed));
-  } catch (error) {
-    console.warn("Failed to persist question view:", error);
-  }
 }
 
 function loadQuestionStatus(): QuestionStatusMap {
@@ -113,6 +91,8 @@ export default function QuestionTab({
   setQuestionIndex,
   questionType,
   setQuestionType,
+  questionView: questionViewProp,
+  setQuestionView,
   onSubmit,
   setSubmissionResults,
   onClearCanvas,
@@ -121,7 +101,9 @@ export default function QuestionTab({
   onQuestionDataChange,
   isSandboxMode,
 }: QuestionTabProps) {
-  const [view, setView] = useState<View>(() => loadSavedQuestionView());
+  const [view, setView] = useState<View>(
+    () => (VALID_VIEWS.includes(questionViewProp as View) && questionViewProp !== "loading" ? (questionViewProp as View) : "root")
+  );
   const [questionCount, setQuestionCount] = useState<number>(0);
   const [questionData, setQuestionData] = useState<QuestionData | null>(null);
   const [questionStatus, setQuestionStatus] = useState<QuestionStatusMap>(() =>
@@ -142,8 +124,10 @@ export default function QuestionTab({
   } | null>(null);
 
   useEffect(() => {
-    persistQuestionView(view);
-  }, [view]);
+    if (view !== "loading") {
+      setQuestionView(view as QuestionView);
+    }
+  }, [view, setQuestionView]);
 
   useEffect(() => {
     persistQuestionStatus(questionStatus);
@@ -180,11 +164,11 @@ export default function QuestionTab({
     setQuestionData(null);
     setQuestionIndex(null);
     setQuestionType(null);
+    setQuestionView("root");
     hydratedList.current = false;
     hydratedQuestion.current = false;
     previousQuestionRef.current = null;
-    persistQuestionView("root");
-  }, [isSandboxMode, setQuestionIndex, setQuestionType]);
+  }, [isSandboxMode, setQuestionIndex, setQuestionType, setQuestionView]);
 
   const updateQuestionStatus = (
     type: QuestionType,
@@ -270,6 +254,7 @@ export default function QuestionTab({
   ): Promise<void> => {
     hydratedQuestion.current = false;
     setQuestionData(null);
+    setSubmissionResults(null);
 
     setView("loading");
 
@@ -393,12 +378,6 @@ export default function QuestionTab({
       })();
     }
   }, [view, questionType, questionIndex, questionData, onQuestionDataChange]);
-
-  useEffect(() => {
-    return () => {
-      setSubmissionResults(null);
-    };
-  }, [questionIndex, setSubmissionResults]);
 
   const getHeading = (): string => {
     if (view === "question" && questionIndex !== null) {

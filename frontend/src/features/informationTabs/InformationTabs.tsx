@@ -13,6 +13,8 @@ interface InformationTabsProps {
   setQuestionIndex: (index: number | null) => void;
   questionType: "test" | "practice" | "prep" | null;
   setQuestionType: (type: "test" | "practice" | "prep" | null) => void;
+  questionView: import("../memoryModelEditor/utils/localStorage").QuestionView;
+  setQuestionView: (view: import("../memoryModelEditor/utils/localStorage").QuestionView) => void;
   onSubmit: () => Promise<boolean>;
   setSubmissionResults: (results: SubmissionResult | null) => void;
   onClearCanvas: () => void;
@@ -35,6 +37,8 @@ export default function InformationTabs({
   setQuestionIndex,
   questionType,
   setQuestionType,
+  questionView,
+  setQuestionView,
   onSubmit,
   setSubmissionResults,
   onClearCanvas,
@@ -86,6 +90,8 @@ export default function InformationTabs({
               setQuestionIndex={setQuestionIndex}
               questionType={questionType}
               setQuestionType={setQuestionType}
+              questionView={questionView}
+              setQuestionView={setQuestionView}
               onSubmit={handleSubmit}
               setSubmissionResults={setSubmissionResults}
               onClearCanvas={onClearCanvas}

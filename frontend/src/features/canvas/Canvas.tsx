@@ -201,7 +201,6 @@ function Canvas({
     };
   }, [canvasHeight, svgRef]);
 
-  // Sync element IDs in non-sandbox mode
   useEffect(() => {
     if (sandbox) return;
 
@@ -212,11 +211,7 @@ function Canvas({
     currentElementIds
       .filter((id) => !ids.includes(id))
       .forEach((id) => addId(id));
-
-    ids
-      .filter((id) => !currentElementIds.includes(id))
-      .forEach((id) => removeId(id));
-  }, [elements, ids, sandbox, addId, removeId]);
+  }, [elements, ids, sandbox, addId]);
 
   // Validate elements whenever they change
   // Create a stable signature of elements for comparison

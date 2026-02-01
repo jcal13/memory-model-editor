@@ -19,6 +19,8 @@ export function useUILocalStorage(state: UIState): void {
     state.questionType,
     state.submissionResults,
     state.sandboxMode,
+    state.questionView,
+    state.isInfoPanelOpen,
   ]);
 }
 

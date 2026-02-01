@@ -19,8 +19,8 @@ import {
 } from "../../memoryModelEditor/utils/localStorage";
 import ConfirmationModal from "../../memoryModelEditor/components/ConfirmationModal";
 
-type View = "root" | "loading" | "test" | "list" | "question" | "practice";
-type QuestionType = "test" | "practice";
+type View = "root" | "loading" | "test" | "list" | "question" | "practice" | "prep";
+type QuestionType = "test" | "practice" | "prep";
 type QuestionStatus = "unattempted" | "attempted" | "completed";
 
 const UI_STORAGE_KEY = "uiState";
@@ -32,6 +32,7 @@ const VALID_VIEWS: View[] = [
   "list",
   "question",
   "practice",
+  "prep",
 ];
 
 interface QuestionStatusMap {
@@ -50,8 +51,8 @@ interface QuestionData {
 interface QuestionTabProps {
   questionIndex: number | null;
   setQuestionIndex: (index: number | null) => void;
-  questionType: "test" | "practice" | null;
-  setQuestionType: (type: "test" | "practice" | null) => void;
+  questionType: "test" | "practice" | "prep" | null;
+  setQuestionType: (type: "test" | "practice" | "prep" | null) => void;
   onSubmit: () => Promise<boolean>;
   setSubmissionResults: (results: SubmissionResult | null) => void;
   onClearCanvas: () => void;
@@ -128,7 +129,7 @@ export default function QuestionTab({
   );
   const [showCanvasClearModal, setShowCanvasClearModal] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<{
-    type: "test" | "practice";
+    type: "test" | "practice" | "prep";
     index: number;
   } | null>(null);
   const [showResetModal, setShowResetModal] = useState(false);
@@ -136,7 +137,7 @@ export default function QuestionTab({
   const hydratedList = useRef<boolean>(false);
   const hydratedQuestion = useRef<boolean>(false);
   const previousQuestionRef = useRef<{
-    type: "test" | "practice";
+    type: "test" | "practice" | "prep";
     index: number;
   } | null>(null);
 
@@ -409,6 +410,9 @@ export default function QuestionTab({
     if (view === "list" && questionType === "practice") {
       return "Practice Questions";
     }
+    if (view === "list" && questionType === "prep") {
+      return "CSC148 Prep Questions";
+    }
     return "Questions";
   };
 
@@ -461,6 +465,14 @@ export default function QuestionTab({
               icon="📝"
               categoryType="test"
               onClick={() => loadQuestions("test")}
+            />
+            <QuestionSelector
+              variant="category"
+              text="CSC148 Prep Questions"
+              subtitle=""
+              icon="🔗"
+              categoryType="prep"
+              onClick={() => loadQuestions("prep")}
             />
           </div>
         )}

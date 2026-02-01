@@ -1,0 +1,229 @@
+[
+  {
+    "id": 1,
+    "question": "Trace the `__main__` block below. The initial memory model (before the call to `move_to_back`) is provided as preloaded boxes. Draw the memory model **immediately before** `move_to_back` returns (i.e., after the `snapshot` call inside the method).\n\nNote: `move_to_back` is a new `LinkedList` method. The `_Node` and `LinkedList` classes are as seen in class.",
+    "code": [
+      "from __future__ import annotations",
+      "",
+      "import json",
+      "from typing import Any",
+      "from python_ta.debug import snapshot",
+      "",
+      "class _Node:",
+      "    def __init__(self, item: Any) -> None:",
+      "        self.item, self.next = item, None",
+      "",
+      "class LinkedList:",
+      "    def __init__(self, items: list) -> None:",
+      "        if not items:",
+      "            self._first = None",
+      "        else:",
+      "            self._first = _Node(items[0])",
+      "            curr = self._first",
+      "            for item in items[1:]:",
+      "                curr.next = _Node(item)",
+      "                curr = curr.next",
+      "",
+      "    def move_to_back(self) -> None:",
+      "        \"\"\"Return the last item in this list, set that node's",
+      "        new item to now be 148, and then move the first node",
+      "        in the list to the end of the list.",
+      "        Precondition: this LinkedList has at least two items",
+      "        \"\"\"",
+      "        curr = self._first",
+      "        while curr.next is not None:",
+      "            curr = curr.next",
+      "        result = curr.item",
+      "        curr.item = 148",
+      "        curr.next = self._first",
+      "        self._first = self._first.next",
+      "        curr.next.next = None",
+      "        # draw the memory model at this point in the code!",
+      "        return result",
+      "",
+      "if __name__ == '__main__':",
+      "    lst = LinkedList([165, 108])",
+      "    # initial memory model is given to here",
+      "    lst.move_to_back()  # trace this call"
+    ],
+    "answer": [
+      {
+        "type": ".frame",
+        "name": "move_to_back",
+        "id": null,
+        "value": {
+          "self": 1,
+          "curr": 2,
+          "result": 7
+        }
+      },
+      {
+        "type": ".frame",
+        "name": "__main__",
+        "id": null,
+        "value": {
+          "lst": 1
+        }
+      },
+      {
+        "type": "int",
+        "id": 3,
+        "value": 148
+      },
+      {
+        "type": "int",
+        "id": 5,
+        "value": 165
+      },
+      {
+        "type": "NoneType",
+        "id": 6,
+        "value": "None"
+      },
+      {
+        "type": ".class",
+        "name": "_Node",
+        "id": 4,
+        "value": {
+          "item": 5,
+          "next": 6
+        }
+      },
+      {
+        "type": ".class",
+        "name": "_Node",
+        "id": 2,
+        "value": {
+          "item": 3,
+          "next": 4
+        }
+      },
+      {
+        "type": ".class",
+        "name": "LinkedList",
+        "id": 1,
+        "value": {
+          "_first": 2
+        }
+      },
+      {
+        "type": "int",
+        "id": 7,
+        "value": 108
+      }
+    ],
+    "description": null,
+    "topics": [
+      "Linked Lists",
+      "Node Manipulation",
+      "Method Tracing",
+      "Object Mutation",
+      "CSC148"
+    ],
+    "canvasConfig": {
+      "elements": [
+        {
+          "boxId": 0,
+          "id": "_",
+          "x": 0,
+          "y": 0,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "value": null,
+            "functionName": "__main__",
+            "params": [
+              {
+                "name": "lst",
+                "targetId": 1
+              }
+            ],
+            "order": 1
+          }
+        },
+        {
+          "boxId": 1,
+          "id": 3,
+          "x": 370,
+          "y": 80,
+          "kind": {
+            "name": "primitive",
+            "type": "int",
+            "value": "165"
+          }
+        },
+        {
+          "boxId": 2,
+          "id": 5,
+          "x": 620,
+          "y": 80,
+          "kind": {
+            "name": "primitive",
+            "type": "int",
+            "value": "108"
+          }
+        },
+        {
+          "boxId": 3,
+          "id": 6,
+          "x": 870,
+          "y": 80,
+          "kind": {
+            "name": "primitive",
+            "type": "None",
+            "value": "None"
+          }
+        },
+        {
+          "boxId": 4,
+          "id": 4,
+          "x": 370,
+          "y": 260,
+          "kind": {
+            "name": "class",
+            "type": "class",
+            "value": null,
+            "className": "_Node",
+            "classVariables": [
+              { "key": "item", "value": 5 },
+              { "key": "next", "value": 6 }
+            ]
+          }
+        },
+        {
+          "boxId": 5,
+          "id": 2,
+          "x": 670,
+          "y": 260,
+          "kind": {
+            "name": "class",
+            "type": "class",
+            "value": null,
+            "className": "_Node",
+            "classVariables": [
+              { "key": "item", "value": 3 },
+              { "key": "next", "value": 4 }
+            ]
+          }
+        },
+        {
+          "boxId": 6,
+          "id": 1,
+          "x": 520,
+          "y": 450,
+          "kind": {
+            "name": "class",
+            "type": "class",
+            "value": null,
+            "className": "LinkedList",
+            "classVariables": [
+              { "key": "_first", "value": 2 }
+            ]
+          }
+        }
+      ],
+      "ids": [1, 2, 3, 4, 5, 6],
+      "classes": ["_Node", "LinkedList"]
+    }
+  }
+]

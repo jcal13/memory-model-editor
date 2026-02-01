@@ -283,14 +283,24 @@ export default function MemoryModelEditor({
     };
   }, [isResizingPalette, tempPaletteWidth, state]);
 
+  // Keep stable refs for info panel resize handlers so the effect
+  // only re-runs when isResizingInfoPanel changes (not on every render).
+  const infoPanelSetWidth = state.setInfoPanelWidth;
+  const infoPanelSetResizing = state.setIsResizingInfoPanel;
+  const infoPanelSetOpen = state.setIsInfoPanelOpen;
+  const mainContainerRefCurrent = refs.mainContainerRef;
+
   useEffect(() => {
     if (!state.isResizingInfoPanel) return;
 
+    document.body.style.userSelect = "none";
+    document.body.style.cursor = "col-resize";
+
     const handleMouseMove = (event: MouseEvent) => {
-      if (!refs.mainContainerRef.current) return;
+      if (!mainContainerRefCurrent.current) return;
 
       const containerRect =
-        refs.mainContainerRef.current.getBoundingClientRect();
+        mainContainerRefCurrent.current.getBoundingClientRect();
       const newWidth = containerRect.right - event.clientX;
 
       const maxWidthBasedOnViewport =
@@ -300,13 +310,25 @@ export default function MemoryModelEditor({
         maxWidthBasedOnViewport
       );
 
-      if (newWidth >= 100 && newWidth <= maxAllowedWidth) {
-        state.setInfoPanelWidth(newWidth);
-      }
+      const clamped = Math.max(50, Math.min(newWidth, maxAllowedWidth));
+      infoPanelSetWidth(clamped);
     };
 
-    const handleMouseUp = () => {
-      state.setIsResizingInfoPanel(false);
+    const handleMouseUp = (event: MouseEvent) => {
+      if (mainContainerRefCurrent.current) {
+        const containerRect =
+          mainContainerRefCurrent.current.getBoundingClientRect();
+        const finalWidth = containerRect.right - event.clientX;
+
+        if (finalWidth < SNAP_CLOSE_THRESHOLD) {
+          infoPanelSetOpen(false);
+          infoPanelSetWidth(500);
+        }
+      }
+
+      infoPanelSetResizing(false);
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
     };
 
     document.addEventListener("mousemove", handleMouseMove);
@@ -315,8 +337,10 @@ export default function MemoryModelEditor({
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
     };
-  }, [state, refs.mainContainerRef]);
+  }, [state.isResizingInfoPanel, infoPanelSetWidth, infoPanelSetResizing, infoPanelSetOpen, mainContainerRefCurrent]);
 
   return (
     <div className={styles.editorContainer}>
@@ -412,7 +436,7 @@ export default function MemoryModelEditor({
         {state.isInfoPanelOpen && (
           <div
             className={`${styles.infoPanel} ${
-              state.isResizingInfoPanel ? styles.resizing : styles.noTransition
+              state.isResizingInfoPanel ? styles.noTransition : ""
             }`}
             style={{
               width: `${state.infoPanelWidth}px`,

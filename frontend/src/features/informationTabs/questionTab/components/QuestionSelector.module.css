@@ -66,6 +66,11 @@
   color: #2563eb;
 }
 
+.categoryIcon.prep {
+  background: #fef3c7;
+  color: #d97706;
+}
+
 .categoryLabel {
   display: flex;
   flex-direction: column;

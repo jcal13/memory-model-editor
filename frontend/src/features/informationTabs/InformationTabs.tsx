@@ -11,8 +11,8 @@ interface InformationTabsProps {
   questionSelected: boolean;
   questionIndex: number | null;
   setQuestionIndex: (index: number | null) => void;
-  questionType: "test" | "practice" | null;
-  setQuestionType: (type: "test" | "practice" | null) => void;
+  questionType: "test" | "practice" | "prep" | null;
+  setQuestionType: (type: "test" | "practice" | "prep" | null) => void;
   onSubmit: () => Promise<boolean>;
   setSubmissionResults: (results: SubmissionResult | null) => void;
   onClearCanvas: () => void;

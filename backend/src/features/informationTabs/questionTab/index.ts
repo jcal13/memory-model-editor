@@ -104,4 +104,39 @@ router.get("/testquestions/:id", async (req: Request, res: Response) => {
   }
 });
 
+router.post("/prepquestions", async (_req: Request, res: Response) => {
+  try {
+    const { rows } = await getPool().query<{ count: number }>(
+      "SELECT COUNT(*)::int AS count FROM prep_questions"
+    );
+    res.status(200).json({ count: rows[0].count });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to count prep questions" });
+  }
+});
+
+router.get("/prepquestions/:id", async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) {
+    res.status(400).json({ error: "Invalid id" });
+    return;
+  }
+
+  try {
+    const { rows } = await getPool().query<QuestionRow>(
+      'SELECT id, question, code, answer, topics, canvas_config AS "canvasConfig" FROM prep_questions WHERE id = $1',
+      [id]
+    );
+    if (rows.length === 0) {
+      res.status(404).json({ error: "Question not found" });
+      return;
+    }
+    res.status(200).json(rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch question" });
+  }
+});
+
 export default router;

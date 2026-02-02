@@ -2,9 +2,7 @@ import axios from "axios";
 
 // Configuration
 const API_URL =
-  process.env.NODE_ENV === "production"
-    ? "http://vm009.teach.cs.toronto.edu:3001"
-    : "http://localhost:3001";
+  process.env.NODE_ENV === "production" ? "" : "http://localhost:3001";
 
 /**
  * Fetches a specific question by ID and type

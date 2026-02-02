@@ -4,9 +4,7 @@ import { buildJSONFromElements } from "./jsonBuilder";
 
 // Configuration
 const API_DEV_URL =
-  process.env.NODE_ENV === "production"
-    ? "http://vm009.teach.cs.toronto.edu:3001"
-    : "http://localhost:3001";
+  process.env.NODE_ENV === "production" ? "" : "http://localhost:3001";
 const SUBMIT_ENDPOINT = "/canvasEditor/submit";
 
 // Types

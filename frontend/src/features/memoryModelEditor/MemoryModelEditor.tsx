@@ -467,6 +467,8 @@ export default function MemoryModelEditor({
               onOpenEditor={openEditor || (() => {})}
               isSandboxMode={state.isSandboxMode}
               onQuestionDataChange={setCurrentQuestionData}
+              tabScrollPositions={state.tabScrollPositions}
+              setTabScrollPositions={state.setTabScrollPositions}
             />
 
             <div

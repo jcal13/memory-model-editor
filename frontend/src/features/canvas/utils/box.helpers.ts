@@ -116,8 +116,8 @@ export function processClassVariables(variables: any[]): Record<string, any> {
 
   const used = new Set<string>();
   return variables.reduce((acc, variable) => {
-    const key = makeUniqueKey(variable.key, used);
-    acc[key] = normalizeId(variable.value);
+    const key = makeUniqueKey(variable.name ?? variable.key, used);
+    acc[key] = normalizeId(variable.targetId ?? variable.value);
     return acc;
   }, {} as Record<string, any>);
 }

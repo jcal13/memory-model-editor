@@ -314,11 +314,15 @@ function Canvas({
 
   const removeElement = useCallback(
     (boxId: number) => {
+      const removed = elements.find((el) => el.boxId === boxId);
+      if (removed && typeof removed.id === "number") {
+        removeId(removed.id);
+      }
       setElements((prev) => prev.filter((el) => el.boxId !== boxId));
       setOpenEditors((prev) => prev.filter((el) => el.boxId !== boxId));
       setSelectedElement((prev) => (prev?.boxId === boxId ? null : prev));
     },
-    [setElements]
+    [elements, setElements, removeId]
   );
 
   const openElementEditor = useCallback((element: CanvasElement) => {

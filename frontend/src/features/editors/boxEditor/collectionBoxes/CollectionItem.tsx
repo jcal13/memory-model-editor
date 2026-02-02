@@ -65,11 +65,13 @@ const CollectionItem = ({
                 />
               </FieldValidationTooltip>
               <button
-                className={styles.deleteVariableButton}
+                className={styles.collectionDeleteButton}
                 onClick={() => removeItem(idx)}
                 title="Delete item"
                 aria-label="Delete item"
-              />
+              >
+                &times;
+              </button>
             </div>
           );
         })}
@@ -130,11 +132,13 @@ const CollectionItem = ({
                 />
               </FieldValidationTooltip>
               <button
-                className={styles.deleteVariableButton}
+                className={styles.collectionDeleteButton}
                 onClick={() => removeItem(idx)}
                 title="Delete pair"
                 aria-label="Delete pair"
-              />
+              >
+                &times;
+              </button>
             </div>
           </div>
         );

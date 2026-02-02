@@ -122,6 +122,7 @@ export default function QuestionTab({
     type: "test" | "practice" | "prep";
     index: number;
   } | null>(null);
+  const prevSandboxModeRef = useRef<boolean>(isSandboxMode);
 
   useEffect(() => {
     if (view !== "loading") {
@@ -160,6 +161,9 @@ export default function QuestionTab({
   }, [view, onQuestionDataChange]);
 
   useEffect(() => {
+    if (prevSandboxModeRef.current === isSandboxMode) return;
+    prevSandboxModeRef.current = isSandboxMode;
+
     setView("root");
     setQuestionData(null);
     setQuestionIndex(null);

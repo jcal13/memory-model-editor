@@ -82,9 +82,14 @@ export const useClassStates = (element: any) => {
   const [className, setClassName] = useState<string>(
     element.kind.className ?? ""
   );
-  const [classVariables, setClassVariables] = useState<any[]>(
-    element.kind.classVariables ?? []
-  );
+
+  // Normalize backend format { key, value } to frontend format { name, targetId }
+  const rawVars: any[] = element.kind.classVariables ?? [];
+  const normalized = rawVars.map((v: any) => ({
+    name: v.name ?? v.key ?? "",
+    targetId: v.targetId ?? v.value ?? null,
+  }));
+  const [classVariables, setClassVariables] = useState<FunctionParams[]>(normalized);
 
   // Return both name and variables (with their setters)
   return [className, setClassName, classVariables, setClassVariables] as const;

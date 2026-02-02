@@ -20,6 +20,7 @@ interface FeedbackTabProps {
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
   onOpenEditor: (element: CanvasElement) => void;
   isSandboxMode: boolean;
+  onResubmit: () => Promise<boolean>;
 }
 
 export default function FeedbackTab({
@@ -32,6 +33,7 @@ export default function FeedbackTab({
   setElements,
   onOpenEditor,
   isSandboxMode,
+  onResubmit,
 }: FeedbackTabProps) {
   const renderTitle = () => {
     let questionName = "";
@@ -129,10 +131,17 @@ export default function FeedbackTab({
         setElements={setElements}
         onOpenEditor={onOpenEditor}
         showTitle={false}
-        emptyStateMessage="No feedback errors"
-        emptyStateSubtext="All feedback has been addressed."
         isSandboxMode={isSandboxMode}
       />
+      <div className={styles.resubmitRow}>
+        <button
+          type="button"
+          className={styles.resubmitButton}
+          onClick={onResubmit}
+        >
+          Resubmit
+        </button>
+      </div>
     </>
   );
 }

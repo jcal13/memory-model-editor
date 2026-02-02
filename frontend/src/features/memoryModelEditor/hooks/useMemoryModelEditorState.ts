@@ -54,6 +54,12 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     initialUIData.questionView ?? "root"
   );
 
+  // Scroll positions for info panel tabs (persists across panel close/open)
+  const [tabScrollPositions, setTabScrollPositions] = useState<Record<Tab, number>>({
+    question: 0,
+    feedback: 0,
+  });
+
   // Panel state
   const [activePaletteTab, setActivePaletteTab] = useState<PaletteTab>("all");
   const [isPaletteOpen, setIsPaletteOpen] = useState(true);
@@ -98,6 +104,8 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     setIsSandboxMode,
     questionView,
     setQuestionView,
+    tabScrollPositions,
+    setTabScrollPositions,
 
     // Panel state
     activePaletteTab,

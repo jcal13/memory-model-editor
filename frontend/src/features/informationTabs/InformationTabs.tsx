@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { SubmissionResult, Tab, CanvasElement } from "../shared/types";
 import { MasterErrorList } from "../memoryModelEditor/utils/masterErrorList";
 import FeedbackTab from "./feedbackTab/FeedbackTab";
@@ -26,6 +27,8 @@ interface InformationTabsProps {
   onOpenEditor: (element: CanvasElement) => void;
   isSandboxMode: boolean;
   onQuestionDataChange?: (data: any) => void;
+  tabScrollPositions: Record<Tab, number>;
+  setTabScrollPositions: React.Dispatch<React.SetStateAction<Record<Tab, number>>>;
 }
 
 export default function InformationTabs({
@@ -50,13 +53,51 @@ export default function InformationTabs({
   onOpenEditor,
   isSandboxMode,
   onQuestionDataChange,
+  tabScrollPositions,
+  setTabScrollPositions,
 }: InformationTabsProps) {
+  const tabBodyRef = useRef<HTMLDivElement>(null);
+
+  const saveCurrentScroll = () => {
+    if (tabBodyRef.current) {
+      setTabScrollPositions((prev) => ({
+        ...prev,
+        [activeTab]: tabBodyRef.current!.scrollTop,
+      }));
+    }
+  };
+
+  // Restore scroll position when active tab changes or on mount
+  useEffect(() => {
+    if (tabBodyRef.current) {
+      tabBodyRef.current.scrollTop = tabScrollPositions[activeTab];
+    }
+  }, [activeTab, tabScrollPositions]);
+
+  // Save scroll position on unmount (panel close)
+  const activeTabRef = useRef(activeTab);
+  activeTabRef.current = activeTab;
+  useEffect(() => {
+    const el = tabBodyRef.current;
+    return () => {
+      if (el) {
+        setTabScrollPositions((prev) => ({
+          ...prev,
+          [activeTabRef.current]: el.scrollTop,
+        }));
+      }
+    };
+  }, [setTabScrollPositions]);
+
   const renderTabButton = (tab: Tab, label: string) => (
     <button
       key={tab}
       type="button"
       className={`${styles.tabBtn} ${activeTab === tab ? styles.active : ""}`}
-      onClick={() => setActive(tab)}
+      onClick={() => {
+        saveCurrentScroll();
+        setActive(tab);
+      }}
       aria-pressed={activeTab === tab}
     >
       {label}
@@ -66,6 +107,7 @@ export default function InformationTabs({
   const handleSubmit = async () => {
     const success = await onSubmit();
     if (success) {
+      saveCurrentScroll();
       setActive("feedback");
     }
     return success;
@@ -79,7 +121,7 @@ export default function InformationTabs({
           {renderTabButton("feedback", "Feedback")}
         </nav>
 
-        <div className={styles.tabBody}>
+        <div className={styles.tabBody} ref={tabBodyRef}>
           <div
             className={activeTab === "question" ? "" : styles.hidden}
             role="tabpanel"
@@ -117,6 +159,7 @@ export default function InformationTabs({
               questionIndex={questionIndex}
               questionType={questionType}
               isSandboxMode={!isSandboxMode}
+              onResubmit={onSubmit}
             />
           </div>
         </div>

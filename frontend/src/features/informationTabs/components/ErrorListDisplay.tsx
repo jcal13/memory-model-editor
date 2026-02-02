@@ -15,8 +15,6 @@ interface ErrorListDisplayProps {
   onOpenEditor: (element: CanvasElement) => void;
   title?: string;
   showTitle?: boolean;
-  emptyStateMessage?: string;
-  emptyStateSubtext?: string;
   isSandboxMode?: boolean;
 }
 
@@ -27,8 +25,6 @@ export default function ErrorListDisplay({
   onOpenEditor,
   title = "Errors",
   showTitle = true,
-  emptyStateMessage = "No errors detected",
-  emptyStateSubtext = "Everything looks good!",
   isSandboxMode = false,
 }: ErrorListDisplayProps) {
   const handleErrorHover = (
@@ -120,18 +116,7 @@ export default function ErrorListDisplay({
   const totalErrors = errors.length;
 
   if (totalErrors === 0) {
-    return (
-      <>
-        {renderTitle()}
-        <div className={styles.content}>
-          <div className={styles.noErrorsContainer}>
-            <div className={styles.successIcon}>✓</div>
-            <p className={styles.successMessage}>{emptyStateMessage}</p>
-            <p className={styles.successSubtext}>{emptyStateSubtext}</p>
-          </div>
-        </div>
-      </>
-    );
+    return <>{renderTitle()}</>;
   }
 
   return (

@@ -159,6 +159,7 @@ export default function InformationTabs({
               questionIndex={questionIndex}
               questionType={questionType}
               isSandboxMode={!isSandboxMode}
+              onResubmit={onSubmit}
             />
           </div>
         </div>

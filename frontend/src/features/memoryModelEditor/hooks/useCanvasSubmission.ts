@@ -67,10 +67,8 @@ export function useCanvasSubmission({
       return false;
     }
 
-    // Clear previous feedback errors before submission
+    // Prepare a clean copy for submission without mutating displayed elements yet
     const clearedElements = clearFeedbackErrors(els);
-    setElsRef.current(clearedElements);
-
     const validElements = clearedElements.filter((el) => !el.invalidated);
 
     if (validElements.length === 0) {
@@ -84,18 +82,20 @@ export function useCanvasSubmission({
       const result = await submitCanvas(validElements, index, qtype);
 
       if (result !== undefined && result !== null) {
-        setResultsRef.current(result);
-
         console.log('[useCanvasSubmission] Submission result:', result);
         console.log('[useCanvasSubmission] Feedback errors count:', result.errors?.length || 0);
 
-        // Apply feedback errors to canvas elements
+        // Apply new feedback errors (or just clear old ones) and update results together
         if (result.errors && result.errors.length > 0) {
           console.log('[useCanvasSubmission] Applying feedback errors:', result.errors);
           const elementsWithFeedback = applyFeedbackErrors(clearedElements, result.errors);
           console.log('[useCanvasSubmission] Elements with feedback:', elementsWithFeedback.filter(el => el.errors && el.errors.length > 0));
           setElsRef.current(elementsWithFeedback);
+        } else {
+          setElsRef.current(clearedElements);
         }
+
+        setResultsRef.current(result);
 
         // Determine if submission was correct based on result
         const isCorrect = determineIfCorrect(result);

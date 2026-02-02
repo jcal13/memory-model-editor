@@ -3,7 +3,10 @@ import { CanvasElement } from "../shared/types";
 import { buildJSONFromElements } from "./jsonBuilder";
 
 // Configuration
-const API_DEV_URL = "http://localhost:3001";
+const API_DEV_URL =
+  process.env.NODE_ENV === "production"
+    ? "http://vm009.teach.cs.toronto.edu:3001"
+    : "http://localhost:3001";
 const SUBMIT_ENDPOINT = "/canvasEditor/submit";
 
 // Types
@@ -25,7 +28,7 @@ export interface SubmissionPayload {
 export async function submitCanvas(
   elements: CanvasElement[],
   questionIndex: number,
-  questionType: QuestionType
+  questionType: QuestionType,
 ) {
   try {
     const payload: SubmissionPayload = {
@@ -36,11 +39,14 @@ export async function submitCanvas(
 
     const response = await axios.post(
       `${API_DEV_URL}${SUBMIT_ENDPOINT}`,
-      payload
+      payload,
     );
 
-    console.log('[questionValidationService] Backend response:', response.data);
-    console.log('[questionValidationService] Response errors:', response.data.errors);
+    console.log("[questionValidationService] Backend response:", response.data);
+    console.log(
+      "[questionValidationService] Response errors:",
+      response.data.errors,
+    );
 
     return response.data;
   } catch (error) {

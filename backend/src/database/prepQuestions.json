@@ -1,28 +1,10 @@
 [
   {
     "id": 1,
-"question": "Trace the `__main__` block below. The initial memory model (before the call to `move_to_back`) is provided as preloaded boxes. Draw the memory model **immediately before** `move_to_back` returns (i.e., after the `snapshot` call inside the method).\n\nNote:\n- `move_to_back` is a new `LinkedList` method.\n- The `_Node` and `LinkedList` classes are as seen in class.\n- You are allowed to use either Practice or Test mode to complete this question.",
+    "question": "Trace the `__main__` block below. The initial memory model (before the call to `move_to_back`) is provided as preloaded boxes. Draw the memory model **immediately before** `move_to_back` returns.\n\nNotes:\n- `move_to_back` is a new `LinkedList` method.\n- The `_Node` and `LinkedList` classes are as seen in class.\n- You are allowed to use either Practice or Test mode to complete this question.",
     "code": [
-      "from __future__ import annotations",
-      "",
-      "import json",
-      "from typing import Any",
-      "from python_ta.debug import snapshot",
-      "",
-      "class _Node:",
-      "    def __init__(self, item: Any) -> None:",
-      "        self.item, self.next = item, None",
-      "",
       "class LinkedList:",
-      "    def __init__(self, items: list) -> None:",
-      "        if not items:",
-      "            self._first = None",
-      "        else:",
-      "            self._first = _Node(items[0])",
-      "            curr = self._first",
-      "            for item in items[1:]:",
-      "                curr.next = _Node(item)",
-      "                curr = curr.next",
+      "    # other methods omitted",
       "",
       "    def move_to_back(self) -> None:",
       "        \"\"\"Return the last item in this list, set that node's",
@@ -216,9 +198,7 @@
             "type": "class",
             "value": null,
             "className": "LinkedList",
-            "classVariables": [
-              { "key": "_first", "value": 2 }
-            ]
+            "classVariables": [{ "key": "_first", "value": 2 }]
           }
         }
       ],

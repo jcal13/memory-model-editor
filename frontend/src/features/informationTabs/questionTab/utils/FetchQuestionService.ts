@@ -1,8 +1,11 @@
 import axios from "axios";
 
 // Configuration
-const API_URL = process.env.NODE_ENV === 'production' 
-  ? ""  : "http://localhost:3001";
+const API_URL =
+  process.env.NODE_ENV === "production"
+    ? "http://vm009.teach.cs.toronto.edu:3001"
+    : "http://localhost:3001";
+
 /**
  * Fetches a specific question by ID and type
  * @param id - Question ID
@@ -11,11 +14,11 @@ const API_URL = process.env.NODE_ENV === 'production'
  */
 export async function fetchQuestion<T = any>(
   id: number,
-  type: "test" | "practice" | "prep"
+  type: "test" | "practice" | "prep",
 ): Promise<T> {
   try {
     const response = await axios.get(
-      `${API_URL}/questions/${type}questions/${id}`
+      `${API_URL}/questions/${type}questions/${id}`,
     );
     return response.data as T;
   } catch (error) {
@@ -32,7 +35,7 @@ export async function fetchQuestion<T = any>(
  * @returns Promise with question count
  */
 export async function fetchQuestionCount(
-  type: "test" | "practice" | "prep"
+  type: "test" | "practice" | "prep",
 ): Promise<number> {
   try {
     const url = `${API_URL}/questions/${type}questions`;

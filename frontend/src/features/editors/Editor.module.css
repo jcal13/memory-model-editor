@@ -187,6 +187,32 @@
   position: relative;
 }
 
+.collectionDeleteButton {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  width: 22px;
+  height: 22px;
+  font-size: 1rem;
+  background-color: #ef4444;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 160ms ease;
+  z-index: 2;
+  padding: 0;
+  line-height: 1;
+}
+
+.collectionDeleteButton:hover {
+  background-color: #dc2626;
+  transform: scale(1.05);
+}
+
 .removeItem:hover,
 .collectionRemoveId:hover {
   background-color: #dc2626;

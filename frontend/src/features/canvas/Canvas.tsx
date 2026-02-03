@@ -136,6 +136,7 @@ function Canvas({
   );
   const [canvasHeight, setCanvasHeight] = useState<number | null>(null);
   const [scale, setScale] = useState(1);
+  const [callStackWidth, setCallStackWidth] = useState(225);
 
   const { svgRef } = useCanvasRefs();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -437,6 +438,7 @@ function Canvas({
             }
             onSelect={openElementEditor}
             onReorder={handleCallStackReorder}
+            onWidthChange={setCallStackWidth}
             scale={scale}
           />
 
@@ -450,6 +452,7 @@ function Canvas({
                   openInterface={() => openElementEditor(el)}
                   updatePosition={createPositionUpdater(el.boxId)}
                   invalidated={el.invalidated}
+                  callStackWidth={callStackWidth}
                 />
               ))}
           </g>

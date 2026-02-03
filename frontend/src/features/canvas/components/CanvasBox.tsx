@@ -13,6 +13,7 @@ export default function CanvasBox({
   onSizeChange,
   invalidated = false,
   disableDrag = false,
+  callStackWidth,
 }: CanvasBoxProps) {
   const { gRef, dragState, dimensions } = useBoxDragState();
 
@@ -25,6 +26,7 @@ export default function CanvasBox({
     updatePosition,
     invalidated,
     disableDrag,
+    callStackWidth,
   });
 
   // Report size changes for parent components (like CallStack)
@@ -53,7 +55,10 @@ export default function CanvasBox({
       ? { width: vb.width, height: vb.height }
       : undefined;
     const callStackBounds = getCallStackBounds(
-      vb?.height || window.innerHeight
+      vb?.height || window.innerHeight,
+      0,
+      0,
+      callStackWidth ?? 225
     );
 
     const constrainedPosition = constrainPositionAwayFromCallStack(
@@ -92,6 +97,7 @@ export default function CanvasBox({
     dimensions.current.height,
     disableDrag,
     updatePosition,
+    callStackWidth,
   ]);
 
   useEffect(() => {

@@ -61,6 +61,7 @@ export function useDraggableBox({
   updatePosition,
   invalidated = false,
   disableDrag = false,
+  callStackWidth,
 }: {
   gRef: React.RefObject<SVGGElement | null>;
   element: CanvasElement;
@@ -70,6 +71,7 @@ export function useDraggableBox({
   updatePosition: (x: number, y: number) => void;
   invalidated?: boolean;
   disableDrag?: boolean;
+  callStackWidth?: number;
 }) {
   const livePosRef = useRef({ x: element.x, y: element.y });
   const movedRef = useRef(false);
@@ -122,7 +124,7 @@ export function useDraggableBox({
       );
 
       // Apply smooth callstack boundary constraints (no teleportation during drag)
-      const callStackBounds = getCallStackBounds(vb?.height);
+      const callStackBounds = getCallStackBounds(vb?.height, 0, 0, callStackWidth ?? 225);
       const constrainedPosition = smoothlyConstrainDragPosition(
         { x: newX, y: newY },
         { width, height },
@@ -141,7 +143,7 @@ export function useDraggableBox({
         `translate(${newX - halfW}, ${newY - halfH})`
       );
     },
-    [getSvgPoint, dimensions, dragState, gRef]
+    [getSvgPoint, dimensions, dragState, gRef, callStackWidth]
   );
 
   const handleMouseUp = useCallback(() => {

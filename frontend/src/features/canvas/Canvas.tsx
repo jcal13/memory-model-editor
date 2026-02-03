@@ -518,7 +518,7 @@ function createNewElement(
         name: "function",
         type: "function",
         value: null,
-        functionName: "__main__",
+        functionName: "function",
         params: [],
         order: functionCount + 1,
       };

@@ -16,8 +16,8 @@ export function createBoxRenderer(boxType: BoxType): SVGSVGElement {
     .reduce((acc: number, char: string) => acc + char.charCodeAt(0), 1);
 
   const model = new MemoryModel({
-    obj_min_width: config.minWidth,
-    obj_min_height: config.minHeight,
+    obj_min_width: config.minWidth + (boxType === "none" ? 20 : 0),
+    obj_min_height: config.minHeight + (boxType ==="none" ? 15 : 0),
     prop_min_width: 54,
     prop_min_height: 36,
     double_rect_sep: 10,

@@ -63,6 +63,20 @@ export default function CanvasBox({
       canvasBounds
     );
 
+    // Clamp position to stay within canvas bounds (prevents boxes from being cut off)
+    if (canvasBounds && canvasBounds.width > 0 && canvasBounds.height > 0) {
+      const halfW = width / 2;
+      const halfH = height / 2;
+      constrainedPosition.x = Math.max(
+        halfW,
+        Math.min(canvasBounds.width - halfW, constrainedPosition.x)
+      );
+      constrainedPosition.y = Math.max(
+        halfH,
+        Math.min(canvasBounds.height - halfH, constrainedPosition.y)
+      );
+    }
+
     // Only update position if it actually changed
     if (
       constrainedPosition.x !== element.x ||
@@ -84,24 +98,28 @@ export default function CanvasBox({
     checkAndConstrainPosition();
   }, [checkAndConstrainPosition]);
 
-  // Window resize effect: re-constrain position when window size changes
+  // Canvas resize effect: re-constrain position when canvas size changes
+  // Uses ResizeObserver on the parent SVG so it fires for both window resizes
+  // and panel resizes (e.g. dragging the question tab wider)
   useEffect(() => {
     if (disableDrag || element.kind.name === "function") return;
 
+    const svg = gRef.current?.ownerSVGElement;
+    if (!svg) return;
+
     let resizeTimeoutId: NodeJS.Timeout;
 
-    const handleResize = () => {
-      // Debounce the resize handling to avoid excessive recalculations
+    const resizeObserver = new ResizeObserver(() => {
       clearTimeout(resizeTimeoutId);
       resizeTimeoutId = setTimeout(() => {
         checkAndConstrainPosition();
       }, 100);
-    };
+    });
 
-    window.addEventListener("resize", handleResize);
+    resizeObserver.observe(svg);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
       clearTimeout(resizeTimeoutId);
     };
   }, [checkAndConstrainPosition, disableDrag, element.kind.name]);

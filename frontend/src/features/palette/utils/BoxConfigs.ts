@@ -59,7 +59,7 @@ export const BoxConfigs: Record<string, BoxConfig> = {
   /* ---------- Function ---------- */
   function: {
     draw: (model: any) => {
-      model.drawClass(5, 5, "__main__", 0, {}, true, DEFAULT_STYLE);
+      model.drawClass(5, 5, "function", 0, {}, true, DEFAULT_STYLE);
     },
     minHeight: 81,
     minWidth: 171,

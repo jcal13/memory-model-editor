@@ -12,7 +12,7 @@ import { CanvasElement, BoxType, ID } from "../shared/types";
 import CanvasBox from "./components/CanvasBox";
 import BoxEditor from "../editors/boxEditor/BoxEditor";
 import CallStack from "./components/CallStack";
-import { ClearCanvasButton, DownloadButton } from "./components/CanvasButtons";
+import { ClearCanvasButton, DownloadButton, ZoomControls } from "./components/CanvasButtons";
 import { useCanvasRefs } from "./hooks/hooks";
 import { validateElements } from "./utils/validation";
 import styles from "./Canvas.module.css";
@@ -135,6 +135,7 @@ function Canvas({
     null
   );
   const [canvasHeight, setCanvasHeight] = useState<number | null>(null);
+  const [scale, setScale] = useState(1);
 
   const { svgRef } = useCanvasRefs();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -145,6 +146,21 @@ function Canvas({
       : "0 0 1920 1080";
 
   const lastViewBox = useRef<string>(initialVB);
+  const baseDims = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
+
+  // Recompute the viewBox from base dims + current scale
+  const applyViewBox = useCallback(
+    (w: number, h: number, s: number) => {
+      const svg = svgRef.current;
+      if (!svg) return;
+      const vb = `0 0 ${w / s} ${h / s}`;
+      if (vb !== lastViewBox.current) {
+        svg.setAttribute("viewBox", vb);
+        lastViewBox.current = vb;
+      }
+    },
+    [svgRef]
+  );
 
   // Canvas sizing and viewBox management (pre-paint to avoid flicker)
   useLayoutEffect(() => {
@@ -154,12 +170,9 @@ function Canvas({
     const height = Math.max(1, rect.height);
     const width = Math.max(1, rect.width);
     setCanvasHeight(height);
-    const viewBox = `0 0 ${width} ${height}`;
-    if (viewBox !== lastViewBox.current) {
-      svg.setAttribute("viewBox", viewBox);
-      lastViewBox.current = viewBox;
-    }
-  }, [svgRef]);
+    baseDims.current = { width, height };
+    applyViewBox(width, height, scale);
+  }, [svgRef, scale, applyViewBox]);
 
   // Handle canvas width changes while preserving height
   useEffect(() => {
@@ -179,12 +192,8 @@ function Canvas({
 
       if (width !== previousWidth) {
         previousWidth = width;
-        const viewBox = `0 0 ${width} ${canvasHeight}`;
-
-        if (viewBox !== lastViewBox.current) {
-          svg.setAttribute("viewBox", viewBox);
-          lastViewBox.current = viewBox;
-        }
+        baseDims.current = { width, height: canvasHeight };
+        applyViewBox(width, canvasHeight, scale);
       }
     };
 
@@ -199,7 +208,15 @@ function Canvas({
       cancelAnimationFrame(animationFrame);
       resizeObserver.disconnect();
     };
-  }, [canvasHeight, svgRef]);
+  }, [canvasHeight, svgRef, scale, applyViewBox]);
+
+  // Re-apply viewBox when scale changes
+  useEffect(() => {
+    const { width, height } = baseDims.current;
+    if (width > 0 && height > 0) {
+      applyViewBox(width, height, scale);
+    }
+  }, [scale, applyViewBox]);
 
   useEffect(() => {
     if (sandbox) return;
@@ -400,7 +417,7 @@ function Canvas({
           data-testid="canvas"
           ref={svgRef}
           viewBox={lastViewBox.current}
-          preserveAspectRatio="none"
+          preserveAspectRatio="xMinYMin meet"
           className={styles.canvas}
           style={{
             width: "100%",
@@ -420,6 +437,7 @@ function Canvas({
             }
             onSelect={openElementEditor}
             onReorder={handleCallStackReorder}
+            scale={scale}
           />
 
           <g>
@@ -442,6 +460,7 @@ function Canvas({
           elements={elements}
           canvasSelector={`.${styles.canvasWrapper}`}
         />
+        <ZoomControls scale={scale} onScaleChange={setScale} />
       </div>
 
       {openEditors.map((element) => {

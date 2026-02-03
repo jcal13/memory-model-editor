@@ -42,6 +42,7 @@ interface CallStackProps {
   x?: number;
   y?: number;
   width?: number;
+  scale?: number;
 }
 
 interface DragState {
@@ -68,6 +69,7 @@ const CallStack: React.FC<CallStackProps> = ({
   x = 20,
   y = 90,
   width = 205,
+  scale = 1,
 }) => {
   const clipPathId = useId();
 
@@ -112,8 +114,11 @@ const CallStack: React.FC<CallStackProps> = ({
   }, [frames, boxSizes]);
 
   const columnWidth = Math.max(width, maxBoxWidth);
-  const columnHeight =
-    viewportHeight - yPosition - (DOWNLOAD_BUTTON_BOTTOM + BUTTON_HEIGHT) - 30;
+  // Compute the call stack height in pixel space, then convert to SVG units.
+  // This keeps the call stack visually the same height regardless of zoom.
+  const pixelColumnHeight =
+    viewportHeight - (yPosition + DOWNLOAD_BUTTON_BOTTOM + BUTTON_HEIGHT + 30) * scale;
+  const columnHeight = pixelColumnHeight / scale;
   const visibleHeight = Math.max(
     100,
     columnHeight - HEADER_HEIGHT - TOP_PADDING - BOTTOM_PADDING

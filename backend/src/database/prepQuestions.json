@@ -1,15 +1,13 @@
 [
   {
     "id": 1,
-    "question": "Trace the `__main__` block below. The initial memory model (before the call to `move_to_back`) is provided as preloaded boxes. Draw the memory model **immediately before** `move_to_back` returns.\n\nNotes:\n- `move_to_back` is a new `LinkedList` method.\n- The `_Node` and `LinkedList` classes are as seen in class.\n- You are allowed to use either Practice or Test mode to complete this question.",
+    "question": "Trace the `__main__` block below. The initial memory model (after `lst = LinkedList([165, 108])` executes) is provided as preloaded boxes. Trace the execution of `lst.move_to_back()` and draw the memory model **immediately before** the method returns (i.e., before `LinkedList.move_to_back` is popped from the call stack).\n\nNotes:\n- `move_to_back` is a new `LinkedList` method.\n- The `LinkedList` (and `_Node`) classes are as seen in this course.\n- You are allowed to use either Practice or Test mode to complete this question.",
     "code": [
       "class LinkedList:",
-      "    # other methods omitted",
+      "    # init and other methods are as seen in this course.",
       "",
       "    def move_to_back(self) -> None:",
-      "        \"\"\"Return the last item in this list, set that node's",
-      "        new item to now be 148, and then move the first node",
-      "        in the list to the end of the list.",
+      "        \"\"\"A new LinkedList method!",
       "        Precondition: this LinkedList has at least two items",
       "        \"\"\"",
       "        curr = self._first",

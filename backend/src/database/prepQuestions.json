@@ -152,7 +152,7 @@
           "y": 80,
           "kind": {
             "name": "primitive",
-            "type": "None",
+            "type": "NoneType",
             "value": "None"
           }
         },

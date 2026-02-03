@@ -480,7 +480,7 @@ function createNewElement(
 ): BoxType | null {
   switch (boxType) {
     case "none":
-      return { name: "primitive", type: "None", value: "null" };
+      return { name: "primitive", type: "NoneType", value: "None" };
     case "int":
       return { name: "primitive", type: "int", value: "0" };
     case "float":
@@ -490,7 +490,7 @@ function createNewElement(
     case "bool":
       return { name: "primitive", type: "bool", value: "false" };
     case "primitive":
-      return { name: "primitive", type: "None", value: "None" };
+      return { name: "primitive", type: "NoneType", value: "None" };
     case "function": {
       const functionCount = elements.filter(
         (el) => el.kind.name === "function"

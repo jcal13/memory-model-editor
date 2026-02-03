@@ -38,7 +38,7 @@ export function structureError(message: string): FeedbackError {
   if (atExpectedMatch) {
     const pathPart = atExpectedMatch[1].trim();
     const gotPart = message.replace(/^At .+?:\s*expected .+,\s*but got\s+/, '');
-    const looksLikeType = /^(int|float|str|bool|None|list|dict|tuple|set|object)$/.test(gotPart.trim());
+    const looksLikeType = /^(int|float|str|bool|None|NoneType|list|dict|tuple|set|object)$/.test(gotPart.trim());
     return {
       type: looksLikeType ? ErrorType.TYPE_MISMATCH : ErrorType.VALUE_MISMATCH,
       message,

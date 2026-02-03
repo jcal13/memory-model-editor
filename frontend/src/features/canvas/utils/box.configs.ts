@@ -18,12 +18,12 @@ export const BOX_CONFIGS: Record<string, BoxTypeConfig> = {
   /* ========== Primitive Box ========== */
   primitive: {
     draw: (model: any, kind: any, id: ID) => {
-      const isNone = kind.type === "None" || kind.value === null;
-      const type = isNone ? "None" : kind.type;
+      const isNone = kind.type === "NoneType" || kind.type === "None" || kind.value === null;
+      const type = isNone ? "NoneType" : kind.type;
 
       let value: any;
       if (isNone) {
-        value = "null";
+        value = "None";
       } else if (["string", "number", "boolean"].includes(typeof kind.value)) {
         value = kind.type === "bool" ? kind.value === "true" : kind.value;
       } else {

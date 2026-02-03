@@ -162,6 +162,7 @@ export default function MemoryModelEditor({
         case "bool":
           requiredTypes.add("bool" as BoxType);
           break;
+        case "NoneType":
         case "None":
           requiredTypes.add("none" as BoxType);
           break;

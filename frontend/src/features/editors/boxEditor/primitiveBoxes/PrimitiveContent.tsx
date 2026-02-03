@@ -32,7 +32,7 @@ const PrimitiveContent = ({ dataType, value, setValue }: Props) => {
       ? float(value)
       : dataType === "bool"
       ? bool(value)
-      : dataType === "None"
+      : dataType === "NoneType"
       ? value === "None"
       : true;
 
@@ -52,7 +52,7 @@ const PrimitiveContent = ({ dataType, value, setValue }: Props) => {
             </label>
           ))}
         </div>
-      ) : dataType === "None" ? (
+      ) : dataType === "NoneType" ? (
         // Display only for NoneType
         <div className={styles.primitiveNoneContainer}>None</div>
       ) : (
@@ -66,7 +66,7 @@ const PrimitiveContent = ({ dataType, value, setValue }: Props) => {
       )}
 
       {/* Inline validation message */}
-      {!isValid() && dataType !== "None" && (
+      {!isValid() && dataType !== "NoneType" && (
         <div className={styles.invalidMessage}>
           Invalid&nbsp;{dataType}&nbsp;value
         </div>

@@ -131,8 +131,8 @@ function formatPathForUser(path: string): string {
 const TYPE_FOR_USER: Record<string, string> = {
   ".frame": "function",
   ".class": "object",
-  "NoneType": "None",
-  "None": "None",
+  "NoneType": "NoneType",
+  "None": "NoneType",
   "object": "object",
   "int": "int",
   "float": "float",

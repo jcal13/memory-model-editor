@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "question": "A `Fries` object calls `Food.update_price` through inheritance. Draw the memory model before `update_price` returns.",
+    "question": "Draw the memory model immediately before `update_price` returns.",
     "code": [
       "class Food:",
       "    def __init__(self, n: str, p: int) -> None:",
@@ -128,7 +128,7 @@
   },
   {
     "id": 2,
-    "question": "This recursive constructor builds a `RecursiveList` for `7` and `hi`. Draw every function and object created during execution of `main`.",
+    "question": "Draw the memory model at the end of execution. Include all frames and objects created during execution.",
     "code": [
       "class RecursiveList:",
       "    def __init__(self, items: list) -> None:",
@@ -193,8 +193,8 @@
       },
       {
         "id": 6,
-        "type": "None",
-        "value": null
+        "type": "NoneType",
+        "value": "None"
       },
       {
         "id": 11,
@@ -254,7 +254,7 @@
   },
   {
     "id": 3,
-    "question": "Nested helper functions append `v` plus one to a shared list then return. Draw the memory model before `a_fun` returns.",
+    "question": "Draw the memory model immediately before `a_fun` returns.",
     "code": [
       "def a_fun(lst: list[int], v: int) -> None:",
       "    x = v + 1",
@@ -354,7 +354,7 @@
   },
   {
     "id": 4,
-    "question": "`duplicate` makes a shallow copy of an outer matrix list. Draw the memory model after `duplicate` returns to `main`.",
+    "question": "Draw the memory model after `duplicate` has returned.",
     "code": [
       "def duplicate(matrix: list[list[int]]) -> list[list[int]]:",
       "    answer = []",
@@ -439,7 +439,7 @@
   },
   {
     "id": 5,
-    "question": "`filter_queue` removes values below `minimum` and reassigns `q` inside the function. Draw the memory model just before `filter_queue` returns.",
+    "question": "Draw the memory model immediately before `filter_queue` returns.",
     "code": [
       "def filter_queue(q: Queue[int], minimum: int) -> None:",
       "    \"\"\"Remove all items from <q> that are less than <minimum>.\"\"\"",
@@ -544,7 +544,7 @@
   },
   {
     "id": 6,
-    "question": "`mystery` aliases list via `c`, mutates it, then rebinds local `b` to a new list. Draw the memory model before `mystery` returns.",
+    "question": "Draw the memory model immediately before `mystery` returns.",
     "code": [
       "def mystery(a: int, b: list[int]) -> None:",
       "    c = b",
@@ -625,7 +625,7 @@
   },
   {
     "id": 7,
-    "question": "`copy_of` builds a shallow copy of a tic‑tac‑toe board. Draw the memory model before `copy_of` returns.",
+    "question": "Draw the memory model immediately before `copy_of` returns.",
     "code": [
       "from typing import Any, List",
       "",
@@ -732,7 +732,7 @@
   },
   {
     "id": 8,
-    "question": "`append_sometimes` appends `2` to sublists that lack it using aliasing. Draw the memory model before `append_sometimes` returns.",
+    "question": "Draw the memory model immediately before `append_sometimes` returns.",
     "code": [
       "from typing import List",
       "",
@@ -841,7 +841,7 @@
   },
   {
     "id": 9,
-    "question": "Two `BagOfStuff` objects share the same list which is mutated after the first construction. Draw the memory model before the `assert` executes.",
+    "question": "Draw the memory model immediately before the `assert` statement executes.",
     "code": [
       "class BagOfStuff:",
       "    def __init__(self, stuff: list[str]) -> None:",
@@ -923,7 +923,7 @@
   },
   {
     "id": 10,
-    "question": "`do_something` appends ninety‑nine to each inner list accessed through an alias. Draw the memory model after `do_something` is popped.",
+    "question": "Draw the memory model after `do_something` has returned.",
     "code": [
       "from typing import List",
       "",

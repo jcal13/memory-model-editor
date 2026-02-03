@@ -41,8 +41,20 @@ export function createBoxRenderer(boxType: BoxType): SVGSVGElement {
     const padding = 5;
     try {
       const bbox = svg.getBBox();
-      svg.setAttribute("width", `${bbox.width + padding}`);
-      svg.setAttribute("height", `${bbox.height + padding}`);
+      
+      const finalWidth = bbox.width + padding;
+      const finalHeight = bbox.height + padding;
+
+      svg.setAttribute("width", `${finalWidth}`);
+      svg.setAttribute("height", `${finalHeight}`);
+
+      if (boxType === "none") {
+        const shiftX = 10; 
+        const shiftY = 10; 
+        
+        svg.setAttribute("viewBox", `${shiftX} ${shiftY} ${finalWidth} ${finalHeight}`);
+      }
+      
     } catch (error) {
       console.warn(`getBBox failed for ${boxType}:`, error);
     }

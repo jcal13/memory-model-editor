@@ -1,4 +1,4 @@
-export type PrimitiveType = "None" | "int" | "float" | "str" | "bool";
+export type PrimitiveType = "NoneType" | "int" | "float" | "str" | "bool";
 export type CollectionType = "list" | "tuple" | "set" | "dict";
 export type SpecialType = "function" | "class";
 export type BoxType =

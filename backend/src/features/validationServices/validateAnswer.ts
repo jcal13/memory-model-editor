@@ -131,8 +131,8 @@ function formatPathForUser(path: string): string {
 const TYPE_FOR_USER: Record<string, string> = {
   ".frame": "function",
   ".class": "object",
-  "NoneType": "None",
-  "None": "None",
+  "NoneType": "NoneType",
+  "None": "NoneType",
   "object": "object",
   "int": "int",
   "float": "float",
@@ -768,8 +768,8 @@ function compareIds(
 }
 
 // Check if the call stack order matches between answer and input.
-// The UI displays bottom-to-top as [__main__, move_to_back]; the answer stores
-// top-to-bottom as [move_to_back, __main__]. Reverse the answer for comparison.
+// The UI displays bottom-to-top as [__main__, LinkedList.move_to_back]; the answer stores
+// top-to-bottom as [LinkedList.move_to_back, __main__]. Reverse the answer for comparison.
 function checkCallStackOrder(
   answerFrames: MemoryBox[],
   inputFrames: MemoryBox[],

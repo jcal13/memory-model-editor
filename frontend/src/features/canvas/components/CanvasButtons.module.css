@@ -98,3 +98,44 @@
 .downloadMenu button:hover {
   background-color: #f1f5f9;
 }
+
+/* Zoom Controls */
+.zoomControls {
+  position: absolute;
+  bottom: 35px;
+  right: 35px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+
+.zoomButton {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1;
+  background-color: #ffffff;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.zoomButton:hover:not(:disabled) {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.zoomButton:active:not(:disabled) {
+  background-color: #e2e8f0;
+}
+
+.zoomButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}

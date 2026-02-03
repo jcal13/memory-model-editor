@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { CanvasElement } from "../../shared/types";
 import { buildJSONFromElements } from "../../validationServices/jsonBuilder";
 import html2canvas from "html2canvas";
@@ -93,11 +93,14 @@ export function DownloadButton({
     const clearButton = canvasNode.querySelector(
       `.${styles.clearButton}`
     ) as HTMLElement;
+    const zoomControls = canvasNode.querySelector(
+      `.${styles.zoomControls}`
+    ) as HTMLElement;
     const modeToggle = document.querySelector(
       '[data-editor-control="mode-toggle"]'
     ) as HTMLElement;
 
-    const elementsToHide = [downloadButton, clearButton, modeToggle].filter(
+    const elementsToHide = [downloadButton, clearButton, zoomControls, modeToggle].filter(
       Boolean
     );
 
@@ -167,6 +170,53 @@ export function DownloadButton({
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+// Zoom Controls
+const MIN_SCALE = 0.5;
+const MAX_SCALE = 2.0;
+const SCALE_STEP = 0.1;
+
+interface ZoomControlsProps {
+  scale: number;
+  onScaleChange: (scale: number) => void;
+}
+
+export function ZoomControls({ scale, onScaleChange }: ZoomControlsProps) {
+  const handleZoomIn = useCallback(() => {
+    const next = Math.min(MAX_SCALE, Math.round((scale + SCALE_STEP) * 10) / 10);
+    onScaleChange(next);
+  }, [scale, onScaleChange]);
+
+  const handleZoomOut = useCallback(() => {
+    const next = Math.max(MIN_SCALE, Math.round((scale - SCALE_STEP) * 10) / 10);
+    onScaleChange(next);
+  }, [scale, onScaleChange]);
+
+  return (
+    <div className={styles.zoomControls}>
+      <button
+        type="button"
+        className={`${styles.baseButton} ${styles.zoomButton}`}
+        onClick={handleZoomOut}
+        disabled={scale <= MIN_SCALE}
+        aria-label="Zoom out"
+        title="Zoom out"
+      >
+        −
+      </button>
+      <button
+        type="button"
+        className={`${styles.baseButton} ${styles.zoomButton}`}
+        onClick={handleZoomIn}
+        disabled={scale >= MAX_SCALE}
+        aria-label="Zoom in"
+        title="Zoom in"
+      >
+        +
+      </button>
     </div>
   );
 }

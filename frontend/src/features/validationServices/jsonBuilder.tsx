@@ -89,7 +89,7 @@ const makeUniqueKey = (rawKey: unknown, usedKeys: Set<string>): string => {
  * @returns The parsed value
  */
 const parsePrimitiveValue = (type: string, value: string): any => {
-  if (type === "None" || value === "null" || value === null) {
+  if (type === "NoneType" || type === "None" || value === "None" || value === "null" || value === null) {
     return null;
   }
 

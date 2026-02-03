@@ -33,8 +33,8 @@ const ClassDisplay = ({
     currentClass={ownClassName}
     buttonClassName={styles.moduleIdBox}
     onRemove={removeClassName}
-    editable={sandbox}
-    sandbox={sandbox}
+    editable={true}
+    sandbox={true}
   />
 );
 

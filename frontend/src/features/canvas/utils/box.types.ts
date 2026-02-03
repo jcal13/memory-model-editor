@@ -21,6 +21,9 @@ export interface CanvasBoxProps {
 
   /** Whether to disable drag functionality for this box */
   disableDrag?: boolean;
+
+  /** Actual rendered width of the call stack (x + columnWidth), used for constraints */
+  callStackWidth?: number;
 }
 
 /**

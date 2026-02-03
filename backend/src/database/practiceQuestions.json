@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "question": "This code assigns `a` to `5`. `b` to `4`. `c` to `6`. Draw the memory model after the assignments complete.",
+    "question": "Draw the memory model after all the code has executed.",
     "code": [
       "a = 5",
       "b = 4",
@@ -45,33 +45,6 @@
     ],
     "canvasConfig": {
       "elements": [
-        {
-          "boxId": 0,
-          "id": "_",
-          "x": 0,
-          "y": 0,
-          "kind": {
-            "name": "function",
-            "type": "function",
-            "value": null,
-            "functionName": "__main__",
-            "params": [
-              {
-                "name": "a",
-                "targetId": "_"
-              },
-              {
-                "name": "b",
-                "targetId": "_"
-              },
-              {
-                "name": "c",
-                "targetId": "_"
-              }
-            ],
-            "order": 1
-          }
-        }
       ],
       "ids": [],
       "classes": []
@@ -79,7 +52,7 @@
   },
   {
     "id": 2,
-    "question": "This code stores `a` as `5`. `b` becomes `a` plus `3`. `c` is a list containing `a` three times. Draw the memory model right after `c` is created.",
+    "question": "Draw the memory model after all the code has executed.",
     "code": [
       "a = 5",
       "b = a + 3",
@@ -128,7 +101,7 @@
   },
   {
     "id": 3,
-    "question": "The variable `b` becomes a triple nested list that ultimately holds `a`. Draw the memory model after `b` is assigned.",
+    "question": "Draw the memory model after all the code has executed.",
     "code": [
       "a = 5",
       "b = [[[a]]]"
@@ -181,7 +154,7 @@
   },
   {
     "id": 4,
-    "question": "`x` holds a list. `y` first aliases `x` then `y` is rebound to the concatenation result creating a new list. Draw the memory model after the concatenation.",
+    "question": "Draw the memory model after all the code has executed.",
     "code": [
       "x = [1, 2, 3]",
       "y = x",
@@ -249,7 +222,7 @@
   },
   {
     "id": 5,
-    "question": "Both `x` and `y` refer to the same set. `y` adds `4` which mutates the shared set. Draw the memory model right after the mutation.",
+    "question": "Draw the memory model after all the code has executed.",
     "code": [
       "x = {1, 2, 3}",
       "y = x",
@@ -307,7 +280,7 @@
   },
   {
     "id": 6,
-    "question": "A nested list `lst` is mutated inside a loop by appending `88` to every inner list. Draw the memory model once the loop is finished.",
+    "question": "Draw the memory model after the loop has finished executing.",
     "code": [
       "lst = [[1, 2], [3, 4]]",
       "for item in lst:",
@@ -387,7 +360,7 @@
   },
   {
     "id": 7,
-    "question": "List `a` is created and `b` is an alias. No mutations happen. Draw the resulting memory model.",
+    "question": "Draw the memory model after all the code has executed.",
     "code": [
       "a = [1]",
       "b = a"
@@ -425,7 +398,7 @@
   },
   {
     "id": 8,
-    "question": "Two independent empty lists `a` and `b` are created. Draw the memory model immediately after creation.",
+    "question": "Draw the memory model after all the code has executed.",
     "code": [
       "a = []",
       "b = []"
@@ -462,7 +435,7 @@
   },
   {
     "id": 9,
-    "question": "`n2` aliases n which starts at fourteen then `n` is rebound to fifteen. Draw the memory model after rebinding.",
+    "question": "Draw the memory model after all the code has executed.",
     "code": [
       "n = 14",
       "n2 = n",
@@ -500,7 +473,7 @@
   },
   {
     "id": 10,
-    "question": "`s2` aliases string `s` then `s` is sliced from index two onward creating a new string object. Draw the memory model after slicing.",
+    "question": "Draw the memory model after all the code has executed.",
     "code": [
       "s = \"hello\"",
       "s2 = s",
@@ -538,7 +511,7 @@
   },
   {
     "id": 11,
-    "question": "`one` aliases `two` then `one` is rebound to a slice from index one to three leaving `two` unchanged. Draw the memory model after slicing.",
+    "question": "Draw the memory model after all the code has executed.",
     "code": [
       "one = [0, 1, 2, 3, 4]",
       "two = one",
@@ -610,7 +583,7 @@
   },
   {
     "id": 12,
-    "question": "Two independent lists `a` and `b` are equal initially then `a` removes the first occurrence of `two`. Draw the memory model after the removal.",
+    "question": "Draw the memory model after all the code has executed.",
     "code": [
       "a = [1, 2, 3, 2, 9]",
       "b = [1, 2, 3, 2, 9]",
@@ -679,7 +652,7 @@
   },
   {
     "id": 13,
-    "question": "Lists `x` and `y` alias the same object then the element at index one is changed to one hundred. Draw the resulting memory model.",
+    "question": "Draw the memory model after all the code has executed.",
     "code": [
       "x = [1, 2, 3]",
       "y = x",
@@ -737,7 +710,7 @@
   },
   {
     "id": 14,
-    "question": "`lst` and `lst2` are aliases then `lst` appends ninety nine mutating the shared list. Draw the memory model afterward.",
+    "question": "Draw the memory model after all the code has executed.",
     "code": [
       "lst = [3, 2, 7]",
       "lst2 = lst",
@@ -796,7 +769,7 @@
   },
   {
     "id": 15,
-    "question": "A `temp` list is inside L alongside a string and an int. `temp` is mutated and other is rebound to zero leaving `L` unchanged. Draw the memory model at this point.",
+    "question": "Draw the memory model after all the code has executed.",
     "code": [
       "temp = [5, 10, 15]",
       "other = 75",
@@ -881,7 +854,7 @@
   },
   {
     "id": 16,
-    "question": "Loop variable item is rebound to eighty eight but the inner lists remain unchanged. Draw the memory model after the loop.",
+    "question": "Draw the memory model after the loop has finished executing.",
     "code": [
       "L = [[1, 2], [3, 4]]",
       "for item in L:",
@@ -958,7 +931,7 @@
   },
   {
     "id": 17,
-    "question": "Create a list named `nums` that contains the integers 1 through 6. Draw the memory model after the assignment.",
+    "question": "Draw the memory model after all the code has executed.",
     "code": [
       "nums = [1, 2, 3, 4, 5, 6]"
     ],

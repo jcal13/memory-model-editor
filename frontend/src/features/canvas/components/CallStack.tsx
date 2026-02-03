@@ -39,9 +39,11 @@ interface CallStackProps {
   selected: CanvasElement | null;
   onSelect: (element: CanvasElement) => void;
   onReorder: (fromIndex: number, toIndex: number) => void;
+  onWidthChange?: (width: number) => void;
   x?: number;
   y?: number;
   width?: number;
+  scale?: number;
 }
 
 interface DragState {
@@ -65,23 +67,17 @@ const CallStack: React.FC<CallStackProps> = ({
   selected,
   onSelect,
   onReorder,
+  onWidthChange,
   x = 20,
   y = 90,
   width = 205,
+  scale = 1,
 }) => {
   const clipPathId = useId();
 
   // Viewport height management
   const [viewportHeight, setViewportHeight] = useState<number>(() => {
     return window.innerHeight;
-  });
-
-  const [centeredY, setCenteredY] = useState<number>(() => {
-    const topSpace = TOP_CONTROLS_HEIGHT;
-    const bottomSpace = DOWNLOAD_BUTTON_BOTTOM + BUTTON_HEIGHT;
-    const availableHeight = window.innerHeight - topSpace - bottomSpace;
-    const callStackHeight = window.innerHeight - topSpace - bottomSpace - 20;
-    return topSpace + (availableHeight - callStackHeight) / 2;
   });
 
   const yPosition = y;
@@ -112,8 +108,17 @@ const CallStack: React.FC<CallStackProps> = ({
   }, [frames, boxSizes]);
 
   const columnWidth = Math.max(width, maxBoxWidth);
-  const columnHeight =
-    viewportHeight - yPosition - (DOWNLOAD_BUTTON_BOTTOM + BUTTON_HEIGHT) - 30;
+
+  // Notify parent when the rendered call stack width changes (e.g. long function names)
+  useEffect(() => {
+    onWidthChange?.(columnWidth + x);
+  }, [columnWidth, x, onWidthChange]);
+
+  // Compute the call stack height in pixel space, then convert to SVG units.
+  // This keeps the call stack visually the same height regardless of zoom.
+  const pixelColumnHeight =
+    viewportHeight - (yPosition + DOWNLOAD_BUTTON_BOTTOM + BUTTON_HEIGHT + 30) * scale;
+  const columnHeight = pixelColumnHeight / scale;
   const visibleHeight = Math.max(
     100,
     columnHeight - HEADER_HEIGHT - TOP_PADDING - BOTTOM_PADDING

@@ -16,8 +16,8 @@ export function createBoxRenderer(boxType: BoxType): SVGSVGElement {
     .reduce((acc: number, char: string) => acc + char.charCodeAt(0), 1);
 
   const model = new MemoryModel({
-    obj_min_width: config.minWidth,
-    obj_min_height: config.minHeight,
+    obj_min_width: config.minWidth + (boxType === "none" ? 20 : 0),
+    obj_min_height: config.minHeight + (boxType ==="none" ? 15 : 0),
     prop_min_width: 54,
     prop_min_height: 36,
     double_rect_sep: 10,
@@ -41,8 +41,20 @@ export function createBoxRenderer(boxType: BoxType): SVGSVGElement {
     const padding = 5;
     try {
       const bbox = svg.getBBox();
-      svg.setAttribute("width", `${bbox.width + padding}`);
-      svg.setAttribute("height", `${bbox.height + padding}`);
+      
+      const finalWidth = bbox.width + padding;
+      const finalHeight = bbox.height + padding;
+
+      svg.setAttribute("width", `${finalWidth}`);
+      svg.setAttribute("height", `${finalHeight}`);
+
+      if (boxType === "none") {
+        const shiftX = 10; 
+        const shiftY = 10; 
+        
+        svg.setAttribute("viewBox", `${shiftX} ${shiftY} ${finalWidth} ${finalHeight}`);
+      }
+      
     } catch (error) {
       console.warn(`getBBox failed for ${boxType}:`, error);
     }

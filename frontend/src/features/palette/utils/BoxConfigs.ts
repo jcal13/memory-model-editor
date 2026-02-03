@@ -9,7 +9,7 @@ export const BoxConfigs: Record<string, BoxConfig> = {
   /* ---------- "None" placeholder ---------- */
   primitive: {
     draw: (model: any) => {
-      model.drawPrimitive(15, 15, "None", "None", "", DEFAULT_STYLE);
+      model.drawPrimitive(15, 15, "NoneType", "None", "", DEFAULT_STYLE);
     },
     minHeight: 81,
     minWidth: 153,
@@ -18,7 +18,7 @@ export const BoxConfigs: Record<string, BoxConfig> = {
   /* ---------- Concrete primitives ---------- */
   none: {
     draw: (model: any) => {
-      model.drawPrimitive(15, 15, "None", "0", "null", DEFAULT_STYLE);
+      model.drawPrimitive(15, 15, "NoneType", "0", "None", DEFAULT_STYLE);
     },
     minHeight: 81,
     minWidth: 153,
@@ -59,7 +59,7 @@ export const BoxConfigs: Record<string, BoxConfig> = {
   /* ---------- Function ---------- */
   function: {
     draw: (model: any) => {
-      model.drawClass(5, 5, "__main__", 0, {}, true, DEFAULT_STYLE);
+      model.drawClass(5, 5, "function", 0, {}, true, DEFAULT_STYLE);
     },
     minHeight: 81,
     minWidth: 171,

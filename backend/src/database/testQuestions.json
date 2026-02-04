@@ -29,16 +29,6 @@
     "answer": [
       {
         "id": null,
-        "name": "__main__",
-        "type": ".frame",
-        "order": 1,
-        "value": {
-          "f": 4,
-          "menu": 5
-        }
-      },
-      {
-        "id": null,
         "name": "Food.update_price",
         "type": ".frame",
         "order": 5,
@@ -46,6 +36,16 @@
           "self": 4,
           "price": 3,
           "new_price": 3
+        }
+      },
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "f": 4,
+          "menu": 5
         }
       },
       {
@@ -144,21 +144,12 @@
     "answer": [
       {
         "id": null,
-        "name": "__main__",
-        "type": ".frame",
-        "order": 1,
-        "value": {
-          "rec_lst": 10
-        }
-      },
-      {
-        "id": null,
         "name": "RecursiveList.__init__",
         "type": ".frame",
-        "order": 2,
+        "order": 4,
         "value": {
-          "self": 10,
-          "items": 11
+          "self": 30,
+          "items": 33
         }
       },
       {
@@ -175,10 +166,19 @@
         "id": null,
         "name": "RecursiveList.__init__",
         "type": ".frame",
-        "order": 4,
+        "order": 2,
         "value": {
-          "self": 30,
-          "items": 33
+          "self": 10,
+          "items": 11
+        }
+      },
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "rec_lst": 10
         }
       },
       {
@@ -276,20 +276,12 @@
     "answer": [
       {
         "id": null,
-        "name": "__main__",
+        "name": "a_fun",
         "type": ".frame",
-        "order": 1,
+        "order": 4,
         "value": {
-          "a": 148,
-          "b": 148
-        }
-      },
-      {
-        "id": null,
-        "name": "have_fun",
-        "type": ".frame",
-        "order": 2,
-        "value": {
+          "v": 3,
+          "x": 4,
           "lst": 148
         }
       },
@@ -304,13 +296,21 @@
       },
       {
         "id": null,
-        "name": "a_fun",
+        "name": "have_fun",
         "type": ".frame",
-        "order": 4,
+        "order": 2,
         "value": {
-          "v": 3,
-          "x": 4,
           "lst": 148
+        }
+      },
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "a": 148,
+          "b": 148
         }
       },
       {
@@ -461,15 +461,6 @@
     "answer": [
       {
         "id": null,
-        "name": "__main__",
-        "type": ".frame",
-        "order": 1,
-        "value": {
-          "q": 90
-        }
-      },
-      {
-        "id": null,
         "name": "filter_queue",
         "type": ".frame",
         "order": 2,
@@ -478,6 +469,15 @@
           "value": 83,
           "minimum": 67,
           "temp_queue": 95
+        }
+      },
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "q": 90
         }
       },
       {
@@ -560,16 +560,6 @@
     "answer": [
       {
         "id": null,
-        "name": "__main__",
-        "type": ".frame",
-        "order": 1,
-        "value": {
-          "my_lst": 99,
-          "my_num": 1
-        }
-      },
-      {
-        "id": null,
         "name": "mystery",
         "type": ".frame",
         "order": 2,
@@ -577,6 +567,16 @@
           "a": 4,
           "b": 100,
           "c": 99
+        }
+      },
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "my_lst": 99,
+          "my_num": 1
         }
       },
       {
@@ -644,15 +644,6 @@
     "answer": [
       {
         "id": null,
-        "name": "__main__",
-        "type": ".frame",
-        "order": 1,
-        "value": {
-          "board": 100
-        }
-      },
-      {
-        "id": null,
         "name": "copy_of",
         "type": ".frame",
         "order": 2,
@@ -660,6 +651,15 @@
           "lst": 100,
           "item": 30,
           "new_lst": 200
+        }
+      },
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "board": 100
         }
       },
       {
@@ -752,15 +752,6 @@
     "answer": [
       {
         "id": null,
-        "name": "__main__",
-        "type": ".frame",
-        "order": 1,
-        "value": {
-          "lst1": 100
-        }
-      },
-      {
-        "id": null,
         "name": "append_sometimes",
         "type": ".frame",
         "order": 2,
@@ -769,6 +760,15 @@
           "new": 2,
           "item": 30,
           "answer": 100
+        }
+      },
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "lst1": 100
         }
       },
       {

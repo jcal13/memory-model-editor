@@ -179,6 +179,7 @@ export default function MemoryModelEditor({
           requiredTypes.add("dict" as BoxType);
           break;
         case ".class":
+        case "object":
           requiredTypes.add("class" as BoxType);
           break;
       }

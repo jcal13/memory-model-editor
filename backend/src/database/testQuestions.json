@@ -732,9 +732,7 @@
     "id": 8,
     "question": "Draw the memory model immediately before `append_sometimes` returns.",
     "code": [
-      "from typing import List",
-      "",
-      "def append_sometimes(lst: List[List[int]], new: int) -> List[List[int]]:",
+      "def append_sometimes(lst: list[list[int]], new: int) -> list[list[int]]:",
       "    \"\"\"Return a new list equal to <lst>, with <new> appended to each",
       "    sub‑list that doesn't already contain it.\"\"\"",
       "    answer = lst",

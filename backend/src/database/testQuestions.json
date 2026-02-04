@@ -921,9 +921,7 @@
     "id": 10,
     "question": "Draw the memory model after `do_something` has returned.",
     "code": [
-      "from typing import List",
-      "",
-      "def do_something(lst: List[List[int]]) -> None:",
+      "def do_something(lst: list[list[int]]) -> None:",
       "    for sublst in lst:",
       "        sublst.append(99)",
       "",

@@ -439,7 +439,7 @@
   },
   {
     "id": 5,
-    "question": "Draw the memory model immediately before `filter_queue` returns.",
+    "question": "Draw the memory model immediately before `filter_queue` returns.\n\nNotes:\n- The `Queue` class uses a private attribute `_items` (a Python list), where the front of the list is the front of the queue.",
     "code": [
       "def filter_queue(q: Queue[int], minimum: int) -> None:",
       "    \"\"\"Remove all items from <q> that are less than <minimum>.\"\"\"",
@@ -627,10 +627,8 @@
     "id": 7,
     "question": "Draw the memory model immediately before `copy_of` returns.",
     "code": [
-      "from typing import Any, List",
-      "",
-      "def copy_of(lst: List[Any]) -> List[Any]:",
-      "    new_lst: List[Any] = []",
+      "def copy_of(lst: list) -> list:",
+      "    new_lst = []",
       "    for item in lst:",
       "        new_lst.append(item)",
       "    return new_lst",

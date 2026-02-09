@@ -15,6 +15,7 @@ interface Props {
   removeId: (id: ID) => void;
   sandbox: boolean;
   validationErrors?: ValidationError[]; // Validation errors for highlighting
+  elements?: any[]; // All canvas elements for ID usage tracking
 }
 
 /**
@@ -35,6 +36,7 @@ const ClassContent = ({
   removeId,
   sandbox,
   validationErrors,
+  elements = [],
 }: Props) => {
   // Add a new empty variable to the list
   const addVariable = () =>
@@ -88,6 +90,7 @@ const ClassContent = ({
                       }`}
                       sandbox={sandbox}
                       editable={true}
+                      elements={elements}
                     />
                   </FieldValidationTooltip>
                 </div>

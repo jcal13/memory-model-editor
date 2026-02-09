@@ -24,6 +24,7 @@ interface Props {
   ownClassVariables: any;
   setOwnClassVariables: any;
   sandbox: boolean;
+  elements?: any[]; // All canvas elements for ID usage tracking
 }
 
 /**
@@ -52,6 +53,7 @@ const Content = ({
   addId,
   removeId,
   sandbox,
+  elements = [],
 }: Props) => {
   const kind = metadata.kind.name;
 
@@ -71,6 +73,7 @@ const Content = ({
         removeId={removeId}
         sandbox={sandbox}
         validationErrors={metadata.validationErrors}
+        elements={elements}
       />
     );
   }
@@ -115,6 +118,7 @@ const Content = ({
         removeId={removeId}
         sandbox={sandbox}
         validationErrors={metadata.validationErrors}
+        elements={elements}
       />
     );
   }

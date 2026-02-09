@@ -31,7 +31,7 @@
         "id": null,
         "name": "Food.update_price",
         "type": ".frame",
-        "order": 5,
+        "order": 2,
         "value": {
           "self": 4,
           "price": 3,

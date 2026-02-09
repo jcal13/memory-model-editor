@@ -22,6 +22,7 @@ export type MemoryBox = {
   id: number | null;
   value: any;
   name?: string;
+  order?: number;
 };
 
 /* ---------- helpers ---------- */
@@ -485,25 +486,48 @@ function gatherFrames(
       severity: 'error'
     });
 
-  const ansByName = new Map(answerFrames.map((f) => [f.name!, f]));
-  const usrByName = new Map(inputFrames.map((f) => [f.name!, f]));
+  // Count frames by name to handle multiple frames with the same name
+  const answerNameCounts = new Map<string, number>();
+  const inputNameCounts = new Map<string, number>();
 
-  for (const n of ansByName.keys())
-    if (!usrByName.has(n)) errors.push({
-      type: ErrorType.MISSING_ELEMENT,
-      message: `Call stack is missing the ${n} function`,
-      path: `function "${n}"`,
-      severity: 'error'
-    });
-  for (const n of usrByName.keys())
-    if (!ansByName.has(n)) errors.push({
-      type: ErrorType.UNEXPECTED_ELEMENT,
-      message: `Call stack has an unexpected ${n} function`,
-      path: `function "${n}"`,
-      severity: 'error'
-    });
+  for (const f of answerFrames) {
+    answerNameCounts.set(f.name!, (answerNameCounts.get(f.name!) ?? 0) + 1);
+  }
+  for (const f of inputFrames) {
+    inputNameCounts.set(f.name!, (inputNameCounts.get(f.name!) ?? 0) + 1);
+  }
 
-  return { answerFrames, inputFrames, ansByName, usrByName };
+  // Check if frame names match (allowing for multiple frames with the same name)
+  for (const [name, count] of answerNameCounts.entries()) {
+    const inputCount = inputNameCounts.get(name) ?? 0;
+    if (inputCount === 0) {
+      errors.push({
+        type: ErrorType.MISSING_ELEMENT,
+        message: `Call stack is missing the ${name} function`,
+        path: `function "${name}"`,
+        severity: 'error'
+      });
+    } else if (inputCount !== count) {
+      errors.push({
+        type: ErrorType.FRAME_MISMATCH,
+        message: `Call stack should have ${count} ${name} function(s), but has ${inputCount}`,
+        severity: 'error'
+      });
+    }
+  }
+
+  for (const [name, count] of inputNameCounts.entries()) {
+    if (!answerNameCounts.has(name)) {
+      errors.push({
+        type: ErrorType.UNEXPECTED_ELEMENT,
+        message: `Call stack has an unexpected ${name} function`,
+        path: `function "${name}"`,
+        severity: 'error'
+      });
+    }
+  }
+
+  return { answerFrames, inputFrames };
 }
 
 // Scan for duplicate IDs in the user model and report them
@@ -526,8 +550,8 @@ function scanDuplicates(model: MemoryBox[], errors: FeedbackError[]): Set<number
 
 // Compare frames from the answer and user model, checking for variable mismatches
 function compareFrames(
-  ansByName: Map<string, MemoryBox>,
-  usrByName: Map<string, MemoryBox>,
+  answerFrames: MemoryBox[],
+  inputFrames: MemoryBox[],
   answerMap: Map<number, MemoryBox>,
   inputMap: Map<number, MemoryBox>,
   globalAnswerToInput: Map<number, { target: number; path: string }>,
@@ -537,10 +561,19 @@ function compareFrames(
 ) {
   const visited = new Map<number, Set<number>>();
 
-  for (const [name, aFrame] of ansByName.entries()) {
-    if (!usrByName.has(name)) continue; // already logged as missing
+  // Sort frames by order to compare them 1:1
+  const sortedAnswer = [...answerFrames].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const sortedInput = [...inputFrames].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-    const uFrame = usrByName.get(name)!;
+  // Compare each pair of frames
+  for (let i = 0; i < sortedAnswer.length && i < sortedInput.length; i++) {
+    const aFrame = sortedAnswer[i];
+    const uFrame = sortedInput[i];
+    const name = aFrame.name!;
+
+    // Skip if names don't match (already reported by checkCallStackOrder)
+    if (aFrame.name !== uFrame.name) continue;
+
     const aVars = aFrame.value as Record<string, number>;
     const uVars = uFrame.value as Record<string, number>;
 
@@ -549,7 +582,7 @@ function compareFrames(
       if (!(k in uVars))
         errors.push({
           type: ErrorType.MISSING_ELEMENT,
-          message: `In ${name}: variable "${k}" is missing`,
+          message: `In ${name} (call stack position ${aFrame.order}): variable "${k}" is missing`,
           elementId: uFrame.id ?? undefined,
           path: `function "${name}" → var "${k}"`,
           severity: 'error'
@@ -558,7 +591,7 @@ function compareFrames(
       if (!(k in aVars))
         errors.push({
           type: ErrorType.UNEXPECTED_ELEMENT,
-          message: `In ${name}: variable "${k}" should not be present`,
+          message: `In ${name} (call stack position ${aFrame.order}): variable "${k}" should not be present`,
           elementId: uFrame.id ?? undefined,
           path: `function "${name}" → var "${k}"`,
           severity: 'error'
@@ -572,7 +605,7 @@ function compareFrames(
       if (uid === "_") {
         errors.push({
           type: ErrorType.GENERIC_ERROR,
-          message: `In ${name}: variable "${k}" needs to be assigned to an object`,
+          message: `In ${name} (call stack position ${aFrame.order}): variable "${k}" needs to be assigned to an object`,
           path: `function "${name}" → var "${k}"`,
           severity: 'error'
         });
@@ -768,17 +801,22 @@ function compareIds(
 }
 
 // Check if the call stack order matches between answer and input.
-// The UI displays bottom-to-top as [__main__, LinkedList.move_to_back]; the answer stores
-// top-to-bottom as [LinkedList.move_to_back, __main__]. Reverse the answer for comparison.
+// Both answer and input frames have an 'order' field that represents the call stack position.
+// Order 1 is the bottom of the stack (e.g., __main__), higher numbers are later calls.
+// The UI displays frames bottom-to-top, so we sort by order ascending for comparison.
 function checkCallStackOrder(
   answerFrames: MemoryBox[],
   inputFrames: MemoryBox[],
   errors: FeedbackError[]
 ) {
   if (answerFrames.length !== inputFrames.length) return; // size already handled
-  const expectedOrder = [...answerFrames].reverse();
-  for (let i = 0; i < expectedOrder.length; i++) {
-    if (expectedOrder[i].name !== inputFrames[i].name) {
+
+  // Sort both by order field (ascending)
+  const sortedAnswer = [...answerFrames].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const sortedInput = [...inputFrames].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  for (let i = 0; i < sortedAnswer.length; i++) {
+    if (sortedAnswer[i].name !== sortedInput[i].name) {
       errors.push({
         type: ErrorType.CALL_STACK_ORDER,
         message: "Call stack functions are in the wrong order",
@@ -848,7 +886,7 @@ export default async function validateAnswer(
   const errors: FeedbackError[] = [];
 
   // gather frames from both models
-  const { answerFrames, inputFrames, ansByName, usrByName } = gatherFrames(
+  const { answerFrames, inputFrames } = gatherFrames(
     answerModel,
     userModel,
     errors
@@ -882,8 +920,8 @@ export default async function validateAnswer(
 
   // compare frames
   compareFrames(
-    ansByName,
-    usrByName,
+    answerFrames,
+    inputFrames,
     answerMap,
     inputMap,
     globalAnswerToInput,

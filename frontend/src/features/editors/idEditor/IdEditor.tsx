@@ -65,7 +65,7 @@ export default function IdEditor({
       if (el.kind?.params && Array.isArray(el.kind.params)) {
         el.kind.params.forEach((param: any) => {
           if (
-            param.targetId &&
+            param.targetId !== undefined &&
             param.targetId !== "_" &&
             param.targetId !== null
           ) {
@@ -77,7 +77,7 @@ export default function IdEditor({
       if (el.kind?.classVariables && Array.isArray(el.kind.classVariables)) {
         el.kind.classVariables.forEach((variable: any) => {
           if (
-            variable.targetId &&
+            variable.targetId !== undefined &&
             variable.targetId !== "_" &&
             variable.targetId !== null
           ) {

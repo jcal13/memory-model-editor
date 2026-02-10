@@ -133,6 +133,7 @@ const BoxEditorModule = ({
         addId={addId}
         removeId={removeId}
         sandbox={sandbox}
+        elements={elements}
       />
 
       {/* Bottom section: shows the remove button */}

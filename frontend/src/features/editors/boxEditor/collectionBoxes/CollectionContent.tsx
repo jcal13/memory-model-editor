@@ -15,6 +15,7 @@ interface Props {
   removeId: (id: ID) => void;
   sandbox: boolean;
   validationErrors?: ValidationError[]; // Validation errors for highlighting
+  elements?: any[]; // All canvas elements for ID usage tracking
 }
 
 /**
@@ -34,6 +35,7 @@ const CollectionContent = ({
   removeId,
   sandbox,
   validationErrors,
+  elements = [],
 }: Props) => {
   return (
     <div className={styles.contentContainer}>
@@ -46,6 +48,7 @@ const CollectionContent = ({
         removeId={removeId}
         sandbox={sandbox}
         validationErrors={validationErrors}
+        elements={elements}
       />
       <CollectionAddButton mode={mode} items={items} setItems={setItems} />
     </div>

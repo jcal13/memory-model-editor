@@ -16,6 +16,7 @@ interface Props {
   removeId: (id: ID) => void;
   sandbox: boolean;
   validationErrors?: ValidationError[]; // Validation errors for highlighting
+  elements?: any[]; // All canvas elements for ID usage tracking
 }
 
 /**
@@ -31,6 +32,7 @@ const CollectionItem = ({
   removeId,
   sandbox,
   validationErrors,
+  elements = [],
 }: Props) => {
   const removeItem = (idx: number) =>
     setItems((prev) => prev.filter((_, i) => i !== idx));
@@ -62,6 +64,7 @@ const CollectionItem = ({
                   }`}
                   editable={true}
                   sandbox={sandbox}
+                  elements={elements}
                 />
               </FieldValidationTooltip>
               <button
@@ -101,11 +104,13 @@ const CollectionItem = ({
                       prev.map((p, i) => (i === idx ? [picked, p[1]] : p))
                     )
                   }
+                  onRemove={removeId}
                   buttonClassName={`${styles.collectionIdBox} ${
                     keyHasError ? styles.errorId : ""
                   }`}
                   editable={true}
                   sandbox={sandbox}
+                  elements={elements}
                 />
               </FieldValidationTooltip>
             </div>
@@ -124,11 +129,13 @@ const CollectionItem = ({
                       prev.map((p, i) => (i === idx ? [p[0], picked] : p))
                     )
                   }
+                  onRemove={removeId}
                   buttonClassName={`${styles.collectionIdBox} ${
                     valHasError ? styles.errorId : ""
                   }`}
                   editable={true}
                   sandbox={sandbox}
+                  elements={elements}
                 />
               </FieldValidationTooltip>
               <button

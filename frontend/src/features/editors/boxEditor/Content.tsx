@@ -89,6 +89,7 @@ const Content = ({
         removeId={removeId}
         sandbox={sandbox}
         validationErrors={metadata.validationErrors}
+        elements={elements}
       />
     );
   }
@@ -104,6 +105,7 @@ const Content = ({
         removeId={removeId}
         sandbox={sandbox}
         validationErrors={metadata.validationErrors}
+        elements={elements}
       />
     );
   }

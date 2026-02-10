@@ -148,8 +148,8 @@
         "type": ".frame",
         "order": 4,
         "value": {
-          "self": 30,
-          "items": 33
+          "self": 7,
+          "items": 9
         }
       },
       {
@@ -158,8 +158,8 @@
         "type": ".frame",
         "order": 3,
         "value": {
-          "self": 20,
-          "items": 22
+          "self": 5,
+          "items": 8
         }
       },
       {
@@ -168,8 +168,8 @@
         "type": ".frame",
         "order": 2,
         "value": {
-          "self": 10,
-          "items": 11
+          "self": 1,
+          "items": 4
         }
       },
       {
@@ -178,16 +178,16 @@
         "type": ".frame",
         "order": 1,
         "value": {
-          "rec_lst": 10
+          "rec_lst": 1
         }
       },
       {
-        "id": 1,
+        "id": 2,
         "type": "int",
         "value": 7
       },
       {
-        "id": 2,
+        "id": 3,
         "type": "str",
         "value": "hi"
       },
@@ -197,45 +197,45 @@
         "value": "None"
       },
       {
-        "id": 11,
+        "id": 4,
         "type": "list",
         "value": [
-          1,
-          2
+          2,
+          3
         ]
       },
       {
-        "id": 22,
+        "id": 8,
         "type": "list",
         "value": [
-          2
+          3
         ]
       },
       {
-        "id": 33,
+        "id": 9,
         "type": "list",
         "value": []
       },
       {
-        "id": 10,
+        "id": 1,
         "name": "RecursiveList",
         "type": "object",
         "value": {
-          "_rest": 20,
-          "_first": 1
-        }
-      },
-      {
-        "id": 20,
-        "name": "RecursiveList",
-        "type": "object",
-        "value": {
-          "_rest": 30,
+          "_rest": 5,
           "_first": 2
         }
       },
       {
-        "id": 30,
+        "id": 5,
+        "name": "RecursiveList",
+        "type": "object",
+        "value": {
+          "_rest": 7,
+          "_first": 3
+        }
+      },
+      {
+        "id": 7,
         "name": "RecursiveList",
         "type": "object",
         "value": {

@@ -1,14 +1,10 @@
 import MemoryViz from "memory-viz";
-import { BoxConfigs } from "./BoxConfigs";
-import { BoxType } from "../shared/types";
+import { BoxTypeName } from "../../shared/types";
+import { getBoxConfig, DEFAULT_PALETTE_STYLE } from "../../shared/boxConfig";
 
-export function createBoxRenderer(boxType: BoxType): SVGSVGElement {
+export function createBoxRenderer(boxType: BoxTypeName): SVGSVGElement {
   const { MemoryModel } = MemoryViz;
-  const config = BoxConfigs[boxType];
-
-  if (!config) {
-    throw new Error(`Unknown box type: ${boxType}`);
-  }
+  const config = getBoxConfig(boxType);
 
   // Generate a consistent seed based on the box type string
   const seed = boxType
@@ -16,8 +12,8 @@ export function createBoxRenderer(boxType: BoxType): SVGSVGElement {
     .reduce((acc: number, char: string) => acc + char.charCodeAt(0), 1);
 
   const model = new MemoryModel({
-    obj_min_width: config.minWidth + (boxType === "none" ? 20 : 0),
-    obj_min_height: config.minHeight + (boxType ==="none" ? 15 : 0),
+    obj_min_width: config.paletteMinWidth + (boxType === "none" ? 20 : 0),
+    obj_min_height: config.paletteMinHeight + (boxType === "none" ? 15 : 0),
     prop_min_width: 54,
     prop_min_height: 36,
     double_rect_sep: 10,
@@ -31,8 +27,8 @@ export function createBoxRenderer(boxType: BoxType): SVGSVGElement {
     },
   });
 
-  // Render the box using the config's draw method
-  config.draw(model);
+  // Render the box using the palette-specific draw method
+  config.drawPalette(model, DEFAULT_PALETTE_STYLE);
 
   const svg = model.svg;
 

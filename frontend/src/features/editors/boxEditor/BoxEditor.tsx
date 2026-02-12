@@ -2,8 +2,9 @@ import styles from "../Editor.module.css";
 import ButtonDisplays from "./buttons/ButtonDisplays";
 import Header from "./Header";
 import Content from "./Content";
-import { useModule } from "../hooks/useEffect";
+import { BoxEditorType } from "../../shared/types";
 import {
+  useEditorAutoSave as useModule,
   useGlobalStates,
   usePrimitiveStates,
   useFunctionStates,
@@ -12,9 +13,8 @@ import {
   useElementIdState,
   useClassStates,
   useInvalidatedState,
-} from "../hooks/useState";
-import { BoxEditorType } from "../../shared/types";
-import { useGlobalRefs } from "../hooks/useRef";
+  useGlobalRefs,
+} from "../hooks/useEditor";
 
 /**
  * BoxEditorModule renders the full editable UI for a memory box,

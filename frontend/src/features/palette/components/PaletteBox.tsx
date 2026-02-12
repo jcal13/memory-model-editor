@@ -1,10 +1,10 @@
 import { useRef } from "react";
-import { usePaletteBoxEffect } from "../hooks/useEffect";
-import { BoxType } from "../shared/types";
+import { usePaletteBoxEffect } from "../hooks/usePalette";
+import { BoxTypeName } from "../../shared/types";
 
 interface PaletteBoxProps {
   /** The type of box to render (e.g., "primitive", "list", "dict") */
-  boxType: BoxType;
+  boxType: BoxTypeName;
 }
 
 /**

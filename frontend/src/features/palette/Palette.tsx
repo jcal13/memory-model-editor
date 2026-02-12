@@ -1,10 +1,10 @@
 import React from "react";
 import PaletteBox from "./components/PaletteBox";
 import styles from "./Palette.module.css";
-import { PaletteTab, BoxType } from "./shared/types";
+import { PaletteTab, BoxTypeName } from "../shared/types";
 
 // Move constants here for better organization
-const ALL_TYPES: readonly BoxType[] = [
+const ALL_TYPES: readonly BoxTypeName[] = [
   "function",
   "class",
   "none",
@@ -18,15 +18,15 @@ const ALL_TYPES: readonly BoxType[] = [
   "dict",
 ] as const;
 
-const CLASS_FN_TYPES: readonly BoxType[] = ["function", "class"] as const;
-const PRIMITIVE_TYPES: readonly BoxType[] = [
+const CLASS_FN_TYPES: readonly BoxTypeName[] = ["function", "class"] as const;
+const PRIMITIVE_TYPES: readonly BoxTypeName[] = [
   "none",
   "int",
   "float",
   "str",
   "bool",
 ] as const;
-const COLLECTION_TYPES: readonly BoxType[] = [
+const COLLECTION_TYPES: readonly BoxTypeName[] = [
   "list",
   "tuple",
   "set",
@@ -50,7 +50,7 @@ const TAB_LABELS = {
 interface PaletteProps {
   activeTab: PaletteTab;
   setActive: (tab: PaletteTab) => void;
-  requiredBoxes?: BoxType[];
+  requiredBoxes?: BoxTypeName[];
   isPracticeMode?: boolean;
 }
 
@@ -72,9 +72,9 @@ const TabButton: React.FC<{
 );
 
 function filterBoxesByRequired(
-  boxes: readonly BoxType[],
-  requiredBoxes?: BoxType[]
-): BoxType[] {
+  boxes: readonly BoxTypeName[],
+  requiredBoxes?: BoxTypeName[]
+): BoxTypeName[] {
   if (!requiredBoxes || requiredBoxes.length === 0) {
     return [...boxes];
   }

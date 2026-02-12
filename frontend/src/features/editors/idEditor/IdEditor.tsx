@@ -2,8 +2,11 @@ import React, { useState, useCallback, useMemo } from "react";
 import ReactDOM from "react-dom";
 import Draggable from "react-draggable";
 import IdSelectorPanel from "./IdSelectorPanel";
-import { useIdListSync, useSinglePanelRegistry } from "../hooks/useEffect";
-import { usePanelRef } from "../hooks/useRef";
+import {
+  useListSync as useIdListSync,
+  useSinglePanelRegistry,
+  usePanelRef,
+} from "../hooks/useEditor";
 import styles from "./IdEditor.module.css";
 import { ID } from "../../shared/types";
 

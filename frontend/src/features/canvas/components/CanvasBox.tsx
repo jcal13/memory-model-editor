@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from "react";
-import { useBoxDragState, useDraggableBox } from "../hooks/hooks";
+import { useBoxDragState, useDraggableBox } from "../hooks/useCanvas";
 import { CanvasBoxProps } from "../utils/box.types";
 import {
   getCallStackBounds,

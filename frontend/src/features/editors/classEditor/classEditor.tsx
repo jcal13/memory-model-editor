@@ -3,10 +3,10 @@ import ReactDOM from "react-dom";
 import Draggable from "react-draggable";
 import ClassSelectorPanel from "./ClassEditorPanel";
 import {
-  useClassListSync,
+  useListSync as useClassListSync,
   useSingleClassPanelRegistry,
-} from "../hooks/useEffect";
-import { useClassPanelRef } from "../hooks/useRef";
+  useClassPanelRef,
+} from "../hooks/useEditor";
 import styles from "./ClassEditor.module.css";
 import { ClassID } from "../../shared/types";
 

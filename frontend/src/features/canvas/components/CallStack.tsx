@@ -10,29 +10,22 @@ import { CanvasElement } from "../../shared/types";
 import { BoxDimensions } from "../utils/box.types";
 import CanvasBox from "./CanvasBox";
 import styles from "./CallStack.module.css";
-
-const DEFAULT_BOX_WIDTH = 180;
-const FALLBACK_BOX_HEIGHT = 60;
-const BOX_GAP = -10;
-
-const HEADER_HEIGHT = 40;
-const TOP_FREE_PADDING = 5;
-const BOTTOM_FREE_PADDING = -12;
-const SELECTION_PADDING_TOP = -25;
-const SELECTION_PADDING_BOTTOM = 20;
-const TOP_PADDING = TOP_FREE_PADDING + SELECTION_PADDING_TOP;
-const BOTTOM_PADDING = BOTTOM_FREE_PADDING + SELECTION_PADDING_BOTTOM + 25;
-
-const SCROLLBAR_WIDTH = 5;
-const SCROLLBAR_INSET = 4;
-const SCROLLBAR_THUMB_MIN_HEIGHT = 30;
-const DRAG_THRESHOLD_PX = 6;
-
-const VERTICAL_OFFSET = 30;
-
-const TOP_CONTROLS_HEIGHT = 120;
-const DOWNLOAD_BUTTON_BOTTOM = 35;
-const BUTTON_HEIGHT = 38;
+import {
+  DEFAULT_BOX_WIDTH,
+  FALLBACK_BOX_HEIGHT,
+  BOX_GAP,
+  CALLSTACK_HEADER_HEIGHT as HEADER_HEIGHT,
+  TOP_PADDING,
+  BOTTOM_PADDING,
+  SCROLLBAR_WIDTH,
+  SCROLLBAR_INSET,
+  SCROLLBAR_THUMB_MIN_HEIGHT,
+  DRAG_THRESHOLD_PX,
+  CALLSTACK_VERTICAL_OFFSET as VERTICAL_OFFSET,
+  DOWNLOAD_BUTTON_BOTTOM,
+  BUTTON_HEIGHT,
+  ADDITIONAL_HEIGHT_OFFSET,
+} from "../constants";
 
 interface CallStackProps {
   frames: CanvasElement[];
@@ -62,6 +55,10 @@ interface LayoutItem {
 
 const MemoizedCanvasBox = React.memo(CanvasBox);
 
+/**
+ * CallStack component displays function call frames in a vertically scrollable column.
+ * Supports drag-and-drop reordering, dynamic sizing, and responsive layout.
+ */
 const CallStack: React.FC<CallStackProps> = ({
   frames,
   selected,
@@ -75,14 +72,12 @@ const CallStack: React.FC<CallStackProps> = ({
 }) => {
   const clipPathId = useId();
 
-  // Viewport height management
   const [viewportHeight, setViewportHeight] = useState<number>(() => {
     return window.innerHeight;
   });
 
   const yPosition = y;
 
-  // Box size tracking
   const [boxSizes, setBoxSizes] = useState<Record<number, BoxDimensions>>({});
 
   const handleBoxSizeChange = useCallback((id: number, size: BoxDimensions) => {
@@ -96,7 +91,6 @@ const CallStack: React.FC<CallStackProps> = ({
     });
   }, []);
 
-  // Layout calculations
   const orderedFrames = useMemo(() => [...frames], [frames]);
 
   const maxBoxWidth = useMemo(() => {
@@ -109,15 +103,12 @@ const CallStack: React.FC<CallStackProps> = ({
 
   const columnWidth = Math.max(width, maxBoxWidth);
 
-  // Notify parent when the rendered call stack width changes (e.g. long function names)
   useEffect(() => {
     onWidthChange?.(columnWidth + x);
   }, [columnWidth, x, onWidthChange]);
 
-  // Compute the call stack height in pixel space, then convert to SVG units.
-  // This keeps the call stack visually the same height regardless of zoom.
   const pixelColumnHeight =
-    viewportHeight - (yPosition + DOWNLOAD_BUTTON_BOTTOM + BUTTON_HEIGHT + 30) * scale;
+    viewportHeight - (yPosition + DOWNLOAD_BUTTON_BOTTOM + BUTTON_HEIGHT + ADDITIONAL_HEIGHT_OFFSET) * scale;
   const columnHeight = pixelColumnHeight / scale;
   const visibleHeight = Math.max(
     100,

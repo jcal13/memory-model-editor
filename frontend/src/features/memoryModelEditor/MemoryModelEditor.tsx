@@ -17,14 +17,12 @@ import {
 } from "./hooks/useLocalStorage";
 import { useCanvasSubmission } from "./hooks/useCanvasSubmission";
 import { useMemo, useEffect, useState, useCallback } from "react";
-import { CanvasElement } from "../shared/types";
+import { CanvasElement, BoxTypeName } from "../shared/types";
 import {
   createMasterErrorList,
   MasterErrorList,
 } from "./utils/masterErrorList";
 import { spreadOverlappingElements } from "../canvas/utils/boundary.helpers";
-// Import BoxType from palette instead of shared
-import { BoxType } from "../palette/shared/types";
 
 // Layout constants
 const MAX_INFO_PANEL_VIEWPORT_RATIO = 0.6667;
@@ -130,18 +128,18 @@ export default function MemoryModelEditor({
     );
   };
 
-  const getRequiredBoxTypes = useCallback((questionData: any): BoxType[] => {
+  const getRequiredBoxTypeNames = useCallback((questionData: any): BoxTypeName[] => {
     if (!questionData?.answer || !Array.isArray(questionData.answer)) {
       return [];
     }
 
-    const requiredTypes = new Set<BoxType>();
+    const requiredTypes = new Set<BoxTypeName>();
 
     const hasFrames = questionData.answer.some(
       (box: any) => box.type === ".frame"
     );
     if (hasFrames) {
-      requiredTypes.add("function" as BoxType);
+      requiredTypes.add("function" as BoxTypeName);
     }
 
     questionData.answer.forEach((box: any) => {
@@ -151,36 +149,36 @@ export default function MemoryModelEditor({
         case ".frame":
           break;
         case "int":
-          requiredTypes.add("int" as BoxType);
+          requiredTypes.add("int" as BoxTypeName);
           break;
         case "float":
-          requiredTypes.add("float" as BoxType);
+          requiredTypes.add("float" as BoxTypeName);
           break;
         case "str":
-          requiredTypes.add("str" as BoxType);
+          requiredTypes.add("str" as BoxTypeName);
           break;
         case "bool":
-          requiredTypes.add("bool" as BoxType);
+          requiredTypes.add("bool" as BoxTypeName);
           break;
         case "NoneType":
         case "None":
-          requiredTypes.add("none" as BoxType);
+          requiredTypes.add("none" as BoxTypeName);
           break;
         case "list":
-          requiredTypes.add("list" as BoxType);
+          requiredTypes.add("list" as BoxTypeName);
           break;
         case "tuple":
-          requiredTypes.add("tuple" as BoxType);
+          requiredTypes.add("tuple" as BoxTypeName);
           break;
         case "set":
-          requiredTypes.add("set" as BoxType);
+          requiredTypes.add("set" as BoxTypeName);
           break;
         case "dict":
-          requiredTypes.add("dict" as BoxType);
+          requiredTypes.add("dict" as BoxTypeName);
           break;
         case ".class":
         case "object":
-          requiredTypes.add("class" as BoxType);
+          requiredTypes.add("class" as BoxTypeName);
           break;
       }
     });
@@ -378,7 +376,7 @@ export default function MemoryModelEditor({
               setActive={state.setActivePaletteTab}
               requiredBoxes={
                 state.isSandboxMode && currentQuestionData
-                  ? getRequiredBoxTypes(currentQuestionData)
+                  ? getRequiredBoxTypeNames(currentQuestionData)
                   : undefined
               }
               isPracticeMode={state.isSandboxMode}

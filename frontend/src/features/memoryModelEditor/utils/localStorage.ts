@@ -282,46 +282,5 @@ export function deleteQuestionCanvasData(
   }
 }
 
-/**
- * Exported for backwards compatibility
- */
-export function getQuestionStorageKey(
-  questionType: "test" | "practice" | "prep",
-  questionIndex: number
-): string {
-  return getQuestionCanvasKey(questionType, questionIndex);
-}
-
-/**
- * Alias for backwards compatibility
- */
-export function saveQuestionCanvas(
-  questionType: "test" | "practice" | "prep",
-  questionIndex: number,
-  elements: CanvasElement[],
-  ids: number[],
-  classes: string[]
-): void {
-  saveQuestionCanvasData(questionType, questionIndex, {
-    elements,
-    ids,
-    classes,
-  });
-}
-
-/**
- * Alias for backwards compatibility
- */
-export function loadQuestionCanvas(
-  questionType: "test" | "practice" | "prep",
-  questionIndex: number
-): CanvasData | null {
-  return loadQuestionCanvasData(questionType, questionIndex);
-}
-
-/**
- * Alias for backwards compatibility - use saveUIState instead
- */
-export function saveUIData(state: UIState): void {
-  saveUIState(state);
-}
+// Backwards compatibility aliases removed - all code now uses the modern function names
+// Previously exported: getQuestionStorageKey, saveQuestionCanvas, loadQuestionCanvas, saveUIData

@@ -13,7 +13,7 @@ import CanvasBox from "./components/CanvasBox";
 import BoxEditor from "../editors/boxEditor/BoxEditor";
 import CallStack from "./components/CallStack";
 import { ClearCanvasButton, DownloadButton, ZoomControls } from "./components/CanvasButtons";
-import { useCanvasRefs } from "./hooks/hooks";
+import { useCanvasRefs } from "./hooks/useCanvas";
 import { validateElements } from "./utils/validation";
 import styles from "./Canvas.module.css";
 

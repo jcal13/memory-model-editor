@@ -1,10 +1,11 @@
 /**
- * Boundary utility functions for preventing canvas elements from overlapping with the callstack
- * and resolving overlap between elements when loading configurations.
+ * Boundary collision detection and positioning utilities.
+ * Prevents canvas elements from overlapping with the call stack and resolves element collisions.
  */
 
 import { CanvasElement } from "../../shared/types";
 import { getBoxDimensions } from "./box.renderer";
+import { DEFAULT_CALLSTACK_WIDTH, DEFAULT_CALLSTACK_HEIGHT } from "../constants";
 
 export interface CallStackBounds {
   x: number;
@@ -24,29 +25,32 @@ export interface ElementDimensions {
 }
 
 /**
- * Default callstack positioning - boundary extends from left edge to callstack right edge
- * and from top to bottom of canvas to prevent any elements from being placed to the left
+ * Default call stack boundary configuration.
+ * Creates an exclusion zone from the left edge through the call stack width.
  */
 export const DEFAULT_CALLSTACK_BOUNDS: CallStackBounds = {
   x: 0,
   y: 0,
-  width: 225,
-  height: 400,
+  width: DEFAULT_CALLSTACK_WIDTH,
+  height: DEFAULT_CALLSTACK_HEIGHT,
 };
 
 /**
- * Calculates the actual callstack bounds based on canvas height
- * The boundary extends from the left edge of the canvas through the callstack area
- * to provide a full exclusion zone that prevents elements from being placed to the left of the callstack
- * The boundary extends to the full height of the canvas (top to bottom)
+ * Calculates the call stack boundary based on canvas dimensions.
+ * Creates a full-height exclusion zone to prevent element placement in the call stack area.
+ *
+ * @param canvasHeight - Height of the canvas (defaults to window.innerHeight)
+ * @param x - X-coordinate of the call stack origin
+ * @param y - Y-coordinate of the call stack origin
+ * @param width - Width of the call stack column
+ * @returns Boundary rectangle defining the call stack exclusion zone
  */
 export function getCallStackBounds(
   canvasHeight: number = window.innerHeight,
   x: number = 0,
   y: number = 0,
-  width: number = 225
+  width: number = DEFAULT_CALLSTACK_WIDTH
 ): CallStackBounds {
-  // Ensure we have a valid canvas height, falling back to window height if needed
   let validCanvasHeight = canvasHeight;
 
   if (
@@ -58,7 +62,6 @@ export function getCallStackBounds(
       typeof window !== "undefined" ? window.innerHeight : 1080;
   }
 
-  // Extend the boundary from top to bottom of the canvas
   const columnHeight = Math.max(400, validCanvasHeight);
 
   return {
@@ -70,7 +73,11 @@ export function getCallStackBounds(
 }
 
 /**
- * Checks if a point overlaps with the callstack area
+ * Checks if a point falls within the call stack boundary.
+ *
+ * @param position - Point coordinates to test
+ * @param callStackBounds - Call stack boundary rectangle
+ * @returns True if the point is inside the call stack area
  */
 export function isPointInCallStack(
   position: Position,
@@ -85,7 +92,13 @@ export function isPointInCallStack(
 }
 
 /**
- * Checks if an element with given position and dimensions overlaps with the callstack
+ * Detects if an element's bounding box overlaps with the call stack area.
+ * Uses axis-aligned bounding box (AABB) collision detection.
+ *
+ * @param position - Center position of the element
+ * @param elementDimensions - Width and height of the element
+ * @param callStackBounds - Call stack boundary rectangle
+ * @returns True if the element overlaps with the call stack
  */
 export function isElementOverlappingCallStack(
   position: Position,
@@ -102,7 +115,6 @@ export function isElementOverlappingCallStack(
   const callStackTop = callStackBounds.y;
   const callStackBottom = callStackBounds.y + callStackBounds.height;
 
-  // Check for overlap using axis-aligned bounding box collision detection
   return !(
     elementRight < callStackLeft ||
     elementLeft > callStackRight ||
@@ -111,13 +123,20 @@ export function isElementOverlappingCallStack(
   );
 }
 
+/**
+ * Minimum spacing between elements and the call stack boundary.
+ */
 export const CALLSTACK_PADDING = 10;
 
 /**
- * Constrains a position to avoid overlapping with the callstack
- * Returns the nearest valid position if the original position would cause overlap
- * Since the callstack boundary extends from top to bottom of the canvas,
- * elements are always moved to the right side of the callstack
+ * Adjusts an element's position to avoid overlap with the call stack.
+ * If overlap is detected, moves the element to the right of the call stack.
+ *
+ * @param position - Original element position
+ * @param elementDimensions - Element width and height
+ * @param callStackBounds - Call stack boundary rectangle
+ * @param canvasBounds - Optional canvas dimensions for boundary constraints
+ * @returns Adjusted position that doesn't overlap the call stack
  */
 export function constrainPositionAwayFromCallStack(
   position: Position,
@@ -135,11 +154,9 @@ export function constrainPositionAwayFromCallStack(
   const elementHalfHeight = elementDimensions.height / 2;
   const padding = CALLSTACK_PADDING;
 
-  // Since the callstack boundary extends from top to bottom, always move to the right
   const moveRight =
     callStackBounds.x + callStackBounds.width + elementHalfWidth + padding;
 
-  // Constrain Y position to stay within canvas bounds
   let constrainedY = position.y;
   if (canvasBounds && canvasBounds.width > 0 && canvasBounds.height > 0) {
     constrainedY = Math.max(
@@ -148,7 +165,6 @@ export function constrainPositionAwayFromCallStack(
     );
   }
 
-  // Check if moving right is valid within canvas bounds
   const rightPositionValid =
     !canvasBounds ||
     (canvasBounds.width > 0 &&

@@ -1,14 +1,27 @@
+/**
+ * Custom hooks for canvas functionality including drag-and-drop, resizing, and SVG rendering.
+ * These hooks manage the interactive canvas behavior and element manipulation.
+ */
+
 import { useRef, useEffect, useCallback } from "react";
 import { createBoxRenderer } from "../utils/box.renderer";
 import { CanvasElement } from "../../shared/types";
 import { DragState, BoxDimensions } from "../utils/box.types";
-import { 
-  getCallStackBounds, 
+import {
+  getCallStackBounds,
   constrainPositionAwayFromCallStack,
   smoothlyConstrainDragPosition
 } from "../utils/boundary.helpers";
 
-// Canvas refs hook
+/**
+ * Creates and manages refs for the main canvas SVG and drag container.
+ *
+ * @returns Object containing svgRef and dragRef
+ *
+ * @example
+ * const { svgRef, dragRef } = useCanvasRefs();
+ * <svg ref={svgRef}>...</svg>
+ */
 export function useCanvasRefs() {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const dragRef = useRef<HTMLDivElement | null>(null);
@@ -16,7 +29,16 @@ export function useCanvasRefs() {
   return { svgRef, dragRef };
 }
 
-// Box drag state hook
+/**
+ * Initializes and manages drag state for a canvas box element.
+ * Tracks drag status, start position, and element dimensions.
+ *
+ * @returns Object containing gRef (element ref), dragState, and dimensions
+ *
+ * @example
+ * const { gRef, dragState, dimensions } = useBoxDragState();
+ * <g ref={gRef}>...</g>
+ */
 export function useBoxDragState() {
   const gRef = useRef<SVGGElement>(null);
   const dragState = useRef<DragState>({
@@ -29,7 +51,17 @@ export function useBoxDragState() {
   return { gRef, dragState, dimensions };
 }
 
-// Canvas resize hook
+/**
+ * Handles canvas resize events and updates the SVG viewBox accordingly.
+ * Ensures the canvas adapts to window size changes.
+ *
+ * @param svgRef - Reference to the SVG element
+ * @param setViewBox - Optional callback to update viewBox state
+ *
+ * @example
+ * const svgRef = useRef<SVGSVGElement>(null);
+ * useCanvasResize(svgRef, (vb) => console.log('New viewBox:', vb));
+ */
 export function useCanvasResize(
   svgRef: React.RefObject<SVGSVGElement>,
   setViewBox?: (viewBox: string) => void
@@ -51,7 +83,41 @@ export function useCanvasResize(
   }, [svgRef, setViewBox]);
 }
 
-// Draggable box behavior hook
+/**
+ * Implements drag-and-drop behavior for a canvas box element.
+ * Handles mouse events, boundary constraints, and position updates.
+ *
+ * Features:
+ * - Smooth dragging with SVG coordinate transformation
+ * - Call stack boundary collision detection
+ * - Canvas edge clamping
+ * - Click vs drag detection
+ * - Prevents text selection during drag
+ *
+ * @param params - Configuration object
+ * @param params.gRef - Reference to the SVG group element
+ * @param params.element - Canvas element being dragged
+ * @param params.dimensions - Mutable ref to element dimensions
+ * @param params.dragState - Mutable ref to drag state
+ * @param params.openInterface - Callback when element is clicked (not dragged)
+ * @param params.updatePosition - Callback when drag completes with new position
+ * @param params.invalidated - Whether element has validation errors (affects styling)
+ * @param params.disableDrag - If true, element is not draggable (click-only)
+ * @param params.callStackWidth - Width of call stack for boundary calculations
+ *
+ * @example
+ * useDraggableBox({
+ *   gRef,
+ *   element,
+ *   dimensions,
+ *   dragState,
+ *   openInterface: (el) => setSelected(el),
+ *   updatePosition: (x, y) => moveElement(element.id, x, y),
+ *   invalidated: false,
+ *   disableDrag: false,
+ *   callStackWidth: 225,
+ * });
+ */
 export function useDraggableBox({
   gRef,
   element,
@@ -98,7 +164,7 @@ export function useDraggableBox({
       const dx = point.x - dragState.current.startPoint.x;
       const dy = point.y - dragState.current.startPoint.y;
       if (!movedRef.current && dx * dx + dy * dy > CLICK_EPS * CLICK_EPS) {
-        movedRef.current = true; // we're dragging, not clicking
+        movedRef.current = true;
       }
 
       const svg = gRef.current?.ownerSVGElement;
@@ -123,7 +189,6 @@ export function useDraggableBox({
         vb.y + vb.height - halfH
       );
 
-      // Apply smooth callstack boundary constraints (no teleportation during drag)
       const callStackBounds = getCallStackBounds(vb?.height, 0, 0, callStackWidth ?? 225);
       const constrainedPosition = smoothlyConstrainDragPosition(
         { x: newX, y: newY },
@@ -137,7 +202,6 @@ export function useDraggableBox({
 
       livePosRef.current = { x: newX, y: newY };
 
-      // Imperative move, no React state churn:
       gRef.current?.setAttribute(
         "transform",
         `translate(${newX - halfW}, ${newY - halfH})`
@@ -150,7 +214,6 @@ export function useDraggableBox({
     if (!dragState.current.isDragging) return;
     dragState.current.isDragging = false;
 
-    // Re-enable text selection after drag
     document.body.style.userSelect = '';
     document.body.style.webkitUserSelect = '';
 
@@ -170,7 +233,6 @@ export function useDraggableBox({
       movedRef.current = false;
       dragState.current.isDragging = true;
 
-      // Prevent text selection during drag
       document.body.style.userSelect = 'none';
       document.body.style.webkitUserSelect = 'none';
 
@@ -254,7 +316,6 @@ export function useDraggableBox({
       openInterface(element);
     };
 
-    // Only add drag event listeners if drag is not disabled
     if (!disableDrag) {
       overlay.addEventListener("mousedown", handleMouseDown as EventListener);
     }

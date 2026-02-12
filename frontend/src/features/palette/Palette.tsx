@@ -1,5 +1,7 @@
 import React from "react";
 import PaletteBox from "./components/PaletteBox";
+import CanvasControls from "./components/CanvasControls";
+import { useResizable } from "./hooks/useResizable";
 import styles from "./Palette.module.css";
 import { PaletteTab, BoxTypeName } from "../shared/types";
 
@@ -95,28 +97,58 @@ export default function Palette({
       ? filterBoxesByRequired(allBoxes, requiredBoxes)
       : allBoxes;
 
+  const { topHeight, handleMouseDown, containerRef } = useResizable({
+    initialTopPercent: 60,
+    minTopPercent: 30,
+    maxTopPercent: 80,
+  });
+
   return (
     <div className={styles.containerWrapper}>
-      <div className={styles.container}>
-        <nav className={styles.tabHeaders} role="tablist">
-          {(Object.keys(TAB_LABELS) as PaletteTab[]).map((tab) => (
-            <TabButton
-              key={tab}
-              tab={tab}
-              label={TAB_LABELS[tab]}
-              isActive={activeTab === tab}
-              onClick={setActive}
-            />
-          ))}
-        </nav>
+      <div className={styles.outerContainer} ref={containerRef}>
+        {/* Palette Section - Resizable */}
+        <div
+          className={styles.paletteSection}
+          style={{ height: `${topHeight}%` }}
+        >
+          <div className={styles.container}>
+            <nav className={styles.tabHeaders} role="tablist">
+              {(Object.keys(TAB_LABELS) as PaletteTab[]).map((tab) => (
+                <TabButton
+                  key={tab}
+                  tab={tab}
+                  label={TAB_LABELS[tab]}
+                  isActive={activeTab === tab}
+                  onClick={setActive}
+                />
+              ))}
+            </nav>
 
-        <div className={styles.tabBody} role="tabpanel">
-          <h3 className={styles.paletteTitle}>Palette</h3>
-          <div className={styles.paletteBoxes}>
-            {boxes.map((boxType) => (
-              <PaletteBox key={boxType} boxType={boxType} />
-            ))}
+            <div className={styles.tabBody} role="tabpanel">
+              <h3 className={styles.paletteTitle}>Palette</h3>
+              <div className={styles.paletteBoxes}>
+                {boxes.map((boxType) => (
+                  <PaletteBox key={boxType} boxType={boxType} />
+                ))}
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* Resizable Divider */}
+        <div
+          className={styles.resizeDivider}
+          onMouseDown={handleMouseDown}
+          role="separator"
+          aria-orientation="horizontal"
+        />
+
+        {/* Canvas Controls Section - Resizable */}
+        <div
+          className={styles.controlsSection}
+          style={{ height: `${100 - topHeight}%` }}
+        >
+          <CanvasControls />
         </div>
       </div>
     </div>

@@ -31,11 +31,7 @@
   transition: none;
 }
 
-.paletteResizeHandle {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
+.resizeDivider {
   width: var(--resize-handle-width);
   cursor: col-resize;
   z-index: 1000;
@@ -43,27 +39,41 @@
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.paletteResizeHandle:hover {
+.resizeDivider:hover {
   background: rgba(59, 130, 246, 0.15);
 }
 
-.paletteResizeHandle:hover::after {
+.resizeDivider::before {
   content: "";
   position: absolute;
-  right: 50%;
+  left: 50%;
   top: 50%;
-  transform: translate(50%, -50%);
+  transform: translate(-50%, -50%);
   width: var(--resize-handle-hover-width);
   height: 40px;
-  background: rgba(59, 130, 246, 0.6);
+  background: transparent;
   border-radius: 2px;
+  transition: background 0.15s ease;
 }
 
-.paletteResizeHandle:active {
+.resizeDivider:hover::before {
+  background: rgba(59, 130, 246, 0.6);
+}
+
+.resizeDivider:active {
   background: rgba(59, 130, 246, 0.25);
+}
+
+.resizeDivider:active::before {
+  background: rgba(37, 99, 235, 0.8);
 }
 
 .mainContainer {
@@ -103,40 +113,6 @@
   transition: none !important;
 }
 
-.infoPanelResizeHandle {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: var(--resize-handle-width);
-  cursor: col-resize;
-  z-index: 1000;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  transition: background-color 0.2s ease;
-}
-
-.infoPanelResizeHandle:hover {
-  background: rgba(59, 130, 246, 0.15);
-}
-
-.infoPanelResizeHandle:hover::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: var(--resize-handle-hover-width);
-  height: 40px;
-  background: rgba(59, 130, 246, 0.6);
-  border-radius: 2px;
-}
-
-.infoPanelResizeHandle:active {
-  background: rgba(59, 130, 246, 0.25);
-}
 
 .modeToggleSwitch {
   position: absolute;

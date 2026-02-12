@@ -354,40 +354,42 @@ export default function MemoryModelEditor({
       />
 
       {state.isPaletteOpen && (
-        <div
-          className={`${styles.palettePanel} ${
-            isResizingPalette ? styles.resizing : ""
-          }`}
-          style={{
-            width: `${isResizingPalette ? tempPaletteWidth : paletteWidth}px`,
-            minWidth: `${
-              isResizingPalette ? tempPaletteWidth : paletteWidth
-            }px`,
-          }}
-        >
+        <>
           <div
-            className={styles.paletteContent}
+            className={`${styles.palettePanel} ${
+              isResizingPalette ? styles.resizing : ""
+            }`}
             style={{
-              width: `${paletteWidth}px`,
+              width: `${isResizingPalette ? tempPaletteWidth : paletteWidth}px`,
+              minWidth: `${
+                isResizingPalette ? tempPaletteWidth : paletteWidth
+              }px`,
             }}
           >
-            <Palette
-              activeTab={state.activePaletteTab}
-              setActive={state.setActivePaletteTab}
-              requiredBoxes={
-                state.isSandboxMode && currentQuestionData
-                  ? getRequiredBoxTypeNames(currentQuestionData)
-                  : undefined
-              }
-              isPracticeMode={state.isSandboxMode}
-            />
+            <div
+              className={styles.paletteContent}
+              style={{
+                width: `${paletteWidth}px`,
+              }}
+            >
+              <Palette
+                activeTab={state.activePaletteTab}
+                setActive={state.setActivePaletteTab}
+                requiredBoxes={
+                  state.isSandboxMode && currentQuestionData
+                    ? getRequiredBoxTypeNames(currentQuestionData)
+                    : undefined
+                }
+                isPracticeMode={state.isSandboxMode}
+              />
+            </div>
           </div>
 
           <div
-            className={styles.paletteResizeHandle}
+            className={styles.resizeDivider}
             onMouseDown={() => setIsResizingPalette(true)}
           />
-        </div>
+        </>
       )}
 
       <div ref={refs.mainContainerRef} className={styles.mainContainer}>
@@ -436,46 +438,48 @@ export default function MemoryModelEditor({
         </div>
 
         {state.isInfoPanelOpen && (
-          <div
-            className={`${styles.infoPanel} ${
-              state.isResizingInfoPanel ? styles.noTransition : ""
-            }`}
-            style={{
-              width: `${state.infoPanelWidth}px`,
-              maxWidth: MAX_INFO_PANEL_CSS_WIDTH,
-            }}
-          >
-            <InformationTabs
-              submissionResults={state.submissionResults}
-              activeTab={state.activeInfoTab}
-              setActive={state.setActiveInfoTab}
-              questionSelected={state.selectedQuestionIndex !== null}
-              questionIndex={state.selectedQuestionIndex}
-              setQuestionIndex={state.setSelectedQuestionIndex}
-              questionType={state.selectedQuestionType}
-              setQuestionType={state.setSelectedQuestionType}
-              questionView={state.questionView}
-              setQuestionView={state.setQuestionView}
-              onSubmit={handleCanvasSubmit}
-              setSubmissionResults={state.setSubmissionResults}
-              onClearCanvas={clearCanvas}
-              onRestoreCanvas={restoreCanvas}
-              currentCanvasState={currentCanvasState}
-              masterErrorList={masterErrorList}
-              elements={state.elements}
-              setElements={state.setElements}
-              onOpenEditor={openEditor || (() => {})}
-              isSandboxMode={state.isSandboxMode}
-              onQuestionDataChange={setCurrentQuestionData}
-              tabScrollPositions={state.tabScrollPositions}
-              setTabScrollPositions={state.setTabScrollPositions}
+          <>
+            <div
+              className={styles.resizeDivider}
+              onMouseDown={() => state.setIsResizingInfoPanel(true)}
             />
 
             <div
-              className={styles.infoPanelResizeHandle}
-              onMouseDown={() => state.setIsResizingInfoPanel(true)}
-            />
-          </div>
+              className={`${styles.infoPanel} ${
+                state.isResizingInfoPanel ? styles.noTransition : ""
+              }`}
+              style={{
+                width: `${state.infoPanelWidth}px`,
+                maxWidth: MAX_INFO_PANEL_CSS_WIDTH,
+              }}
+            >
+              <InformationTabs
+                submissionResults={state.submissionResults}
+                activeTab={state.activeInfoTab}
+                setActive={state.setActiveInfoTab}
+                questionSelected={state.selectedQuestionIndex !== null}
+                questionIndex={state.selectedQuestionIndex}
+                setQuestionIndex={state.setSelectedQuestionIndex}
+                questionType={state.selectedQuestionType}
+                setQuestionType={state.setSelectedQuestionType}
+                questionView={state.questionView}
+                setQuestionView={state.setQuestionView}
+                onSubmit={handleCanvasSubmit}
+                setSubmissionResults={state.setSubmissionResults}
+                onClearCanvas={clearCanvas}
+                onRestoreCanvas={restoreCanvas}
+                currentCanvasState={currentCanvasState}
+                masterErrorList={masterErrorList}
+                elements={state.elements}
+                setElements={state.setElements}
+                onOpenEditor={openEditor || (() => {})}
+                isSandboxMode={state.isSandboxMode}
+                onQuestionDataChange={setCurrentQuestionData}
+                tabScrollPositions={state.tabScrollPositions}
+                setTabScrollPositions={state.setTabScrollPositions}
+              />
+            </div>
+          </>
         )}
       </div>
 

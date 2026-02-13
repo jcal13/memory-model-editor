@@ -12,16 +12,17 @@
 
 /* Clear Canvas Button */
 .clearButton {
-  background-color: #ef4444;
+  background-color: var(--accent-red);
   color: white;
 }
 
 .clearButton:hover {
-  background-color: #dc2626;
+  background-color: var(--accent-red-hover);
 }
 
 .clearButton:active {
-  background-color: #b91c1c;
+  background-color: var(--accent-red-hover);
+  filter: brightness(0.9);
 }
 
 /* Download Button Container */
@@ -35,13 +36,13 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background-color: #3b82f6;
+  background-color: var(--accent-blue);
   color: white;
   width: 100%;
 }
 
 .downloadButton:hover {
-  background-color: #2563eb;
+  background-color: var(--accent-blue-hover);
 }
 
 .dropdownCaret {
@@ -61,24 +62,26 @@
   gap: 6px;
   margin-top: 8px;
   padding-left: 8px;
-  border-left: 2px solid #e2e8f0;
+  border-left: 2px solid var(--border-primary);
+  transition: border-color 200ms ease;
 }
 
 .downloadOptionButton {
-  background-color: #f8fafc;
-  color: #475569;
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
   text-align: left;
   justify-content: flex-start;
   padding-left: 16px;
+  transition: background-color 160ms ease, color 160ms ease;
 }
 
 .downloadOptionButton:hover {
-  background-color: #f1f5f9;
-  color: #1e293b;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .downloadOptionButton:active {
-  background-color: #e2e8f0;
+  background-color: var(--bg-hover);
 }
 
 /* Zoom Controls */
@@ -99,22 +102,22 @@
   font-size: 1.2rem;
   font-weight: 600;
   line-height: 1;
-  background-color: #ffffff;
-  color: #334155;
-  border: 1px solid #e2e8f0;
+  background-color: var(--button-bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
   transition: all 160ms ease;
 }
 
 .zoomButton:hover:not(:disabled) {
-  background-color: #f1f5f9;
-  border-color: #cbd5e1;
+  background-color: var(--button-hover);
+  border-color: var(--border-secondary);
 }
 
 .zoomButton:active:not(:disabled) {
-  background-color: #e2e8f0;
+  background-color: var(--button-active);
 }
 
 .zoomButton:disabled {

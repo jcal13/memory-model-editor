@@ -66,7 +66,7 @@ const CallStack: React.FC<CallStackProps> = ({
   onReorder,
   onWidthChange,
   x = 20,
-  y = 90,
+  y = 73,
   width = 205,
   scale = 1,
 }) => {
@@ -107,13 +107,24 @@ const CallStack: React.FC<CallStackProps> = ({
     onWidthChange?.(columnWidth + x);
   }, [columnWidth, x, onWidthChange]);
 
-  const pixelColumnHeight =
-    viewportHeight - (yPosition + DOWNLOAD_BUTTON_BOTTOM + BUTTON_HEIGHT + ADDITIONAL_HEIGHT_OFFSET) * scale;
+  // Calculate height in pixels (not affected by scale)
+  // The call stack height stays constant regardless of zoom level
+  const bottomSpacing = DOWNLOAD_BUTTON_BOTTOM + BUTTON_HEIGHT + ADDITIONAL_HEIGHT_OFFSET;
+  const pixelColumnHeight = viewportHeight - (yPosition + bottomSpacing);
   const columnHeight = pixelColumnHeight / scale;
   const visibleHeight = Math.max(
     100,
     columnHeight - HEADER_HEIGHT - TOP_PADDING - BOTTOM_PADDING
   );
+
+  // Log for debugging - remove after verification
+  console.log('CallStack centering:', {
+    viewportHeight,
+    yPosition,
+    bottomSpacing,
+    columnHeight,
+    'Should be equal': yPosition === bottomSpacing
+  });
 
   const layout = useMemo((): LayoutItem[] => {
     let yOffset = 0;

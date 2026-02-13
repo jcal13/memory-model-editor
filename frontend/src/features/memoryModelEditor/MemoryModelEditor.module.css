@@ -1,5 +1,4 @@
 :root {
-  --editor-background: #f1f5f9;
   --resize-handle-width: 8px;
   --resize-handle-hover-width: 4px;
 }
@@ -10,7 +9,8 @@
   width: 100%;
   overflow: hidden;
   align-items: stretch;
-  background: var(--editor-background);
+  background: var(--bg-tertiary);
+  transition: background-color 200ms ease;
 }
 
 .palettePanel {
@@ -48,7 +48,7 @@
 }
 
 .resizeDivider:hover {
-  background: rgba(59, 130, 246, 0.15);
+  background: var(--bg-hover);
 }
 
 .resizeDivider::before {
@@ -65,15 +65,15 @@
 }
 
 .resizeDivider:hover::before {
-  background: rgba(59, 130, 246, 0.6);
+  background: var(--accent-blue);
 }
 
 .resizeDivider:active {
-  background: rgba(59, 130, 246, 0.25);
+  background: var(--bg-tertiary);
 }
 
 .resizeDivider:active::before {
-  background: rgba(37, 99, 235, 0.8);
+  background: var(--accent-blue-hover);
 }
 
 .mainContainer {

@@ -3,9 +3,10 @@
  * Includes mode toggle, clear, download, zoom controls, and dark mode.
  */
 
-import React, { useState } from "react";
+import React from "react";
 import { CanvasElement } from "../../shared/types";
 import { ClearCanvasButton, DownloadButton, ZoomControls } from "../../canvas/components/CanvasButtons";
+import { useTheme } from "../../../contexts/ThemeContext";
 import styles from "./CanvasControls.module.css";
 
 interface CanvasControlsProps {
@@ -25,13 +26,8 @@ export default function CanvasControls({
   scale = 1,
   onScaleChange,
 }: CanvasControlsProps) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  const handleDarkModeToggle = () => {
-    setIsDarkMode(!isDarkMode);
-    // TODO: Implement dark mode functionality
-    console.log("Dark mode:", !isDarkMode);
-  };
+  const { theme, toggleTheme } = useTheme();
+  const isDarkMode = theme === 'dark';
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -94,7 +90,7 @@ export default function CanvasControls({
               type="button"
               role="switch"
               aria-checked={isDarkMode}
-              onClick={handleDarkModeToggle}
+              onClick={toggleTheme}
               className={`${styles.toggle} ${isDarkMode ? styles.toggleActive : ""}`}
             >
               <span className={styles.toggleThumb} />

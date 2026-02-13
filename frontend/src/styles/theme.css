@@ -1,0 +1,138 @@
+/**
+ * Global theme variables for light and dark modes
+ */
+
+:root[data-theme="light"] {
+  /* Background colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-hover: #e2e8f0;
+
+  /* Text colors */
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-tertiary: #64748b;
+  --text-muted: #94a3b8;
+
+  /* Border colors */
+  --border-primary: #e2e8f0;
+  --border-secondary: #cbd5e1;
+  --border-focus: #3b82f6;
+
+  /* Canvas colors */
+  --canvas-bg: #ffffff;
+  --canvas-grid: #f1f5f9;
+  --canvas-box-bg: #ffffff;
+  --canvas-box-border: #e2e8f0;
+  --canvas-box-shadow: rgba(0, 0, 0, 0.1);
+
+  /* Call stack colors */
+  --callstack-bg: #ffffff;
+  --callstack-title: #334155;
+  --callstack-scrollbar-track: rgba(226, 232, 240, 0.3);
+  --callstack-scrollbar-thumb: #cbd5e1;
+
+  /* Button colors */
+  --button-bg: #ffffff;
+  --button-hover: #f1f5f9;
+  --button-active: #e2e8f0;
+
+  /* Accent colors */
+  --accent-blue: #3b82f6;
+  --accent-blue-hover: #2563eb;
+  --accent-red: #ef4444;
+  --accent-red-hover: #dc2626;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* Memory-viz box styling */
+  --text-id-color: #c2410c;
+  --text-type-color: #7c2d12;
+  --text-value-color: #0f172a;
+  --box-fill: #ffffff;
+  --box-line-color: #334155;
+  --highlight-value-text-color: #0f172a;
+  --highlight-id-text-color: #1e293b;
+  --fade-text-color: #94a3b8;
+  --hide-text-color: #ffffff;
+  --highlight-box-fill: #dbeafe;
+  --highlight-box-line-color: #3b82f6;
+  --fade-box-fill: #f8fafc;
+  --fade-box-line-color: #e2e8f0;
+  --hide-box-fill: #ffffff;
+}
+
+:root[data-theme="dark"] {
+  /* Background colors */
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --bg-hover: #475569;
+
+  /* Text colors */
+  --text-primary: #f8fafc;
+  --text-secondary: #e2e8f0;
+  --text-tertiary: #cbd5e1;
+  --text-muted: #94a3b8;
+
+  /* Border colors */
+  --border-primary: #334155;
+  --border-secondary: #475569;
+  --border-focus: #60a5fa;
+
+  /* Canvas colors */
+  --canvas-bg: #1e293b;
+  --canvas-grid: #334155;
+  --canvas-box-bg: #1e293b;
+  --canvas-box-border: #334155;
+  --canvas-box-shadow: rgba(0, 0, 0, 0.3);
+
+  /* Call stack colors */
+  --callstack-bg: #1e293b;
+  --callstack-title: #e2e8f0;
+  --callstack-scrollbar-track: rgba(51, 65, 85, 0.3);
+  --callstack-scrollbar-thumb: #475569;
+
+  /* Button colors */
+  --button-bg: #334155;
+  --button-hover: #475569;
+  --button-active: #64748b;
+
+  /* Accent colors */
+  --accent-blue: #60a5fa;
+  --accent-blue-hover: #3b82f6;
+  --accent-red: #f87171;
+  --accent-red-hover: #ef4444;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+
+  /* Memory-viz box styling */
+  --text-id-color: #fb923c;
+  --text-type-color: #fdba74;
+  --text-value-color: #f8fafc;
+  --box-fill: #1e293b;
+  --box-line-color: #64748b;
+  --highlight-value-text-color: #f8fafc;
+  --highlight-id-text-color: #e2e8f0;
+  --fade-text-color: #64748b;
+  --hide-text-color: #1e293b;
+  --highlight-box-fill: #1e3a8a;
+  --highlight-box-line-color: #60a5fa;
+  --fade-box-fill: #334155;
+  --fade-box-line-color: #475569;
+  --hide-box-fill: #1e293b;
+}
+
+/* Apply theme to body */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 200ms ease, color 200ms ease;
+}

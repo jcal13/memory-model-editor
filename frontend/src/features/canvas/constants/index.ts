@@ -115,18 +115,21 @@ export const TOP_CONTROLS_HEIGHT = 120;
 
 /**
  * Space reserved at the bottom for download button
+ * NOTE: Buttons moved to Canvas Controls panel, keeping spacing from bottom edge
+ * Set to 40 to match y position of 60 for vertical centering (40 + 0 + 20 = 60)
  */
-export const DOWNLOAD_BUTTON_BOTTOM = 35;
+export const DOWNLOAD_BUTTON_BOTTOM = 40;
 
 /**
  * Standard height for UI buttons
  */
-export const BUTTON_HEIGHT = 38;
+export const BUTTON_HEIGHT = 0;
 
 /**
  * Extra spacing applied in height calculations (formerly magic number)
+ * Reduced since buttons are no longer on canvas
  */
-export const ADDITIONAL_HEIGHT_OFFSET = 30;
+export const ADDITIONAL_HEIGHT_OFFSET = 20;
 
 /**
  * Calculates the effective top padding for the call stack based on selection state.

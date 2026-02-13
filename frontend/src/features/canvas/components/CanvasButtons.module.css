@@ -6,16 +6,12 @@
   cursor: pointer;
   font-weight: 500;
   font-size: 0.85rem;
-  width: max-content;
+  width: 100%;
   transition: all 160ms ease;
 }
 
 /* Clear Canvas Button */
 .clearButton {
-  position: absolute;
-  top: 35px;
-  right: 35px;
-  z-index: 9999;
   background-color: #ef4444;
   color: white;
 }
@@ -30,18 +26,18 @@
 
 /* Download Button Container */
 .downloadContainer {
-  position: absolute;
-  bottom: 35px;
-  left: 35px;
-  z-index: 9999;
+  position: relative;
+  width: 100%;
 }
 
 .downloadButton {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   background-color: #3b82f6;
   color: white;
+  width: 100%;
 }
 
 .downloadButton:hover {
@@ -51,67 +47,50 @@
 .dropdownCaret {
   font-size: 0.85em;
   opacity: 0.8;
+  transition: transform 160ms ease;
 }
 
-/* Download Menu */
-.downloadMenu {
-  position: absolute;
-  bottom: calc(100% + 10px);
-  left: 0;
+.caretRotated {
+  transform: rotate(180deg);
+}
+
+/* Download Options (inline dropdown) */
+.downloadOptions {
   display: flex;
   flex-direction: column;
-  padding: 4px;
-  background-color: #ffffff;
-  color: #1e293b;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  min-width: 180px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+  gap: 6px;
+  margin-top: 8px;
+  padding-left: 8px;
+  border-left: 2px solid #e2e8f0;
 }
 
-.downloadMenu::after {
-  content: "";
-  position: absolute;
-  bottom: -6px;
-  left: 14px;
-  width: 10px;
-  height: 10px;
-  background: #fff;
-  border-left: 1px solid #e2e8f0;
-  border-bottom: 1px solid #e2e8f0;
-  transform: rotate(45deg);
-}
-
-.downloadMenu button {
-  padding: 8px 10px;
-  border: none;
-  background: transparent;
-  color: #1e293b;
+.downloadOptionButton {
+  background-color: #f8fafc;
+  color: #475569;
   text-align: left;
-  border-radius: 6px;
-  font-weight: 500;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: background 160ms ease;
+  justify-content: flex-start;
+  padding-left: 16px;
 }
 
-.downloadMenu button:hover {
+.downloadOptionButton:hover {
   background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.downloadOptionButton:active {
+  background-color: #e2e8f0;
 }
 
 /* Zoom Controls */
 .zoomControls {
-  position: absolute;
-  bottom: 35px;
-  right: 35px;
-  z-index: 9999;
   display: flex;
   flex-direction: row;
   gap: 4px;
+  width: 100%;
 }
 
 .zoomButton {
-  width: 36px;
+  flex: 1;
   height: 36px;
   padding: 0;
   display: flex;
@@ -123,7 +102,10 @@
   background-color: #ffffff;
   color: #334155;
   border: 1px solid #e2e8f0;
+  border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 160ms ease;
 }
 
 .zoomButton:hover:not(:disabled) {

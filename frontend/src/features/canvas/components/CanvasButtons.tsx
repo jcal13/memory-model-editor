@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef, useState, useEffect } from "react";
 import { CanvasElement } from "../../shared/types";
 import { buildJSONFromElements } from "../../validationServices/jsonBuilder";
 import html2canvas from "html2canvas";
@@ -26,30 +26,20 @@ export function ClearCanvasButton({ onClick }: ClearButtonProps) {
 // Download Options Button
 interface DownloadButtonProps {
   elements: CanvasElement[];
-  canvasSelector?: string;
 }
 
 export function DownloadButton({
   elements,
-  canvasSelector = ".canvasColumn",
 }: DownloadButtonProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const closeTimer = useRef<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleMenuOpen = () => {
-    if (closeTimer.current) {
-      window.clearTimeout(closeTimer.current);
-      closeTimer.current = null;
-    }
-    setIsMenuOpen(true);
-  };
-
-  const handleMenuClose = () => {
-    if (closeTimer.current) window.clearTimeout(closeTimer.current);
-    closeTimer.current = window.setTimeout(() => setIsMenuOpen(false), 150);
+  const handleToggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
   };
 
   const downloadJson = () => {
+    // Don't close the menu - keep it open
     const processedData = buildJSONFromElements(elements);
     const blob = new Blob([JSON.stringify(processedData, null, 2)], {
       type: "application/json",
@@ -81,40 +71,28 @@ export function DownloadButton({
   // };
 
   const downloadPng = async () => {
-    setIsMenuOpen(false);
+    // Don't close the menu - keep it open
     await new Promise(requestAnimationFrame);
 
-    const canvasNode = document.querySelector(canvasSelector) as HTMLElement;
-    if (!canvasNode) return;
+    // Find the canvas SVG element and its parent wrapper
+    const canvasSvg = document.querySelector('[data-testid="canvas"]') as SVGElement;
+    if (!canvasSvg) {
+      console.error("Canvas SVG not found");
+      return;
+    }
 
-    const downloadButton = canvasNode.querySelector(
-      `.${styles.downloadContainer}`
-    ) as HTMLElement;
-    const clearButton = canvasNode.querySelector(
-      `.${styles.clearButton}`
-    ) as HTMLElement;
-    const zoomControls = canvasNode.querySelector(
-      `.${styles.zoomControls}`
-    ) as HTMLElement;
-    const modeToggle = document.querySelector(
-      '[data-editor-control="mode-toggle"]'
-    ) as HTMLElement;
-
-    const elementsToHide = [downloadButton, clearButton, zoomControls, modeToggle].filter(
-      Boolean
-    );
-
-    const originalDisplays = elementsToHide.map((el) => el.style.display);
-
-    elementsToHide.forEach((el) => {
-      el.style.display = "none";
-    });
+    const canvasWrapper = canvasSvg.parentElement;
+    if (!canvasWrapper) {
+      console.error("Canvas wrapper not found");
+      return;
+    }
 
     try {
-      const canvas = await html2canvas(canvasNode, {
+      const canvas = await html2canvas(canvasWrapper, {
         backgroundColor: "#ffffff",
         useCORS: true,
         scale: 2,
+        logging: false,
       });
 
       canvas.toBlob((blob) => {
@@ -130,42 +108,38 @@ export function DownloadButton({
       });
     } catch (error) {
       console.error("PNG download failed:", error);
-    } finally {
-      elementsToHide.forEach((el, index) => {
-        el.style.display = originalDisplays[index];
-      });
     }
   };
 
   return (
-    <div
-      className={styles.downloadContainer}
-      onMouseEnter={handleMenuOpen}
-      onMouseLeave={handleMenuClose}
-    >
+    <div className={styles.downloadContainer} ref={containerRef}>
       <button
         type="button"
         className={`${styles.baseButton} ${styles.downloadButton}`}
         aria-haspopup="menu"
         aria-expanded={isMenuOpen}
+        onClick={handleToggleMenu}
       >
         Download{" "}
-        <span className={styles.dropdownCaret} aria-hidden>
+        <span className={`${styles.dropdownCaret} ${isMenuOpen ? styles.caretRotated : ""}`} aria-hidden>
           ▾
         </span>
       </button>
 
       {isMenuOpen && (
-        <div
-          className={styles.downloadMenu}
-          role="menu"
-          onMouseEnter={handleMenuOpen}
-          onMouseLeave={handleMenuClose}
-        >
-          <button type="button" role="menuitem" onClick={downloadPng}>
+        <div className={styles.downloadOptions}>
+          <button
+            type="button"
+            className={`${styles.baseButton} ${styles.downloadOptionButton}`}
+            onClick={downloadPng}
+          >
             Download PNG
           </button>
-          <button type="button" role="menuitem" onClick={downloadJson}>
+          <button
+            type="button"
+            className={`${styles.baseButton} ${styles.downloadOptionButton}`}
+            onClick={downloadJson}
+          >
             Download JSON
           </button>
         </div>

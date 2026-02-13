@@ -12,7 +12,6 @@ import { CanvasElement, BoxType, ID } from "../shared/types";
 import CanvasBox from "./components/CanvasBox";
 import BoxEditor from "../editors/boxEditor/BoxEditor";
 import CallStack from "./components/CallStack";
-import { ClearCanvasButton, DownloadButton, ZoomControls } from "./components/CanvasButtons";
 import { useCanvasRefs } from "./hooks/useCanvas";
 import { validateElements } from "./utils/validation";
 import styles from "./Canvas.module.css";
@@ -115,6 +114,8 @@ interface CanvasProps {
   sandbox?: boolean;
   onClear: () => void;
   onEditorOpenerReady?: (openEditor: (element: CanvasElement) => void) => void;
+  scale?: number;
+  onScaleChange?: (scale: number) => void;
 }
 
 function Canvas({
@@ -129,14 +130,20 @@ function Canvas({
   sandbox = true,
   onClear,
   onEditorOpenerReady,
+  scale: externalScale,
+  onScaleChange: externalOnScaleChange,
 }: CanvasProps) {
   const [openEditors, setOpenEditors] = useState<CanvasElement[]>([]);
   const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(
     null
   );
   const [canvasHeight, setCanvasHeight] = useState<number | null>(null);
-  const [scale, setScale] = useState(1);
+  const [internalScale, setInternalScale] = useState(1);
   const [callStackWidth, setCallStackWidth] = useState(225);
+
+  // Use external scale if provided, otherwise use internal
+  const scale = externalScale !== undefined ? externalScale : internalScale;
+  const setScale = externalOnScaleChange || setInternalScale;
 
   const { svgRef } = useCanvasRefs();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -215,7 +222,10 @@ function Canvas({
   useEffect(() => {
     const { width, height } = baseDims.current;
     if (width > 0 && height > 0) {
-      applyViewBox(width, height, scale);
+      // Force immediate update
+      requestAnimationFrame(() => {
+        applyViewBox(width, height, scale);
+      });
     }
   }, [scale, applyViewBox]);
 
@@ -457,13 +467,6 @@ function Canvas({
               ))}
           </g>
         </svg>
-
-        <ClearCanvasButton onClick={onClear} />
-        <DownloadButton
-          elements={elements}
-          canvasSelector={`.${styles.canvasWrapper}`}
-        />
-        <ZoomControls scale={scale} onScaleChange={setScale} />
       </div>
 
       {openEditors.map((element) => {
@@ -575,7 +578,8 @@ const areEqual = (prev: Readonly<CanvasProps>, next: Readonly<CanvasProps>) => {
     prev.elements === next.elements &&
     prev.ids === next.ids &&
     prev.classes === next.classes &&
-    prev.sandbox === next.sandbox
+    prev.sandbox === next.sandbox &&
+    prev.scale === next.scale
   );
 };
 

@@ -54,6 +54,7 @@ export default function MemoryModelEditor({
   );
 
   const [currentQuestionData, setCurrentQuestionData] = useState<any>(null);
+  const [canvasScale, setCanvasScale] = useState<number>(1);
 
   const handleEditorOpenerReady = useCallback(
     (opener: (element: CanvasElement) => void) => {
@@ -381,6 +382,12 @@ export default function MemoryModelEditor({
                     : undefined
                 }
                 isPracticeMode={state.isSandboxMode}
+                isSandboxMode={state.isSandboxMode}
+                onModeToggle={() => state.setShowModeToggleModal(true)}
+                onClear={() => state.setShowClearCanvasModal(true)}
+                elements={state.elements}
+                scale={canvasScale}
+                onScaleChange={setCanvasScale}
               />
             </div>
           </div>
@@ -408,29 +415,10 @@ export default function MemoryModelEditor({
               sandbox={!state.isSandboxMode}
               onClear={() => state.setShowClearCanvasModal(true)}
               onEditorOpenerReady={handleEditorOpenerReady}
+              scale={canvasScale}
+              onScaleChange={setCanvasScale}
             />
           </div>
-
-          <label
-            className={styles.modeToggleSwitch}
-            data-editor-control="mode-toggle"
-          >
-            <span className={styles.modeToggleLabel}>
-              {state.isSandboxMode ? "Practice" : "Test"}
-            </span>
-            <input
-              type="checkbox"
-              className={styles.modeToggleInput}
-              checked={state.isSandboxMode}
-              onChange={(event) => {
-                event.preventDefault();
-                state.setShowModeToggleModal(true);
-              }}
-            />
-            <div className={styles.modeToggleSliderWrapper}>
-              <span className={styles.modeToggleSlider}></span>
-            </div>
-          </label>
 
           {state.jsonOutput && (
             <pre className={styles.jsonPreview}>{state.jsonOutput}</pre>

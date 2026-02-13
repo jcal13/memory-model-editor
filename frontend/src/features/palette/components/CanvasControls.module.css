@@ -41,8 +41,10 @@
   padding: 20px 24px;
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 transparent;
+  min-height: 0; /* Important for flex scrolling */
 }
 
 .controlsBody::-webkit-scrollbar {
@@ -79,6 +81,39 @@
   font-weight: 500;
   color: #334155;
   cursor: pointer;
+}
+
+/* =======================================
+   === Control Groups ====================
+======================================= */
+
+.controlGroup {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.controlGroup:first-of-type {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.groupTitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 12px 0;
+}
+
+.buttonWrapper {
+  margin-bottom: 8px;
+}
+
+.buttonWrapper:last-child {
+  margin-bottom: 0;
 }
 
 /* =======================================

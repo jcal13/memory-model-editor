@@ -3,7 +3,7 @@ import PaletteBox from "./components/PaletteBox";
 import CanvasControls from "./components/CanvasControls";
 import { useResizable } from "./hooks/useResizable";
 import styles from "./Palette.module.css";
-import { PaletteTab, BoxTypeName } from "../shared/types";
+import { PaletteTab, BoxTypeName, CanvasElement } from "../shared/types";
 
 // Move constants here for better organization
 const ALL_TYPES: readonly BoxTypeName[] = [
@@ -54,6 +54,13 @@ interface PaletteProps {
   setActive: (tab: PaletteTab) => void;
   requiredBoxes?: BoxTypeName[];
   isPracticeMode?: boolean;
+  // Canvas Controls props
+  isSandboxMode?: boolean;
+  onModeToggle?: () => void;
+  onClear?: () => void;
+  elements?: CanvasElement[];
+  scale?: number;
+  onScaleChange?: (scale: number) => void;
 }
 
 // Extract TabButton component inline
@@ -89,6 +96,12 @@ export default function Palette({
   setActive,
   requiredBoxes,
   isPracticeMode = false,
+  isSandboxMode,
+  onModeToggle,
+  onClear,
+  elements,
+  scale,
+  onScaleChange,
 }: PaletteProps) {
   const allBoxes = TAB_BOX_MAPPING[activeTab];
 
@@ -148,7 +161,14 @@ export default function Palette({
           className={styles.controlsSection}
           style={{ height: `${100 - topHeight}%` }}
         >
-          <CanvasControls />
+          <CanvasControls
+            isSandboxMode={isSandboxMode}
+            onModeToggle={onModeToggle}
+            onClear={onClear}
+            elements={elements}
+            scale={scale}
+            onScaleChange={onScaleChange}
+          />
         </div>
       </div>
     </div>

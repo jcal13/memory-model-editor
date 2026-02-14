@@ -108,7 +108,7 @@ export const PALETTE_OFFSET_SMALL = { x: 5, y: 5 } as const;
 function getBoxFillColor(): string {
   if (typeof document !== 'undefined') {
     const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-    return isDarkMode ? '#2d3748' : '#ffffff';
+    return isDarkMode ? '#2d2d2d' : '#ffffff';
   }
   return '#ffffff';
 }

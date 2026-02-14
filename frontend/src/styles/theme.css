@@ -68,39 +68,39 @@
 
 :root[data-theme="dark"] {
   /* Background colors */
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  --bg-hover: #475569;
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #242424;
+  --bg-tertiary: #2d2d2d;
+  --bg-hover: #3a3a3a;
 
   /* Text colors */
-  --text-primary: #f8fafc;
-  --text-secondary: #e2e8f0;
-  --text-tertiary: #cbd5e1;
-  --text-muted: #94a3b8;
+  --text-primary: #e8e8e8;
+  --text-secondary: #d0d0d0;
+  --text-tertiary: #b0b0b0;
+  --text-muted: #888888;
 
   /* Border colors */
-  --border-primary: #334155;
-  --border-secondary: #475569;
+  --border-primary: #3a3a3a;
+  --border-secondary: #4a4a4a;
   --border-focus: #60a5fa;
 
   /* Canvas colors */
-  --canvas-bg: #1e293b;
-  --canvas-grid: #334155;
-  --canvas-box-bg: #1e293b;
-  --canvas-box-border: #334155;
-  --canvas-box-shadow: rgba(0, 0, 0, 0.3);
+  --canvas-bg: #242424;
+  --canvas-grid: #2d2d2d;
+  --canvas-box-bg: #242424;
+  --canvas-box-border: #3a3a3a;
+  --canvas-box-shadow: rgba(0, 0, 0, 0.5);
 
   /* Call stack colors */
-  --callstack-bg: #1e293b;
-  --callstack-title: #e2e8f0;
-  --callstack-scrollbar-track: rgba(51, 65, 85, 0.3);
-  --callstack-scrollbar-thumb: #475569;
+  --callstack-bg: #242424;
+  --callstack-title: #d0d0d0;
+  --callstack-scrollbar-track: rgba(58, 58, 58, 0.3);
+  --callstack-scrollbar-thumb: #4a4a4a;
 
   /* Button colors */
-  --button-bg: #334155;
-  --button-hover: #475569;
-  --button-active: #64748b;
+  --button-bg: #2d2d2d;
+  --button-hover: #3a3a3a;
+  --button-active: #4a4a4a;
 
   /* Accent colors */
   --accent-blue: #60a5fa;
@@ -109,25 +109,25 @@
   --accent-red-hover: #ef4444;
 
   /* Shadow */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.7);
 
   /* Memory-viz box styling */
   --text-id-color: #FFC266;
-  --text-type-color: #A6B5FF;
+  --text-type-color: #B8B8FF;
   --text-value-color: #E8E8E8;
-  --box-fill: #1e293b;
+  --box-fill: #2d2d2d;
   --box-line-color: #888888;
-  --highlight-value-text-color: #f8fafc;
-  --highlight-id-text-color: #e2e8f0;
-  --fade-text-color: #64748b;
-  --hide-text-color: #1e293b;
-  --highlight-box-fill: #1e3a8a;
-  --highlight-box-line-color: #60a5fa;
-  --fade-box-fill: #334155;
-  --fade-box-line-color: #475569;
-  --hide-box-fill: #1e293b;
+  --highlight-value-text-color: #e8e8e8;
+  --highlight-id-text-color: #d0d0d0;
+  --fade-text-color: #6a6a6a;
+  --hide-text-color: #2d2d2d;
+  --highlight-box-fill: #3a3a3a;
+  --highlight-box-line-color: #b0b0b0;
+  --fade-box-fill: #2d2d2d;
+  --fade-box-line-color: #3a3a3a;
+  --hide-box-fill: #2d2d2d;
 }
 
 /* Apply theme to body */

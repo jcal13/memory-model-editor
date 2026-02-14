@@ -221,7 +221,7 @@
 
 /* Override memory-viz box background fills for dark mode in palette */
 :root[data-theme="dark"] .paletteBoxes :global(svg g path[fill]:not([fill="none"])) {
-  fill: #2d3748 !important;
+  fill: #2d2d2d !important;
 }
 
 :root[data-theme="dark"] .paletteBoxes :global(rect[stroke="#000000"]),

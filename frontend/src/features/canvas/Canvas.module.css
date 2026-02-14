@@ -30,7 +30,7 @@
 
 /* Override memory-viz box background fills for dark mode */
 :root[data-theme="dark"] .canvas :global(svg g path[fill]:not([fill="none"])) {
-  fill: #2d3748 !important;
+  fill: #2d2d2d !important;
 }
 
 :root[data-theme="dark"] .canvas :global(rect[stroke="#000000"]),

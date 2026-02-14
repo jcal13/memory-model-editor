@@ -59,16 +59,34 @@
 .categoryIcon.practice {
   background: #ede9fe;
   color: #7c3aed;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+:root[data-theme="dark"] .categoryIcon.practice {
+  background: #3a2d4a;
+  color: #c4b5fd;
 }
 
 .categoryIcon.test {
   background: #dbeafe;
   color: #2563eb;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+:root[data-theme="dark"] .categoryIcon.test {
+  background: #2d3a4a;
+  color: #93c5fd;
 }
 
 .categoryIcon.prep {
   background: #fef3c7;
   color: #d97706;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+:root[data-theme="dark"] .categoryIcon.prep {
+  background: #4a3d2d;
+  color: #fbbf24;
 }
 
 .categoryLabel {
@@ -134,18 +152,31 @@
   height: 0.375rem;
   border-radius: 50%;
   flex-shrink: 0;
+  transition: background-color 200ms ease;
 }
 
 .statusDot.unattempted {
   background: #d1d5db;
 }
 
+:root[data-theme="dark"] .statusDot.unattempted {
+  background: #4a4a4a;
+}
+
 .statusDot.attempted {
   background: #f97316;
 }
 
+:root[data-theme="dark"] .statusDot.attempted {
+  background: #fb923c;
+}
+
 .statusDot.completed {
   background: #10b981;
+}
+
+:root[data-theme="dark"] .statusDot.completed {
+  background: #34d399;
 }
 
 /* Completed status */
@@ -155,10 +186,22 @@
   color: #065f46;
 }
 
+:root[data-theme="dark"] .selectorBtn.completed {
+  background: #2d4a3a;
+  border-color: #34d399;
+  color: #a7f3d0;
+}
+
 .selectorBtn.completed:hover {
   background: #d1fae5;
   border-color: #6ee7b7;
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+}
+
+:root[data-theme="dark"] .selectorBtn.completed:hover {
+  background: #3a5a4a;
+  border-color: #6ee7b7;
+  box-shadow: 0 2px 8px rgba(52, 211, 153, 0.2);
 }
 
 /* Attempted status */
@@ -168,8 +211,20 @@
   color: #9a3412;
 }
 
+:root[data-theme="dark"] .selectorBtn.attempted {
+  background: #4a3a2d;
+  border-color: #fb923c;
+  color: #fdba74;
+}
+
 .selectorBtn.attempted:hover {
   background: #ffedd5;
   border-color: #fdba74;
   box-shadow: 0 2px 8px rgba(249, 115, 22, 0.1);
+}
+
+:root[data-theme="dark"] .selectorBtn.attempted:hover {
+  background: #5a4a3a;
+  border-color: #f97316;
+  box-shadow: 0 2px 8px rgba(251, 146, 60, 0.2);
 }

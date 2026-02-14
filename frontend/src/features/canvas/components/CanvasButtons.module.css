@@ -1,28 +1,39 @@
 /* Base button styling */
 .baseButton {
   padding: 8px 12px;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
   font-size: 0.85rem;
   width: 100%;
   transition: all 160ms ease;
+  box-shadow: var(--shadow-sm);
 }
 
 /* Clear Canvas Button */
 .clearButton {
   background-color: var(--accent-red);
   color: white;
+  border-color: var(--accent-red);
 }
 
 .clearButton:hover {
   background-color: var(--accent-red-hover);
+  border-color: var(--accent-red-hover);
+  box-shadow: var(--shadow-md);
 }
 
 .clearButton:active {
   background-color: var(--accent-red-hover);
+  border-color: var(--accent-red-hover);
   filter: brightness(0.9);
+  box-shadow: var(--shadow-sm);
+}
+
+.clearButton:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 /* Download Button Container */
@@ -39,10 +50,25 @@
   background-color: var(--accent-blue);
   color: white;
   width: 100%;
+  border-color: var(--accent-blue);
 }
 
 .downloadButton:hover {
   background-color: var(--accent-blue-hover);
+  border-color: var(--accent-blue-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.downloadButton:active {
+  background-color: var(--accent-blue-hover);
+  border-color: var(--accent-blue-hover);
+  filter: brightness(0.9);
+  box-shadow: var(--shadow-sm);
+}
+
+.downloadButton:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 .dropdownCaret {
@@ -123,4 +149,9 @@
 .zoomButton:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+.zoomButton:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }

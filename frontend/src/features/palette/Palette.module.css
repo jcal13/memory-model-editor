@@ -212,3 +212,48 @@
   align-items: center;
   gap: 16px;
 }
+
+/* Override memory-viz box background fills for light mode in palette */
+:root[data-theme="light"] .paletteBoxes :global(svg g path[fill]:not([fill="none"])),
+.paletteBoxes :global(svg g path[fill]:not([fill="none"])) {
+  fill: #ffffff !important;
+}
+
+/* Override memory-viz box background fills for dark mode in palette */
+:root[data-theme="dark"] .paletteBoxes :global(svg g path[fill]:not([fill="none"])) {
+  fill: #2d3748 !important;
+}
+
+:root[data-theme="dark"] .paletteBoxes :global(rect[stroke="#000000"]),
+:root[data-theme="dark"] .paletteBoxes :global(rect[stroke="black"]),
+:root[data-theme="dark"] .paletteBoxes :global(rect[stroke="#000"]),
+:root[data-theme="dark"] .paletteBoxes :global(path[stroke="rgb(0, 0, 0)"]),
+:root[data-theme="dark"] .paletteBoxes :global(path) {
+  stroke: var(--box-line-color) !important;
+  transition: stroke 200ms ease;
+}
+
+:root[data-theme="dark"] .paletteBoxes :global(text.id) {
+  fill: var(--text-id-color) !important;
+  transition: fill 200ms ease;
+}
+
+:root[data-theme="dark"] .paletteBoxes :global(text.type),
+:root[data-theme="dark"] .paletteBoxes :global(text.attribute) {
+  fill: var(--text-type-color) !important;
+  transition: fill 200ms ease;
+}
+
+:root[data-theme="dark"] .paletteBoxes :global(text.value),
+:root[data-theme="dark"] .paletteBoxes :global(text.default),
+:root[data-theme="dark"] .paletteBoxes :global(text.variable) {
+  fill: var(--text-value-color) !important;
+  transition: fill 200ms ease;
+}
+
+:root[data-theme="dark"] .paletteBoxes :global(line[stroke="#000000"]),
+:root[data-theme="dark"] .paletteBoxes :global(line[stroke="black"]),
+:root[data-theme="dark"] .paletteBoxes :global(line[stroke="#000"]) {
+  stroke: var(--box-line-color) !important;
+  transition: stroke 200ms ease;
+}

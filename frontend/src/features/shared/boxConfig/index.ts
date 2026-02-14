@@ -28,6 +28,7 @@ import {
 export interface BoxStyle {
   box_id: { fill: string; fillStyle: string };
   box_type: { fill: string; fillStyle: string };
+  box_container?: { fill: string; fillStyle: string };
 }
 
 /**
@@ -102,19 +103,32 @@ export const PALETTE_OFFSET = { x: 15, y: 15 } as const;
 export const PALETTE_OFFSET_SMALL = { x: 5, y: 5 } as const;
 
 /**
+ * Get the appropriate box fill color based on current theme
+ */
+function getBoxFillColor(): string {
+  if (typeof document !== 'undefined') {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    return isDarkMode ? '#2d3748' : '#ffffff';
+  }
+  return '#ffffff';
+}
+
+/**
  * Default style for canvas boxes
  */
 export const DEFAULT_CANVAS_STYLE: BoxStyle = {
-  box_id: { fill: "#fff", fillStyle: "solid" },
-  box_type: { fill: "#fff", fillStyle: "solid" },
+  get box_id() { return { fill: getBoxFillColor(), fillStyle: "solid" as const }; },
+  get box_type() { return { fill: getBoxFillColor(), fillStyle: "solid" as const }; },
+  get box_container() { return { fill: getBoxFillColor(), fillStyle: "solid" as const }; },
 };
 
 /**
  * Default style for palette preview boxes
  */
 export const DEFAULT_PALETTE_STYLE: BoxStyle = {
-  box_id: { fill: "#fff", fillStyle: "solid" },
-  box_type: { fill: "#fff", fillStyle: "solid" },
+  get box_id() { return { fill: getBoxFillColor(), fillStyle: "solid" as const }; },
+  get box_type() { return { fill: getBoxFillColor(), fillStyle: "solid" as const }; },
+  get box_container() { return { fill: getBoxFillColor(), fillStyle: "solid" as const }; },
 };
 
 // ============================================================================

@@ -114,11 +114,11 @@
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
 
   /* Memory-viz box styling */
-  --text-id-color: #fb923c;
-  --text-type-color: #fdba74;
-  --text-value-color: #f8fafc;
+  --text-id-color: #FFC266;
+  --text-type-color: #A6B5FF;
+  --text-value-color: #E8E8E8;
   --box-fill: #1e293b;
-  --box-line-color: #64748b;
+  --box-line-color: #888888;
   --highlight-value-text-color: #f8fafc;
   --highlight-id-text-color: #e2e8f0;
   --fade-text-color: #64748b;

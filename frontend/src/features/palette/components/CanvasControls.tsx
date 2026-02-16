@@ -5,7 +5,7 @@
 
 import React, { useState } from "react";
 import { CanvasElement } from "../../shared/types";
-import { ClearCanvasButton, DownloadButton, ZoomControls, UndoButton } from "../../canvas/components/CanvasButtons";
+import { ClearCanvasButton, DownloadButton, ZoomControls, UndoButton, RedoButton } from "../../canvas/components/CanvasButtons";
 import { useTheme } from "../../../contexts/ThemeContext";
 import styles from "./CanvasControls.module.css";
 
@@ -14,7 +14,9 @@ interface CanvasControlsProps {
   onModeToggle?: () => void;
   onClear?: () => void;
   onUndo?: () => void;
+  onRedo?: () => void;
   canUndo?: boolean;
+  canRedo?: boolean;
   elements?: CanvasElement[];
   scale?: number;
   onScaleChange?: (scale: number) => void;
@@ -51,7 +53,9 @@ export default function CanvasControls({
   onModeToggle,
   onClear,
   onUndo,
+  onRedo,
   canUndo = false,
+  canRedo = false,
   elements = [],
   scale = 1,
   onScaleChange,
@@ -85,6 +89,12 @@ export default function CanvasControls({
             {onUndo && (
               <div className={styles.buttonWrapper}>
                 <UndoButton onClick={onUndo} disabled={!canUndo} />
+              </div>
+            )}
+
+            {onRedo && (
+              <div className={styles.buttonWrapper}>
+                <RedoButton onClick={onRedo} disabled={!canRedo} />
               </div>
             )}
 

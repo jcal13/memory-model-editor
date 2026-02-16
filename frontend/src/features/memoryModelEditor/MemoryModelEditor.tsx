@@ -59,7 +59,7 @@ export default function MemoryModelEditor({
   const [editorScale, setEditorScale] = useState<number>(1);
 
   // Initialize undo history
-  const { canUndo, undo, recordState, clearHistory } = useUndoHistory(
+  const { canUndo, canRedo, undo, redo, recordState, clearHistory } = useUndoHistory(
     state.setElements,
     state.setElementIds,
     state.setElementClasses
@@ -95,8 +95,8 @@ export default function MemoryModelEditor({
       JSON.stringify(prevState.classes) !== JSON.stringify(currentState.classes);
 
     if (hasChanged) {
-      // Record the previous state before the change
-      recordState(prevState);
+      // Record the current state (after the change)
+      recordState(currentState);
       prevStateRef.current = currentState;
     }
   }, [state.elements, state.elementIds, state.elementClasses, recordState]);
@@ -426,7 +426,9 @@ export default function MemoryModelEditor({
                 onModeToggle={() => state.setShowModeToggleModal(true)}
                 onClear={() => state.setShowClearCanvasModal(true)}
                 onUndo={undo}
+                onRedo={redo}
                 canUndo={canUndo}
+                canRedo={canRedo}
                 elements={state.elements}
                 scale={canvasScale}
                 onScaleChange={setCanvasScale}

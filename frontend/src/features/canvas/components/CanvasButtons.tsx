@@ -44,6 +44,27 @@ export function UndoButton({ onClick, disabled = false }: UndoButtonProps) {
   );
 }
 
+// Redo Button
+interface RedoButtonProps {
+  onClick: () => void;
+  disabled?: boolean;
+}
+
+export function RedoButton({ onClick, disabled = false }: RedoButtonProps) {
+  return (
+    <button
+      type="button"
+      className={`${styles.baseButton} ${styles.undoButton}`}
+      onClick={onClick}
+      disabled={disabled}
+      aria-label="Redo"
+      title="Redo last undone action"
+    >
+      Redo
+    </button>
+  );
+}
+
 // Download Options Button
 interface DownloadButtonProps {
   elements: CanvasElement[];

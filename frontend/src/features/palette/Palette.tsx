@@ -59,7 +59,9 @@ interface PaletteProps {
   onModeToggle?: () => void;
   onClear?: () => void;
   onUndo?: () => void;
+  onRedo?: () => void;
   canUndo?: boolean;
+  canRedo?: boolean;
   elements?: CanvasElement[];
   scale?: number;
   onScaleChange?: (scale: number) => void;
@@ -104,7 +106,9 @@ export default function Palette({
   onModeToggle,
   onClear,
   onUndo,
+  onRedo,
   canUndo,
+  canRedo,
   elements,
   scale,
   onScaleChange,
@@ -174,7 +178,9 @@ export default function Palette({
             onModeToggle={onModeToggle}
             onClear={onClear}
             onUndo={onUndo}
+            onRedo={onRedo}
             canUndo={canUndo}
+            canRedo={canRedo}
             elements={elements}
             scale={scale}
             onScaleChange={onScaleChange}

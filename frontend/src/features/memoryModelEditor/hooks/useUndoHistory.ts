@@ -9,29 +9,60 @@ interface CanvasState {
 
 interface UndoHistoryReturn {
   canUndo: boolean;
+  canRedo: boolean;
   undo: () => void;
+  redo: () => void;
   recordState: (state: CanvasState) => void;
   clearHistory: () => void;
 }
 
 const MAX_HISTORY_SIZE = 50;
+const HISTORY_STORAGE_KEY = "canvas_undo_history";
+const HISTORY_INDEX_STORAGE_KEY = "canvas_undo_history_index";
 
 export function useUndoHistory(
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>,
   setElementIds: React.Dispatch<React.SetStateAction<number[]>>,
   setElementClasses: React.Dispatch<React.SetStateAction<string[]>>
 ): UndoHistoryReturn {
-  const [history, setHistory] = useState<CanvasState[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
-  const isUndoing = useRef(false);
+  // Load initial history from localStorage
+  const loadHistory = useCallback(() => {
+    try {
+      const saved = localStorage.getItem(HISTORY_STORAGE_KEY);
+      const savedIndex = localStorage.getItem(HISTORY_INDEX_STORAGE_KEY);
+      return {
+        history: saved ? JSON.parse(saved) : [],
+        index: savedIndex ? parseInt(savedIndex, 10) : -1,
+      };
+    } catch (error) {
+      console.error("Failed to load undo history:", error);
+      return { history: [], index: -1 };
+    }
+  }, []);
+
+  const { history: initialHistory, index: initialIndex } = loadHistory();
+
+  const [history, setHistory] = useState<CanvasState[]>(initialHistory);
+  const [historyIndex, setHistoryIndex] = useState(initialIndex);
+  const isUndoRedoing = useRef(false);
+
+  // Save history to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
+      localStorage.setItem(HISTORY_INDEX_STORAGE_KEY, historyIndex.toString());
+    } catch (error) {
+      console.error("Failed to save undo history:", error);
+    }
+  }, [history, historyIndex]);
 
   const recordState = useCallback((state: CanvasState) => {
-    // Don't record while we're undoing to prevent recursion
-    if (isUndoing.current) return;
+    // Don't record while we're undoing/redoing to prevent recursion
+    if (isUndoRedoing.current) return;
 
     setHistory((prev) => {
-      // If we're not at the end of history, discard future states
-      const newHistory = historyIndex >= 0 ? prev.slice(0, historyIndex + 1) : prev;
+      // If we're in the middle of history (after undo), discard future states
+      const currentHistory = prev.slice(0, historyIndex + 1);
 
       // Deep clone the state to prevent mutations
       const clonedState: CanvasState = {
@@ -41,28 +72,31 @@ export function useUndoHistory(
       };
 
       // Add new state
-      const updatedHistory = [...newHistory, clonedState];
+      const updatedHistory = [...currentHistory, clonedState];
 
       // Limit history size
       if (updatedHistory.length > MAX_HISTORY_SIZE) {
-        return updatedHistory.slice(1);
+        const trimmed = updatedHistory.slice(1);
+        // Adjust index since we removed from the beginning
+        setHistoryIndex((prev) => Math.max(-1, prev - 1));
+        return trimmed;
       }
 
       return updatedHistory;
     });
 
-    setHistoryIndex((prev) => {
-      const newIndex = prev + 1;
-      return newIndex >= MAX_HISTORY_SIZE ? MAX_HISTORY_SIZE - 1 : newIndex;
-    });
+    setHistoryIndex((prev) => prev + 1);
   }, [historyIndex]);
 
   const undo = useCallback(() => {
-    if (historyIndex < 0) return;
+    // Need at least 2 states in history to undo (index 1 to go back to index 0)
+    if (historyIndex < 1) return;
 
-    isUndoing.current = true;
+    isUndoRedoing.current = true;
 
-    const previousState = history[historyIndex];
+    const previousIndex = historyIndex - 1;
+    const previousState = history[previousIndex];
+
     if (previousState) {
       // Restore the previous state
       setElements(JSON.parse(JSON.stringify(previousState.elements)));
@@ -70,25 +104,59 @@ export function useUndoHistory(
       setElementClasses([...previousState.classes]);
 
       // Move back in history
-      setHistoryIndex((prev) => prev - 1);
+      setHistoryIndex(previousIndex);
     }
 
     // Use setTimeout to ensure state updates complete before allowing new recordings
     setTimeout(() => {
-      isUndoing.current = false;
+      isUndoRedoing.current = false;
+    }, 0);
+  }, [history, historyIndex, setElements, setElementIds, setElementClasses]);
+
+  const redo = useCallback(() => {
+    // Can redo if we're not at the end of history
+    if (historyIndex >= history.length - 1) return;
+
+    isUndoRedoing.current = true;
+
+    const nextIndex = historyIndex + 1;
+    const nextState = history[nextIndex];
+
+    if (nextState) {
+      // Restore the next state
+      setElements(JSON.parse(JSON.stringify(nextState.elements)));
+      setElementIds([...nextState.ids]);
+      setElementClasses([...nextState.classes]);
+
+      // Move forward in history
+      setHistoryIndex(nextIndex);
+    }
+
+    // Use setTimeout to ensure state updates complete before allowing new recordings
+    setTimeout(() => {
+      isUndoRedoing.current = false;
     }, 0);
   }, [history, historyIndex, setElements, setElementIds, setElementClasses]);
 
   const clearHistory = useCallback(() => {
     setHistory([]);
     setHistoryIndex(-1);
+    try {
+      localStorage.removeItem(HISTORY_STORAGE_KEY);
+      localStorage.removeItem(HISTORY_INDEX_STORAGE_KEY);
+    } catch (error) {
+      console.error("Failed to clear undo history from localStorage:", error);
+    }
   }, []);
 
-  const canUndo = historyIndex >= 0;
+  const canUndo = historyIndex >= 1;
+  const canRedo = historyIndex < history.length - 1;
 
   return {
     canUndo,
+    canRedo,
     undo,
+    redo,
     recordState,
     clearHistory,
   };

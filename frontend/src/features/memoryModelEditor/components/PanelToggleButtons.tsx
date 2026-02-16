@@ -23,7 +23,6 @@ export default function PanelToggleButtons({
           onClick={onTogglePalette}
           aria-label="Show Palette"
           title="Show Palette"
-          data-tutorial="palette-toggle"
         >
           <svg
             width="16"
@@ -47,7 +46,6 @@ export default function PanelToggleButtons({
           onClick={onToggleInfoPanel}
           aria-label="Show Info Panel"
           title="Show Info Panel"
-          data-tutorial="info-panel-toggle"
         >
           <svg
             width="16"

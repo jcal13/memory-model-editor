@@ -237,21 +237,3 @@ export function ZoomControls({ scale, onScaleChange }: ZoomControlsProps) {
   );
 }
 
-// Tutorial Button
-interface TutorialButtonProps {
-  onClick: () => void;
-}
-
-export function TutorialButton({ onClick }: TutorialButtonProps) {
-  return (
-    <button
-      type="button"
-      className={`${styles.baseButton} ${styles.tutorialButton}`}
-      onClick={onClick}
-      aria-label="Start Tutorial"
-      title="Start guided tutorial"
-    >
-      Tutorial
-    </button>
-  );
-}

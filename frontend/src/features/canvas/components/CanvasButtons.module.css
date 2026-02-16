@@ -184,29 +184,3 @@
   outline: 2px solid var(--border-focus);
   outline-offset: 2px;
 }
-
-/* Tutorial Button */
-.tutorialButton {
-  background-color: var(--accent-green, #10b981);
-  color: white;
-  border-color: var(--accent-green, #10b981);
-  font-weight: 600;
-}
-
-.tutorialButton:hover {
-  background-color: var(--accent-green-hover, #059669);
-  border-color: var(--accent-green-hover, #059669);
-  box-shadow: var(--shadow-md);
-}
-
-.tutorialButton:active {
-  background-color: var(--accent-green-hover, #059669);
-  border-color: var(--accent-green-hover, #059669);
-  filter: brightness(0.9);
-  box-shadow: var(--shadow-sm);
-}
-
-.tutorialButton:focus-visible {
-  outline: 2px solid var(--border-focus);
-  outline-offset: 2px;
-}

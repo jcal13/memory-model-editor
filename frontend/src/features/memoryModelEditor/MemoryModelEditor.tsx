@@ -3,7 +3,6 @@ import Palette from "../palette/Palette";
 import ConfirmationModal from "./components/ConfirmationModal";
 import InformationTabs from "../informationTabs/InformationTabs";
 import PanelToggleButtons from "./components/PanelToggleButtons";
-import { Tutorial, tutorialSteps } from "../tutorial";
 import styles from "./MemoryModelEditor.module.css";
 import { useResponsivePanels } from "./hooks/useResponsivePanels";
 
@@ -58,7 +57,6 @@ export default function MemoryModelEditor({
   const [currentQuestionData, setCurrentQuestionData] = useState<any>(null);
   const [canvasScale, setCanvasScale] = useState<number>(1);
   const [editorScale, setEditorScale] = useState<number>(1);
-  const [isTutorialActive, setIsTutorialActive] = useState<boolean>(false);
 
   // Initialize undo history
   const { canUndo, canRedo, undo, redo, recordState, clearHistory } = useUndoHistory(
@@ -80,18 +78,6 @@ export default function MemoryModelEditor({
     },
     []
   );
-
-  const handleTutorialStart = useCallback(() => {
-    setIsTutorialActive(true);
-  }, []);
-
-  const handleTutorialComplete = useCallback(() => {
-    setIsTutorialActive(false);
-  }, []);
-
-  const handleTutorialSkip = useCallback(() => {
-    setIsTutorialActive(false);
-  }, []);
 
   // Record state changes for undo functionality
   useEffect(() => {
@@ -448,7 +434,6 @@ export default function MemoryModelEditor({
                 onScaleChange={setCanvasScale}
                 editorScale={editorScale}
                 onEditorScaleChange={setEditorScale}
-                onTutorialStart={handleTutorialStart}
               />
             </div>
           </div>
@@ -562,13 +547,6 @@ export default function MemoryModelEditor({
         />
       )}
 
-      {isTutorialActive && (
-        <Tutorial
-          steps={tutorialSteps}
-          onComplete={handleTutorialComplete}
-          onSkip={handleTutorialSkip}
-        />
-      )}
     </div>
   );
 }

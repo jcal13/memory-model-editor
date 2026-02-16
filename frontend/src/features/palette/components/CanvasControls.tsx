@@ -5,7 +5,7 @@
 
 import React, { useState } from "react";
 import { CanvasElement } from "../../shared/types";
-import { ClearCanvasButton, DownloadButton, ZoomControls, UndoButton, RedoButton, TutorialButton } from "../../canvas/components/CanvasButtons";
+import { ClearCanvasButton, DownloadButton, ZoomControls, UndoButton, RedoButton } from "../../canvas/components/CanvasButtons";
 import { useTheme } from "../../../contexts/ThemeContext";
 import styles from "./CanvasControls.module.css";
 
@@ -22,7 +22,6 @@ interface CanvasControlsProps {
   onScaleChange?: (scale: number) => void;
   editorScale?: number;
   onEditorScaleChange?: (scale: number) => void;
-  onTutorialStart?: () => void;
 }
 
 type ControlTab = "actions" | "view" | "settings";
@@ -62,15 +61,14 @@ export default function CanvasControls({
   onScaleChange,
   editorScale = 1,
   onEditorScaleChange,
-  onTutorialStart,
 }: CanvasControlsProps) {
   const { theme, toggleTheme } = useTheme();
   const isDarkMode = theme === 'dark';
   const [activeTab, setActiveTab] = useState<ControlTab>("actions");
 
   return (
-    <div className={styles.container} data-tutorial="canvas-controls">
-      <nav className={styles.tabHeaders} role="tablist" data-tutorial="controls-tabs">
+    <div className={styles.container}>
+      <nav className={styles.tabHeaders} role="tablist">
         {(Object.keys(TAB_LABELS) as ControlTab[]).map((tab) => (
           <TabButton
             key={tab}
@@ -109,12 +107,6 @@ export default function CanvasControls({
             <div className={styles.buttonWrapper}>
               <DownloadButton elements={elements} />
             </div>
-
-            {onTutorialStart && (
-              <div className={styles.buttonWrapper}>
-                <TutorialButton onClick={onTutorialStart} />
-              </div>
-            )}
           </div>
         )}
 

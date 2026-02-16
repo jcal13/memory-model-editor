@@ -67,7 +67,6 @@ interface PaletteProps {
   onScaleChange?: (scale: number) => void;
   editorScale?: number;
   onEditorScaleChange?: (scale: number) => void;
-  onTutorialStart?: () => void;
 }
 
 // Extract TabButton component inline
@@ -115,7 +114,6 @@ export default function Palette({
   onScaleChange,
   editorScale,
   onEditorScaleChange,
-  onTutorialStart,
 }: PaletteProps) {
   const allBoxes = TAB_BOX_MAPPING[activeTab];
 
@@ -162,10 +160,9 @@ export default function Palette({
           className={styles.paletteSection}
           style={{ height: `${topHeight}%` }}
           ref={paletteContainerRef}
-          data-tutorial="palette-section"
         >
-          <div className={styles.container} data-tutorial="palette-container">
-            <nav className={styles.tabHeaders} role="tablist" data-tutorial="palette-tabs">
+          <div className={styles.container}>
+            <nav className={styles.tabHeaders} role="tablist">
               {(Object.keys(TAB_LABELS) as PaletteTab[]).map((tab) => (
                 <TabButton
                   key={tab}
@@ -186,7 +183,6 @@ export default function Palette({
                   transformOrigin: 'top center',
                   transition: 'transform 0.2s ease',
                 }}
-                data-tutorial="palette-boxes"
               >
                 {boxes.map((boxType) => (
                   <PaletteBox key={boxType} boxType={boxType} />
@@ -208,7 +204,6 @@ export default function Palette({
         <div
           className={styles.controlsSection}
           style={{ height: `${100 - topHeight}%` }}
-          data-tutorial="canvas-controls-section"
         >
           <CanvasControls
             isSandboxMode={isSandboxMode}
@@ -223,7 +218,6 @@ export default function Palette({
             onScaleChange={onScaleChange}
             editorScale={editorScale}
             onEditorScaleChange={onEditorScaleChange}
-            onTutorialStart={onTutorialStart}
           />
         </div>
       </div>

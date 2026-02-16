@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PaletteBox from "./components/PaletteBox";
 import CanvasControls from "./components/CanvasControls";
 import { useResizable } from "./hooks/useResizable";
@@ -128,6 +128,30 @@ export default function Palette({
     maxTopPercent: 80,
   });
 
+  // Track palette width for scaling boxes
+  const REFERENCE_WIDTH = 280; // Default palette width
+  const [boxScale, setBoxScale] = useState(1);
+  const paletteContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!paletteContainerRef.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const width = entry.contentRect.width;
+        // Calculate scale based on ratio, but cap at 1.0 (don't enlarge)
+        const calculatedScale = Math.min(1, width / REFERENCE_WIDTH);
+        setBoxScale(calculatedScale);
+      }
+    });
+
+    resizeObserver.observe(paletteContainerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
   return (
     <div className={styles.containerWrapper}>
       <div className={styles.outerContainer} ref={containerRef}>
@@ -135,6 +159,7 @@ export default function Palette({
         <div
           className={styles.paletteSection}
           style={{ height: `${topHeight}%` }}
+          ref={paletteContainerRef}
         >
           <div className={styles.container}>
             <nav className={styles.tabHeaders} role="tablist">
@@ -151,7 +176,14 @@ export default function Palette({
 
             <div className={styles.tabBody} role="tabpanel">
               <h3 className={styles.paletteTitle}>Palette</h3>
-              <div className={styles.paletteBoxes}>
+              <div
+                className={styles.paletteBoxes}
+                style={{
+                  transform: `scale(${boxScale})`,
+                  transformOrigin: 'top center',
+                  transition: 'transform 0.2s ease',
+                }}
+              >
                 {boxes.map((boxType) => (
                   <PaletteBox key={boxType} boxType={boxType} />
                 ))}

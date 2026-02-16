@@ -105,15 +105,17 @@
 
 .title {
   text-align: center;
-  font-size: 1.05rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  color: var(--text-primary);
-  margin: 4px 0 20px 0;
-  letter-spacing: -0.01em;
+  color: var(--text-tertiary);
+  margin: 0 0 18px 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   border-bottom: none;
-  padding: 0;
+  padding: 0 0 8px 0;
   background-color: transparent;
   transition: color 200ms ease;
+  position: relative;
 }
 
 .tabContent {

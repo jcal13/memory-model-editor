@@ -58,6 +58,8 @@ interface PaletteProps {
   isSandboxMode?: boolean;
   onModeToggle?: () => void;
   onClear?: () => void;
+  onUndo?: () => void;
+  canUndo?: boolean;
   elements?: CanvasElement[];
   scale?: number;
   onScaleChange?: (scale: number) => void;
@@ -99,6 +101,8 @@ export default function Palette({
   isSandboxMode,
   onModeToggle,
   onClear,
+  onUndo,
+  canUndo,
   elements,
   scale,
   onScaleChange,
@@ -165,6 +169,8 @@ export default function Palette({
             isSandboxMode={isSandboxMode}
             onModeToggle={onModeToggle}
             onClear={onClear}
+            onUndo={onUndo}
+            canUndo={canUndo}
             elements={elements}
             scale={scale}
             onScaleChange={onScaleChange}

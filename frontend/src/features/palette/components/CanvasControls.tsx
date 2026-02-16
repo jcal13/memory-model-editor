@@ -5,7 +5,7 @@
 
 import React, { useState } from "react";
 import { CanvasElement } from "../../shared/types";
-import { ClearCanvasButton, DownloadButton, ZoomControls } from "../../canvas/components/CanvasButtons";
+import { ClearCanvasButton, DownloadButton, ZoomControls, UndoButton } from "../../canvas/components/CanvasButtons";
 import { useTheme } from "../../../contexts/ThemeContext";
 import styles from "./CanvasControls.module.css";
 
@@ -13,6 +13,8 @@ interface CanvasControlsProps {
   isSandboxMode?: boolean;
   onModeToggle?: () => void;
   onClear?: () => void;
+  onUndo?: () => void;
+  canUndo?: boolean;
   elements?: CanvasElement[];
   scale?: number;
   onScaleChange?: (scale: number) => void;
@@ -46,6 +48,8 @@ export default function CanvasControls({
   isSandboxMode = false,
   onModeToggle,
   onClear,
+  onUndo,
+  canUndo = false,
   elements = [],
   scale = 1,
   onScaleChange,
@@ -74,6 +78,12 @@ export default function CanvasControls({
         {/* Actions Tab */}
         {activeTab === "actions" && (
           <div className={styles.tabContent}>
+            {onUndo && (
+              <div className={styles.buttonWrapper}>
+                <UndoButton onClick={onUndo} disabled={!canUndo} />
+              </div>
+            )}
+
             {onClear && (
               <div className={styles.buttonWrapper}>
                 <ClearCanvasButton onClick={onClear} />

@@ -36,6 +36,35 @@
   outline-offset: 2px;
 }
 
+/* Undo Button */
+.undoButton {
+  background-color: var(--button-bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+}
+
+.undoButton:hover:not(:disabled) {
+  background-color: var(--button-hover);
+  border-color: var(--border-secondary);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.undoButton:active:not(:disabled) {
+  background-color: var(--button-active);
+  box-shadow: var(--shadow-sm);
+}
+
+.undoButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.undoButton:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
 /* Download Button Container */
 .downloadContainer {
   position: relative;

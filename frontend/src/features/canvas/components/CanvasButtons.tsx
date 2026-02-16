@@ -23,6 +23,27 @@ export function ClearCanvasButton({ onClick }: ClearButtonProps) {
   );
 }
 
+// Undo Button
+interface UndoButtonProps {
+  onClick: () => void;
+  disabled?: boolean;
+}
+
+export function UndoButton({ onClick, disabled = false }: UndoButtonProps) {
+  return (
+    <button
+      type="button"
+      className={`${styles.baseButton} ${styles.undoButton}`}
+      onClick={onClick}
+      disabled={disabled}
+      aria-label="Undo"
+      title="Undo last action"
+    >
+      Undo
+    </button>
+  );
+}
+
 // Download Options Button
 interface DownloadButtonProps {
   elements: CanvasElement[];

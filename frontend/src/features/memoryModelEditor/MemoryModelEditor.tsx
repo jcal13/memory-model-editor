@@ -16,7 +16,8 @@ import {
   useUILocalStorage,
 } from "./hooks/useLocalStorage";
 import { useCanvasSubmission } from "./hooks/useCanvasSubmission";
-import { useMemo, useEffect, useState, useCallback } from "react";
+import { useUndoHistory } from "./hooks/useUndoHistory";
+import { useMemo, useEffect, useState, useCallback, useRef } from "react";
 import { CanvasElement, BoxTypeName } from "../shared/types";
 import {
   createMasterErrorList,
@@ -56,12 +57,48 @@ export default function MemoryModelEditor({
   const [currentQuestionData, setCurrentQuestionData] = useState<any>(null);
   const [canvasScale, setCanvasScale] = useState<number>(1);
 
+  // Initialize undo history
+  const { canUndo, undo, recordState, clearHistory } = useUndoHistory(
+    state.setElements,
+    state.setElementIds,
+    state.setElementClasses
+  );
+
+  // Track previous state for recording changes
+  const prevStateRef = useRef({
+    elements: state.elements,
+    ids: state.elementIds,
+    classes: state.elementClasses,
+  });
+
   const handleEditorOpenerReady = useCallback(
     (opener: (element: CanvasElement) => void) => {
       setOpenEditor(() => opener);
     },
     []
   );
+
+  // Record state changes for undo functionality
+  useEffect(() => {
+    const prevState = prevStateRef.current;
+    const currentState = {
+      elements: state.elements,
+      ids: state.elementIds,
+      classes: state.elementClasses,
+    };
+
+    // Check if state has actually changed
+    const hasChanged =
+      JSON.stringify(prevState.elements) !== JSON.stringify(currentState.elements) ||
+      JSON.stringify(prevState.ids) !== JSON.stringify(currentState.ids) ||
+      JSON.stringify(prevState.classes) !== JSON.stringify(currentState.classes);
+
+    if (hasChanged) {
+      // Record the previous state before the change
+      recordState(prevState);
+      prevStateRef.current = currentState;
+    }
+  }, [state.elements, state.elementIds, state.elementClasses, recordState]);
 
   const clearCanvas = () => {
     state.setElements([]);
@@ -73,6 +110,7 @@ export default function MemoryModelEditor({
     state.setActiveInfoTab("question");
     state.setCanvasResetKey((prev) => prev + 1);
     clearCanvasStorage();
+    clearHistory();
   };
 
   const restoreCanvas = (
@@ -83,6 +121,7 @@ export default function MemoryModelEditor({
     state.setElements(spreadOverlappingElements(elements));
     state.setElementIds(ids);
     state.setElementClasses(classes);
+    clearHistory();
   };
 
   const masterErrorList: MasterErrorList = useMemo(
@@ -385,6 +424,8 @@ export default function MemoryModelEditor({
                 isSandboxMode={state.isSandboxMode}
                 onModeToggle={() => state.setShowModeToggleModal(true)}
                 onClear={() => state.setShowClearCanvasModal(true)}
+                onUndo={undo}
+                canUndo={canUndo}
                 elements={state.elements}
                 scale={canvasScale}
                 onScaleChange={setCanvasScale}

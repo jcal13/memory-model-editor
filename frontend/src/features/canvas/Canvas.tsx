@@ -42,6 +42,7 @@ interface FloatingEditorProps {
   removeClasses?: (className: string) => void;
   sandbox: boolean;
   elements: CanvasElement[];
+  editorScale: number;
 }
 
 function FloatingEditor({
@@ -60,6 +61,7 @@ function FloatingEditor({
   removeClasses,
   sandbox,
   elements,
+  editorScale,
 }: FloatingEditorProps) {
   const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -70,6 +72,7 @@ function FloatingEditor({
       defaultPosition={defaultPosition}
       onMouseDown={onSelect}
       bounds={`.${styles.canvasWrapper}`}
+      scale={editorScale}
       onStart={(e) => {
         e.stopPropagation();
         // Prevent text selection during drag
@@ -83,20 +86,28 @@ function FloatingEditor({
       }}
     >
       <div ref={nodeRef} className={styles.floatingEditor}>
-        <Editor
-          metadata={element}
-          onSave={onSave}
-          onRemove={onRemove}
-          onClose={onClose}
-          ids={ids}
-          addId={addId}
-          removeId={removeId}
-          classes={classes}
-          addClasses={addClasses}
-          removeClasses={removeClasses}
-          sandbox={sandbox}
-          elements={elements}
-        />
+        <div
+          style={{
+            transform: `scale(${editorScale})`,
+            transformOrigin: 'top left',
+            transition: 'transform 0.2s ease',
+          }}
+        >
+          <Editor
+            metadata={element}
+            onSave={onSave}
+            onRemove={onRemove}
+            onClose={onClose}
+            ids={ids}
+            addId={addId}
+            removeId={removeId}
+            classes={classes}
+            addClasses={addClasses}
+            removeClasses={removeClasses}
+            sandbox={sandbox}
+            elements={elements}
+          />
+        </div>
       </div>
     </Draggable>
   );
@@ -116,6 +127,7 @@ interface CanvasProps {
   onEditorOpenerReady?: (openEditor: (element: CanvasElement) => void) => void;
   scale?: number;
   onScaleChange?: (scale: number) => void;
+  editorScale?: number;
 }
 
 function Canvas({
@@ -132,6 +144,7 @@ function Canvas({
   onEditorOpenerReady,
   scale: externalScale,
   onScaleChange: externalOnScaleChange,
+  editorScale = 1,
 }: CanvasProps) {
   const [openEditors, setOpenEditors] = useState<CanvasElement[]>([]);
   const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(
@@ -491,6 +504,7 @@ function Canvas({
             removeClasses={removeClasses}
             sandbox={sandbox}
             elements={elements}
+            editorScale={editorScale}
           />
         );
       })}
@@ -579,7 +593,8 @@ const areEqual = (prev: Readonly<CanvasProps>, next: Readonly<CanvasProps>) => {
     prev.ids === next.ids &&
     prev.classes === next.classes &&
     prev.sandbox === next.sandbox &&
-    prev.scale === next.scale
+    prev.scale === next.scale &&
+    prev.editorScale === next.editorScale
   );
 };
 

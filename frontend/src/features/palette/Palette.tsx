@@ -63,6 +63,8 @@ interface PaletteProps {
   elements?: CanvasElement[];
   scale?: number;
   onScaleChange?: (scale: number) => void;
+  editorScale?: number;
+  onEditorScaleChange?: (scale: number) => void;
 }
 
 // Extract TabButton component inline
@@ -106,6 +108,8 @@ export default function Palette({
   elements,
   scale,
   onScaleChange,
+  editorScale,
+  onEditorScaleChange,
 }: PaletteProps) {
   const allBoxes = TAB_BOX_MAPPING[activeTab];
 
@@ -174,6 +178,8 @@ export default function Palette({
             elements={elements}
             scale={scale}
             onScaleChange={onScaleChange}
+            editorScale={editorScale}
+            onEditorScaleChange={onEditorScaleChange}
           />
         </div>
       </div>

@@ -18,6 +18,8 @@ interface CanvasControlsProps {
   elements?: CanvasElement[];
   scale?: number;
   onScaleChange?: (scale: number) => void;
+  editorScale?: number;
+  onEditorScaleChange?: (scale: number) => void;
 }
 
 type ControlTab = "actions" | "view" | "settings";
@@ -53,6 +55,8 @@ export default function CanvasControls({
   elements = [],
   scale = 1,
   onScaleChange,
+  editorScale = 1,
+  onEditorScaleChange,
 }: CanvasControlsProps) {
   const { theme, toggleTheme } = useTheme();
   const isDarkMode = theme === 'dark';
@@ -102,11 +106,23 @@ export default function CanvasControls({
             {onScaleChange && (
               <>
                 <div className={styles.controlItem}>
-                  <label className={styles.controlLabel}>Zoom</label>
+                  <label className={styles.controlLabel}>Canvas Zoom</label>
                   <span className={styles.scaleValue}>{Math.round(scale * 100)}%</span>
                 </div>
                 <div className={styles.buttonWrapper}>
                   <ZoomControls scale={scale} onScaleChange={onScaleChange} />
+                </div>
+              </>
+            )}
+
+            {onEditorScaleChange && (
+              <>
+                <div className={styles.controlItem}>
+                  <label className={styles.controlLabel}>Editor Zoom</label>
+                  <span className={styles.scaleValue}>{Math.round(editorScale * 100)}%</span>
+                </div>
+                <div className={styles.buttonWrapper}>
+                  <ZoomControls scale={editorScale} onScaleChange={onEditorScaleChange} />
                 </div>
               </>
             )}

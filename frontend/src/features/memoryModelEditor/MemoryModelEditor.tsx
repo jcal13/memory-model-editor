@@ -56,6 +56,7 @@ export default function MemoryModelEditor({
 
   const [currentQuestionData, setCurrentQuestionData] = useState<any>(null);
   const [canvasScale, setCanvasScale] = useState<number>(1);
+  const [editorScale, setEditorScale] = useState<number>(1);
 
   // Initialize undo history
   const { canUndo, undo, recordState, clearHistory } = useUndoHistory(
@@ -429,6 +430,8 @@ export default function MemoryModelEditor({
                 elements={state.elements}
                 scale={canvasScale}
                 onScaleChange={setCanvasScale}
+                editorScale={editorScale}
+                onEditorScaleChange={setEditorScale}
               />
             </div>
           </div>
@@ -458,6 +461,7 @@ export default function MemoryModelEditor({
               onEditorOpenerReady={handleEditorOpenerReady}
               scale={canvasScale}
               onScaleChange={setCanvasScale}
+              editorScale={editorScale}
             />
           </div>
 

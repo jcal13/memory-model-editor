@@ -436,6 +436,7 @@ function Canvas({
         ref={wrapperRef}
         className={styles.canvasWrapper}
         style={{ overflowX: "hidden" }}
+        data-tutorial="canvas-area"
       >
         <svg
           data-testid="canvas"

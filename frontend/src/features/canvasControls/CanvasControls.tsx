@@ -4,9 +4,9 @@
  */
 
 import React, { useState } from "react";
-import { CanvasElement } from "../../shared/types";
-import { ClearCanvasButton, DownloadButton, ZoomControls, UndoButton, RedoButton, TutorialButton } from "../../canvas/components/CanvasButtons";
-import { useTheme } from "../../../contexts/ThemeContext";
+import { CanvasElement } from "../shared/types";
+import { ClearCanvasButton, DownloadButton, ZoomControls, UndoButton, RedoButton, TutorialButton } from "../canvas/components/CanvasButtons";
+import { useTheme } from "../../contexts/ThemeContext";
 import styles from "./CanvasControls.module.css";
 
 interface CanvasControlsProps {

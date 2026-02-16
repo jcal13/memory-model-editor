@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState, useEffect } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { CanvasElement } from "../../shared/types";
 import { buildJSONFromElements } from "../../validationServices/jsonBuilder";
 import html2canvas from "html2canvas";
@@ -234,5 +234,24 @@ export function ZoomControls({ scale, onScaleChange }: ZoomControlsProps) {
         +
       </button>
     </div>
+  );
+}
+
+// Tutorial Button
+interface TutorialButtonProps {
+  onClick: () => void;
+}
+
+export function TutorialButton({ onClick }: TutorialButtonProps) {
+  return (
+    <button
+      type="button"
+      className={`${styles.baseButton} ${styles.tutorialButton}`}
+      onClick={onClick}
+      aria-label="Start Tutorial"
+      title="Start guided tutorial"
+    >
+      Tutorial
+    </button>
   );
 }

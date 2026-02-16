@@ -34,7 +34,7 @@ export default function PanelToggleButtons({
             strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <polyline points="15 18 9 12 15 6"></polyline>
+            <polyline points="9 18 15 12 9 6"></polyline>
           </svg>
         </button>
       )}
@@ -57,7 +57,7 @@ export default function PanelToggleButtons({
             strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <polyline points="9 18 15 12 9 6"></polyline>
+            <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
         </button>
       )}

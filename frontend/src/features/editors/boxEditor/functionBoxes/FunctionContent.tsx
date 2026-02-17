@@ -19,14 +19,7 @@ interface Props {
 }
 
 /**
- * FunctionContent renders editable fields for function parameters.
- *
- * Each parameter consists of:
- * - A `name` input box for variable name
- * - A visual placeholder for the parameter's target ID
- * - A remove button to delete the parameter
- *
- * The component also provides an "Add Variable" button to append a new parameter.
+ * FunctionContent renders the editable parameter fields for a function box.
  */
 const FunctionContent = ({
   functionParams,

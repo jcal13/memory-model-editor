@@ -6,78 +6,178 @@
   width: max-content;
   position: relative;
   min-width: 340px;
-  padding: 24px;
-  gap: 40px;
+  padding: 0;
   background: var(--bg-primary);
   border: 1px solid var(--border-primary);
-  border-radius: 12px;
-  box-shadow: var(--shadow-md);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   z-index: 1000;
-  transition: background-color 200ms ease, border-color 200ms ease;
+  transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
 }
 
 /* =======================================
    === Header Section ===
 ======================================= */
 
+/* Title bar: type label left, × right */
+.titleBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10px 12px 10px 16px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
+  border-radius: 14px 14px 0 0;
+  box-sizing: border-box;
+  cursor: move;
+  user-select: none;
+  gap: 10px;
+  transition: background-color 200ms ease, border-color 200ms ease;
+}
+
+.titleBarLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  transition: color 200ms ease;
+}
+
+/* Meta row: ID chip left, type badge right */
+.metaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  box-sizing: border-box;
+  transition: background-color 200ms ease, border-color 200ms ease;
+}
+
+.metaRowRight {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+/* Read-only type badge — grayed out to signal non-interactive */
+.typeChip {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  height: 36px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  box-sizing: border-box;
+  cursor: default;
+  user-select: none;
+  transition: color 200ms ease, background-color 200ms ease, border-color 200ms ease;
+}
+
+/* Legacy — kept for any remaining references */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  padding: 10px 14px 10px 16px;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+  gap: 10px;
+  box-sizing: border-box;
+  border-radius: 14px 14px 0 0;
+  transition: background-color 200ms ease, border-color 200ms ease;
 }
 
 .collectionHeader {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
+  padding: 10px 14px 10px 16px;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+  gap: 10px;
+  box-sizing: border-box;
+  border-radius: 14px 14px 0 0;
+  transition: background-color 200ms ease, border-color 200ms ease;
 }
 
 /* === ID Display === */
 .moduleIdBox {
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 0.85rem;
+  font-weight: 600;
   color: var(--text-secondary) !important;
-  padding: 8px 14px;
+  height: 36px;
+  padding: 0 12px;
   border: 1px solid var(--border-primary);
-  border-radius: 8px;
-  background-color: var(--bg-secondary);
+  border-radius: 6px;
+  background-color: var(--bg-primary);
   cursor: pointer;
-  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 160ms ease;
+  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: center;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
   box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .moduleIdBox:hover {
   background-color: var(--bg-tertiary);
-  box-shadow: var(--shadow-md);
+  border-color: var(--border-secondary);
 }
 
 .typeSelector {
-  font-size: 0.95rem;
-  padding: 10px 12px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 4px 8px;
   border: 1px solid var(--border-primary);
-  border-radius: 8px;
-  background-color: var(--bg-secondary);
+  border-radius: 6px;
+  background-color: var(--bg-primary);
   color: var(--text-secondary);
   cursor: pointer;
   box-sizing: border-box;
-  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
 }
 
 .typeDisplay {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--text-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
   background-color: var(--bg-tertiary);
-  padding: 8px 14px;
-  border-radius: 8px;
+  padding: 4px 9px;
+  border-radius: 5px;
+  border: 1px solid var(--border-primary);
   transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* =======================================
+   === Content Area ===
+======================================= */
+
+.contentArea {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 /* =======================================
@@ -88,8 +188,8 @@
 .functionNameInput,
 .primitiveValueContainer {
   width: 100%;
-  font-size: 1rem;
-  padding: 10px 12px;
+  font-size: 0.95rem;
+  padding: 8px 12px;
   border: 1px solid var(--border-primary);
   border-radius: 8px;
   box-sizing: border-box;
@@ -102,24 +202,28 @@
 .functionNameInput:focus,
 .primitiveValueContainer:focus {
   outline: 2px solid var(--border-focus);
-  outline-offset: 2px;
+  outline-offset: 1px;
+  border-color: transparent;
 }
 
 .variableNameBox {
   flex: 1;
-  font-size: 1rem;
-  padding: 10px 12px;
+  font-size: 0.95rem;
+  padding: 0 12px;
+  height: 42px;
   border: 1px solid var(--border-primary);
   border-radius: 8px;
   box-sizing: border-box;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+  min-width: 160px;
 }
 
 .variableNameBox:focus {
   outline: 2px solid var(--border-focus);
-  outline-offset: 2px;
+  outline-offset: 1px;
+  border-color: transparent;
 }
 
 /* =======================================
@@ -128,71 +232,122 @@
 
 .addButton,
 .removeButton {
-  padding: 10px 26px;
-  font-size: 0.95rem;
-  border-radius: 8px;
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 7px;
   border: none;
   cursor: pointer;
-  height: 38px;
+  height: 32px;
   width: max-content;
-  transition: all 160ms ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: background-color 160ms ease, box-shadow 160ms ease, transform 80ms ease;
+  letter-spacing: 0.01em;
 }
 
-/* Add Button */
+.addButton:active,
+.removeButton:active {
+  transform: scale(0.97);
+}
+
 .addButton {
   background-color: #10b981;
   color: white;
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.25);
 }
 
 .addButton:hover {
   background-color: #059669;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35);
 }
 
-/* Floating Remove Icons (×) */
-.removeItem,
-.collectionRemoveId {
-  position: absolute;
-  top: -9px;
-  right: -9px;
-  width: 22px;
-  height: 22px;
-  font-size: 1rem;
+.removeButton {
   background-color: var(--accent-red);
-  border: none;
-  border-radius: 50%;
   color: white;
+  box-shadow: 0 1px 3px rgba(239, 68, 68, 0.2);
+}
+
+.removeButton:hover {
+  background-color: var(--accent-red-hover);
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+}
+
+.removeItem {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  font-size: 1rem;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--text-tertiary);
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: all 160ms ease;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.removeItem:hover {
+  background-color: rgba(239, 68, 68, 0.12);
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.collectionRemoveId {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 17px;
+  height: 17px;
+  font-size: 0.75rem;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 50%;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
   z-index: 2;
+  padding: 0;
+  line-height: 1;
+}
+
+.collectionRemoveId:hover {
+  background-color: var(--accent-red);
+  border-color: var(--accent-red);
+  color: white;
+  transform: scale(1.1);
 }
 
 .deleteVariableButton {
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
-  background-color: #ef4444;
-  border: none;
-  border-radius: 50%;
-  color: white;
+  height: 24px;
+  width: 24px;
+  min-width: 24px;
+  align-self: center;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: var(--text-tertiary);
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: all 160ms ease;
-  font-size: 1rem;
-  font-weight: 400;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+  font-size: 1.1rem;
   flex-shrink: 0;
   line-height: 1;
   padding: 0;
 }
 
 .deleteVariableButton:hover {
-  background-color: #dc2626;
-  transform: scale(1.1);
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: var(--accent-red);
+  color: var(--accent-red);
 }
 
 .deleteVariableButton::before {
@@ -206,46 +361,47 @@
 
 .collectionDeleteButton {
   position: absolute;
-  top: -9px;
-  right: -9px;
-  width: 22px;
-  height: 22px;
-  font-size: 1rem;
-  background-color: #ef4444;
-  border: none;
+  top: -7px;
+  right: -7px;
+  width: 17px;
+  height: 17px;
+  font-size: 0.75rem;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
   border-radius: 50%;
-  color: white;
+  color: var(--text-tertiary);
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: all 160ms ease;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
   z-index: 2;
   padding: 0;
   line-height: 1;
 }
 
 .collectionDeleteButton:hover {
-  background-color: #dc2626;
-  transform: scale(1.05);
-}
-
-.removeItem:hover,
-.collectionRemoveId:hover {
-  background-color: var(--accent-red-hover);
-  transform: scale(1.05);
+  background-color: var(--accent-red);
+  border-color: var(--accent-red);
+  color: white;
+  transform: scale(1.1);
 }
 
 /* =======================================
    === Layout Containers ===
 ======================================= */
 
-.contentContainer,
+.contentContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .ItemContainer,
 .removeButtonContainer {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 8px;
 }
 
 .pairItem {
@@ -261,35 +417,36 @@
 .collectionIdContainer {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  max-width: 600px;
+  gap: 10px;
+  max-width: 520px;
   width: 100%;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .collectionPairsContainer {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px;
+  align-items: flex-start;
+  gap: 8px;
   width: 100%;
 }
 
 .collectionPairContainer {
   display: flex;
-  gap: 16px;
+  gap: 8px;
   align-items: center;
   width: max-content;
 }
 
 .collectionPairSeparator {
   font-weight: 600;
-  color: var(--text-secondary);
+  font-size: 0.95rem;
+  color: var(--text-tertiary);
   transition: color 200ms ease;
 }
 
 /* =======================================
-   === ID Boxes (Function / Collection) ===
+   === ID Chips ===
 ======================================= */
 
 .functionIdBox {
@@ -297,32 +454,41 @@
   display: flex;
   width: auto;
   min-width: 48px;
+  height: 42px;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--border-primary);
   background-color: var(--bg-secondary);
   border-radius: 8px;
-  transition: background-color 200ms ease, border-color 200ms ease;
-}
-
-.functionIdBox {
-  width: 55px;
-  height: 40px;
+  color: var(--text-secondary);
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
 }
 
 .collectionIdBox {
-  width: 55px;
-  height: 50px;
+  position: relative;
+  display: flex;
+  width: auto;
+  min-width: 48px;
+  height: 42px;
   cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-primary);
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
 }
 
 .collectionIdBox:hover {
   background-color: var(--bg-tertiary);
+  border-color: var(--border-secondary);
+  box-shadow: var(--shadow-sm);
 }
 
 .functionIdBoxText,
 .collectionIdBoxText {
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-secondary);
   opacity: 0.7;
@@ -333,48 +499,32 @@
   border: none;
   background: transparent;
   height: 100%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
   color: var(--text-secondary);
   transition: color 200ms ease;
 }
 
-.collectionIdBox {
-  position: relative;
-  display: flex;
-  width: auto;
-  min-width: 48px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--border-primary);
-  background-color: var(--bg-secondary);
-  border-radius: 8px;
-  color: var(--text-secondary);
-  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
-}
-
-/* === Error Styling for Invalid IDs === */
+/* === Error Styling === */
 .errorId {
-  border: 2px solid #dc2626 !important;
-  background-color: #fee2e2 !important;
+  border: 2px solid var(--accent-red) !important;
+  background-color: rgba(239, 68, 68, 0.07) !important;
   animation: errorPulse 0.5s ease-in-out;
 }
 
 @keyframes errorPulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
-  }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+  50%       { box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1); }
 }
 
 .errorId:hover {
-  background-color: #fecaca !important;
+  background-color: rgba(239, 68, 68, 0.12) !important;
 }
 
 /* =======================================
@@ -385,18 +535,38 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  font-size: 1rem;
+  gap: 12px;
+  font-size: 0.95rem;
+  padding: 4px 0;
 }
 
 .primitiveNoneContainer {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--text-tertiary);
+  text-align: center;
+  padding: 6px 0;
   transition: color 200ms ease;
 }
 
 .invalidMessage {
-  font-size: 1rem;
+  font-size: 0.82rem;
   color: var(--accent-red);
   transition: color 200ms ease;
+}
+
+/* =======================================
+   === Footer / Button Row ===
+======================================= */
+
+.footerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+  box-sizing: border-box;
+  border-radius: 0 0 14px 14px;
+  transition: background-color 200ms ease, border-color 200ms ease;
 }

@@ -275,3 +275,36 @@ export function usePanelRef() {
 export function useClassPanelRef() {
   return useRef<HTMLDivElement | null>(null);
 }
+
+let closeCurrentFunctionPanel: (() => void) | null = null;
+
+/**
+ * Ensures only one function name selector panel is open at a time.
+ */
+export function useSingleFunctionPanelRegistry(
+  open: boolean,
+  closeSelf: () => void
+) {
+  useEffect(() => {
+    if (open) {
+      if (closeCurrentFunctionPanel && closeCurrentFunctionPanel !== closeSelf) {
+        closeCurrentFunctionPanel();
+      }
+      closeCurrentFunctionPanel = closeSelf;
+    } else if (closeCurrentFunctionPanel === closeSelf) {
+      closeCurrentFunctionPanel = null;
+    }
+    return () => {
+      if (closeCurrentFunctionPanel === closeSelf) {
+        closeCurrentFunctionPanel = null;
+      }
+    };
+  }, [open, closeSelf]);
+}
+
+/**
+ * Creates a ref for the function name selector panel.
+ */
+export function useFunctionPanelRef() {
+  return useRef<HTMLDivElement | null>(null);
+}

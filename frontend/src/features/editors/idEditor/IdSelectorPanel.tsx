@@ -60,10 +60,12 @@ const IdSelectorPanel: React.FC<Props> = ({
     <div
       className={`${boxStyles.boxEditorModule} ${panelStyles.panelShell} ${panelStyles.activeOutline}`}
     >
-      <button className={boxStyles.removeItem} onClick={onClose}>
-        ×
-      </button>
-      <div className={`drag-handle ${panelStyles.header}`}>Select ID</div>
+      <div className={`drag-handle ${panelStyles.header}`}>
+        <span>Select ID</span>
+        <button className={boxStyles.removeItem} onClick={onClose} title="Close">
+          ×
+        </button>
+      </div>
 
       <div className={panelStyles.content}>
         <div className={boxStyles.collectionIdContainer}>

@@ -1,216 +1,223 @@
 .trigger {
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    padding: 8px 14px;
-    border: 1px solid var(--border-primary);
-    border-radius: 8px;
-    background-color: var(--bg-secondary);
-    cursor: pointer;
-    transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 160ms ease;
-    box-shadow: var(--shadow-sm);
-  }
-  .trigger:hover {
-    background-color: var(--bg-tertiary);
-    box-shadow: var(--shadow-md);
-  }
-  
-  .panelControlsDiv {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  
-  .removeButton {
-    background: var(--accent-red);
-    color: #ffffff;
-    padding: 10px 26px;
-    font-size: 0.95rem;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    width: max-content;
-    transition: background-color 200ms ease, box-shadow 160ms ease;
-    box-shadow: var(--shadow-sm);
-  }
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 5px 12px;
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  background-color: var(--bg-primary);
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
 
-  .removeButton:hover {
-    background: var(--accent-red-hover);
-    box-shadow: var(--shadow-md);
-  }
-  
-  .panelContainer {
-    z-index: 10000;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-  
-  .panel {
-    width: 300px;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-primary);
-    border-radius: 12px;
-    box-shadow: var(--shadow-md);
-    display: flex;
-    flex-direction: column;
-    transition: background-color 200ms ease, border-color 200ms ease;
-  }
+.trigger:hover {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-secondary);
+}
 
-  .header {
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--border-primary);
-    background: var(--bg-secondary);
-    font-weight: 600;
-    color: var(--text-primary);
-    cursor: move;
-    user-select: none;
-    text-align: center;
-    transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
-  }
-  
-  .form {
-    display: flex;
-    gap: 10px;
-    padding: 12px 14px;
-  }
-  
-  .form input {
-    flex: 1;
-    padding: 8px 10px;
-    border: 1px solid var(--border-primary);
-    border-radius: 8px;
-    font-size: 0.95rem;
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
-  }
+.panelControlsDiv {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
 
-  .form button {
-    padding: 8px 18px;
-    background: #10b981;
-    color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background-color 200ms ease;
-  }
+.removeButton {
+  background: var(--accent-red);
+  color: #ffffff;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  width: max-content;
+  transition: background-color 160ms ease, box-shadow 160ms ease;
+  box-shadow: 0 1px 3px rgba(239, 68, 68, 0.2);
+}
 
-  .form button:hover {
-    background: #059669;
-  }
-  
-  .list {
-    max-height: 180px;
-    overflow-y: auto;
-  }
-  
-  .list li button {
-    width: 100%;
-    text-align: left;
-    padding: 10px 14px;
-    background: transparent;
-    border: none;
-    font-size: 0.95rem;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: background-color 200ms ease, color 200ms ease;
-  }
+.removeButton:hover {
+  background: var(--accent-red-hover);
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+}
 
-  .list li button:hover {
-    background: var(--bg-tertiary);
-  }
+.panelContainer {
+  z-index: 10000;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 
-  .empty {
-    padding: 10px 14px;
-    color: var(--text-tertiary);
-    font-size: 0.95rem;
-    text-align: center;
-    transition: color 200ms ease;
-  }
-  
-  /* ───────── Row that holds the auto-add button ───────── */
-  .actionRow {
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--border-primary);
-    transition: border-color 200ms ease;
-  }
+.panel {
+  width: max-content;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  transition: background-color 200ms ease, border-color 200ms ease;
+}
 
-  .actionRow button {
-    width: 100%;
-    padding: 10px 0;
-    background: var(--accent-blue);
-    color: #ffffff;
-    font-size: 0.95rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 200ms ease;
-  }
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px 10px 16px;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+  border-radius: 14px 14px 0 0;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  cursor: move;
+  user-select: none;
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
 
-  .actionRow button:hover {
-    background: var(--accent-blue-hover);
-  }
-  
-  /* Panel shell & header reuse previous rules, no change needed */
+.form {
+  display: flex;
+  gap: 8px;
+  padding: 12px 14px;
+}
 
-  .panel {
-    width: max-content;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-primary);
-    border-radius: 12px;
-    box-shadow: var(--shadow-md);
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    transition: background-color 200ms ease, border-color 200ms ease;
-  }
-  
-  .content {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .empty {
-    padding: 14px;
-    font-size: 0.95rem;
-    color: var(--text-tertiary);
-    transition: color 200ms ease;
-  }
-  
-  .panelShell {
-    width: max-content; /* let content set width like other editors */
-  }
-  
-  
-  .classInputBox {
-    flex: 2;
-    min-width: 250px;    /* <-- ensure it never shrinks below this */
-    font-size: 1rem;
-    height: 38px;
-    padding: 10px 12px;
-    border: 1px solid var(--border-primary);
-    border-radius: 8px;
-    box-sizing: border-box;
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
-  }
+.form input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid var(--border-primary);
+  border-radius: 7px;
+  font-size: 0.9rem;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
 
-  .activeOutline {
-    outline: 3px solid var(--accent-blue);
-    outline-offset: 2px;
-  }
-  
-  .flexWrap {
+.form input:focus {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+.form button {
+  padding: 6px 14px;
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+  border-radius: 7px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+  height: 34px;
+}
+
+.form button:hover {
+  background: #059669;
+}
+
+.list {
+  max-height: 160px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-secondary) transparent;
+}
+
+.list li button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.list li button:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.empty {
+  padding: 8px 14px;
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+  text-align: center;
+  transition: color 200ms ease;
+}
+
+.actionRow {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-primary);
+  transition: border-color 200ms ease;
+}
+
+.actionRow button {
+  width: 100%;
+  padding: 7px 0;
+  background: var(--accent-blue);
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+  height: 32px;
+}
+
+.actionRow button:hover {
+  background: var(--accent-blue-hover);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+}
+
+.panelShell {
+  width: max-content;
+}
+
+.classInputBox {
+  flex: 2;
+  min-width: 220px;
+  font-size: 0.9rem;
+  height: 34px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-primary);
+  border-radius: 7px;
+  box-sizing: border-box;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.classInputBox:focus {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+.activeOutline {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.flexWrap {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
   justify-content: flex-start;
   width: 100%;
@@ -218,8 +225,8 @@
 
 .autoWidthBox {
   display: inline-flex;
-  flex: 0 0 auto;    
-  width: fit-content; 
+  flex: 0 0 auto;
+  width: fit-content;
   max-width: 100%;
 }
 
@@ -227,13 +234,13 @@
   display: inline-block;
   white-space: nowrap;
   width: auto !important;
-  padding: 6px 10px;
-  min-width: 48px;            
+  padding: 4px 8px;
+  min-width: 44px;
   text-align: center;
 }
 
 .minChip {
-  min-width: 48px;             
+  min-width: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;

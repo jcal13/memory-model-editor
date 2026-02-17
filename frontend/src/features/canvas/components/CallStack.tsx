@@ -329,23 +329,53 @@ const CallStack: React.FC<CallStackProps> = ({
 
   return (
     <g className={styles.callStackRoot} onWheel={handleWheel}>
+      {/* Outer container */}
       <rect
         className={styles.containerBackground}
         x={x}
         y={yPosition}
         width={columnWidth}
         height={columnHeight}
-        rx={10}
-        ry={10}
+        rx={12}
+        ry={12}
+      />
+
+      {/* Header background — rounded top corners only via clipPath trick with two rects */}
+      <rect
+        className={styles.headerBackground}
+        x={x}
+        y={yPosition}
+        width={columnWidth}
+        height={HEADER_HEIGHT}
+        rx={12}
+        ry={12}
+      />
+      {/* Cover the bottom rounded corners of the header rect so it looks flush */}
+      <rect
+        className={styles.headerBackground}
+        x={x}
+        y={yPosition + HEADER_HEIGHT / 2}
+        width={columnWidth}
+        height={HEADER_HEIGHT / 2}
+      />
+
+      {/* Header divider line */}
+      <line
+        className={styles.headerDivider}
+        x1={x}
+        y1={yPosition + HEADER_HEIGHT}
+        x2={x + columnWidth}
+        y2={yPosition + HEADER_HEIGHT}
       />
 
       <text
         className={styles.callStackTitle}
         x={x + columnWidth / 2}
-        y={yPosition + 30}
+        y={yPosition + HEADER_HEIGHT / 2 + 4}
         textAnchor="middle"
+        fontSize="10"
       >
-        Call&nbsp;Stack
+        Call Stack
       </text>
 
       <clipPath id={clipPathId}>

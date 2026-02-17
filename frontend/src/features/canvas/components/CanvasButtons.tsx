@@ -190,6 +190,22 @@ export function DownloadButton({
   );
 }
 
+// Feedback & Bug Report Button
+export function FeedbackButton() {
+  return (
+    <a
+      href="https://forms.gle/z7LenpBv1C9Ghk5TA"
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`${styles.baseButton} ${styles.feedbackButton}`}
+      aria-label="Feedback and bug report"
+      title="Submit feedback or report a bug"
+    >
+      Feedback &amp; Bug Report
+    </a>
+  );
+}
+
 // Zoom Controls
 const MIN_SCALE = 0.5;
 const MAX_SCALE = 2.0;

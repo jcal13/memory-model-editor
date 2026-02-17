@@ -5,7 +5,7 @@
 
 import React, { useState } from "react";
 import { CanvasElement } from "../shared/types";
-import { ClearCanvasButton, DownloadButton, ZoomControls, UndoButton, RedoButton } from "../canvas/components/CanvasButtons";
+import { ClearCanvasButton, DownloadButton, ZoomControls, UndoButton, RedoButton, FeedbackButton } from "../canvas/components/CanvasButtons";
 import { useTheme } from "../../contexts/ThemeContext";
 import styles from "./CanvasControls.module.css";
 
@@ -175,6 +175,10 @@ export default function CanvasControls({
               >
                 <span className={styles.toggleThumb} />
               </button>
+            </div>
+
+            <div className={`${styles.buttonWrapper} ${styles.feedbackWrapper}`}>
+              <FeedbackButton />
             </div>
           </div>
         )}

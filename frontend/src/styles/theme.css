@@ -29,8 +29,10 @@
 
   /* Call stack colors */
   --callstack-bg: #ffffff;
-  --callstack-title: #334155;
-  --callstack-scrollbar-track: rgba(226, 232, 240, 0.3);
+  --callstack-header-bg: #f8fafc;
+  --callstack-border: #e2e8f0;
+  --callstack-title: #64748b;
+  --callstack-scrollbar-track: rgba(226, 232, 240, 0.4);
   --callstack-scrollbar-thumb: #cbd5e1;
 
   /* Button colors */
@@ -92,9 +94,11 @@
   --canvas-box-shadow: rgba(0, 0, 0, 0.5);
 
   /* Call stack colors */
-  --callstack-bg: #242424;
-  --callstack-title: #d0d0d0;
-  --callstack-scrollbar-track: rgba(58, 58, 58, 0.3);
+  --callstack-bg: #1e1e1e;
+  --callstack-header-bg: #242424;
+  --callstack-border: #3a3a3a;
+  --callstack-title: #888888;
+  --callstack-scrollbar-track: rgba(58, 58, 58, 0.4);
   --callstack-scrollbar-thumb: #4a4a4a;
 
   /* Button colors */

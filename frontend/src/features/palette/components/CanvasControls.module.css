@@ -133,6 +133,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 0;
+  min-width: 0;
 }
 
 .controlLabel {
@@ -157,6 +158,10 @@
 
 .buttonWrapper:last-child {
   margin-bottom: 0;
+}
+
+.feedbackWrapper {
+  margin-top: 16px;
 }
 
 /* =======================================

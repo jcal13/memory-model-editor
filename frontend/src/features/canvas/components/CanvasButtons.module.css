@@ -139,6 +139,36 @@
   background-color: var(--bg-hover);
 }
 
+/* Feedback Button */
+.feedbackButton {
+  background-color: var(--button-bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: fit-content;
+}
+
+.feedbackButton:hover {
+  background-color: var(--button-hover);
+  border-color: var(--border-secondary);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.feedbackButton:active {
+  background-color: var(--button-active);
+  box-shadow: var(--shadow-sm);
+}
+
+.feedbackButton:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
 /* Zoom Controls */
 .zoomControls {
   display: flex;

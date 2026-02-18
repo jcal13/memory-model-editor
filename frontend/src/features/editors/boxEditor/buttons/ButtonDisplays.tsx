@@ -90,9 +90,9 @@ const ButtonDisplays = ({
   };
 
   return (
-    <div className={styles.buttonRow}>
+    <>
       <button onClick={handleInvalidate} className={styles.invalidateButton}>
-        {invalidated ? "Uninvalidate" : "Invalidate"}
+        {invalidated ? "Validate" : "Invalidate"}
       </button>
 
       <button
@@ -103,7 +103,7 @@ const ButtonDisplays = ({
       >
         Remove Box
       </button>
-    </div>
+    </>
   );
 };
 

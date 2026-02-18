@@ -1,31 +1,38 @@
+/**
+ * Custom hooks for palette functionality.
+ * Handles rendering preview SVGs for draggable palette items.
+ */
+
 import { useEffect, RefObject } from "react";
 import { createBoxRenderer } from "../utils/BoxRenderer";
-import { BoxType } from "../shared/types";
+import { BoxTypeName } from "../../shared/types";
 
 /**
- * usePaletteBoxEffect renders a preview SVG for a given boxType
- * inside a DOM container. This is used to show draggable items in the palette.
+ * Renders a static preview SVG for a palette box type.
+ * Automatically updates when the box type changes and adjusts container size.
  *
- * @param containerRef - A ref to the div container where the SVG will be inserted
- * @param boxType - The type of memory element (e.g., "primitive", "list", etc.)
+ * @param containerRef - Reference to the container div that will hold the SVG
+ * @param boxType - Type of box to render (e.g., "primitive", "list", "dict")
+ *
+ * @example
+ * const containerRef = useRef<HTMLDivElement>(null);
+ * usePaletteBoxEffect(containerRef, "function");
+ * // Renders a function box preview in the container
  */
 export const usePaletteBoxEffect = (
   containerRef: RefObject<HTMLDivElement | null>,
-  boxType: BoxType
+  boxType: BoxTypeName
 ) => {
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     try {
-      // Generate the SVG for the given boxType
       const svg = createBoxRenderer(boxType);
 
-      // Clear any previous content and insert the new SVG
       container.innerHTML = "";
       container.appendChild(svg);
 
-      // Adjust the container size based on the bounding box of the SVG
       const padding = 5;
       const bbox = svg.getBBox();
       container.style.width = `${bbox.width + padding}px`;

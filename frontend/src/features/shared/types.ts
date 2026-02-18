@@ -1,6 +1,32 @@
 export type PrimitiveType = "NoneType" | "int" | "float" | "str" | "bool";
 export type CollectionType = "list" | "tuple" | "set" | "dict";
 export type SpecialType = "function" | "class";
+
+/**
+ * Box type names (used for palette and box configuration lookup)
+ */
+export type BoxTypeName =
+  | "class"
+  | "function"
+  | "none"
+  | "int"
+  | "float"
+  | "str"
+  | "bool"
+  | "list"
+  | "tuple"
+  | "set"
+  | "dict"
+  | "primitive";
+
+/**
+ * Palette tab categories
+ */
+export type PaletteTab = "all" | "classesFns" | "primitives" | "collections";
+
+/**
+ * Box type discriminated union (for canvas elements)
+ */
 export type BoxType =
   | PrimitiveKind
   | FunctionKind
@@ -153,5 +179,4 @@ export interface BoxEditorType {
   elements?: any[];
 }
 
-export type PaletteTab = "all" | "classesFns" | "primitives" | "collections";
 export type Tab = "feedback" | "question";

@@ -10,29 +10,22 @@ import { CanvasElement } from "../../shared/types";
 import { BoxDimensions } from "../utils/box.types";
 import CanvasBox from "./CanvasBox";
 import styles from "./CallStack.module.css";
-
-const DEFAULT_BOX_WIDTH = 180;
-const FALLBACK_BOX_HEIGHT = 60;
-const BOX_GAP = -10;
-
-const HEADER_HEIGHT = 40;
-const TOP_FREE_PADDING = 5;
-const BOTTOM_FREE_PADDING = -12;
-const SELECTION_PADDING_TOP = -25;
-const SELECTION_PADDING_BOTTOM = 20;
-const TOP_PADDING = TOP_FREE_PADDING + SELECTION_PADDING_TOP;
-const BOTTOM_PADDING = BOTTOM_FREE_PADDING + SELECTION_PADDING_BOTTOM + 25;
-
-const SCROLLBAR_WIDTH = 5;
-const SCROLLBAR_INSET = 4;
-const SCROLLBAR_THUMB_MIN_HEIGHT = 30;
-const DRAG_THRESHOLD_PX = 6;
-
-const VERTICAL_OFFSET = 30;
-
-const TOP_CONTROLS_HEIGHT = 120;
-const DOWNLOAD_BUTTON_BOTTOM = 35;
-const BUTTON_HEIGHT = 38;
+import {
+  DEFAULT_BOX_WIDTH,
+  FALLBACK_BOX_HEIGHT,
+  BOX_GAP,
+  CALLSTACK_HEADER_HEIGHT as HEADER_HEIGHT,
+  TOP_PADDING,
+  BOTTOM_PADDING,
+  SCROLLBAR_WIDTH,
+  SCROLLBAR_INSET,
+  SCROLLBAR_THUMB_MIN_HEIGHT,
+  DRAG_THRESHOLD_PX,
+  CALLSTACK_VERTICAL_OFFSET as VERTICAL_OFFSET,
+  DOWNLOAD_BUTTON_BOTTOM,
+  BUTTON_HEIGHT,
+  ADDITIONAL_HEIGHT_OFFSET,
+} from "../constants";
 
 interface CallStackProps {
   frames: CanvasElement[];
@@ -62,6 +55,10 @@ interface LayoutItem {
 
 const MemoizedCanvasBox = React.memo(CanvasBox);
 
+/**
+ * CallStack component displays function call frames in a vertically scrollable column.
+ * Supports drag-and-drop reordering, dynamic sizing, and responsive layout.
+ */
 const CallStack: React.FC<CallStackProps> = ({
   frames,
   selected,
@@ -69,20 +66,18 @@ const CallStack: React.FC<CallStackProps> = ({
   onReorder,
   onWidthChange,
   x = 20,
-  y = 90,
+  y = 73,
   width = 205,
   scale = 1,
 }) => {
   const clipPathId = useId();
 
-  // Viewport height management
   const [viewportHeight, setViewportHeight] = useState<number>(() => {
     return window.innerHeight;
   });
 
   const yPosition = y;
 
-  // Box size tracking
   const [boxSizes, setBoxSizes] = useState<Record<number, BoxDimensions>>({});
 
   const handleBoxSizeChange = useCallback((id: number, size: BoxDimensions) => {
@@ -96,7 +91,6 @@ const CallStack: React.FC<CallStackProps> = ({
     });
   }, []);
 
-  // Layout calculations
   const orderedFrames = useMemo(() => [...frames], [frames]);
 
   const maxBoxWidth = useMemo(() => {
@@ -109,20 +103,28 @@ const CallStack: React.FC<CallStackProps> = ({
 
   const columnWidth = Math.max(width, maxBoxWidth);
 
-  // Notify parent when the rendered call stack width changes (e.g. long function names)
   useEffect(() => {
     onWidthChange?.(columnWidth + x);
   }, [columnWidth, x, onWidthChange]);
 
-  // Compute the call stack height in pixel space, then convert to SVG units.
-  // This keeps the call stack visually the same height regardless of zoom.
-  const pixelColumnHeight =
-    viewportHeight - (yPosition + DOWNLOAD_BUTTON_BOTTOM + BUTTON_HEIGHT + 30) * scale;
+  // Calculate height in pixels (not affected by scale)
+  // The call stack height stays constant regardless of zoom level
+  const bottomSpacing = DOWNLOAD_BUTTON_BOTTOM + BUTTON_HEIGHT + ADDITIONAL_HEIGHT_OFFSET;
+  const pixelColumnHeight = viewportHeight - (yPosition + bottomSpacing);
   const columnHeight = pixelColumnHeight / scale;
   const visibleHeight = Math.max(
     100,
     columnHeight - HEADER_HEIGHT - TOP_PADDING - BOTTOM_PADDING
   );
+
+  // Log for debugging - remove after verification
+  console.log('CallStack centering:', {
+    viewportHeight,
+    yPosition,
+    bottomSpacing,
+    columnHeight,
+    'Should be equal': yPosition === bottomSpacing
+  });
 
   const layout = useMemo((): LayoutItem[] => {
     let yOffset = 0;
@@ -327,23 +329,53 @@ const CallStack: React.FC<CallStackProps> = ({
 
   return (
     <g className={styles.callStackRoot} onWheel={handleWheel}>
+      {/* Outer container */}
       <rect
         className={styles.containerBackground}
         x={x}
         y={yPosition}
         width={columnWidth}
         height={columnHeight}
-        rx={10}
-        ry={10}
+        rx={12}
+        ry={12}
+      />
+
+      {/* Header background — rounded top corners only via clipPath trick with two rects */}
+      <rect
+        className={styles.headerBackground}
+        x={x}
+        y={yPosition}
+        width={columnWidth}
+        height={HEADER_HEIGHT}
+        rx={12}
+        ry={12}
+      />
+      {/* Cover the bottom rounded corners of the header rect so it looks flush */}
+      <rect
+        className={styles.headerBackground}
+        x={x}
+        y={yPosition + HEADER_HEIGHT / 2}
+        width={columnWidth}
+        height={HEADER_HEIGHT / 2}
+      />
+
+      {/* Header divider line */}
+      <line
+        className={styles.headerDivider}
+        x1={x}
+        y1={yPosition + HEADER_HEIGHT}
+        x2={x + columnWidth}
+        y2={yPosition + HEADER_HEIGHT}
       />
 
       <text
         className={styles.callStackTitle}
         x={x + columnWidth / 2}
-        y={yPosition + 30}
+        y={yPosition + HEADER_HEIGHT / 2 + 4}
         textAnchor="middle"
+        fontSize="10"
       >
-        Call&nbsp;Stack
+        Call Stack
       </text>
 
       <clipPath id={clipPathId}>

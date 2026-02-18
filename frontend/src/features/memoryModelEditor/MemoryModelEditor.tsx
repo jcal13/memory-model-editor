@@ -16,15 +16,14 @@ import {
   useUILocalStorage,
 } from "./hooks/useLocalStorage";
 import { useCanvasSubmission } from "./hooks/useCanvasSubmission";
-import { useMemo, useEffect, useState, useCallback } from "react";
-import { CanvasElement } from "../shared/types";
+import { useUndoHistory } from "./hooks/useUndoHistory";
+import { useMemo, useEffect, useState, useCallback, useRef } from "react";
+import { CanvasElement, BoxTypeName } from "../shared/types";
 import {
   createMasterErrorList,
   MasterErrorList,
 } from "./utils/masterErrorList";
 import { spreadOverlappingElements } from "../canvas/utils/boundary.helpers";
-// Import BoxType from palette instead of shared
-import { BoxType } from "../palette/shared/types";
 
 // Layout constants
 const MAX_INFO_PANEL_VIEWPORT_RATIO = 0.6667;
@@ -56,6 +55,22 @@ export default function MemoryModelEditor({
   );
 
   const [currentQuestionData, setCurrentQuestionData] = useState<any>(null);
+  const [canvasScale, setCanvasScale] = useState<number>(1);
+  const [editorScale, setEditorScale] = useState<number>(1);
+
+  // Initialize undo history
+  const { canUndo, canRedo, undo, redo, recordState, clearHistory } = useUndoHistory(
+    state.setElements,
+    state.setElementIds,
+    state.setElementClasses
+  );
+
+  // Track previous state for recording changes
+  const prevStateRef = useRef({
+    elements: state.elements,
+    ids: state.elementIds,
+    classes: state.elementClasses,
+  });
 
   const handleEditorOpenerReady = useCallback(
     (opener: (element: CanvasElement) => void) => {
@@ -63,6 +78,28 @@ export default function MemoryModelEditor({
     },
     []
   );
+
+  // Record state changes for undo functionality
+  useEffect(() => {
+    const prevState = prevStateRef.current;
+    const currentState = {
+      elements: state.elements,
+      ids: state.elementIds,
+      classes: state.elementClasses,
+    };
+
+    // Check if state has actually changed
+    const hasChanged =
+      JSON.stringify(prevState.elements) !== JSON.stringify(currentState.elements) ||
+      JSON.stringify(prevState.ids) !== JSON.stringify(currentState.ids) ||
+      JSON.stringify(prevState.classes) !== JSON.stringify(currentState.classes);
+
+    if (hasChanged) {
+      // Record the current state (after the change)
+      recordState(currentState);
+      prevStateRef.current = currentState;
+    }
+  }, [state.elements, state.elementIds, state.elementClasses, recordState]);
 
   const clearCanvas = () => {
     state.setElements([]);
@@ -74,6 +111,7 @@ export default function MemoryModelEditor({
     state.setActiveInfoTab("question");
     state.setCanvasResetKey((prev) => prev + 1);
     clearCanvasStorage();
+    clearHistory();
   };
 
   const restoreCanvas = (
@@ -84,6 +122,7 @@ export default function MemoryModelEditor({
     state.setElements(spreadOverlappingElements(elements));
     state.setElementIds(ids);
     state.setElementClasses(classes);
+    clearHistory();
   };
 
   const masterErrorList: MasterErrorList = useMemo(
@@ -130,18 +169,18 @@ export default function MemoryModelEditor({
     );
   };
 
-  const getRequiredBoxTypes = useCallback((questionData: any): BoxType[] => {
+  const getRequiredBoxTypeNames = useCallback((questionData: any): BoxTypeName[] => {
     if (!questionData?.answer || !Array.isArray(questionData.answer)) {
       return [];
     }
 
-    const requiredTypes = new Set<BoxType>();
+    const requiredTypes = new Set<BoxTypeName>();
 
     const hasFrames = questionData.answer.some(
       (box: any) => box.type === ".frame"
     );
     if (hasFrames) {
-      requiredTypes.add("function" as BoxType);
+      requiredTypes.add("function" as BoxTypeName);
     }
 
     questionData.answer.forEach((box: any) => {
@@ -151,36 +190,36 @@ export default function MemoryModelEditor({
         case ".frame":
           break;
         case "int":
-          requiredTypes.add("int" as BoxType);
+          requiredTypes.add("int" as BoxTypeName);
           break;
         case "float":
-          requiredTypes.add("float" as BoxType);
+          requiredTypes.add("float" as BoxTypeName);
           break;
         case "str":
-          requiredTypes.add("str" as BoxType);
+          requiredTypes.add("str" as BoxTypeName);
           break;
         case "bool":
-          requiredTypes.add("bool" as BoxType);
+          requiredTypes.add("bool" as BoxTypeName);
           break;
         case "NoneType":
         case "None":
-          requiredTypes.add("none" as BoxType);
+          requiredTypes.add("none" as BoxTypeName);
           break;
         case "list":
-          requiredTypes.add("list" as BoxType);
+          requiredTypes.add("list" as BoxTypeName);
           break;
         case "tuple":
-          requiredTypes.add("tuple" as BoxType);
+          requiredTypes.add("tuple" as BoxTypeName);
           break;
         case "set":
-          requiredTypes.add("set" as BoxType);
+          requiredTypes.add("set" as BoxTypeName);
           break;
         case "dict":
-          requiredTypes.add("dict" as BoxType);
+          requiredTypes.add("dict" as BoxTypeName);
           break;
         case ".class":
         case "object":
-          requiredTypes.add("class" as BoxType);
+          requiredTypes.add("class" as BoxTypeName);
           break;
       }
     });
@@ -356,40 +395,54 @@ export default function MemoryModelEditor({
       />
 
       {state.isPaletteOpen && (
-        <div
-          className={`${styles.palettePanel} ${
-            isResizingPalette ? styles.resizing : ""
-          }`}
-          style={{
-            width: `${isResizingPalette ? tempPaletteWidth : paletteWidth}px`,
-            minWidth: `${
-              isResizingPalette ? tempPaletteWidth : paletteWidth
-            }px`,
-          }}
-        >
+        <>
           <div
-            className={styles.paletteContent}
+            className={`${styles.palettePanel} ${
+              isResizingPalette ? styles.resizing : ""
+            }`}
             style={{
-              width: `${paletteWidth}px`,
+              width: `${isResizingPalette ? tempPaletteWidth : paletteWidth}px`,
+              minWidth: `${
+                isResizingPalette ? tempPaletteWidth : paletteWidth
+              }px`,
             }}
           >
-            <Palette
-              activeTab={state.activePaletteTab}
-              setActive={state.setActivePaletteTab}
-              requiredBoxes={
-                state.isSandboxMode && currentQuestionData
-                  ? getRequiredBoxTypes(currentQuestionData)
-                  : undefined
-              }
-              isPracticeMode={state.isSandboxMode}
-            />
+            <div
+              className={styles.paletteContent}
+              style={{
+                width: `${paletteWidth}px`,
+              }}
+            >
+              <Palette
+                activeTab={state.activePaletteTab}
+                setActive={state.setActivePaletteTab}
+                requiredBoxes={
+                  state.isSandboxMode && currentQuestionData
+                    ? getRequiredBoxTypeNames(currentQuestionData)
+                    : undefined
+                }
+                isPracticeMode={state.isSandboxMode}
+                isSandboxMode={state.isSandboxMode}
+                onModeToggle={() => state.setShowModeToggleModal(true)}
+                onClear={() => state.setShowClearCanvasModal(true)}
+                onUndo={undo}
+                onRedo={redo}
+                canUndo={canUndo}
+                canRedo={canRedo}
+                elements={state.elements}
+                scale={canvasScale}
+                onScaleChange={setCanvasScale}
+                editorScale={editorScale}
+                onEditorScaleChange={setEditorScale}
+              />
+            </div>
           </div>
 
           <div
-            className={styles.paletteResizeHandle}
+            className={styles.resizeDivider}
             onMouseDown={() => setIsResizingPalette(true)}
           />
-        </div>
+        </>
       )}
 
       <div ref={refs.mainContainerRef} className={styles.mainContainer}>
@@ -408,29 +461,11 @@ export default function MemoryModelEditor({
               sandbox={!state.isSandboxMode}
               onClear={() => state.setShowClearCanvasModal(true)}
               onEditorOpenerReady={handleEditorOpenerReady}
+              scale={canvasScale}
+              onScaleChange={setCanvasScale}
+              editorScale={editorScale}
             />
           </div>
-
-          <label
-            className={styles.modeToggleSwitch}
-            data-editor-control="mode-toggle"
-          >
-            <span className={styles.modeToggleLabel}>
-              {state.isSandboxMode ? "Practice" : "Test"}
-            </span>
-            <input
-              type="checkbox"
-              className={styles.modeToggleInput}
-              checked={state.isSandboxMode}
-              onChange={(event) => {
-                event.preventDefault();
-                state.setShowModeToggleModal(true);
-              }}
-            />
-            <div className={styles.modeToggleSliderWrapper}>
-              <span className={styles.modeToggleSlider}></span>
-            </div>
-          </label>
 
           {state.jsonOutput && (
             <pre className={styles.jsonPreview}>{state.jsonOutput}</pre>
@@ -438,46 +473,48 @@ export default function MemoryModelEditor({
         </div>
 
         {state.isInfoPanelOpen && (
-          <div
-            className={`${styles.infoPanel} ${
-              state.isResizingInfoPanel ? styles.noTransition : ""
-            }`}
-            style={{
-              width: `${state.infoPanelWidth}px`,
-              maxWidth: MAX_INFO_PANEL_CSS_WIDTH,
-            }}
-          >
-            <InformationTabs
-              submissionResults={state.submissionResults}
-              activeTab={state.activeInfoTab}
-              setActive={state.setActiveInfoTab}
-              questionSelected={state.selectedQuestionIndex !== null}
-              questionIndex={state.selectedQuestionIndex}
-              setQuestionIndex={state.setSelectedQuestionIndex}
-              questionType={state.selectedQuestionType}
-              setQuestionType={state.setSelectedQuestionType}
-              questionView={state.questionView}
-              setQuestionView={state.setQuestionView}
-              onSubmit={handleCanvasSubmit}
-              setSubmissionResults={state.setSubmissionResults}
-              onClearCanvas={clearCanvas}
-              onRestoreCanvas={restoreCanvas}
-              currentCanvasState={currentCanvasState}
-              masterErrorList={masterErrorList}
-              elements={state.elements}
-              setElements={state.setElements}
-              onOpenEditor={openEditor || (() => {})}
-              isSandboxMode={state.isSandboxMode}
-              onQuestionDataChange={setCurrentQuestionData}
-              tabScrollPositions={state.tabScrollPositions}
-              setTabScrollPositions={state.setTabScrollPositions}
+          <>
+            <div
+              className={styles.resizeDivider}
+              onMouseDown={() => state.setIsResizingInfoPanel(true)}
             />
 
             <div
-              className={styles.infoPanelResizeHandle}
-              onMouseDown={() => state.setIsResizingInfoPanel(true)}
-            />
-          </div>
+              className={`${styles.infoPanel} ${
+                state.isResizingInfoPanel ? styles.noTransition : ""
+              }`}
+              style={{
+                width: `${state.infoPanelWidth}px`,
+                maxWidth: MAX_INFO_PANEL_CSS_WIDTH,
+              }}
+            >
+              <InformationTabs
+                submissionResults={state.submissionResults}
+                activeTab={state.activeInfoTab}
+                setActive={state.setActiveInfoTab}
+                questionSelected={state.selectedQuestionIndex !== null}
+                questionIndex={state.selectedQuestionIndex}
+                setQuestionIndex={state.setSelectedQuestionIndex}
+                questionType={state.selectedQuestionType}
+                setQuestionType={state.setSelectedQuestionType}
+                questionView={state.questionView}
+                setQuestionView={state.setQuestionView}
+                onSubmit={handleCanvasSubmit}
+                setSubmissionResults={state.setSubmissionResults}
+                onClearCanvas={clearCanvas}
+                onRestoreCanvas={restoreCanvas}
+                currentCanvasState={currentCanvasState}
+                masterErrorList={masterErrorList}
+                elements={state.elements}
+                setElements={state.setElements}
+                onOpenEditor={openEditor || (() => {})}
+                isSandboxMode={state.isSandboxMode}
+                onQuestionDataChange={setCurrentQuestionData}
+                tabScrollPositions={state.tabScrollPositions}
+                setTabScrollPositions={state.setTabScrollPositions}
+              />
+            </div>
+          </>
         )}
       </div>
 
@@ -509,6 +546,7 @@ export default function MemoryModelEditor({
           onCancel={() => state.setShowModeToggleModal(false)}
         />
       )}
+
     </div>
   );
 }

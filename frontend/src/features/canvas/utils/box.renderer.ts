@@ -1,9 +1,21 @@
+/**
+ * SVG rendering functions for canvas memory model boxes.
+ * Generates MemoryViz-based visualizations with error styling support.
+ */
+
 import MemoryViz from "memory-viz";
 import { CanvasElement } from "../../shared/types";
-import { BOX_CONFIGS } from "./box.configs";
 import { MemoryVizConfig } from "./box.types";
-import { DEFAULT_DIMENSIONS } from "./box.helpers";
+import {
+  getBoxConfig,
+  DEFAULT_DIMENSIONS,
+  DEFAULT_CANVAS_STYLE,
+} from "../../shared/boxConfig";
 
+/**
+ * Base MemoryViz configuration for all canvas boxes.
+ * Defines property sizes, spacing, and styling defaults.
+ */
 const DEFAULT_MEMORY_VIZ_CONFIG: Partial<MemoryVizConfig> = {
   prop_min_width: 54,
   prop_min_height: 36,
@@ -19,24 +31,23 @@ const DEFAULT_MEMORY_VIZ_CONFIG: Partial<MemoryVizConfig> = {
 };
 
 /**
- * Creates an SVG renderer for a memory model element
+ * Renders a canvas element as an SVG using MemoryViz.
+ * Applies element-specific configuration and optional error styling.
  *
- * @param element - The canvas element to render
- * @returns SVG element representing the memory model box
+ * @param element - Canvas element containing kind, id, and styling data
+ * @returns SVG element ready for insertion into the DOM
+ *
+ * @example
+ * const svg = createBoxRenderer(element);
+ * container.appendChild(svg);
  */
 export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
   const { MemoryModel } = MemoryViz;
   const { kind, id, boxId } = element;
   const kindName = kind.name;
 
-  // Get the configuration for this box type
-  const boxConfig = BOX_CONFIGS[kindName];
+  const boxConfig = getBoxConfig(kindName);
 
-  if (!boxConfig) {
-    throw new Error(`Unsupported box type: ${kindName}`);
-  }
-
-  // Build MemoryViz configuration with element-specific seed
   const memoryVizConfig: MemoryVizConfig = {
     ...DEFAULT_MEMORY_VIZ_CONFIG,
     obj_min_width: boxConfig.getMinWidth(),
@@ -49,24 +60,23 @@ export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
     },
   } as MemoryVizConfig;
 
-  // Create the MemoryViz model
   const model = new MemoryModel(memoryVizConfig);
 
-  // Draw the element using the standard method
-  boxConfig.draw(model, kind, id);
+  boxConfig.drawCanvas(model, kind, id, DEFAULT_CANVAS_STYLE);
 
   if (element.color) {
     applyErrorStyling(model.svg, element.color);
   }
 
-  // Return the generated SVG
   return model.svg;
 }
 
 /**
- * Applies error styling to a rendered SVG element
- * @param svg - The SVG element to style
- * @param customColor - Optional custom color to use instead of default red
+ * Applies error styling to an SVG element by modifying stroke, fill, and text colors.
+ * Creates a visual error state with lightened fills and colored strokes.
+ *
+ * @param svg - SVG element to style
+ * @param customColor - Optional hex color (defaults to red #DC2626)
  */
 function applyErrorStyling(svg: SVGSVGElement, customColor?: string): void {
   const errorColor = customColor || "#DC2626";
@@ -89,7 +99,6 @@ function applyErrorStyling(svg: SVGSVGElement, customColor?: string): void {
     }
   });
 
-  // Apply tint to text
   const textElements = svg.querySelectorAll<SVGElement>("text, tspan");
   textElements.forEach((text) => {
     text.style.setProperty("fill", textColor, "important");
@@ -97,10 +106,11 @@ function applyErrorStyling(svg: SVGSVGElement, customColor?: string): void {
 }
 
 /**
- * Lightens a color by mixing it with white
+ * Lightens a hex color by blending it with white.
+ *
  * @param color - Hex color string (e.g., "#FF0000")
- * @param amount - Amount to lighten (0-1, where 1 is full white)
- * @returns Lightened hex color
+ * @param amount - Lightening factor from 0 (no change) to 1 (pure white)
+ * @returns Lightened hex color string
  */
 function lightenColor(color: string, amount: number): string {
   const hex = color.replace("#", "");
@@ -118,10 +128,11 @@ function lightenColor(color: string, amount: number): string {
 }
 
 /**
- * Darkens a color by mixing it with black
+ * Darkens a hex color by blending it with black.
+ *
  * @param color - Hex color string (e.g., "#FF0000")
- * @param amount - Amount to darken (0-1, where 1 is full black)
- * @returns Darkened hex color
+ * @param amount - Darkening factor from 0 (no change) to 1 (pure black)
+ * @returns Darkened hex color string
  */
 function darkenColor(color: string, amount: number): string {
   const hex = color.replace("#", "");
@@ -139,37 +150,20 @@ function darkenColor(color: string, amount: number): string {
 }
 
 /**
- * Gets the dimensions for a box type
+ * Retrieves the dimensions for a canvas element based on its box type.
  *
- * @param element - The canvas element
- * @returns Object containing width and height
+ * @param element - Canvas element to measure
+ * @returns Object with width and height in SVG units
  */
 export function getBoxDimensions(element: CanvasElement): {
   width: number;
   height: number;
 } {
   const kindName = element.kind.name;
-  const boxConfig = BOX_CONFIGS[kindName];
-
-  if (!boxConfig) {
-    return {
-      width: DEFAULT_DIMENSIONS.STANDARD_WIDTH,
-      height: DEFAULT_DIMENSIONS.MIN_HEIGHT,
-    };
-  }
+  const boxConfig = getBoxConfig(kindName);
 
   return {
     width: boxConfig.getMinWidth(),
     height: boxConfig.getHeight(element.kind),
   };
-}
-
-/**
- * Checks if a box type is supported
- *
- * @param typeName - The name of the box type
- * @returns True if the type is supported
- */
-export function isBoxTypeSupported(typeName: string): boolean {
-  return typeName in BOX_CONFIGS;
 }

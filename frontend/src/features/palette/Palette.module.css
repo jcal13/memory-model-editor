@@ -6,11 +6,73 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 16px 0px 16px 10px;
+  padding: 12px 0px 18px 6px;
   width: 100%;
   height: 100%;
-  background-color: #f1f5f9;
+  background-color: var(--bg-tertiary);
   box-sizing: border-box;
+  transition: background-color 200ms ease;
+}
+
+.outerContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.paletteSection {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.controlsSection {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.resizeDivider {
+  height: 8px;
+  background: transparent;
+  cursor: ns-resize;
+  position: relative;
+  flex-shrink: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms ease;
+}
+
+.resizeDivider:hover {
+  background: var(--bg-hover);
+}
+
+.resizeDivider::before {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 3px;
+  background: transparent;
+  border-radius: 3px;
+  transition: background 150ms ease;
+}
+
+.resizeDivider:hover::before {
+  background: var(--accent-blue);
+}
+
+.resizeDivider:active {
+  background: var(--bg-tertiary);
+}
+
+.resizeDivider:active::before {
+  background: var(--accent-blue-hover);
 }
 
 .container {
@@ -33,7 +95,7 @@
 }
 
 .container::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--border-secondary);
   border-radius: 9999px;
 }
 
@@ -55,11 +117,11 @@
   padding: 12px 6px;
   font-weight: 600;
   font-size: 0.8rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-secondary);
   border-right: none;
   border-radius: 8px 0 0 8px;
-  background: #e2e8f0;
-  color: #64748b;
+  background: var(--border-primary);
+  color: var(--text-tertiary);
   transition: all 160ms ease;
   writing-mode: vertical-rl;
   direction: rtl;
@@ -67,20 +129,22 @@
 }
 
 .tabBtn:hover {
-  background: #cbd5e1;
-  color: #334155;
+  background: var(--border-secondary);
+  color: var(--text-secondary);
+  border-color: var(--text-muted);
 }
 
 .tabBtn:focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--border-focus);
   outline-offset: 2px;
 }
 
 .active {
-  background: #ffffff;
-  color: #0f172a;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   z-index: 2;
-  border-right: 1px solid #ffffff;
+  border: 1px solid var(--border-secondary);
+  border-right: 1px solid var(--bg-primary);
 }
 
 .tabLabel {
@@ -95,15 +159,16 @@
 ======================================= */
 
 .tabBody {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
   border-radius: 0 10px 10px 0;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-sm);
   padding: 20px 24px;
   flex: 1;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-color: var(--border-secondary) transparent;
+  transition: background-color 200ms ease, border-color 200ms ease;
 }
 
 .tabBody::-webkit-scrollbar {
@@ -115,7 +180,7 @@
 }
 
 .tabBody::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--border-secondary);
   border-radius: 9999px;
   visibility: hidden;
 }
@@ -130,14 +195,17 @@
 
 .paletteTitle {
   text-align: center;
-  font-size: 1.05rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  color: #0f172a;
-  margin: 4px 0 20px 0;
-  letter-spacing: -0.01em;
+  color: var(--text-tertiary);
+  margin: 0 0 18px 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   border-bottom: none;
-  padding: 0;
+  padding: 0 0 8px 0;
   background-color: transparent;
+  transition: color 200ms ease;
+  position: relative;
 }
 
 .paletteBoxes {
@@ -145,4 +213,49 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
+}
+
+/* Override memory-viz box background fills for light mode in palette */
+:root[data-theme="light"] .paletteBoxes :global(svg g path[fill]:not([fill="none"])),
+.paletteBoxes :global(svg g path[fill]:not([fill="none"])) {
+  fill: #ffffff !important;
+}
+
+/* Override memory-viz box background fills for dark mode in palette */
+:root[data-theme="dark"] .paletteBoxes :global(svg g path[fill]:not([fill="none"])) {
+  fill: #2d2d2d !important;
+}
+
+:root[data-theme="dark"] .paletteBoxes :global(rect[stroke="#000000"]),
+:root[data-theme="dark"] .paletteBoxes :global(rect[stroke="black"]),
+:root[data-theme="dark"] .paletteBoxes :global(rect[stroke="#000"]),
+:root[data-theme="dark"] .paletteBoxes :global(path[stroke="rgb(0, 0, 0)"]),
+:root[data-theme="dark"] .paletteBoxes :global(path) {
+  stroke: var(--box-line-color) !important;
+  transition: stroke 200ms ease;
+}
+
+:root[data-theme="dark"] .paletteBoxes :global(text.id) {
+  fill: var(--text-id-color) !important;
+  transition: fill 200ms ease;
+}
+
+:root[data-theme="dark"] .paletteBoxes :global(text.type),
+:root[data-theme="dark"] .paletteBoxes :global(text.attribute) {
+  fill: var(--text-type-color) !important;
+  transition: fill 200ms ease;
+}
+
+:root[data-theme="dark"] .paletteBoxes :global(text.value),
+:root[data-theme="dark"] .paletteBoxes :global(text.default),
+:root[data-theme="dark"] .paletteBoxes :global(text.variable) {
+  fill: var(--text-value-color) !important;
+  transition: fill 200ms ease;
+}
+
+:root[data-theme="dark"] .paletteBoxes :global(line[stroke="#000000"]),
+:root[data-theme="dark"] .paletteBoxes :global(line[stroke="black"]),
+:root[data-theme="dark"] .paletteBoxes :global(line[stroke="#000"]) {
+  stroke: var(--box-line-color) !important;
+  transition: stroke 200ms ease;
 }

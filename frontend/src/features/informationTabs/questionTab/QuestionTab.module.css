@@ -20,17 +20,20 @@
 }
 
 .scroller::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: var(--border-secondary);
   border-radius: 9999px;
 }
 
 .title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 2px 0 14px 0;
-  letter-spacing: -0.01em;
-  padding: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 20px 0;
+  letter-spacing: -0.02em;
+  padding: 0 0 12px 0;
+  transition: color 200ms ease;
+  border-bottom: 2px solid var(--border-primary);
+  line-height: 1.3;
 }
 
 .selectors {
@@ -47,9 +50,10 @@
 
 .loading {
   margin-top: 1.5rem;
-  color: #94a3b8;
+  color: var(--text-muted);
   font-size: 0.85rem;
   text-align: center;
+  transition: color 200ms ease;
 }
 
 .backRow {
@@ -61,10 +65,10 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
-  color: #475569;
+  color: var(--text-secondary);
   font-weight: 500;
   font-size: 0.8rem;
   padding: 0.35rem 0.75rem;
@@ -73,17 +77,17 @@
 }
 
 .backBtn:hover {
-  color: #1e293b;
-  background: #f1f5f9;
-  border-color: #cbd5e1;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border-color: var(--border-secondary);
 }
 
 .backBtn:active {
-  background: #e2e8f0;
+  background: var(--bg-hover);
 }
 
 .backBtn:focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--border-focus);
   outline-offset: 2px;
 }
 
@@ -97,24 +101,27 @@
   font-size: 0.95rem;
   line-height: 1.55;
   margin-bottom: 0.875rem;
-  color: #1e293b;
+  color: var(--text-secondary);
+  transition: color 200ms ease;
 }
 
 .questionText code {
-  background: #f1f5f9;
+  background: var(--bg-tertiary);
   color: #e11d48;
   padding: 0.15em 0.4em;
   border-radius: 5px;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.9em;
+  transition: background-color 200ms ease;
 }
 
 .topicsSection {
   margin: 0 0 1rem 0;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-primary);
   border-radius: 10px;
-  background: #f8fafc;
+  background: var(--bg-secondary);
   overflow: hidden;
+  transition: background-color 200ms ease, border-color 200ms ease;
 }
 
 .topicsSummary {
@@ -122,15 +129,15 @@
   padding: 0.6rem 0.85rem;
   font-weight: 600;
   font-size: 0.85rem;
-  color: #334155;
-  background: #f1f5f9;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
   list-style: none;
   user-select: none;
-  transition: background 120ms ease;
+  transition: background 120ms ease, color 200ms ease;
 }
 
 .topicsSummary:hover {
-  background: #e2e8f0;
+  background: var(--bg-hover);
 }
 
 .topicsSummary::-webkit-details-marker {
@@ -171,8 +178,9 @@
 
 .topicsEmpty {
   margin: 0;
-  color: #94a3b8;
+  color: var(--text-muted);
   font-size: 0.85rem;
+  transition: color 200ms ease;
 }
 
 .buttonRow {
@@ -183,25 +191,25 @@
 
 .resetButton {
   padding: 0.5rem 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
   font-size: 0.85rem;
   flex: 1;
   transition: all 160ms ease;
-  background: #ffffff;
-  color: #475569;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
 }
 
 .resetButton:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-  color: #1e293b;
+  background: var(--bg-secondary);
+  border-color: var(--border-secondary);
+  color: var(--text-primary);
 }
 
 .resetButton:active {
-  background: #f1f5f9;
+  background: var(--bg-tertiary);
 }
 
 .submitButton {

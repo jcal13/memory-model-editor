@@ -12,8 +12,7 @@ import { CanvasElement, BoxType, ID } from "../shared/types";
 import CanvasBox from "./components/CanvasBox";
 import BoxEditor from "../editors/boxEditor/BoxEditor";
 import CallStack from "./components/CallStack";
-import { ClearCanvasButton, DownloadButton, ZoomControls } from "./components/CanvasButtons";
-import { useCanvasRefs } from "./hooks/hooks";
+import { useCanvasRefs } from "./hooks/useCanvas";
 import { validateElements } from "./utils/validation";
 import styles from "./Canvas.module.css";
 
@@ -43,6 +42,7 @@ interface FloatingEditorProps {
   removeClasses?: (className: string) => void;
   sandbox: boolean;
   elements: CanvasElement[];
+  editorScale: number;
 }
 
 function FloatingEditor({
@@ -61,6 +61,7 @@ function FloatingEditor({
   removeClasses,
   sandbox,
   elements,
+  editorScale,
 }: FloatingEditorProps) {
   const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -71,6 +72,7 @@ function FloatingEditor({
       defaultPosition={defaultPosition}
       onMouseDown={onSelect}
       bounds={`.${styles.canvasWrapper}`}
+      scale={editorScale}
       onStart={(e) => {
         e.stopPropagation();
         // Prevent text selection during drag
@@ -84,20 +86,28 @@ function FloatingEditor({
       }}
     >
       <div ref={nodeRef} className={styles.floatingEditor}>
-        <Editor
-          metadata={element}
-          onSave={onSave}
-          onRemove={onRemove}
-          onClose={onClose}
-          ids={ids}
-          addId={addId}
-          removeId={removeId}
-          classes={classes}
-          addClasses={addClasses}
-          removeClasses={removeClasses}
-          sandbox={sandbox}
-          elements={elements}
-        />
+        <div
+          style={{
+            transform: `scale(${editorScale})`,
+            transformOrigin: 'top left',
+            transition: 'transform 0.2s ease',
+          }}
+        >
+          <Editor
+            metadata={element}
+            onSave={onSave}
+            onRemove={onRemove}
+            onClose={onClose}
+            ids={ids}
+            addId={addId}
+            removeId={removeId}
+            classes={classes}
+            addClasses={addClasses}
+            removeClasses={removeClasses}
+            sandbox={sandbox}
+            elements={elements}
+          />
+        </div>
       </div>
     </Draggable>
   );
@@ -115,6 +125,9 @@ interface CanvasProps {
   sandbox?: boolean;
   onClear: () => void;
   onEditorOpenerReady?: (openEditor: (element: CanvasElement) => void) => void;
+  scale?: number;
+  onScaleChange?: (scale: number) => void;
+  editorScale?: number;
 }
 
 function Canvas({
@@ -129,14 +142,21 @@ function Canvas({
   sandbox = true,
   onClear,
   onEditorOpenerReady,
+  scale: externalScale,
+  onScaleChange: externalOnScaleChange,
+  editorScale = 1,
 }: CanvasProps) {
   const [openEditors, setOpenEditors] = useState<CanvasElement[]>([]);
   const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(
     null
   );
   const [canvasHeight, setCanvasHeight] = useState<number | null>(null);
-  const [scale, setScale] = useState(1);
+  const [internalScale, setInternalScale] = useState(1);
   const [callStackWidth, setCallStackWidth] = useState(225);
+
+  // Use external scale if provided, otherwise use internal
+  const scale = externalScale !== undefined ? externalScale : internalScale;
+  const setScale = externalOnScaleChange || setInternalScale;
 
   const { svgRef } = useCanvasRefs();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -215,7 +235,10 @@ function Canvas({
   useEffect(() => {
     const { width, height } = baseDims.current;
     if (width > 0 && height > 0) {
-      applyViewBox(width, height, scale);
+      // Force immediate update
+      requestAnimationFrame(() => {
+        applyViewBox(width, height, scale);
+      });
     }
   }, [scale, applyViewBox]);
 
@@ -457,13 +480,6 @@ function Canvas({
               ))}
           </g>
         </svg>
-
-        <ClearCanvasButton onClick={onClear} />
-        <DownloadButton
-          elements={elements}
-          canvasSelector={`.${styles.canvasWrapper}`}
-        />
-        <ZoomControls scale={scale} onScaleChange={setScale} />
       </div>
 
       {openEditors.map((element) => {
@@ -488,6 +504,7 @@ function Canvas({
             removeClasses={removeClasses}
             sandbox={sandbox}
             elements={elements}
+            editorScale={editorScale}
           />
         );
       })}
@@ -521,7 +538,7 @@ function createNewElement(
         name: "function",
         type: "function",
         value: null,
-        functionName: "function",
+        functionName: "NoFunction",
         params: [],
         order: functionCount + 1,
       };
@@ -575,7 +592,9 @@ const areEqual = (prev: Readonly<CanvasProps>, next: Readonly<CanvasProps>) => {
     prev.elements === next.elements &&
     prev.ids === next.ids &&
     prev.classes === next.classes &&
-    prev.sandbox === next.sandbox
+    prev.sandbox === next.sandbox &&
+    prev.scale === next.scale &&
+    prev.editorScale === next.editorScale
   );
 };
 

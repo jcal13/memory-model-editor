@@ -3,10 +3,11 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 12px;
+  padding: 12px 0px;
   height: 100vh;
-  background-color: #f1f5f9;
+  background-color: var(--bg-tertiary);
   box-sizing: border-box;
+  transition: background-color 200ms ease;
 }
 
 /* Main SVG canvas */
@@ -14,10 +15,63 @@
   width: 100%;
   height: 100%;
   display: block;
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--canvas-bg);
+  border: 1px solid var(--border-primary);
   border-radius: 10px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-sm);
+  transition: background-color 200ms ease, border-color 200ms ease;
+}
+
+/* Override memory-viz box background fills for light mode */
+:root[data-theme="light"] .canvas :global(svg g path[fill]:not([fill="none"])),
+.canvas :global(svg g path[fill]:not([fill="none"])) {
+  fill: #ffffff !important;
+}
+
+/* Override memory-viz box background fills for dark mode */
+:root[data-theme="dark"] .canvas :global(svg g path[fill]:not([fill="none"])) {
+  fill: #2d2d2d !important;
+}
+
+:root[data-theme="dark"] .canvas :global(rect[stroke="#000000"]),
+:root[data-theme="dark"] .canvas :global(rect[stroke="black"]),
+:root[data-theme="dark"] .canvas :global(rect[stroke="#000"]),
+:root[data-theme="dark"] .canvas :global(path[stroke="rgb(0, 0, 0)"]),
+:root[data-theme="dark"] .canvas :global(path) {
+  stroke: var(--box-line-color) !important;
+  transition: stroke 200ms ease;
+}
+
+:root[data-theme="dark"] .canvas :global(text[fill="#000000"]),
+:root[data-theme="dark"] .canvas :global(text[fill="black"]),
+:root[data-theme="dark"] .canvas :global(text[fill="#000"]) {
+  fill: var(--text-primary) !important;
+  transition: fill 200ms ease;
+}
+
+:root[data-theme="dark"] .canvas :global(text.id) {
+  fill: var(--text-id-color) !important;
+  transition: fill 200ms ease;
+}
+
+:root[data-theme="dark"] .canvas :global(text.type),
+:root[data-theme="dark"] .canvas :global(text.attribute) {
+  fill: var(--text-type-color) !important;
+  transition: fill 200ms ease;
+}
+
+:root[data-theme="dark"] .canvas :global(text.value),
+:root[data-theme="dark"] .canvas :global(text.default),
+:root[data-theme="dark"] .canvas :global(text.variable) {
+  fill: var(--text-value-color) !important;
+  transition: fill 200ms ease;
+}
+
+:root[data-theme="dark"] .canvas :global(line[stroke="#000000"]),
+:root[data-theme="dark"] .canvas :global(line[stroke="black"]),
+:root[data-theme="dark"] .canvas :global(line[stroke="#000"]) {
+  stroke: var(--box-line-color) !important;
+  transition: stroke 200ms ease;
 }
 
 /* Column layout for canvas content */

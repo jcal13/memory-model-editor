@@ -1,38 +1,40 @@
 import React, { useState } from "react";
-import panelStyles from "./ClassEditor.module.css";
+import panelStyles from "./FunctionEditor.module.css";
 import boxStyles from "../Editor.module.css";
 
 interface Props {
-  classes: string[];
-  onAdd: (className: string) => void;
-  onSelect: (className: string) => void;
-  onRemove: (className: string) => void;
+  names: string[];
+  onAdd: (name: string) => void;
+  onSelect: (name: string) => void;
+  onRemove: (name: string) => void;
   onClose: () => void;
+  onUnassign: () => void;
   sandbox: boolean;
 }
 
-const ClassSelectorPanel: React.FC<Props> = ({
-  classes,
+const FunctionNameSelectorPanel: React.FC<Props> = ({
+  names,
   onAdd,
   onSelect,
   onRemove,
   onClose,
+  onUnassign,
   sandbox,
 }) => {
-  const [customClass, setCustomClass] = useState("");
+  const [customName, setCustomName] = useState("");
   const [showWarn, setShowWarn] = useState(false);
   const [showDup, setShowDup] = useState(false);
 
   const handleAdd = () => {
-    const trimmed = customClass.trim();
+    const trimmed = customName.trim();
     if (trimmed !== "") {
-      if (classes.includes(trimmed)) {
+      if (names.includes(trimmed)) {
         setShowDup(true);
         setShowWarn(false);
         return;
       }
       onAdd(trimmed);
-      setCustomClass("");
+      setCustomName("");
       setShowWarn(false);
       setShowDup(false);
       return;
@@ -46,7 +48,7 @@ const ClassSelectorPanel: React.FC<Props> = ({
       className={`${boxStyles.boxEditorModule} ${panelStyles.panelShell} ${panelStyles.activeOutline}`}
     >
       <div className={`drag-handle ${panelStyles.header}`}>
-        <span>Select Class</span>
+        <span>Function Name</span>
         <button className={boxStyles.removeItem} onClick={onClose} title="Close">
           ×
         </button>
@@ -54,20 +56,20 @@ const ClassSelectorPanel: React.FC<Props> = ({
 
       <div className={panelStyles.content}>
         <div className={boxStyles.collectionIdContainer}>
-          {classes.map((className) => (
-            <div key={className} className={boxStyles.collectionIdBox}>
+          {names.map((name) => (
+            <div key={name} className={boxStyles.collectionIdBox}>
               <button
                 type="button"
                 className={boxStyles.collectionIdNoBorder}
-                onClick={() => onSelect(className)}
+                onClick={() => onSelect(name)}
               >
-                {className}
+                {name}
               </button>
               {sandbox && (
                 <button
                   type="button"
                   className={boxStyles.collectionRemoveId}
-                  onClick={() => onRemove(className)}
+                  onClick={() => onRemove(name)}
                 >
                   ×
                 </button>
@@ -76,9 +78,9 @@ const ClassSelectorPanel: React.FC<Props> = ({
           ))}
         </div>
 
-        {sandbox && classes.length === 0 && (
+        {names.length === 0 && (
           <div className={panelStyles.empty}>
-            No classes yet — enter a name and click "Add".
+            No function names yet — enter one below and click "Add".
           </div>
         )}
 
@@ -87,15 +89,15 @@ const ClassSelectorPanel: React.FC<Props> = ({
             <>
               <input
                 type="text"
-                value={customClass}
+                value={customName}
                 onChange={(e) => {
-                  setCustomClass(e.target.value);
+                  setCustomName(e.target.value);
                   setShowWarn(false);
                   setShowDup(false);
                 }}
-                placeholder="Enter new class name"
-                className={panelStyles.classInputBox}
-                aria-label="New class name"
+                placeholder="Enter function name"
+                className={panelStyles.nameInputBox}
+                aria-label="Function name"
               />
               <button
                 type="button"
@@ -106,10 +108,9 @@ const ClassSelectorPanel: React.FC<Props> = ({
               </button>
             </>
           )}
-
           <button
             type="button"
-            onClick={() => onSelect("NoClass")}
+            onClick={onUnassign}
             className={boxStyles.removeButton}
           >
             Unassign
@@ -118,12 +119,12 @@ const ClassSelectorPanel: React.FC<Props> = ({
 
         {showWarn && (
           <span style={{ color: "#dc2626", fontSize: "0.8rem" }}>
-            Please enter a class name
+            Please enter a function name
           </span>
         )}
         {showDup && (
           <span style={{ color: "#dc2626", fontSize: "0.8rem" }}>
-            Class already added
+            Name already added
           </span>
         )}
       </div>
@@ -131,4 +132,4 @@ const ClassSelectorPanel: React.FC<Props> = ({
   );
 };
 
-export default ClassSelectorPanel;
+export default FunctionNameSelectorPanel;

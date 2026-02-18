@@ -1,0 +1,142 @@
+/**
+ * Global theme variables for light and dark modes
+ */
+
+:root[data-theme="light"] {
+  /* Background colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-hover: #e2e8f0;
+
+  /* Text colors */
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-tertiary: #64748b;
+  --text-muted: #94a3b8;
+
+  /* Border colors */
+  --border-primary: #e2e8f0;
+  --border-secondary: #cbd5e1;
+  --border-focus: #3b82f6;
+
+  /* Canvas colors */
+  --canvas-bg: #ffffff;
+  --canvas-grid: #f1f5f9;
+  --canvas-box-bg: #ffffff;
+  --canvas-box-border: #e2e8f0;
+  --canvas-box-shadow: rgba(0, 0, 0, 0.1);
+
+  /* Call stack colors */
+  --callstack-bg: #ffffff;
+  --callstack-header-bg: #f8fafc;
+  --callstack-border: #e2e8f0;
+  --callstack-title: #64748b;
+  --callstack-scrollbar-track: rgba(226, 232, 240, 0.4);
+  --callstack-scrollbar-thumb: #cbd5e1;
+
+  /* Button colors */
+  --button-bg: #ffffff;
+  --button-hover: #f1f5f9;
+  --button-active: #e2e8f0;
+
+  /* Accent colors */
+  --accent-blue: #3b82f6;
+  --accent-blue-hover: #2563eb;
+  --accent-red: #ef4444;
+  --accent-red-hover: #dc2626;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* Memory-viz box styling */
+  --text-id-color: #c2410c;
+  --text-type-color: #7c2d12;
+  --text-value-color: #0f172a;
+  --box-fill: #ffffff;
+  --box-line-color: #334155;
+  --highlight-value-text-color: #0f172a;
+  --highlight-id-text-color: #1e293b;
+  --fade-text-color: #94a3b8;
+  --hide-text-color: #ffffff;
+  --highlight-box-fill: #dbeafe;
+  --highlight-box-line-color: #3b82f6;
+  --fade-box-fill: #f8fafc;
+  --fade-box-line-color: #e2e8f0;
+  --hide-box-fill: #ffffff;
+}
+
+:root[data-theme="dark"] {
+  /* Background colors */
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #242424;
+  --bg-tertiary: #2d2d2d;
+  --bg-hover: #3a3a3a;
+
+  /* Text colors */
+  --text-primary: #e8e8e8;
+  --text-secondary: #d0d0d0;
+  --text-tertiary: #b0b0b0;
+  --text-muted: #888888;
+
+  /* Border colors */
+  --border-primary: #3a3a3a;
+  --border-secondary: #4a4a4a;
+  --border-focus: #60a5fa;
+
+  /* Canvas colors */
+  --canvas-bg: #242424;
+  --canvas-grid: #2d2d2d;
+  --canvas-box-bg: #242424;
+  --canvas-box-border: #3a3a3a;
+  --canvas-box-shadow: rgba(0, 0, 0, 0.5);
+
+  /* Call stack colors */
+  --callstack-bg: #1e1e1e;
+  --callstack-header-bg: #242424;
+  --callstack-border: #3a3a3a;
+  --callstack-title: #888888;
+  --callstack-scrollbar-track: rgba(58, 58, 58, 0.4);
+  --callstack-scrollbar-thumb: #4a4a4a;
+
+  /* Button colors */
+  --button-bg: #2d2d2d;
+  --button-hover: #3a3a3a;
+  --button-active: #4a4a4a;
+
+  /* Accent colors */
+  --accent-blue: #60a5fa;
+  --accent-blue-hover: #3b82f6;
+  --accent-red: #f87171;
+  --accent-red-hover: #ef4444;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.7);
+
+  /* Memory-viz box styling */
+  --text-id-color: #FFC266;
+  --text-type-color: #B8B8FF;
+  --text-value-color: #E8E8E8;
+  --box-fill: #2d2d2d;
+  --box-line-color: #888888;
+  --highlight-value-text-color: #e8e8e8;
+  --highlight-id-text-color: #d0d0d0;
+  --fade-text-color: #6a6a6a;
+  --hide-text-color: #2d2d2d;
+  --highlight-box-fill: #3a3a3a;
+  --highlight-box-line-color: #b0b0b0;
+  --fade-box-fill: #2d2d2d;
+  --fade-box-line-color: #3a3a3a;
+  --hide-box-fill: #2d2d2d;
+}
+
+/* Apply theme to body */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 200ms ease, color 200ms ease;
+}

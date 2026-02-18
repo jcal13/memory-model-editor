@@ -1,5 +1,4 @@
 :root {
-  --editor-background: #f1f5f9;
   --resize-handle-width: 8px;
   --resize-handle-hover-width: 4px;
 }
@@ -10,7 +9,8 @@
   width: 100%;
   overflow: hidden;
   align-items: stretch;
-  background: var(--editor-background);
+  background: var(--bg-tertiary);
+  transition: background-color 200ms ease;
 }
 
 .palettePanel {
@@ -31,11 +31,7 @@
   transition: none;
 }
 
-.paletteResizeHandle {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
+.resizeDivider {
   width: var(--resize-handle-width);
   cursor: col-resize;
   z-index: 1000;
@@ -43,27 +39,41 @@
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.paletteResizeHandle:hover {
-  background: rgba(59, 130, 246, 0.15);
+.resizeDivider:hover {
+  background: var(--bg-hover);
 }
 
-.paletteResizeHandle:hover::after {
+.resizeDivider::before {
   content: "";
   position: absolute;
-  right: 50%;
+  left: 50%;
   top: 50%;
-  transform: translate(50%, -50%);
+  transform: translate(-50%, -50%);
   width: var(--resize-handle-hover-width);
   height: 40px;
-  background: rgba(59, 130, 246, 0.6);
+  background: transparent;
   border-radius: 2px;
+  transition: background 0.15s ease;
 }
 
-.paletteResizeHandle:active {
-  background: rgba(59, 130, 246, 0.25);
+.resizeDivider:hover::before {
+  background: var(--accent-blue);
+}
+
+.resizeDivider:active {
+  background: var(--bg-tertiary);
+}
+
+.resizeDivider:active::before {
+  background: var(--accent-blue-hover);
 }
 
 .mainContainer {
@@ -103,40 +113,6 @@
   transition: none !important;
 }
 
-.infoPanelResizeHandle {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: var(--resize-handle-width);
-  cursor: col-resize;
-  z-index: 1000;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  transition: background-color 0.2s ease;
-}
-
-.infoPanelResizeHandle:hover {
-  background: rgba(59, 130, 246, 0.15);
-}
-
-.infoPanelResizeHandle:hover::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: var(--resize-handle-hover-width);
-  height: 40px;
-  background: rgba(59, 130, 246, 0.6);
-  border-radius: 2px;
-}
-
-.infoPanelResizeHandle:active {
-  background: rgba(59, 130, 246, 0.25);
-}
 
 .modeToggleSwitch {
   position: absolute;

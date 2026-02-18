@@ -2,45 +2,56 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
   width: 100%;
 }
 
 .invalidateButton {
-  background-color: #3b82f6;
+  background-color: var(--accent-blue);
   color: white;
-  padding: 10px 26px;
-  font-size: 0.95rem;
-  border-radius: 8px;
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 7px;
   border: none;
   cursor: pointer;
-  height: 38px;
+  height: 32px;
   width: max-content;
-  transition: all 160ms ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  letter-spacing: 0.01em;
+  transition: background-color 160ms ease, box-shadow 160ms ease, transform 80ms ease;
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.25);
 }
 
 .invalidateButton:hover {
-  background-color: #2563eb;
+  background-color: var(--accent-blue-hover);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.35);
+}
+
+.invalidateButton:active {
+  transform: scale(0.97);
 }
 
 .removeButton {
-  background-color: #ef4444;
+  background-color: var(--accent-red);
   color: white;
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  height: 32px;
+  width: max-content;
+  letter-spacing: 0.01em;
+  transition: background-color 160ms ease, box-shadow 160ms ease, transform 80ms ease;
+  box-shadow: 0 1px 3px rgba(239, 68, 68, 0.2);
 }
 
 .removeButton:hover {
-  background-color: #dc2626;
+  background-color: var(--accent-red-hover);
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
 }
 
-.removeButton {
-  padding: 10px 26px;
-  font-size: 0.95rem;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  height: 38px;
-  width: max-content;
-  transition: all 160ms ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+.removeButton:active {
+  transform: scale(0.97);
 }

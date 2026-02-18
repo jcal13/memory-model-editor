@@ -1,9 +1,12 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import ReactDOM from "react-dom";
 import Draggable from "react-draggable";
 import IdSelectorPanel from "./IdSelectorPanel";
-import { useIdListSync, useSinglePanelRegistry } from "../hooks/useEffect";
-import { usePanelRef } from "../hooks/useRef";
+import {
+  useListSync as useIdListSync,
+  useSinglePanelRegistry,
+  usePanelRef,
+} from "../hooks/useEditor";
 import styles from "./IdEditor.module.css";
 import { ID } from "../../shared/types";
 
@@ -89,6 +92,60 @@ export default function IdEditor({
     return used;
   }, [elements]);
 
+  const toggleOpen = useCallback(() => setOpen((v) => !v), []);
+  const handleAdd = useCallback((id: ID) => {
+    if (!list.includes(id)) {
+      setList((prev) => [...prev, id]);
+      onAdd?.(id);
+    }
+  }, [list, onAdd]);
+
+  const handleRemove = useCallback((id: ID) => {
+    setList((prev) => prev.filter((v) => v !== id));
+    onRemove?.(id);
+  }, [onRemove]);
+
+  const handleSelect = useCallback((id: ID) => {
+    onSelect(id);
+    closeSelf();
+  }, [onSelect, closeSelf]);
+
+  // When the trigger button is focused (e.g. via Tab), pressing a digit
+  // immediately assigns that ID if it exists — no need to open the panel.
+  const handleButtonKeyDown = useCallback((e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key >= '0' && e.key <= '9') {
+      const typedNumber = Number(e.key);
+      if (list.includes(typedNumber as ID)) {
+        e.preventDefault();
+        onSelect(typedNumber as ID);
+      }
+    }
+  }, [list, onSelect]);
+
+  // Handle keypresses for quick ID selection when panel is open
+  useEffect(() => {
+    if (!open || !editable) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if typing in an input or textarea
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
+      // Check if a digit key was pressed (0-9)
+      if (e.key >= '0' && e.key <= '9') {
+        const typedNumber = Number(e.key);
+        // Only select if this ID exists in the list
+        if (list.includes(typedNumber as ID)) {
+          e.preventDefault();
+          handleSelect(typedNumber as ID);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [open, editable, list, handleSelect]);
+
   if (!editable) {
     return (
       <div data-testid="id-selector-panel">
@@ -99,27 +156,12 @@ export default function IdEditor({
     );
   }
 
-  const toggleOpen = () => setOpen((v) => !v);
-  const handleAdd = (id: ID) => {
-    if (!list.includes(id)) {
-      setList((prev) => [...prev, id]);
-      onAdd?.(id);
-    }
-  };
-  const handleRemove = (id: ID) => {
-    setList((prev) => prev.filter((v) => v !== id));
-    onRemove?.(id);
-  };
-  const handleSelect = (id: ID) => {
-    onSelect(id);
-    closeSelf();
-  };
-
   return (
     <div data-testid="id-selector-panel">
       <button
         type="button"
         onClick={toggleOpen}
+        onKeyDown={handleButtonKeyDown}
         className={`${buttonClassName} ${
           open ? styles.activeOutline : ""
         }`.trim()}

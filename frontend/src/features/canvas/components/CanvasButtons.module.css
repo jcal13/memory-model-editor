@@ -1,117 +1,184 @@
 /* Base button styling */
 .baseButton {
   padding: 8px 12px;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
   font-size: 0.85rem;
-  width: max-content;
+  width: 100%;
   transition: all 160ms ease;
+  box-shadow: var(--shadow-sm);
 }
 
 /* Clear Canvas Button */
 .clearButton {
-  position: absolute;
-  top: 35px;
-  right: 35px;
-  z-index: 9999;
-  background-color: #ef4444;
+  background-color: var(--accent-red);
   color: white;
+  border-color: var(--accent-red);
 }
 
 .clearButton:hover {
-  background-color: #dc2626;
+  background-color: var(--accent-red-hover);
+  border-color: var(--accent-red-hover);
+  box-shadow: var(--shadow-md);
 }
 
 .clearButton:active {
-  background-color: #b91c1c;
+  background-color: var(--accent-red-hover);
+  border-color: var(--accent-red-hover);
+  filter: brightness(0.9);
+  box-shadow: var(--shadow-sm);
+}
+
+.clearButton:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* Undo Button */
+.undoButton {
+  background-color: var(--button-bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+}
+
+.undoButton:hover:not(:disabled) {
+  background-color: var(--button-hover);
+  border-color: var(--border-secondary);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.undoButton:active:not(:disabled) {
+  background-color: var(--button-active);
+  box-shadow: var(--shadow-sm);
+}
+
+.undoButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.undoButton:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 /* Download Button Container */
 .downloadContainer {
-  position: absolute;
-  bottom: 35px;
-  left: 35px;
-  z-index: 9999;
+  position: relative;
+  width: 100%;
 }
 
 .downloadButton {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  background-color: #3b82f6;
+  background-color: var(--accent-blue);
   color: white;
+  width: 100%;
+  border-color: var(--accent-blue);
 }
 
 .downloadButton:hover {
-  background-color: #2563eb;
+  background-color: var(--accent-blue-hover);
+  border-color: var(--accent-blue-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.downloadButton:active {
+  background-color: var(--accent-blue-hover);
+  border-color: var(--accent-blue-hover);
+  filter: brightness(0.9);
+  box-shadow: var(--shadow-sm);
+}
+
+.downloadButton:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 .dropdownCaret {
   font-size: 0.85em;
   opacity: 0.8;
+  transition: transform 160ms ease;
 }
 
-/* Download Menu */
-.downloadMenu {
-  position: absolute;
-  bottom: calc(100% + 10px);
-  left: 0;
+.caretRotated {
+  transform: rotate(180deg);
+}
+
+/* Download Options (inline dropdown) */
+.downloadOptions {
   display: flex;
   flex-direction: column;
-  padding: 4px;
-  background-color: #ffffff;
-  color: #1e293b;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  min-width: 180px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+  gap: 6px;
+  margin-top: 8px;
+  padding-left: 8px;
+  border-left: 2px solid var(--border-primary);
+  transition: border-color 200ms ease;
 }
 
-.downloadMenu::after {
-  content: "";
-  position: absolute;
-  bottom: -6px;
-  left: 14px;
-  width: 10px;
-  height: 10px;
-  background: #fff;
-  border-left: 1px solid #e2e8f0;
-  border-bottom: 1px solid #e2e8f0;
-  transform: rotate(45deg);
-}
-
-.downloadMenu button {
-  padding: 8px 10px;
-  border: none;
-  background: transparent;
-  color: #1e293b;
+.downloadOptionButton {
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
   text-align: left;
-  border-radius: 6px;
-  font-weight: 500;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: background 160ms ease;
+  justify-content: flex-start;
+  padding-left: 16px;
+  transition: background-color 160ms ease, color 160ms ease;
 }
 
-.downloadMenu button:hover {
-  background-color: #f1f5f9;
+.downloadOptionButton:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.downloadOptionButton:active {
+  background-color: var(--bg-hover);
+}
+
+/* Feedback Button */
+.feedbackButton {
+  background-color: var(--button-bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: fit-content;
+}
+
+.feedbackButton:hover {
+  background-color: var(--button-hover);
+  border-color: var(--border-secondary);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.feedbackButton:active {
+  background-color: var(--button-active);
+  box-shadow: var(--shadow-sm);
+}
+
+.feedbackButton:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 /* Zoom Controls */
 .zoomControls {
-  position: absolute;
-  bottom: 35px;
-  right: 35px;
-  z-index: 9999;
   display: flex;
   flex-direction: row;
   gap: 4px;
+  width: 100%;
 }
 
 .zoomButton {
-  width: 36px;
+  flex: 1;
   height: 36px;
   padding: 0;
   display: flex;
@@ -120,22 +187,30 @@
   font-size: 1.2rem;
   font-weight: 600;
   line-height: 1;
-  background-color: #ffffff;
-  color: #334155;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  background-color: var(--button-bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all 160ms ease;
 }
 
 .zoomButton:hover:not(:disabled) {
-  background-color: #f1f5f9;
-  border-color: #cbd5e1;
+  background-color: var(--button-hover);
+  border-color: var(--border-secondary);
 }
 
 .zoomButton:active:not(:disabled) {
-  background-color: #e2e8f0;
+  background-color: var(--button-active);
 }
 
 .zoomButton:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+.zoomButton:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }

@@ -21,8 +21,8 @@ export type {
   ElementDimensions,
 } from "./boundary.helpers";
 
-// Configuration exports
-export { BOX_CONFIGS } from "./box.configs";
+// Configuration exports (now unified in shared/boxConfig)
+// BOX_CONFIGS moved to shared/boxConfig for unified canvas + palette rendering
 
 // Helper function exports
 export {
@@ -51,7 +51,6 @@ export {
 export {
   createBoxRenderer,
   getBoxDimensions,
-  isBoxTypeSupported,
 } from "./box.renderer";
 
 // Validation exports

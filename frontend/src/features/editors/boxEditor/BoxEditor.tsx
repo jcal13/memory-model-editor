@@ -2,8 +2,10 @@ import styles from "../Editor.module.css";
 import ButtonDisplays from "./buttons/ButtonDisplays";
 import Header from "./Header";
 import Content from "./Content";
-import { useModule } from "../hooks/useEffect";
+import { BoxEditorType } from "../../shared/types";
+import { useState } from "react";
 import {
+  useEditorAutoSave as useModule,
   useGlobalStates,
   usePrimitiveStates,
   useFunctionStates,
@@ -12,9 +14,8 @@ import {
   useElementIdState,
   useClassStates,
   useInvalidatedState,
-} from "../hooks/useState";
-import { BoxEditorType } from "../../shared/types";
-import { useGlobalRefs } from "../hooks/useRef";
+  useGlobalRefs,
+} from "../hooks/useEditor";
 
 /**
  * BoxEditorModule renders the full editable UI for a memory box,
@@ -68,6 +69,9 @@ const BoxEditorModule = ({
   ] = useClassStates(metadata);
 
   const [invalidated, setInvalidated] = useInvalidatedState(metadata);
+
+  // Function name list for the selector panel — seeded with __init__ by default
+  const [functionNames, setFunctionNames] = useState<string[]>(["__init__"]);
   // -----------------------------------
 
   const collectionData =
@@ -89,10 +93,8 @@ const BoxEditorModule = ({
   );
   return (
     <div ref={moduleRef} className={`drag-handle ${styles.boxEditorModule}`}>
-      <button className={styles.removeItem} onClick={onClose}>
-        ×
-      </button>
-      {/* Top section: displays type-specific headers (id, selector, name) */}
+
+      {/* Top section: header with id, type, name + close button */}
       <Header
         element={metadata}
         dataType={dataType}
@@ -101,6 +103,8 @@ const BoxEditorModule = ({
         setValue={setContentValue}
         functionName={functionName}
         setFunctionName={setFunctionName}
+        functionNames={functionNames}
+        setFunctionNames={setFunctionNames}
         classes={classes}
         ownClasses={ownClassName}
         addClasses={addClasses}
@@ -113,46 +117,51 @@ const BoxEditorModule = ({
         removeId={removeId}
         sandbox={sandbox}
         elements={elements}
+        onClose={onClose}
       />
 
-      {/* Middle section: displays the input or editable content for the box */}
-      <Content
-        metadata={metadata}
-        dataType={dataType}
-        value={contentValue}
-        setValue={setContentValue}
-        functionParams={functionParams}
-        setFunctionParams={setFunctionParams}
-        collectionItems={collectionItems}
-        setCollectionItems={setCollectionItems}
-        collectionPairs={collectionPairs}
-        setCollectionPairs={setCollectionPairs}
-        ownClassVariables={ownClassVariables}
-        setOwnClassVariables={setOwnClassVariables}
-        ids={ids}
-        addId={addId}
-        removeId={removeId}
-        sandbox={sandbox}
-        elements={elements}
-      />
+      {/* Middle section: editable content */}
+      <div className={styles.contentArea}>
+        <Content
+          metadata={metadata}
+          dataType={dataType}
+          value={contentValue}
+          setValue={setContentValue}
+          functionParams={functionParams}
+          setFunctionParams={setFunctionParams}
+          collectionItems={collectionItems}
+          setCollectionItems={setCollectionItems}
+          collectionPairs={collectionPairs}
+          setCollectionPairs={setCollectionPairs}
+          ownClassVariables={ownClassVariables}
+          setOwnClassVariables={setOwnClassVariables}
+          ids={ids}
+          addId={addId}
+          removeId={removeId}
+          sandbox={sandbox}
+          elements={elements}
+        />
+      </div>
 
-      {/* Bottom section: shows the remove button */}
-      <ButtonDisplays
-        element={metadata}
-        onSave={onSave}
-        onRemove={onRemove}
-        dataType={dataType}
-        value={contentValue}
-        hoverRemove={hoverRemove}
-        setHoverRemove={setHoverRemove}
-        functionName={functionName}
-        functionParams={functionParams}
-        className={ownClassName}
-        invalidated={invalidated}
-        onToggleInvalidate={setInvalidated}
-        ownClassVariables={ownClassVariables}
-        items={collectionItems}
-      />
+      {/* Bottom section: action buttons */}
+      <div className={styles.footerRow}>
+        <ButtonDisplays
+          element={metadata}
+          onSave={onSave}
+          onRemove={onRemove}
+          dataType={dataType}
+          value={contentValue}
+          hoverRemove={hoverRemove}
+          setHoverRemove={setHoverRemove}
+          functionName={functionName}
+          functionParams={functionParams}
+          className={ownClassName}
+          invalidated={invalidated}
+          onToggleInvalidate={setInvalidated}
+          ownClassVariables={ownClassVariables}
+          items={collectionItems}
+        />
+      </div>
     </div>
   );
 };

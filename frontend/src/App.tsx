@@ -1,11 +1,15 @@
 import "./App.css";
+import "./styles/theme.css";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import MemoryModelEditor from "./features/memoryModelEditor/MemoryModelEditor";
 
 function App() {
   return (
-    <div className="App">
-      <MemoryModelEditor sandbox={true} />
-    </div>
+    <ThemeProvider>
+      <div className="App">
+        <MemoryModelEditor sandbox={true} />
+      </div>
+    </ThemeProvider>
   );
 }
 

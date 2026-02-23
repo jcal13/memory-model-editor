@@ -40,6 +40,7 @@ const BoxEditorModule = ({
   removeClasses,
   sandbox = true,
   elements = [],
+  questionFunctionNames,
 }: BoxEditorType) => {
   // Shared hover state for remove button
   const { hoverRemove, setHoverRemove } = useGlobalStates();
@@ -70,8 +71,15 @@ const BoxEditorModule = ({
 
   const [invalidated, setInvalidated] = useInvalidatedState(metadata);
 
-  // Function name list for the selector panel — seeded with __init__ by default
-  const [functionNames, setFunctionNames] = useState<string[]>(["__init__"]);
+  // Function name list for the selector panel.
+  // In practice mode (non-sandbox), pre-populate with the question's function names.
+  // In sandbox mode, seed with __init__ as a default.
+  const [functionNames, setFunctionNames] = useState<string[]>(() => {
+    if (!sandbox && questionFunctionNames && questionFunctionNames.length > 0) {
+      return questionFunctionNames;
+    }
+    return ["__init__"];
+  });
   // -----------------------------------
 
   const collectionData =

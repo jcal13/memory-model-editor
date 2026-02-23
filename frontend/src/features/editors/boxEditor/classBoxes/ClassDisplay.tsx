@@ -34,7 +34,7 @@ const ClassDisplay = ({
     buttonClassName={styles.moduleIdBox}
     onRemove={removeClassName}
     editable={true}
-    sandbox={true}
+    sandbox={sandbox}
   />
 );
 

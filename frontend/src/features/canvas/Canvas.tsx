@@ -43,6 +43,7 @@ interface FloatingEditorProps {
   sandbox: boolean;
   elements: CanvasElement[];
   editorScale: number;
+  questionFunctionNames?: string[];
 }
 
 function FloatingEditor({
@@ -62,6 +63,7 @@ function FloatingEditor({
   sandbox,
   elements,
   editorScale,
+  questionFunctionNames,
 }: FloatingEditorProps) {
   const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -106,6 +108,7 @@ function FloatingEditor({
             removeClasses={removeClasses}
             sandbox={sandbox}
             elements={elements}
+            questionFunctionNames={questionFunctionNames}
           />
         </div>
       </div>
@@ -128,6 +131,7 @@ interface CanvasProps {
   scale?: number;
   onScaleChange?: (scale: number) => void;
   editorScale?: number;
+  questionFunctionNames?: string[];
 }
 
 function Canvas({
@@ -145,6 +149,7 @@ function Canvas({
   scale: externalScale,
   onScaleChange: externalOnScaleChange,
   editorScale = 1,
+  questionFunctionNames,
 }: CanvasProps) {
   const [openEditors, setOpenEditors] = useState<CanvasElement[]>([]);
   const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(
@@ -505,6 +510,7 @@ function Canvas({
             sandbox={sandbox}
             elements={elements}
             editorScale={editorScale}
+            questionFunctionNames={questionFunctionNames}
           />
         );
       })}
@@ -594,7 +600,8 @@ const areEqual = (prev: Readonly<CanvasProps>, next: Readonly<CanvasProps>) => {
     prev.classes === next.classes &&
     prev.sandbox === next.sandbox &&
     prev.scale === next.scale &&
-    prev.editorScale === next.editorScale
+    prev.editorScale === next.editorScale &&
+    prev.questionFunctionNames === next.questionFunctionNames
   );
 };
 

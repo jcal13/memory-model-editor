@@ -125,6 +125,23 @@ export default function MemoryModelEditor({
     clearHistory();
   };
 
+  // When a question loads in practice mode, seed elementClasses with the class names
+  // from the question's answer so the class selector shows them as pre-built options.
+  useEffect(() => {
+    if (!state.isSandboxMode || !currentQuestionData) return;
+    const questionClassNames = getQuestionClassNames(currentQuestionData);
+    if (questionClassNames.length === 0) return;
+    state.setElementClasses((prev) => {
+      const merged = [...prev];
+      for (const name of questionClassNames) {
+        if (!merged.includes(name)) {
+          merged.push(name);
+        }
+      }
+      return merged;
+    });
+  }, [currentQuestionData, state.isSandboxMode]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const masterErrorList: MasterErrorList = useMemo(
     () => createMasterErrorList(state.elements),
     [state.elements]
@@ -168,6 +185,35 @@ export default function MemoryModelEditor({
       prevClasses.filter((existingClass) => existingClass !== className)
     );
   };
+
+  const getQuestionFunctionNames = useCallback((questionData: any): string[] => {
+    if (!questionData?.answer || !Array.isArray(questionData.answer)) {
+      return [];
+    }
+    return questionData.answer
+      .filter((box: any) => box.type === ".frame" && typeof box.name === "string")
+      .map((box: any) => box.name as string);
+  }, []);
+
+  const getQuestionClassNames = useCallback((questionData: any): string[] => {
+    if (!questionData?.answer || !Array.isArray(questionData.answer)) {
+      return [];
+    }
+    const seen = new Set<string>();
+    const names: string[] = [];
+    for (const box of questionData.answer) {
+      if (
+        (box.type === ".class" || box.type === "object") &&
+        typeof box.name === "string"
+      ) {
+        if (!seen.has(box.name)) {
+          seen.add(box.name);
+          names.push(box.name);
+        }
+      }
+    }
+    return names;
+  }, []);
 
   const getRequiredBoxTypeNames = useCallback((questionData: any): BoxTypeName[] => {
     if (!questionData?.answer || !Array.isArray(questionData.answer)) {
@@ -464,6 +510,11 @@ export default function MemoryModelEditor({
               scale={canvasScale}
               onScaleChange={setCanvasScale}
               editorScale={editorScale}
+              questionFunctionNames={
+                state.isSandboxMode && currentQuestionData
+                  ? getQuestionFunctionNames(currentQuestionData)
+                  : undefined
+              }
             />
           </div>
 

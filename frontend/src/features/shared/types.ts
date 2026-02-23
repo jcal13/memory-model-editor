@@ -177,6 +177,7 @@ export interface BoxEditorType {
 
   sandbox?: boolean;
   elements?: any[];
+  questionFunctionNames?: string[];
 }
 
 export type Tab = "feedback" | "question";

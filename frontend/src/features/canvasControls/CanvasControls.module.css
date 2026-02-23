@@ -151,6 +151,12 @@
   transition: color 200ms ease;
 }
 
+.undoRedoRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
 .buttonWrapper {
   margin-bottom: 8px;
 }

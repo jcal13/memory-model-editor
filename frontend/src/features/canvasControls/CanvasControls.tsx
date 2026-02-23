@@ -86,15 +86,10 @@ export default function CanvasControls({
         {/* Actions Tab */}
         {activeTab === "actions" && (
           <div className={styles.tabContent}>
-            {onUndo && (
-              <div className={styles.buttonWrapper}>
-                <UndoButton onClick={onUndo} disabled={!canUndo} />
-              </div>
-            )}
-
-            {onRedo && (
-              <div className={styles.buttonWrapper}>
-                <RedoButton onClick={onRedo} disabled={!canRedo} />
+            {(onUndo || onRedo) && (
+              <div className={styles.undoRedoRow}>
+                {onUndo && <UndoButton onClick={onUndo} disabled={!canUndo} />}
+                {onRedo && <RedoButton onClick={onRedo} disabled={!canRedo} />}
               </div>
             )}
 

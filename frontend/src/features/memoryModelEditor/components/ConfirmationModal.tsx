@@ -91,18 +91,18 @@ export default function ConfirmationModal({
           <div className={styles.modalActions}>
             <button
               type="button"
+              className={styles.cancelButton}
+              onClick={onCancel}
+            >
+              {cancelLabel}
+            </button>
+            <button
+              type="button"
               className={styles.confirmButton}
               onClick={handleConfirm}
               autoFocus
             >
               {confirmLabel}
-            </button>
-            <button
-              type="button"
-              className={styles.cancelButton}
-              onClick={onCancel}
-            >
-              {cancelLabel}
             </button>
           </div>
         </main>

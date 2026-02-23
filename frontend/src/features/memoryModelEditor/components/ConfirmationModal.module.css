@@ -121,3 +121,42 @@
   font-size: 0.825rem;
   color: #64748b;
 }
+
+/* Dark mode overrides */
+:root[data-theme="dark"] .backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="dark"] .modal {
+  background: var(--bg-secondary);
+  border-color: var(--border-primary);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+:root[data-theme="dark"] .modalHeader {
+  background: var(--bg-tertiary);
+  border-bottom-color: var(--border-primary);
+}
+
+:root[data-theme="dark"] .modalTitle {
+  color: var(--text-primary);
+}
+
+:root[data-theme="dark"] .modalMessage {
+  color: var(--text-secondary);
+}
+
+:root[data-theme="dark"] .cancelButton {
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-color: var(--border-primary);
+}
+
+:root[data-theme="dark"] .cancelButton:hover {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-secondary);
+}
+
+:root[data-theme="dark"] .checkboxLabel {
+  color: var(--text-secondary);
+}

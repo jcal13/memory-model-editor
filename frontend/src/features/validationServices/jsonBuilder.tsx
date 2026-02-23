@@ -112,10 +112,12 @@ const parsePrimitiveValue = (type: string, value: string): any => {
  */
 const processFunctionFrames = (elements: CanvasElement[]): FrameEntry[] => {
   const frameEntries: FrameEntry[] = [];
+  let orderCounter = 0;
 
   elements.forEach(({ id, kind }) => {
     if (kind.name !== "function") return;
 
+    orderCounter++;
     const usedKeys = new Set<string>();
     const frameValue: Record<string, number | null> = {};
 
@@ -129,7 +131,7 @@ const processFunctionFrames = (elements: CanvasElement[]): FrameEntry[] => {
       name: kind.functionName || `func${id}`,
       id: null,
       value: frameValue,
-      order: kind.order ?? 0,
+      order: orderCounter,
     });
   });
 

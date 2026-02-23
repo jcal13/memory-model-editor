@@ -10,6 +10,7 @@ import {
   useMemoryModelEditorState,
   clearCanvasStorage,
 } from "./hooks/useMemoryModelEditorState";
+import { loadInitialUIData } from "./utils/localStorage";
 import { useMemoryModelEditorRefs } from "./hooks/useRef";
 import {
   useCanvasLocalStorage,
@@ -55,8 +56,9 @@ export default function MemoryModelEditor({
   );
 
   const [currentQuestionData, setCurrentQuestionData] = useState<any>(null);
-  const [canvasScale, setCanvasScale] = useState<number>(1);
-  const [editorScale, setEditorScale] = useState<number>(1);
+  const _initialUI = loadInitialUIData();
+  const [canvasScale, setCanvasScale] = useState<number>(_initialUI.canvasScale ?? 1);
+  const [editorScale, setEditorScale] = useState<number>(_initialUI.editorScale ?? 1);
 
   // Initialize undo history
   const { canUndo, canRedo, undo, redo, recordState, clearHistory } = useUndoHistory(
@@ -296,6 +298,8 @@ export default function MemoryModelEditor({
     sandboxMode: state.isSandboxMode,
     questionView: state.questionView,
     isInfoPanelOpen: state.isInfoPanelOpen,
+    canvasScale,
+    editorScale,
   });
 
   useResponsivePanels({

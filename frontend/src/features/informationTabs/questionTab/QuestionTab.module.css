@@ -25,15 +25,16 @@
 }
 
 .title {
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin: 0 0 20px 0;
-  letter-spacing: -0.02em;
-  padding: 0 0 12px 0;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  margin: 0 0 18px 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: none;
+  padding: 8px 0 8px 0;
   transition: color 200ms ease;
-  border-bottom: 2px solid var(--border-primary);
-  line-height: 1.3;
 }
 
 .selectors {
@@ -231,4 +232,15 @@
 
 .submitButton:active {
   background: #047857;
+}
+
+/* Dark mode overrides */
+:root[data-theme="dark"] .questionText code {
+  color: #fb7185;
+}
+
+:root[data-theme="dark"] .topicChip {
+  background: #1a2d3a;
+  color: #93c5fd;
+  border-color: #2d4a6a;
 }

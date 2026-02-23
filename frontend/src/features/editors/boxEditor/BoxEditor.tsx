@@ -73,12 +73,12 @@ const BoxEditorModule = ({
 
   // Function name list for the selector panel.
   // In practice mode (non-sandbox), pre-populate with the question's function names.
-  // In sandbox mode, seed with __init__ as a default.
+  // In sandbox mode, seed with __main__ as a default.
   const [functionNames, setFunctionNames] = useState<string[]>(() => {
     if (!sandbox && questionFunctionNames && questionFunctionNames.length > 0) {
       return questionFunctionNames;
     }
-    return ["__init__"];
+    return ["__main__"];
   });
   // -----------------------------------
 
@@ -97,11 +97,10 @@ const BoxEditorModule = ({
     collectionData,
     ownClassName,
     ownClassVariables,
-    invalidated
+    invalidated,
   );
   return (
     <div ref={moduleRef} className={`drag-handle ${styles.boxEditorModule}`}>
-
       {/* Top section: header with id, type, name + close button */}
       <Header
         element={metadata}

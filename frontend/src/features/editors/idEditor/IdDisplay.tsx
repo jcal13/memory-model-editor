@@ -33,7 +33,7 @@ const IdDisplay = ({
     currentId={ownId}
     buttonClassName={styles.moduleIdBox}
     onRemove={removeId}
-    editable={sandbox}
+    editable={true}
     sandbox={sandbox}
     elements={elements}
   />

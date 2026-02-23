@@ -124,7 +124,7 @@ const Header = ({
               onAdd={handleFunctionAdd}
               onRemove={handleFunctionRemove}
               buttonClassName={styles.moduleIdBox}
-              editable={sandbox}
+              editable={true}
               sandbox={sandbox}
             />
           ) : (

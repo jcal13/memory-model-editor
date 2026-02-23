@@ -97,15 +97,17 @@ const Header = ({
 
       {/* Meta row: ID chip left, type/class/function chip right */}
       <div className={styles.metaRow}>
-        <IdDisplay
-          ids={ids}
-          addId={addId}
-          ownId={ownId}
-          setElementId={setElementId}
-          removeId={removeId}
-          sandbox={sandbox}
-          elements={elements}
-        />
+        {kind !== "function" && (
+          <IdDisplay
+            ids={ids}
+            addId={addId}
+            ownId={ownId}
+            setElementId={setElementId}
+            removeId={removeId}
+            sandbox={sandbox}
+            elements={elements}
+          />
+        )}
         <div className={styles.metaRowRight}>
           {kind === "class" ? (
             <ClassDisplay

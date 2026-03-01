@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { CanvasElement } from "../../shared/types";
 import { buildJSONFromElements } from "../../validationServices/jsonBuilder";
 import html2canvas from "html2canvas";

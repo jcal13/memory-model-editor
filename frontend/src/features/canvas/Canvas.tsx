@@ -144,10 +144,8 @@ function Canvas({
   addClasses,
   removeClasses,
   sandbox = true,
-  onClear,
   onEditorOpenerReady,
   scale: externalScale,
-  onScaleChange: externalOnScaleChange,
   editorScale = 1,
   questionFunctionNames,
 }: CanvasProps) {
@@ -156,12 +154,11 @@ function Canvas({
     null
   );
   const [canvasHeight, setCanvasHeight] = useState<number | null>(null);
-  const [internalScale, setInternalScale] = useState(1);
+  const [internalScale] = useState(1);
   const [callStackWidth, setCallStackWidth] = useState(225);
 
   // Use external scale if provided, otherwise use internal
   const scale = externalScale !== undefined ? externalScale : internalScale;
-  const setScale = externalOnScaleChange || setInternalScale;
 
   const { svgRef } = useCanvasRefs();
   const wrapperRef = useRef<HTMLDivElement>(null);

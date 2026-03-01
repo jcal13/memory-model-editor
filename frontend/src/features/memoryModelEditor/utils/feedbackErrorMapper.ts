@@ -124,16 +124,6 @@ export function applyFeedbackErrors(
     }
 
     if (primaryElement && relatedElementIds.length > 0) {
-      // Create ElementError with all related element IDs
-      const elementError: ElementError = {
-        source: ErrorSource.FEEDBACK,
-        type: feedbackError.type,
-        message: feedbackError.message,
-        field: feedbackError.field,
-        relatedElementIds: relatedElementIds,
-        severity: feedbackError.severity || "error",
-      };
-
       const existing = errorsByElement.get(primaryElement) || [];
       existing.push(feedbackError);
       errorsByElement.set(primaryElement, existing);

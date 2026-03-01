@@ -72,9 +72,7 @@ const CallStack: React.FC<CallStackProps> = ({
 }) => {
   const clipPathId = useId();
 
-  const [viewportHeight, setViewportHeight] = useState<number>(() => {
-    return window.innerHeight;
-  });
+  const [viewportHeight] = useState<number>(() => window.innerHeight);
 
   const yPosition = y;
 

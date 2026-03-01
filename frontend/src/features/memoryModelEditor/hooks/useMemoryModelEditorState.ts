@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   CanvasElement,
-  ID,
   SubmissionResult,
   Tab,
   PaletteTab,

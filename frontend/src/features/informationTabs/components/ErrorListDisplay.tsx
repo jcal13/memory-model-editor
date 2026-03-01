@@ -22,7 +22,6 @@ export default function ErrorListDisplay({
   errors,
   elements,
   setElements,
-  onOpenEditor,
   title = "Errors",
   showTitle = true,
   isSandboxMode = false,
@@ -81,7 +80,6 @@ export default function ErrorListDisplay({
 
   const parseErrorMessage = (
     message: string,
-    elementType: string,
     isSandboxMode: boolean
   ) => {
     let displayMessage = processErrorMessage(message, isSandboxMode);
@@ -134,7 +132,6 @@ export default function ErrorListDisplay({
           {errors.map((item, index) => {
             const { displayMessage, errorType } = parseErrorMessage(
               item.error.message,
-              item.elementType,
               isSandboxMode
             );
 

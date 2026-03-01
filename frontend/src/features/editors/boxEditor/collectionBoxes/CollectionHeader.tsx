@@ -23,7 +23,6 @@ interface Props {
  * This component is typically used at the top of collection editors (like list, set, tuple, or dict).
  */
 const CollectionHeader = ({
-  element,
   ids,
   addId,
   ownId,

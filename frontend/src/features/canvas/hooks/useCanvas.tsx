@@ -9,7 +9,6 @@ import { CanvasElement } from "../../shared/types";
 import { DragState, BoxDimensions } from "../utils/box.types";
 import {
   getCallStackBounds,
-  constrainPositionAwayFromCallStack,
   smoothlyConstrainDragPosition
 } from "../utils/boundary.helpers";
 

@@ -302,7 +302,7 @@ function Canvas({
       event.preventDefault();
       const boxType = event.dataTransfer.getData("application/box-type");
 
-      const newKind = createNewElement(boxType, elements);
+      const newKind = createNewElement(boxType);
       if (!newKind) return;
 
       const svg = svgRef.current;
@@ -417,25 +417,7 @@ function Canvas({
         const [movedElement] = reordered.splice(sourceIndex, 1);
         reordered.splice(targetIndex, 0, movedElement);
 
-        // Update order properties
-        const reorderedFunctions = reordered.filter(
-          (el) => el.kind.name === "function"
-        );
-        const orderMapping = new Map<number, number>();
-
-        reorderedFunctions.forEach((func, index) => {
-          orderMapping.set(func.boxId, index + 1);
-        });
-
-        return reordered.map((el) => {
-          if (el.kind.name === "function" && orderMapping.has(el.boxId)) {
-            return {
-              ...el,
-              kind: { ...el.kind, order: orderMapping.get(el.boxId)! },
-            };
-          }
-          return el;
-        });
+        return reordered;
       });
     },
     [setElements]
@@ -530,10 +512,7 @@ function Canvas({
 }
 
 // Helper functions
-function createNewElement(
-  boxType: string,
-  elements: CanvasElement[]
-): BoxType | null {
+function createNewElement(boxType: string): BoxType | null {
   switch (boxType) {
     case "none":
       return { name: "primitive", type: "NoneType", value: "None" };
@@ -547,19 +526,14 @@ function createNewElement(
       return { name: "primitive", type: "bool", value: "false" };
     case "primitive":
       return { name: "primitive", type: "NoneType", value: "None" };
-    case "function": {
-      const functionCount = elements.filter(
-        (el) => el.kind.name === "function"
-      ).length;
+    case "function":
       return {
         name: "function",
         type: "function",
         value: null,
         functionName: "NoFunction",
         params: [],
-        order: functionCount + 1,
       };
-    }
     case "list":
       return { name: "list", type: "list", value: [] };
     case "tuple":

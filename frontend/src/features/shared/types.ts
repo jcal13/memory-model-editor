@@ -52,7 +52,6 @@ export type FunctionKind = {
   value: null;
   functionName: string;
   params: FunctionParams[];
-  order: number;
 };
 
 export interface ListKind {
@@ -147,10 +146,6 @@ export interface SubmissionResult {
   correct: boolean;
   errors: FeedbackError[]; // Changed from string[] to structured errors
 }
-
-// Legacy type alias for backwards compatibility
-export type ValidationError = ElementError;
-export const ValidationErrorType = ErrorType;
 
 export type ID = number | "_";
 export type ClassID = string | "_";

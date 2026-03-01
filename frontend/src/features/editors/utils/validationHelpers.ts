@@ -5,7 +5,7 @@
  * in editor components.
  */
 
-import { ValidationError } from "../../shared/types";
+import { ElementError } from "../../shared/types";
 
 /**
  * Checks if a specific field has validation errors
@@ -14,7 +14,7 @@ import { ValidationError } from "../../shared/types";
  * @returns True if the field has errors
  */
 export function hasFieldError(
-  errors: ValidationError[] | undefined,
+  errors: ElementError[] | undefined,
   field: string
 ): boolean {
   if (!errors || errors.length === 0) return false;
@@ -27,7 +27,7 @@ export function hasFieldError(
  * @returns Set of invalid ID numbers
  */
 export function getInvalidIds(
-  errors: ValidationError[] | undefined
+  errors: ElementError[] | undefined
 ): Set<number> {
   if (!errors || errors.length === 0) return new Set();
   
@@ -48,7 +48,7 @@ export function getInvalidIds(
  * @returns True if the ID is invalid
  */
 export function isIdInvalid(
-  errors: ValidationError[] | undefined,
+  errors: ElementError[] | undefined,
   id: number | string | null
 ): boolean {
   if (typeof id !== "number") return false;
@@ -73,9 +73,9 @@ export function getErrorClass(hasError: boolean, baseClass: string): string {
  * @returns Array of validation errors related to this ID
  */
 export function getErrorsForId(
-  errors: ValidationError[] | undefined,
+  errors: ElementError[] | undefined,
   id: number | string | null
-): ValidationError[] {
+): ElementError[] {
   if (!errors || errors.length === 0 || typeof id !== "number") return [];
   return errors.filter((error) => error.invalidId === id);
 }

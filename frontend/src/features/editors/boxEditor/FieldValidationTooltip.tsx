@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import styles from "./FieldValidationTooltip.module.css";
-import { ValidationError } from "../../shared/types";
+import { ElementError } from "../../shared/types";
 
 interface FieldValidationTooltipProps {
-  errors: ValidationError[];
+  errors: ElementError[];
   children: React.ReactNode;
 }
 

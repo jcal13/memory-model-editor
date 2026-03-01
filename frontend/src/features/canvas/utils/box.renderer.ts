@@ -8,7 +8,6 @@ import { CanvasElement } from "../../shared/types";
 import { MemoryVizConfig } from "./box.types";
 import {
   getBoxConfig,
-  DEFAULT_DIMENSIONS,
   DEFAULT_CANVAS_STYLE,
 } from "../../shared/boxConfig";
 

@@ -44,8 +44,19 @@ interface QuestionData {
   question: string;
   code: string[];
   answer: unknown;
+  description?: string | null;
   topics?: string[] | null;
   canvasConfig?: CanvasData | null;
+}
+
+function formatSource(description: string): string {
+  // "CSC148 2023 midterm 1" → "CSC148 · 2023 · Midterm 1"
+  // "CSC148 2024 final"     → "CSC148 · 2024 · Final"
+  const parts = description.trim().split(/\s+/);
+  if (parts.length < 2) return description;
+  const [course, year, ...rest] = parts;
+  const label = rest.map((p, i) => (i === 0 ? p.charAt(0).toUpperCase() + p.slice(1) : p)).join(" ");
+  return label ? `${course} · ${year} · ${label}` : `${course} · ${year}`;
 }
 
 interface QuestionTabProps {
@@ -429,7 +440,23 @@ export default function QuestionTab({
   return (
     <>
       <div className={styles.wrapper}>
-        <h1 className={styles.title}>{getHeading()}</h1>
+        <div className={styles.titleRow}>
+          {(view === "list" || view === "question") && (
+            <button
+              type="button"
+              onClick={view === "list" ? () => { setQuestionIndex(null); setView("root"); } : navigateToList}
+              className={styles.backBtn}
+            >
+              ← Back
+            </button>
+          )}
+          <div className={styles.titleStack}>
+            <h1 className={styles.title}>{getHeading()}</h1>
+            {view === "question" && questionType === "test" && questionData?.description && (
+              <p className={styles.sourceText}>{formatSource(questionData.description)}</p>
+            )}
+          </div>
+        </div>
 
         {view === "root" && (
           <div className={styles.selectors}>
@@ -464,19 +491,6 @@ export default function QuestionTab({
 
         {view === "list" && (
           <>
-            <div className={styles.backRow}>
-              <button
-                type="button"
-                onClick={() => {
-                  setQuestionIndex(null);
-                  setView("root");
-                }}
-                className={styles.backBtn}
-              >
-                ← Back
-              </button>
-            </div>
-
             <div className={styles.scroller}>
               <div className={styles.questionGrid}>
                 {Array.from({ length: questionCount }, (_, index) => {
@@ -501,16 +515,6 @@ export default function QuestionTab({
 
         {view === "question" && questionData && (
           <>
-            <div className={styles.backRow}>
-              <button
-                type="button"
-                onClick={navigateToList}
-                className={styles.backBtn}
-              >
-                ← Back
-              </button>
-            </div>
-
             <div className={styles.questionArea}>
               <details className={styles.topicsSection}>
                 <summary className={styles.topicsSummary}>Topics</summary>

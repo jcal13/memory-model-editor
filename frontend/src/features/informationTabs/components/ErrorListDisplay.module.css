@@ -7,18 +7,18 @@
 }
 
 .title {
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin: 0 0 20px 0;
-  letter-spacing: -0.02em;
-  padding: 0 0 12px 0;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  margin: 0 0 18px 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: none;
+  padding: 0 0 8px 0;
   background-color: transparent;
   font-style: normal;
-  text-align: left;
   transition: color 200ms ease;
-  border-bottom: 2px solid var(--border-primary);
-  line-height: 1.3;
 }
 
 /* Error summary */
@@ -90,7 +90,7 @@
   align-items: center;
   gap: 6px;
   font-size: 0.9rem;
-  color: #1e293b;
+  color: var(--text-secondary);
 }
 
 .elementInfo strong {
@@ -99,7 +99,7 @@
 
 .elementType {
   font-size: 0.78rem;
-  color: #94a3b8;
+  color: var(--text-muted);
   font-weight: 400;
 }
 
@@ -125,4 +125,51 @@
   font-size: 0.78rem;
   color: #991b1b;
   border: 1px solid #fca5a5;
+}
+
+/* Dark mode overrides */
+:root[data-theme="dark"] .errorSummary {
+  background-color: #450a0a;
+  border-left-color: #f87171;
+}
+
+:root[data-theme="dark"] .errorCount {
+  color: #f87171;
+}
+
+:root[data-theme="dark"] .errorLabel {
+  color: #fca5a5;
+}
+
+:root[data-theme="dark"] .errorItem {
+  background-color: #450a0a;
+  border-color: #7f1d1d;
+  border-left-color: #f87171;
+}
+
+:root[data-theme="dark"] .errorItem:hover {
+  background-color: #5a1010;
+  box-shadow: 0 2px 8px rgba(248, 113, 113, 0.2);
+}
+
+:root[data-theme="dark"] .errorIcon {
+  color: #f87171;
+}
+
+:root[data-theme="dark"] .elementInfo strong {
+  color: #fca5a5;
+}
+
+:root[data-theme="dark"] .errorMessage {
+  color: #fca5a5;
+}
+
+:root[data-theme="dark"] .errorField {
+  color: #fca5a5;
+}
+
+:root[data-theme="dark"] .errorField code {
+  background-color: #5a1010;
+  color: #fca5a5;
+  border-color: #7f1d1d;
 }

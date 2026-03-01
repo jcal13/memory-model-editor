@@ -1,15 +1,15 @@
 import React from "react";
-import { ValidationError } from "../../shared/types";
-import styles from "./ValidationErrorDisplay.module.css";
+import { ElementError } from "../../shared/types";
+import styles from "./ElementErrorDisplay.module.css";
 
-interface ValidationErrorDisplayProps {
-  errors?: ValidationError[];
+interface ElementErrorDisplayProps {
+  errors?: ElementError[];
 }
 
 /**
  * Component to display validation errors in the box editor
  */
-const ValidationErrorDisplay: React.FC<ValidationErrorDisplayProps> = ({
+const ElementErrorDisplay: React.FC<ElementErrorDisplayProps> = ({
   errors,
 }) => {
   if (!errors || errors.length === 0) {
@@ -52,4 +52,4 @@ const ValidationErrorDisplay: React.FC<ValidationErrorDisplayProps> = ({
   );
 };
 
-export default ValidationErrorDisplay;
+export default ElementErrorDisplay;

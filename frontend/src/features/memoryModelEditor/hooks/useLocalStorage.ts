@@ -21,6 +21,8 @@ export function useUILocalStorage(state: UIState): void {
     state.sandboxMode,
     state.questionView,
     state.isInfoPanelOpen,
+    state.canvasScale,
+    state.editorScale,
   ]);
 }
 

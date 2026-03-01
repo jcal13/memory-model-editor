@@ -88,7 +88,7 @@
         }
       }
     ],
-    "description": "2023 midterm 1",
+    "description": "CSC148 2023 midterm 1",
     "topics": [
       "Classes",
       "Inheritance",
@@ -244,7 +244,7 @@
         }
       }
     ],
-    "description": "2024 final",
+    "description": "CSC148 2024 final",
     "topics": [
       "Recursion",
       "Constructors",
@@ -344,7 +344,7 @@
         ]
       }
     ],
-    "description": "2024 midterm 1",
+    "description": "CSC148 2024 midterm 1",
     "topics": [
       "Functions",
       "Aliasing",
@@ -430,7 +430,7 @@
         ]
       }
     ],
-    "description": "2017 final",
+    "description": "CSC148 2017 final",
     "topics": [
       "Shallow Copy",
       "Lists",
@@ -534,7 +534,7 @@
         }
       }
     ],
-    "description": "2017 midterm 1",
+    "description": "CSC148 2017 midterm 1",
     "topics": [
       "Queues",
       "Loops",
@@ -615,7 +615,7 @@
         ]
       }
     ],
-    "description": "2018 midterm",
+    "description": "CSC148 2018 midterm",
     "topics": [
       "Aliasing",
       "Mutation",
@@ -721,7 +721,7 @@
         ]
       }
     ],
-    "description": "2019 midterm 1",
+    "description": "CSC148 2019 midterm 1",
     "topics": [
       "Shallow Copy",
       "Lists",
@@ -827,7 +827,7 @@
         ]
       }
     ],
-    "description": "2019 midterm 2",
+    "description": "CSC148 2019 midterm 2",
     "topics": [
       "Aliasing",
       "Mutation",
@@ -909,7 +909,7 @@
         "value": "snacks"
       }
     ],
-    "description": "2019 midterm 3",
+    "description": "CSC148 2019 midterm 3",
     "topics": [
       "Classes",
       "Aliasing",
@@ -1013,7 +1013,7 @@
         ]
       }
     ],
-    "description": "2022 final",
+    "description": "CSC148 2022 final",
     "topics": [
       "Aliasing",
       "Mutation",

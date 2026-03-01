@@ -214,7 +214,6 @@ export function smoothlyConstrainDragPosition(
 
   // Calculate the callstack boundary with padding
   const padding = CALLSTACK_PADDING;
-  const callStackLeft = callStackBounds.x;
   const callStackRight = callStackBounds.x + callStackBounds.width + padding;
   const callStackTop = callStackBounds.y;
   const callStackBottom = callStackBounds.y + callStackBounds.height;

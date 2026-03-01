@@ -140,18 +140,6 @@
   border-color: var(--border-secondary);
 }
 
-.typeSelector {
-  font-size: 0.82rem;
-  font-weight: 500;
-  padding: 4px 8px;
-  border: 1px solid var(--border-primary);
-  border-radius: 6px;
-  background-color: var(--bg-primary);
-  color: var(--text-secondary);
-  cursor: pointer;
-  box-sizing: border-box;
-  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
-}
 
 .typeDisplay {
   display: inline-flex;
@@ -397,8 +385,7 @@
   gap: 16px;
 }
 
-.ItemContainer,
-.removeButtonContainer {
+.ItemContainer {
   display: flex;
   flex-direction: column;
   gap: 8px;

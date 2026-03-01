@@ -43,7 +43,6 @@ const ButtonDisplays = ({
   onRemove,
   dataType,
   value,
-  hoverRemove,
   setHoverRemove,
   functionName,
   functionParams,

@@ -6,7 +6,6 @@ interface FrameEntry {
   name: string;
   id: null;
   value: Record<string, number | null>;
-  order: number;
 }
 
 interface ValueEntry {
@@ -129,7 +128,6 @@ const processFunctionFrames = (elements: CanvasElement[]): FrameEntry[] => {
       name: kind.functionName || `func${id}`,
       id: null,
       value: frameValue,
-      order: kind.order ?? 0,
     });
   });
 

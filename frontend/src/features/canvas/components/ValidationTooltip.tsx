@@ -1,9 +1,9 @@
 import React from "react";
-import { ValidationError } from "../../shared/types";
+import { ElementError } from "../../shared/types";
 import styles from "./ValidationTooltip.module.css";
 
 interface ValidationTooltipProps {
-  errors: ValidationError[];
+  errors: ElementError[];
   visible: boolean;
 }
 

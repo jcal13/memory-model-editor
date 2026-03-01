@@ -192,7 +192,7 @@ export const BOX_TYPE_CONFIGS: Record<string, BoxTypeConfig> = {
 
   /* ========== None Type ========== */
   none: {
-    drawCanvas: (model: any, kind: any, id: ID, style: BoxStyle) => {
+    drawCanvas: (model: any, _kind: any, id: ID, style: BoxStyle) => {
       model.drawPrimitive(0, 0, "NoneType", id, "None", style);
     },
     drawPalette: (model: any, style: BoxStyle) => {

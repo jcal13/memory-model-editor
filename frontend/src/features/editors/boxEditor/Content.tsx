@@ -2,7 +2,7 @@ import PrimitiveContent from "./primitiveBoxes/PrimitiveContent";
 import FunctionContent from "./functionBoxes/FunctionContent";
 import CollectionContent from "./collectionBoxes/CollectionContent";
 import ClassContent from "./classBoxes/ClassContent";
-import { ClassID, ID } from "../../shared/types";
+import { ID } from "../../shared/types";
 
 /**
  * Props for the Content component.

@@ -1,7 +1,7 @@
 import CollectionItem from "./CollectionItem";
 import CollectionAddButton from "./CollectionAddButton";
 import styles from "../../Editor.module.css";
-import { ID, ValidationError } from "../../../shared/types";
+import { ID, ElementError } from "../../../shared/types";
 
 /**
  * Props for the CollectionContent component.
@@ -14,7 +14,7 @@ interface Props {
   addId: (id: ID) => void;
   removeId: (id: ID) => void;
   sandbox: boolean;
-  validationErrors?: ValidationError[]; // Validation errors for highlighting
+  validationErrors?: ElementError[]; // Validation errors for highlighting
   elements?: any[]; // All canvas elements for ID usage tracking
 }
 

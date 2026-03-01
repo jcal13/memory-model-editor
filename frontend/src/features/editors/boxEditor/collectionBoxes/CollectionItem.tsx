@@ -1,6 +1,6 @@
 import styles from "../../Editor.module.css";
 import IdSelector from "../../idEditor/IdEditor";
-import { ID, ValidationError } from "../../../shared/types";
+import { ID, ElementError } from "../../../shared/types";
 import { isIdInvalid, getErrorsForId } from "../../utils/validationHelpers";
 import FieldValidationTooltip from "../FieldValidationTooltip";
 
@@ -15,7 +15,7 @@ interface Props {
   addId: (id: ID) => void; // adds a new ID to the pool
   removeId: (id: ID) => void;
   sandbox: boolean;
-  validationErrors?: ValidationError[]; // Validation errors for highlighting
+  validationErrors?: ElementError[]; // Validation errors for highlighting
   elements?: any[]; // All canvas elements for ID usage tracking
 }
 

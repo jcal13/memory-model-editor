@@ -56,6 +56,8 @@ export interface UIState {
   sandboxMode: boolean | null;
   questionView?: QuestionView;
   isInfoPanelOpen?: boolean;
+  canvasScale?: number;
+  editorScale?: number;
 }
 
 /**
@@ -116,6 +118,20 @@ export function loadInitialUIData(): UIState {
     const isInfoPanelOpen =
       typeof parsed?.isInfoPanelOpen === "boolean" ? parsed.isInfoPanelOpen : undefined;
 
+    const canvasScale =
+      typeof parsed?.canvasScale === "number" &&
+      parsed.canvasScale >= 0.5 &&
+      parsed.canvasScale <= 2.0
+        ? parsed.canvasScale
+        : undefined;
+
+    const editorScale =
+      typeof parsed?.editorScale === "number" &&
+      parsed.editorScale >= 0.5 &&
+      parsed.editorScale <= 2.0
+        ? parsed.editorScale
+        : undefined;
+
     return {
       activeTab,
       questionIndex,
@@ -124,6 +140,8 @@ export function loadInitialUIData(): UIState {
       sandboxMode,
       questionView,
       isInfoPanelOpen,
+      canvasScale,
+      editorScale,
     };
   } catch (error) {
     console.warn("Failed to load UI data from localStorage:", error);

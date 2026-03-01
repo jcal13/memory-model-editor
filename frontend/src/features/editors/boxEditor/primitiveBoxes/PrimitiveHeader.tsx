@@ -23,7 +23,6 @@ interface Props {
 }
 
 const PrimitiveHeader = ({
-  dataType,
   ids,
   addId,
   ownId,

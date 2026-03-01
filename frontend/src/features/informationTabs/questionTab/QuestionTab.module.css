@@ -24,16 +24,24 @@
   border-radius: 9999px;
 }
 
+.titleRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  padding: 8px 0;
+}
+
 .title {
   text-align: center;
   font-size: 1rem;
   font-weight: 700;
   color: var(--text-tertiary);
-  margin: 0 0 18px 0;
+  margin: 0;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   border-bottom: none;
-  padding: 8px 0 8px 0;
   transition: color 200ms ease;
 }
 
@@ -57,34 +65,30 @@
   transition: color 200ms ease;
 }
 
-.backRow {
-  width: 100%;
-  margin-bottom: 0.75rem;
-}
-
 .backBtn {
+  position: absolute;
+  left: 0;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: 8px;
-  color: var(--text-secondary);
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-tertiary);
   font-weight: 500;
   font-size: 0.8rem;
-  padding: 0.35rem 0.75rem;
+  padding: 0.25rem 0.5rem;
   cursor: pointer;
-  transition: all 160ms ease;
+  transition: color 160ms ease, background 160ms ease;
 }
 
 .backBtn:hover {
   color: var(--text-primary);
-  background: var(--bg-tertiary);
-  border-color: var(--border-secondary);
+  background: var(--bg-hover);
 }
 
 .backBtn:active {
-  background: var(--bg-hover);
+  background: var(--bg-tertiary);
 }
 
 .backBtn:focus-visible {

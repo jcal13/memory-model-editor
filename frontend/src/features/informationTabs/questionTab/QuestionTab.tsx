@@ -429,7 +429,18 @@ export default function QuestionTab({
   return (
     <>
       <div className={styles.wrapper}>
-        <h1 className={styles.title}>{getHeading()}</h1>
+        <div className={styles.titleRow}>
+          {(view === "list" || view === "question") && (
+            <button
+              type="button"
+              onClick={view === "list" ? () => { setQuestionIndex(null); setView("root"); } : navigateToList}
+              className={styles.backBtn}
+            >
+              ← Back
+            </button>
+          )}
+          <h1 className={styles.title}>{getHeading()}</h1>
+        </div>
 
         {view === "root" && (
           <div className={styles.selectors}>
@@ -464,19 +475,6 @@ export default function QuestionTab({
 
         {view === "list" && (
           <>
-            <div className={styles.backRow}>
-              <button
-                type="button"
-                onClick={() => {
-                  setQuestionIndex(null);
-                  setView("root");
-                }}
-                className={styles.backBtn}
-              >
-                ← Back
-              </button>
-            </div>
-
             <div className={styles.scroller}>
               <div className={styles.questionGrid}>
                 {Array.from({ length: questionCount }, (_, index) => {
@@ -501,16 +499,6 @@ export default function QuestionTab({
 
         {view === "question" && questionData && (
           <>
-            <div className={styles.backRow}>
-              <button
-                type="button"
-                onClick={navigateToList}
-                className={styles.backBtn}
-              >
-                ← Back
-              </button>
-            </div>
-
             <div className={styles.questionArea}>
               <details className={styles.topicsSection}>
                 <summary className={styles.topicsSummary}>Topics</summary>

@@ -102,6 +102,22 @@
   text-align: left;
 }
 
+.titleStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.sourceText {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  transition: color 200ms ease;
+}
+
 .questionText {
   font-size: 0.95rem;
   line-height: 1.55;

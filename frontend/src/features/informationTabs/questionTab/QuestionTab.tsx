@@ -44,8 +44,19 @@ interface QuestionData {
   question: string;
   code: string[];
   answer: unknown;
+  description?: string | null;
   topics?: string[] | null;
   canvasConfig?: CanvasData | null;
+}
+
+function formatSource(description: string): string {
+  // "CSC148 2023 midterm 1" → "CSC148 · 2023 · Midterm 1"
+  // "CSC148 2024 final"     → "CSC148 · 2024 · Final"
+  const parts = description.trim().split(/\s+/);
+  if (parts.length < 2) return description;
+  const [course, year, ...rest] = parts;
+  const label = rest.map((p, i) => (i === 0 ? p.charAt(0).toUpperCase() + p.slice(1) : p)).join(" ");
+  return label ? `${course} · ${year} · ${label}` : `${course} · ${year}`;
 }
 
 interface QuestionTabProps {
@@ -439,7 +450,12 @@ export default function QuestionTab({
               ← Back
             </button>
           )}
-          <h1 className={styles.title}>{getHeading()}</h1>
+          <div className={styles.titleStack}>
+            <h1 className={styles.title}>{getHeading()}</h1>
+            {view === "question" && questionType === "test" && questionData?.description && (
+              <p className={styles.sourceText}>{formatSource(questionData.description)}</p>
+            )}
+          </div>
         </div>
 
         {view === "root" && (

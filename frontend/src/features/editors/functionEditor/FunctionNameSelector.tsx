@@ -21,6 +21,7 @@ interface Props {
   buttonClassName?: string;
   editable: boolean;
   sandbox: boolean;
+  canManageFunctions?: boolean;
 }
 
 export default function FunctionNameSelector({
@@ -32,6 +33,7 @@ export default function FunctionNameSelector({
   buttonClassName = "",
   editable,
   sandbox,
+  canManageFunctions = sandbox,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [list, setList] = useState<string[]>(names);
@@ -113,6 +115,7 @@ export default function FunctionNameSelector({
                 onClose={closeSelf}
                 onUnassign={handleUnassign}
                 sandbox={sandbox}
+                canManageFunctions={canManageFunctions}
               />
             </div>
           </Draggable>,

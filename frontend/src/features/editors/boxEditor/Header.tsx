@@ -20,6 +20,8 @@ interface Props {
   setElementId: (id: ID) => void;
   removeId: (id: ID) => void;
   sandbox: boolean;
+  canManageClasses?: boolean;
+  canManageFunctions?: boolean;
   classes?: string[];
   addClasses?: (className: string) => void;
   ownClasses?: string;
@@ -56,6 +58,8 @@ const Header = ({
   setElementId,
   removeId,
   sandbox,
+  canManageClasses = sandbox,
+  canManageFunctions = sandbox,
   classes = [],
   addClasses = () => {},
   ownClasses = "",
@@ -117,6 +121,7 @@ const Header = ({
               setElementClassName={setOwnClassName}
               removeClassName={removeClasses}
               sandbox={sandbox}
+              canManageClasses={canManageClasses}
             />
           ) : kind === "function" ? (
             <FunctionNameSelector
@@ -128,6 +133,7 @@ const Header = ({
               buttonClassName={styles.moduleIdBox}
               editable={true}
               sandbox={sandbox}
+              canManageFunctions={canManageFunctions}
             />
           ) : (
             <span className={styles.typeChip}>{typeLabel}</span>

@@ -11,6 +11,7 @@ interface Props {
   setElementClassName: (className: string) => void;
   removeClassName: (className: string) => void;
   sandbox: boolean;
+  canManageClasses?: boolean;
 }
 
 /**
@@ -25,6 +26,7 @@ const ClassDisplay = ({
   setElementClassName,
   removeClassName,
   sandbox,
+  canManageClasses = sandbox,
 }: Props) => (
   <ClassSelector
     classes={classes}
@@ -35,6 +37,7 @@ const ClassDisplay = ({
     onRemove={removeClassName}
     editable={true}
     sandbox={sandbox}
+    canManageClasses={canManageClasses}
   />
 );
 

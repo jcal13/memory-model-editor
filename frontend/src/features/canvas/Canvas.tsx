@@ -41,6 +41,8 @@ interface FloatingEditorProps {
   addClasses?: (className: string) => void;
   removeClasses?: (className: string) => void;
   sandbox: boolean;
+  canManageClasses?: boolean;
+  canManageFunctions?: boolean;
   elements: CanvasElement[];
   editorScale: number;
   questionFunctionNames?: string[];
@@ -61,6 +63,8 @@ function FloatingEditor({
   addClasses,
   removeClasses,
   sandbox,
+  canManageClasses,
+  canManageFunctions,
   elements,
   editorScale,
   questionFunctionNames,
@@ -107,6 +111,8 @@ function FloatingEditor({
             addClasses={addClasses}
             removeClasses={removeClasses}
             sandbox={sandbox}
+            canManageClasses={canManageClasses ?? sandbox}
+            canManageFunctions={canManageFunctions ?? sandbox}
             elements={elements}
             questionFunctionNames={questionFunctionNames}
           />
@@ -126,6 +132,8 @@ interface CanvasProps {
   addClasses?: (className: string) => void;
   removeClasses?: (className: string) => void;
   sandbox?: boolean;
+  canManageClasses?: boolean;
+  canManageFunctions?: boolean;
   onClear: () => void;
   onEditorOpenerReady?: (openEditor: (element: CanvasElement) => void) => void;
   scale?: number;
@@ -144,6 +152,8 @@ function Canvas({
   addClasses,
   removeClasses,
   sandbox = true,
+  canManageClasses,
+  canManageFunctions,
   onEditorOpenerReady,
   scale: externalScale,
   editorScale = 1,
@@ -255,6 +265,17 @@ function Canvas({
       .filter((id) => !ids.includes(id))
       .forEach((id) => addId(id));
   }, [elements, ids, sandbox, addId]);
+
+  // Close any floating editors whose element no longer exists
+  // (e.g. when exiting a question clears the canvas, or an element is deleted)
+  useEffect(() => {
+    setOpenEditors((prev) => {
+      const filtered = prev.filter((editor) =>
+        elements.some((el) => el.boxId === editor.boxId)
+      );
+      return filtered.length === prev.length ? prev : filtered;
+    });
+  }, [elements]);
 
   // Validate elements whenever they change
   // Create a stable signature of elements for comparison
@@ -501,6 +522,8 @@ function Canvas({
             addClasses={addClasses}
             removeClasses={removeClasses}
             sandbox={sandbox}
+            canManageClasses={canManageClasses ?? sandbox}
+            canManageFunctions={canManageFunctions ?? sandbox}
             elements={elements}
             editorScale={editorScale}
             questionFunctionNames={questionFunctionNames}

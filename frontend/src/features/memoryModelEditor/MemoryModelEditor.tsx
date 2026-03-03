@@ -275,7 +275,7 @@ export default function MemoryModelEditor({
     return Array.from(requiredTypes);
   }, []);
 
-  const { handleCanvasSubmit } = useCanvasSubmission({
+  const { handleCanvasSubmit, handleCanvasSubmitAtLine } = useCanvasSubmission({
     selectedQuestionIndex: state.selectedQuestionIndex,
     selectedQuestionType: state.selectedQuestionType,
     elements: state.elements,
@@ -557,6 +557,7 @@ export default function MemoryModelEditor({
                 questionView={state.questionView}
                 setQuestionView={state.setQuestionView}
                 onSubmit={handleCanvasSubmit}
+                onSubmitAtLine={handleCanvasSubmitAtLine}
                 setSubmissionResults={state.setSubmissionResults}
                 onClearCanvas={clearCanvas}
                 onRestoreCanvas={restoreCanvas}

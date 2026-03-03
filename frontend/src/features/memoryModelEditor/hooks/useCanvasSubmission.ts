@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { CanvasElement, SubmissionResult, Tab } from "../../shared/types";
-import { submitCanvas } from "../../validationServices/questionValidationService";
+import { submitCanvas, submitCanvasAtLine } from "../../validationServices/questionValidationService";
 import { applyFeedbackErrors, clearFeedbackErrors } from "../utils/feedbackErrorMapper";
 
 interface UseCanvasSubmissionParams {
@@ -14,6 +14,7 @@ interface UseCanvasSubmissionParams {
 
 interface UseCanvasSubmissionReturn {
   handleCanvasSubmit: () => Promise<boolean>;
+  handleCanvasSubmitAtLine: (lineNumber: number) => Promise<boolean>;
 }
 
 /**
@@ -118,7 +119,61 @@ export function useCanvasSubmission({
     }
   }, []);
 
-  return { handleCanvasSubmit };
+  const handleCanvasSubmitAtLine = useCallback(async (lineNumber: number): Promise<boolean> => {
+    const index = idxRef.current;
+    const qtype = typeRef.current;
+    const els = elsRef.current;
+
+    if (index === null || qtype === null) {
+      console.warn("Cannot submit at line: question index or type is null");
+      setResultsRef.current(null);
+      setTabRef.current("feedback");
+      return false;
+    }
+
+    const clearedElements = clearFeedbackErrors(els);
+    const validElements = clearedElements.filter((el) => !el.invalidated);
+
+    if (validElements.length === 0) {
+      console.warn("No valid elements to submit at line");
+      setResultsRef.current(null);
+      setTabRef.current("feedback");
+      return false;
+    }
+
+    try {
+      const result = await submitCanvasAtLine(validElements, index, qtype, lineNumber);
+
+      if (result !== undefined && result !== null) {
+        console.log('[useCanvasSubmission] submitAtLine result:', result);
+
+        if (result.errors && result.errors.length > 0) {
+          const elementsWithFeedback = applyFeedbackErrors(clearedElements, result.errors);
+          setElsRef.current(elementsWithFeedback);
+        } else {
+          setElsRef.current(clearedElements);
+        }
+
+        setResultsRef.current(result);
+
+        const isCorrect = determineIfCorrect(result);
+        setTabRef.current("feedback");
+        return isCorrect;
+      } else {
+        console.warn("submitAtLine returned undefined result");
+        setResultsRef.current(null);
+        setTabRef.current("feedback");
+        return false;
+      }
+    } catch (error) {
+      console.error("Canvas submitAtLine failed:", error);
+      setResultsRef.current(null);
+      setTabRef.current("feedback");
+      return false;
+    }
+  }, []);
+
+  return { handleCanvasSubmit, handleCanvasSubmitAtLine };
 }
 
 /**

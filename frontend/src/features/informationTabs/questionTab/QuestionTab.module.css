@@ -254,6 +254,54 @@
   background: #047857;
 }
 
+.checkAtLineButton {
+  padding: 0.5rem 1rem;
+  border: 1.5px solid #7dd3fc;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  flex: 1;
+  transition: all 160ms ease;
+  background: rgba(125, 211, 252, 0.1);
+  color: #7dd3fc;
+}
+
+.checkAtLineButton:hover {
+  background: rgba(125, 211, 252, 0.2);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.checkAtLineButton:active {
+  background: rgba(125, 211, 252, 0.3);
+}
+
+.lineHint {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+  transition: color 200ms ease;
+}
+
+/* Light mode overrides */
+:root:not([data-theme="dark"]) .checkAtLineButton {
+  background: rgba(14, 116, 144, 0.1);
+  border-color: #0e7490;
+  color: #0e7490;
+}
+
+:root:not([data-theme="dark"]) .checkAtLineButton:hover {
+  background: rgba(14, 116, 144, 0.18);
+  border-color: #0369a1;
+  color: #0369a1;
+}
+
+:root:not([data-theme="dark"]) .checkAtLineButton:active {
+  background: rgba(14, 116, 144, 0.28);
+}
+
 /* Dark mode overrides */
 :root[data-theme="dark"] .questionText code {
   color: #fb7185;

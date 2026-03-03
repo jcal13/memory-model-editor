@@ -6,6 +6,9 @@ interface CodeBlockProps {
   language: "python" | "javascript" | "typescript" | "java" | string;
   showLineNumbers?: boolean;
   startLineNumber?: number;
+  checkableLines?: Set<number>;
+  selectedLine?: number | null;
+  onLineClick?: (lineNumber: number) => void;
 }
 
 export default function CodeBlock({
@@ -13,6 +16,9 @@ export default function CodeBlock({
   language,
   showLineNumbers = true,
   startLineNumber = 1,
+  checkableLines,
+  selectedLine,
+  onLineClick,
 }: CodeBlockProps) {
   return (
     <Highlight code={code} language={language as any} theme={undefined}>
@@ -26,11 +32,28 @@ export default function CodeBlock({
           {tokens.map((line, index) => {
             const lineNumber = startLineNumber + index;
             const lineProps = getLineProps({ line, key: index });
+            const isCheckable = checkableLines?.has(lineNumber) ?? false;
+            const isSelected = selectedLine === lineNumber;
+
+            const lineClassName = [
+              styles.line,
+              lineProps.className ?? "",
+              isCheckable ? styles.checkableLine : "",
+              isSelected ? styles.selectedLine : "",
+            ]
+              .filter(Boolean)
+              .join(" ");
 
             return (
               <div
                 key={index}
-                className={`${styles.line} ${lineProps.className ?? ""}`}
+                className={lineClassName}
+                onClick={
+                  isCheckable && onLineClick
+                    ? () => onLineClick(lineNumber)
+                    : undefined
+                }
+                title={isCheckable ? `Check answer at line ${lineNumber}` : undefined}
                 {...Object.fromEntries(
                   Object.entries(lineProps).filter(
                     ([key]) => key !== "className"
@@ -38,7 +61,10 @@ export default function CodeBlock({
                 )}
               >
                 {showLineNumbers && (
-                  <span className={styles.gutter} aria-hidden="true">
+                  <span
+                    className={`${styles.gutter} ${isCheckable ? styles.checkableGutter : ""}`}
+                    aria-hidden="true"
+                  >
                     {lineNumber}
                   </span>
                 )}

@@ -44,6 +44,7 @@ interface QuestionData {
   question: string;
   code: string[];
   answer: unknown;
+  steps?: Array<{ lineNumber: number; answer: unknown }> | null;
   description?: string | null;
   topics?: string[] | null;
   canvasConfig?: CanvasData | null;
@@ -67,6 +68,7 @@ interface QuestionTabProps {
   questionView: QuestionView;
   setQuestionView: (view: QuestionView) => void;
   onSubmit: () => Promise<boolean>;
+  onSubmitAtLine: (lineNumber: number) => Promise<boolean>;
   setSubmissionResults: (results: SubmissionResult | null) => void;
   onClearCanvas: () => void;
   onRestoreCanvas: (elements: any[], ids: number[], classes: string[]) => void;
@@ -105,6 +107,7 @@ export default function QuestionTab({
   questionView: questionViewProp,
   setQuestionView,
   onSubmit,
+  onSubmitAtLine,
   setSubmissionResults,
   onClearCanvas,
   onRestoreCanvas,
@@ -126,6 +129,7 @@ export default function QuestionTab({
     index: number;
   } | null>(null);
   const [showResetModal, setShowResetModal] = useState(false);
+  const [selectedLine, setSelectedLine] = useState<number | null>(null);
 
   const hydratedList = useRef<boolean>(false);
   const hydratedQuestion = useRef<boolean>(false);
@@ -202,6 +206,17 @@ export default function QuestionTab({
     return questionStatus[key] || "unattempted";
   };
 
+  const handleSubmitAtLine = async (lineNumber: number) => {
+    if (questionType && questionIndex !== null) {
+      try {
+        await onSubmitAtLine(lineNumber);
+        // line-check results don't change question completion status
+      } catch (error) {
+        console.error("Error during line submission:", error);
+      }
+    }
+  };
+
   const handleSubmit = async () => {
     if (questionType && questionIndex !== null) {
       try {
@@ -270,6 +285,7 @@ export default function QuestionTab({
     hydratedQuestion.current = false;
     setQuestionData(null);
     setSubmissionResults(null);
+    setSelectedLine(null);
 
     setView("loading");
 
@@ -321,6 +337,7 @@ export default function QuestionTab({
 
     setQuestionIndex(null);
     setQuestionData(null);
+    setSelectedLine(null);
     hydratedQuestion.current = false;
     onRestoreCanvas([], [], []);
     setView("list");
@@ -332,6 +349,7 @@ export default function QuestionTab({
       if (pendingNavigation.index === -1) {
         setQuestionIndex(null);
         setQuestionData(null);
+        setSelectedLine(null);
         hydratedQuestion.current = false;
         onRestoreCanvas([], [], []);
         setView("list");
@@ -513,63 +531,90 @@ export default function QuestionTab({
           </>
         )}
 
-        {view === "question" && questionData && (
-          <>
-            <div className={styles.questionArea}>
-              <details className={styles.topicsSection}>
-                <summary className={styles.topicsSummary}>Topics</summary>
-                <div className={styles.topicsContent}>
-                  {(questionData.topics ?? []).length > 0 ? (
-                    <div className={styles.topicChips}>
-                      {(questionData.topics ?? []).map((topic, index) => (
-                        <span
-                          key={`${topic}-${index}`}
-                          className={styles.topicChip}
-                        >
-                          {topic}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className={styles.topicsEmpty}>
-                      No topics listed yet.
-                    </p>
-                  )}
+        {view === "question" && questionData && (() => {
+          const checkableLines = new Set(
+            questionData.steps?.map((s) => s.lineNumber) ?? []
+          );
+          return (
+            <>
+              <div className={styles.questionArea}>
+                <details className={styles.topicsSection}>
+                  <summary className={styles.topicsSummary}>Topics</summary>
+                  <div className={styles.topicsContent}>
+                    {(questionData.topics ?? []).length > 0 ? (
+                      <div className={styles.topicChips}>
+                        {(questionData.topics ?? []).map((topic, index) => (
+                          <span
+                            key={`${topic}-${index}`}
+                            className={styles.topicChip}
+                          >
+                            {topic}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className={styles.topicsEmpty}>
+                        No topics listed yet.
+                      </p>
+                    )}
+                  </div>
+                </details>
+
+                <div className={styles.questionText}>
+                  <ReactMarkdown>{questionData.question}</ReactMarkdown>
                 </div>
-              </details>
 
-              <div className={styles.questionText}>
-                <ReactMarkdown>{questionData.question}</ReactMarkdown>
+                <CodeBlock
+                  code={questionData.code.join("\n")}
+                  language="python"
+                  checkableLines={checkableLines}
+                  selectedLine={selectedLine}
+                  onLineClick={(n) =>
+                    setSelectedLine((prev) => (prev === n ? null : n))
+                  }
+                />
+
+                {checkableLines.size > 0 && (
+                  <p className={styles.lineHint}>
+                    Click a highlighted line number to check your answer at that point.
+                  </p>
+                )}
+
+                <div className={styles.buttonRow}>
+                  <button
+                    type="button"
+                    className={styles.resetButton}
+                    onClick={handleResetQuestion}
+                    aria-label="Reset Question"
+                    title="Reset Question"
+                  >
+                    Reset
+                  </button>
+                  {selectedLine !== null && checkableLines.has(selectedLine) && (
+                    <button
+                      type="button"
+                      className={styles.checkAtLineButton}
+                      onClick={() => handleSubmitAtLine(selectedLine)}
+                      aria-label={`Check answer at line ${selectedLine}`}
+                      title={`Check answer at line ${selectedLine}`}
+                    >
+                      Check at line {selectedLine}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className={styles.submitButton}
+                    onClick={handleSubmit}
+                    aria-label="Submit Canvas"
+                    title="Submit Canvas"
+                  >
+                    Submit
+                  </button>
+                </div>
               </div>
-
-              <CodeBlock
-                code={questionData.code.join("\n")}
-                language="python"
-              />
-
-              <div className={styles.buttonRow}>
-                <button
-                  type="button"
-                  className={styles.resetButton}
-                  onClick={handleResetQuestion}
-                  aria-label="Reset Question"
-                  title="Reset Question"
-                >
-                  Reset
-                </button>
-                <button
-                  type="button"
-                  className={styles.submitButton}
-                  onClick={handleSubmit}
-                  aria-label="Submit Canvas"
-                  title="Submit Canvas"
-                >
-                  Submit
-                </button>
-              </div>
-            </div>
-          </>
-        )}
+            </>
+          );
+        })()}
       </div>
 
       {showCanvasClearModal && (

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS practice_questions (
     question TEXT,
     code TEXT[],
     answer JSONB,
+    steps JSONB,
     description TEXT,
     canvas_config JSONB
 );
@@ -14,6 +15,7 @@ CREATE TABLE IF NOT EXISTS test_questions (
     question TEXT,
     code TEXT[],
     answer JSONB,
+    steps JSONB,
     description TEXT,
     canvas_config JSONB
 );

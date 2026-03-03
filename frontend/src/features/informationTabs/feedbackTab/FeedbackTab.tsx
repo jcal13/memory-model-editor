@@ -21,6 +21,7 @@ interface FeedbackTabProps {
   onOpenEditor: (element: CanvasElement) => void;
   isSandboxMode: boolean;
   onResubmit: () => Promise<boolean>;
+  resubmitLine?: number | null;
 }
 
 export default function FeedbackTab({
@@ -34,6 +35,7 @@ export default function FeedbackTab({
   onOpenEditor,
   isSandboxMode,
   onResubmit,
+  resubmitLine,
 }: FeedbackTabProps) {
   const renderTitle = () => {
     let questionName = "";
@@ -139,7 +141,7 @@ export default function FeedbackTab({
           className={styles.resubmitButton}
           onClick={onResubmit}
         >
-          Resubmit
+          {resubmitLine != null ? `Resubmit at line ${resubmitLine}` : "Resubmit"}
         </button>
       </div>
     </>

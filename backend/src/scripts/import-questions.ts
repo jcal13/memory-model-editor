@@ -10,6 +10,7 @@ interface Question {
   question: string;
   code: string[];
   answer: any;
+  steps?: Array<{ lineNumber: number; answer: any }> | null;
   description: string | null;
   topics: string[];
   canvasConfig?: {
@@ -74,6 +75,7 @@ async function createTablesIfNotExist(pool: Pool) {
         question TEXT,
         code TEXT[],
         answer JSONB,
+        steps JSONB,
         description TEXT,
         topics TEXT[],
         canvas_config JSONB
@@ -84,6 +86,7 @@ async function createTablesIfNotExist(pool: Pool) {
         question TEXT,
         code TEXT[],
         answer JSONB,
+        steps JSONB,
         description TEXT,
         topics TEXT[],
         canvas_config JSONB
@@ -94,6 +97,7 @@ async function createTablesIfNotExist(pool: Pool) {
         question TEXT,
         code TEXT[],
         answer JSONB,
+        steps JSONB,
         description TEXT,
         topics TEXT[],
         canvas_config JSONB
@@ -122,6 +126,15 @@ async function createTablesIfNotExist(pool: Pool) {
   );
   await pool.query(
     "ALTER TABLE prep_questions ADD COLUMN IF NOT EXISTS canvas_config JSONB"
+  );
+  await pool.query(
+    "ALTER TABLE practice_questions ADD COLUMN IF NOT EXISTS steps JSONB"
+  );
+  await pool.query(
+    "ALTER TABLE test_questions ADD COLUMN IF NOT EXISTS steps JSONB"
+  );
+  await pool.query(
+    "ALTER TABLE prep_questions ADD COLUMN IF NOT EXISTS steps JSONB"
   );
   console.log("Tables created or already exist");
 }
@@ -186,12 +199,13 @@ async function importQuestions() {
     console.log("Importing practice questions...");
     for (const q of practiceQuestions) {
       await pool.query(
-        `INSERT INTO practice_questions (question, code, answer, description, topics, canvas_config)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
+        `INSERT INTO practice_questions (question, code, answer, steps, description, topics, canvas_config)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
         [
           q.question,
           q.code,
           JSON.stringify(q.answer),
+          q.steps ? JSON.stringify(q.steps) : null,
           q.description,
           q.topics ?? [],
           q.canvasConfig ?? null,
@@ -203,12 +217,13 @@ async function importQuestions() {
     console.log("\nImporting test questions...");
     for (const q of testQuestions) {
       await pool.query(
-        `INSERT INTO test_questions (question, code, answer, description, topics, canvas_config)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
+        `INSERT INTO test_questions (question, code, answer, steps, description, topics, canvas_config)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
         [
           q.question,
           q.code,
           JSON.stringify(q.answer),
+          q.steps ? JSON.stringify(q.steps) : null,
           q.description,
           q.topics ?? [],
           q.canvasConfig ?? null,
@@ -220,12 +235,13 @@ async function importQuestions() {
     console.log("\nImporting prep questions...");
     for (const q of prepQuestions) {
       await pool.query(
-        `INSERT INTO prep_questions (question, code, answer, description, topics, canvas_config)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
+        `INSERT INTO prep_questions (question, code, answer, steps, description, topics, canvas_config)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
         [
           q.question,
           q.code,
           JSON.stringify(q.answer),
+          q.steps ? JSON.stringify(q.steps) : null,
           q.description,
           q.topics ?? [],
           q.canvasConfig ?? null,

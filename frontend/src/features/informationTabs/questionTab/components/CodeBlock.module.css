@@ -29,3 +29,29 @@
   white-space: pre;
   padding-right: 1.25rem;
 }
+
+/* Interactive line selection */
+.checkableLine {
+  cursor: pointer;
+}
+
+.checkableLine:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.checkableGutter {
+  opacity: 0.75;
+  color: #7dd3fc; /* light blue tint to hint interactivity */
+}
+
+.selectedLine {
+  background: rgba(125, 211, 252, 0.12);
+  border-left: 3px solid #7dd3fc;
+  padding-left: 0;
+}
+
+.selectedLine .gutter {
+  padding-left: 0;
+  color: #7dd3fc;
+  opacity: 1;
+}

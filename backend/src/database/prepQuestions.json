@@ -219,18 +219,8 @@
           }
         }
       ],
-      "ids": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6
-      ],
-      "classes": [
-        "_Node",
-        "LinkedList"
-      ]
+      "ids": [1, 2, 3, 4, 5, 6],
+      "classes": ["_Node", "LinkedList"]
     },
     "steps": [
       {

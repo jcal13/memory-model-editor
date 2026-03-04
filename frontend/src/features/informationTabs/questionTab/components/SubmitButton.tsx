@@ -10,8 +10,8 @@ export function SubmitButton({ onClick }: SubmitButtonProps) {
       type="button"
       className={`${styles.baseButton} ${styles.submitButton}`}
       onClick={onClick}
-      aria-label="Submit Canvas"
-      title="Submit Canvas"
+      aria-label="Submit"
+      title="Submit"
     >
       Submit
     </button>

@@ -44,7 +44,7 @@ interface QuestionData {
   question: string;
   code: string[];
   answer: unknown;
-  steps?: Array<{ lineNumber: number; answer: unknown }> | null;
+  steps?: Array<{ lineNumber: number; iterationNumber?: number; answer: unknown }> | null;
   description?: string | null;
   topics?: string[] | null;
   canvasConfig?: CanvasData | null;
@@ -68,7 +68,7 @@ interface QuestionTabProps {
   questionView: QuestionView;
   setQuestionView: (view: QuestionView) => void;
   onSubmit: () => Promise<boolean>;
-  onSubmitAtLine: (lineNumber: number) => Promise<boolean>;
+  onSubmitAtLine: (lineNumber: number, iterationNumber?: number) => Promise<boolean>;
   setSubmissionResults: (results: SubmissionResult | null) => void;
   onClearCanvas: () => void;
   onRestoreCanvas: (elements: any[], ids: number[], classes: string[]) => void;
@@ -130,6 +130,7 @@ export default function QuestionTab({
   } | null>(null);
   const [showResetModal, setShowResetModal] = useState(false);
   const [selectedLine, setSelectedLine] = useState<number | null>(null);
+  const [selectedIteration, setSelectedIteration] = useState<number | undefined>(undefined);
 
   const hydratedList = useRef<boolean>(false);
   const hydratedQuestion = useRef<boolean>(false);
@@ -206,10 +207,10 @@ export default function QuestionTab({
     return questionStatus[key] || "unattempted";
   };
 
-  const handleSubmitAtLine = async (lineNumber: number) => {
+  const handleSubmitAtLine = async (lineNumber: number, iterationNumber?: number) => {
     if (questionType && questionIndex !== null) {
       try {
-        await onSubmitAtLine(lineNumber);
+        await onSubmitAtLine(lineNumber, iterationNumber);
         // line-check results don't change question completion status
       } catch (error) {
         console.error("Error during line submission:", error);
@@ -286,6 +287,7 @@ export default function QuestionTab({
     setQuestionData(null);
     setSubmissionResults(null);
     setSelectedLine(null);
+    setSelectedIteration(undefined);
 
     setView("loading");
 
@@ -338,6 +340,7 @@ export default function QuestionTab({
     setQuestionIndex(null);
     setQuestionData(null);
     setSelectedLine(null);
+    setSelectedIteration(undefined);
     hydratedQuestion.current = false;
     onRestoreCanvas([], [], []);
     setView("list");
@@ -350,6 +353,7 @@ export default function QuestionTab({
         setQuestionIndex(null);
         setQuestionData(null);
         setSelectedLine(null);
+        setSelectedIteration(undefined);
         hydratedQuestion.current = false;
         onRestoreCanvas([], [], []);
         setView("list");
@@ -535,6 +539,21 @@ export default function QuestionTab({
           const checkableLines = new Set(
             questionData.steps?.map((s) => s.lineNumber) ?? []
           );
+          // Map from lineNumber → sorted iteration numbers (empty array = no iterations)
+          const lineIterations = new Map<number, number[]>();
+          for (const s of questionData.steps ?? []) {
+            if (s.iterationNumber !== undefined) {
+              const arr = lineIterations.get(s.lineNumber) ?? [];
+              arr.push(s.iterationNumber);
+              lineIterations.set(s.lineNumber, arr);
+            }
+          }
+          const selectedLineHasIterations =
+            selectedLine !== null && (lineIterations.get(selectedLine)?.length ?? 0) > 0;
+          const canCheckAtLine =
+            selectedLine !== null &&
+            checkableLines.has(selectedLine) &&
+            (!selectedLineHasIterations || selectedIteration !== undefined);
           return (
             <>
               <div className={styles.questionArea}>
@@ -569,15 +588,34 @@ export default function QuestionTab({
                   language="python"
                   checkableLines={checkableLines}
                   selectedLine={selectedLine}
-                  onLineClick={(n) =>
-                    setSelectedLine((prev) => (prev === n ? null : n))
-                  }
+                  onLineClick={(n) => {
+                    setSelectedLine((prev) => (prev === n ? null : n));
+                    setSelectedIteration(undefined);
+                  }}
                 />
 
                 {checkableLines.size > 0 && (
                   <p className={styles.lineHint}>
                     Click a highlighted line number to check your answer at that point.
                   </p>
+                )}
+
+                {selectedLine !== null && selectedLineHasIterations && (
+                  <div className={styles.iterationPicker}>
+                    <span className={styles.iterationLabel}>After iteration:</span>
+                    {(lineIterations.get(selectedLine) ?? []).map((iter) => (
+                      <button
+                        key={iter}
+                        type="button"
+                        className={`${styles.iterationBtn} ${selectedIteration === iter ? styles.iterationBtnActive : ""}`}
+                        onClick={() =>
+                          setSelectedIteration((prev) => (prev === iter ? undefined : iter))
+                        }
+                      >
+                        {iter}
+                      </button>
+                    ))}
+                  </div>
                 )}
 
                 <div className={styles.buttonRow}>
@@ -590,15 +628,17 @@ export default function QuestionTab({
                   >
                     Reset
                   </button>
-                  {selectedLine !== null && checkableLines.has(selectedLine) && (
+                  {canCheckAtLine && (
                     <button
                       type="button"
                       className={styles.checkAtLineButton}
-                      onClick={() => handleSubmitAtLine(selectedLine)}
+                      onClick={() => handleSubmitAtLine(selectedLine!, selectedIteration)}
                       aria-label={`Check answer at line ${selectedLine}`}
                       title={`Check answer at line ${selectedLine}`}
                     >
-                      Check at line {selectedLine}
+                      {selectedIteration !== undefined
+                        ? `Check at line ${selectedLine} (iter ${selectedIteration})`
+                        : `Check at line ${selectedLine}`}
                     </button>
                   )}
                   <button

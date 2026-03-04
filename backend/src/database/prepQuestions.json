@@ -167,8 +167,14 @@
             "value": null,
             "className": "_Node",
             "classVariables": [
-              { "key": "item", "value": 5 },
-              { "key": "next", "value": 6 }
+              {
+                "key": "item",
+                "value": 5
+              },
+              {
+                "key": "next",
+                "value": 6
+              }
             ]
           }
         },
@@ -183,8 +189,14 @@
             "value": null,
             "className": "_Node",
             "classVariables": [
-              { "key": "item", "value": 3 },
-              { "key": "next", "value": 4 }
+              {
+                "key": "item",
+                "value": 3
+              },
+              {
+                "key": "next",
+                "value": 4
+              }
             ]
           }
         },
@@ -198,12 +210,828 @@
             "type": "class",
             "value": null,
             "className": "LinkedList",
-            "classVariables": [{ "key": "_first", "value": 2 }]
+            "classVariables": [
+              {
+                "key": "_first",
+                "value": 2
+              }
+            ]
           }
         }
       ],
-      "ids": [1, 2, 3, 4, 5, 6],
-      "classes": ["_Node", "LinkedList"]
-    }
+      "ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "classes": [
+        "_Node",
+        "LinkedList"
+      ]
+    },
+    "steps": [
+      {
+        "lineNumber": 20,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 7,
+              "next": 6
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 4
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 8,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 7,
+              "next": 6
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 4
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 9,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 7,
+              "next": 6
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 4
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 10,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 2
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 7,
+              "next": 6
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 4
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 9,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 2
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 7,
+              "next": 6
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 4
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 11,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 2,
+              "result": 7
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 7,
+              "next": 6
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 4
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 12,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 2,
+              "result": 7
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 148
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 3,
+              "next": 6
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 4
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 13,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 2,
+              "result": 7
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 148
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 3,
+              "next": 4
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 4
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 14,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 2,
+              "result": 7
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 148
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 3,
+              "next": 4
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 2
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 15,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 2,
+              "result": 7
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 148
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 6
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 3,
+              "next": 4
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 2
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 17,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 2,
+              "result": 7
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 148
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 6
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 3,
+              "next": 4
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 2
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 22,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 148
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 6
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 3,
+              "next": 4
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 2
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

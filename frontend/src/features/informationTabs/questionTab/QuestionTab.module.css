@@ -285,6 +285,59 @@
   transition: color 200ms ease;
 }
 
+.iterationPicker {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.iterationLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+  transition: color 200ms ease;
+}
+
+.iterationBtn {
+  padding: 0.2rem 0.6rem;
+  border: 1.5px solid #7dd3fc;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.78rem;
+  background: transparent;
+  color: #7dd3fc;
+  transition: all 140ms ease;
+}
+
+.iterationBtn:hover {
+  background: rgba(125, 211, 252, 0.15);
+}
+
+.iterationBtnActive {
+  background: rgba(125, 211, 252, 0.25);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+/* Light mode iteration buttons */
+:root:not([data-theme="dark"]) .iterationBtn {
+  border-color: #0e7490;
+  color: #0e7490;
+}
+
+:root:not([data-theme="dark"]) .iterationBtn:hover {
+  background: rgba(14, 116, 144, 0.1);
+}
+
+:root:not([data-theme="dark"]) .iterationBtnActive {
+  background: rgba(14, 116, 144, 0.18);
+  border-color: #0369a1;
+  color: #0369a1;
+}
+
 /* Light mode overrides */
 :root:not([data-theme="dark"]) .checkAtLineButton {
   background: rgba(14, 116, 144, 0.1);

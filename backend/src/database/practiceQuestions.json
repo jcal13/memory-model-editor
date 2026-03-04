@@ -695,6 +695,141 @@
             ]
           }
         ]
+      },
+      {
+        "lineNumber": 3,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 5,
+              "item": 6
+            },
+            "inactive": false
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 8,
+            "type": "int",
+            "value": 88
+          },
+          {
+            "id": 5,
+            "type": "list",
+            "value": [
+              6,
+              7
+            ]
+          },
+          {
+            "id": 6,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              8
+            ]
+          },
+          {
+            "id": 7,
+            "type": "list",
+            "value": [
+              3,
+              4
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 3,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 5,
+              "item": 7
+            },
+            "inactive": false
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 8,
+            "type": "int",
+            "value": 88
+          },
+          {
+            "id": 5,
+            "type": "list",
+            "value": [
+              6,
+              7
+            ]
+          },
+          {
+            "id": 6,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              8
+            ]
+          },
+          {
+            "id": 7,
+            "type": "list",
+            "value": [
+              3,
+              4,
+              8
+            ]
+          }
+        ]
       }
     ]
   },
@@ -2022,6 +2157,138 @@
             "id": 4,
             "type": "int",
             "value": 4
+          },
+          {
+            "id": 6,
+            "type": "list",
+            "value": [
+              1,
+              2
+            ]
+          },
+          {
+            "id": 7,
+            "type": "list",
+            "value": [
+              3,
+              4
+            ]
+          },
+          {
+            "id": 8,
+            "type": "list",
+            "value": [
+              6,
+              7
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 3,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "L": 8,
+              "item": 5
+            },
+            "inactive": false
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 88
+          },
+          {
+            "id": 6,
+            "type": "list",
+            "value": [
+              1,
+              2
+            ]
+          },
+          {
+            "id": 7,
+            "type": "list",
+            "value": [
+              3,
+              4
+            ]
+          },
+          {
+            "id": 8,
+            "type": "list",
+            "value": [
+              6,
+              7
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 3,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "L": 8,
+              "item": 5
+            },
+            "inactive": false
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 88
           },
           {
             "id": 6,

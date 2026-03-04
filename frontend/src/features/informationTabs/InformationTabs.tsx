@@ -17,7 +17,7 @@ interface InformationTabsProps {
   questionView: import("../memoryModelEditor/utils/localStorage").QuestionView;
   setQuestionView: (view: import("../memoryModelEditor/utils/localStorage").QuestionView) => void;
   onSubmit: () => Promise<boolean>;
-  onSubmitAtLine: (lineNumber: number) => Promise<boolean>;
+  onSubmitAtLine: (lineNumber: number, iterationNumber?: number) => Promise<boolean>;
   setSubmissionResults: (results: SubmissionResult | null) => void;
   onClearCanvas: () => void;
   onRestoreCanvas: (elements: any[], ids: number[], classes: string[]) => void;
@@ -60,8 +60,9 @@ export default function InformationTabs({
 }: InformationTabsProps) {
   const tabBodyRef = useRef<HTMLDivElement>(null);
   // Track the last submission context so Resubmit repeats the same check
-  const lastSubmitLineRef = useRef<number | null>(null);
-  const [lastSubmitLine, setLastSubmitLine] = useState<number | null>(null);
+  type LastLineCtx = { line: number; iteration?: number } | null;
+  const lastSubmitLineRef = useRef<LastLineCtx>(null);
+  const [lastSubmitLine, setLastSubmitLine] = useState<LastLineCtx>(null);
 
   const saveCurrentScroll = () => {
     if (tabBodyRef.current) {
@@ -120,18 +121,19 @@ export default function InformationTabs({
     return success;
   };
 
-  const handleSubmitAtLine = async (lineNumber: number) => {
-    lastSubmitLineRef.current = lineNumber;
-    setLastSubmitLine(lineNumber);
-    return onSubmitAtLine(lineNumber);
+  const handleSubmitAtLine = async (lineNumber: number, iterationNumber?: number) => {
+    const ctx = { line: lineNumber, iteration: iterationNumber };
+    lastSubmitLineRef.current = ctx;
+    setLastSubmitLine(ctx);
+    return onSubmitAtLine(lineNumber, iterationNumber);
   };
 
   const handleResubmit = async () => {
-    const line = lastSubmitLineRef.current;
-    if (line !== null) {
-      return onSubmitAtLine(line); // repeat the same line check
+    const ctx = lastSubmitLineRef.current;
+    if (ctx !== null) {
+      return onSubmitAtLine(ctx.line, ctx.iteration);
     }
-    return onSubmit(); // repeat the full submit
+    return onSubmit();
   };
 
   return (

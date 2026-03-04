@@ -124,7 +124,477 @@
       ],
       "ids": [],
       "classes": []
-    }
+    },
+    "steps": [
+      {
+        "lineNumber": 20,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "f": 4
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "fries"
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 4,
+            "name": "Fries",
+            "type": "object",
+            "value": {
+              "name": 1,
+              "price": 2
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 21,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "f": 4,
+              "menu": 5
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "fries"
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 4,
+            "name": "Fries",
+            "type": "object",
+            "value": {
+              "name": 1,
+              "price": 2
+            }
+          },
+          {
+            "id": 6,
+            "type": "list",
+            "value": [
+              4
+            ]
+          },
+          {
+            "id": 5,
+            "name": "Menu",
+            "type": "object",
+            "value": {
+              "items": 6
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 8,
+        "answer": [
+          {
+            "id": null,
+            "name": "Food.update_price",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 4,
+              "new_price": 3,
+              "price": 2
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "f": 4,
+              "menu": 5
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "fries"
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 4,
+            "name": "Fries",
+            "type": "object",
+            "value": {
+              "name": 1,
+              "price": 2
+            }
+          },
+          {
+            "id": 6,
+            "type": "list",
+            "value": [
+              4
+            ]
+          },
+          {
+            "id": 5,
+            "name": "Menu",
+            "type": "object",
+            "value": {
+              "items": 6
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 9,
+        "answer": [
+          {
+            "id": null,
+            "name": "Food.update_price",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 4,
+              "new_price": 3,
+              "price": 3
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "f": 4,
+              "menu": 5
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "fries"
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 4,
+            "name": "Fries",
+            "type": "object",
+            "value": {
+              "name": 1,
+              "price": 2
+            }
+          },
+          {
+            "id": 6,
+            "type": "list",
+            "value": [
+              4
+            ]
+          },
+          {
+            "id": 5,
+            "name": "Menu",
+            "type": "object",
+            "value": {
+              "items": 6
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 3,
+        "answer": [
+          {
+            "id": null,
+            "name": "Food.__init__",
+            "type": ".frame",
+            "order": 3,
+            "value": {
+              "self": 4,
+              "n": 1,
+              "p": 2
+            }
+          },
+          {
+            "id": null,
+            "name": "Fries.__init__",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 4,
+              "p": 2
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {}
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "fries"
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 4,
+            "name": "Fries",
+            "type": "object",
+            "value": {
+              "name": 1
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 4,
+        "answer": [
+          {
+            "id": null,
+            "name": "Food.__init__",
+            "type": ".frame",
+            "order": 3,
+            "value": {
+              "self": 4,
+              "n": 1,
+              "p": 2
+            }
+          },
+          {
+            "id": null,
+            "name": "Fries.__init__",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 4,
+              "p": 2
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {}
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "fries"
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 4,
+            "name": "Fries",
+            "type": "object",
+            "value": {
+              "name": 1,
+              "price": 2
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 13,
+        "answer": [
+          {
+            "id": null,
+            "name": "Fries.__init__",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 4,
+              "p": 2
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {}
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "fries"
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 4,
+            "name": "Fries",
+            "type": "object",
+            "value": {
+              "name": 1,
+              "price": 2
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 17,
+        "answer": [
+          {
+            "id": null,
+            "name": "Menu.__init__",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 5,
+              "items": 6
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "f": 4
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "fries"
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 4,
+            "name": "Fries",
+            "type": "object",
+            "value": {
+              "name": 1,
+              "price": 2
+            }
+          },
+          {
+            "id": 6,
+            "type": "list",
+            "value": [
+              4
+            ]
+          },
+          {
+            "id": 5,
+            "name": "Menu",
+            "type": "object",
+            "value": {
+              "items": 6
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 22,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "f": 4,
+              "menu": 5
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "fries"
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 4,
+            "name": "Fries",
+            "type": "object",
+            "value": {
+              "name": 1,
+              "price": 2
+            }
+          },
+          {
+            "id": 6,
+            "type": "list",
+            "value": [
+              4
+            ]
+          },
+          {
+            "id": 5,
+            "name": "Menu",
+            "type": "object",
+            "value": {
+              "items": 6
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": 2,
@@ -250,6 +720,729 @@
       "Constructors",
       "Objects",
       "Linked List"
+    ],
+    "steps": [
+      {
+        "lineNumber": 6,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "items": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {}
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "hi"
+          },
+          {
+            "id": 4,
+            "type": "list",
+            "value": [
+              2,
+              3
+            ]
+          },
+          {
+            "id": 1,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 2
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 6,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 3,
+            "value": {
+              "self": 5,
+              "items": 8
+            }
+          },
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "items": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {}
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "hi"
+          },
+          {
+            "id": 4,
+            "type": "list",
+            "value": [
+              2,
+              3
+            ]
+          },
+          {
+            "id": 8,
+            "type": "list",
+            "value": [
+              3
+            ]
+          },
+          {
+            "id": 1,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 2
+            }
+          },
+          {
+            "id": 5,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 3
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 4,
+        "iterationNumber": 3,
+        "answer": [
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 4,
+            "value": {
+              "self": 7,
+              "items": 9
+            }
+          },
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 3,
+            "value": {
+              "self": 5,
+              "items": 8
+            }
+          },
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "items": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {}
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "hi"
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "type": "list",
+            "value": [
+              2,
+              3
+            ]
+          },
+          {
+            "id": 8,
+            "type": "list",
+            "value": [
+              3
+            ]
+          },
+          {
+            "id": 9,
+            "type": "list",
+            "value": []
+          },
+          {
+            "id": 1,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 2
+            }
+          },
+          {
+            "id": 5,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 3
+            }
+          },
+          {
+            "id": 7,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 6,
+              "_rest": 6
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 7,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 3,
+            "value": {
+              "self": 5,
+              "items": 8
+            }
+          },
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "items": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {}
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "hi"
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "type": "list",
+            "value": [
+              2,
+              3
+            ]
+          },
+          {
+            "id": 8,
+            "type": "list",
+            "value": [
+              3
+            ]
+          },
+          {
+            "id": 9,
+            "type": "list",
+            "value": []
+          },
+          {
+            "id": 1,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 2
+            }
+          },
+          {
+            "id": 5,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 3,
+              "_rest": 7
+            }
+          },
+          {
+            "id": 7,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 6,
+              "_rest": 6
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 7,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "items": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {}
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "hi"
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "type": "list",
+            "value": [
+              2,
+              3
+            ]
+          },
+          {
+            "id": 8,
+            "type": "list",
+            "value": [
+              3
+            ]
+          },
+          {
+            "id": 9,
+            "type": "list",
+            "value": []
+          },
+          {
+            "id": 1,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 2,
+              "_rest": 5
+            }
+          },
+          {
+            "id": 5,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 3,
+              "_rest": 7
+            }
+          },
+          {
+            "id": 7,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 6,
+              "_rest": 6
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 3,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "items": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {}
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "hi"
+          },
+          {
+            "id": 4,
+            "type": "list",
+            "value": [
+              2,
+              3
+            ]
+          },
+          {
+            "id": 1,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {}
+          }
+        ]
+      },
+      {
+        "lineNumber": 3,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 3,
+            "value": {
+              "self": 5,
+              "items": 8
+            }
+          },
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "items": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {}
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "hi"
+          },
+          {
+            "id": 4,
+            "type": "list",
+            "value": [
+              2,
+              3
+            ]
+          },
+          {
+            "id": 8,
+            "type": "list",
+            "value": [
+              3
+            ]
+          },
+          {
+            "id": 1,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 2
+            }
+          },
+          {
+            "id": 5,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {}
+          }
+        ]
+      },
+      {
+        "lineNumber": 3,
+        "iterationNumber": 3,
+        "answer": [
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 4,
+            "value": {
+              "self": 7,
+              "items": 9
+            }
+          },
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 3,
+            "value": {
+              "self": 5,
+              "items": 8
+            }
+          },
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "items": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {}
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "hi"
+          },
+          {
+            "id": 4,
+            "type": "list",
+            "value": [
+              2,
+              3
+            ]
+          },
+          {
+            "id": 8,
+            "type": "list",
+            "value": [
+              3
+            ]
+          },
+          {
+            "id": 9,
+            "type": "list",
+            "value": []
+          },
+          {
+            "id": 1,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 2
+            }
+          },
+          {
+            "id": 5,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 3
+            }
+          },
+          {
+            "id": 7,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {}
+          }
+        ]
+      },
+      {
+        "lineNumber": 5,
+        "answer": [
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 4,
+            "value": {
+              "self": 7,
+              "items": 9
+            }
+          },
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 3,
+            "value": {
+              "self": 5,
+              "items": 8
+            }
+          },
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "items": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {}
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "hi"
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "type": "list",
+            "value": [
+              2,
+              3
+            ]
+          },
+          {
+            "id": 8,
+            "type": "list",
+            "value": [
+              3
+            ]
+          },
+          {
+            "id": 9,
+            "type": "list",
+            "value": []
+          },
+          {
+            "id": 1,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 2
+            }
+          },
+          {
+            "id": 5,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 3
+            }
+          },
+          {
+            "id": 7,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 6,
+              "_rest": 6
+            }
+          }
+        ]
+      }
     ]
   },
   {
@@ -350,6 +1543,412 @@
       "Aliasing",
       "Mutation",
       "Call Stack"
+    ],
+    "steps": [
+      {
+        "lineNumber": 13,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "a": 148
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 148,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 14,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "a": 148,
+              "b": 148
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 148,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "a_fun",
+            "type": ".frame",
+            "order": 4,
+            "value": {
+              "lst": 148,
+              "v": 3,
+              "x": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "y_fun",
+            "type": ".frame",
+            "order": 3,
+            "value": {
+              "d": 148
+            }
+          },
+          {
+            "id": null,
+            "name": "have_fun",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 148
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "a": 148,
+              "b": 148
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 148,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 3,
+        "answer": [
+          {
+            "id": null,
+            "name": "a_fun",
+            "type": ".frame",
+            "order": 4,
+            "value": {
+              "lst": 148,
+              "v": 3,
+              "x": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "y_fun",
+            "type": ".frame",
+            "order": 3,
+            "value": {
+              "d": 148
+            }
+          },
+          {
+            "id": null,
+            "name": "have_fun",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 148
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "a": 148,
+              "b": 148
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 148,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 6,
+        "answer": [
+          {
+            "id": null,
+            "name": "y_fun",
+            "type": ".frame",
+            "order": 3,
+            "value": {
+              "d": 148
+            }
+          },
+          {
+            "id": null,
+            "name": "have_fun",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 148
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "a": 148,
+              "b": 148
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 148,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 7,
+        "answer": [
+          {
+            "id": null,
+            "name": "y_fun",
+            "type": ".frame",
+            "order": 3,
+            "value": {
+              "d": 148
+            }
+          },
+          {
+            "id": null,
+            "name": "have_fun",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 148
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "a": 148,
+              "b": 148
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 148,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 10,
+        "answer": [
+          {
+            "id": null,
+            "name": "have_fun",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 148
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "a": 148,
+              "b": 148
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 148,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        ]
+      }
     ]
   },
   {
@@ -435,6 +2034,590 @@
       "Shallow Copy",
       "Lists",
       "Aliasing"
+    ],
+    "steps": [
+      {
+        "lineNumber": 8,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "m1": 101
+            }
+          },
+          {
+            "id": 50,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 60,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 70,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 102,
+            "type": "list",
+            "value": [
+              50,
+              60
+            ]
+          },
+          {
+            "id": 103,
+            "type": "list",
+            "value": [
+              70,
+              80
+            ]
+          },
+          {
+            "id": 101,
+            "type": "list",
+            "value": [
+              102,
+              103
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "duplicate",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "matrix": 101,
+              "answer": 104
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "m1": 101
+            }
+          },
+          {
+            "id": 50,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 60,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 70,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 102,
+            "type": "list",
+            "value": [
+              50,
+              60
+            ]
+          },
+          {
+            "id": 103,
+            "type": "list",
+            "value": [
+              70,
+              80
+            ]
+          },
+          {
+            "id": 101,
+            "type": "list",
+            "value": [
+              102,
+              103
+            ]
+          },
+          {
+            "id": 104,
+            "type": "list",
+            "value": []
+          }
+        ]
+      },
+      {
+        "lineNumber": 4,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "duplicate",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "matrix": 101,
+              "answer": 104,
+              "item": 102
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "m1": 101
+            }
+          },
+          {
+            "id": 50,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 60,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 70,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 102,
+            "type": "list",
+            "value": [
+              50,
+              60
+            ]
+          },
+          {
+            "id": 103,
+            "type": "list",
+            "value": [
+              70,
+              80
+            ]
+          },
+          {
+            "id": 101,
+            "type": "list",
+            "value": [
+              102,
+              103
+            ]
+          },
+          {
+            "id": 104,
+            "type": "list",
+            "value": [
+              102
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 4,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "duplicate",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "matrix": 101,
+              "answer": 104,
+              "item": 103
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "m1": 101
+            }
+          },
+          {
+            "id": 50,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 60,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 70,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 102,
+            "type": "list",
+            "value": [
+              50,
+              60
+            ]
+          },
+          {
+            "id": 103,
+            "type": "list",
+            "value": [
+              70,
+              80
+            ]
+          },
+          {
+            "id": 101,
+            "type": "list",
+            "value": [
+              102,
+              103
+            ]
+          },
+          {
+            "id": 104,
+            "type": "list",
+            "value": [
+              102,
+              103
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 3,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "duplicate",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "matrix": 101,
+              "answer": 104,
+              "item": 102
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "m1": 101
+            }
+          },
+          {
+            "id": 50,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 60,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 70,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 102,
+            "type": "list",
+            "value": [
+              50,
+              60
+            ]
+          },
+          {
+            "id": 103,
+            "type": "list",
+            "value": [
+              70,
+              80
+            ]
+          },
+          {
+            "id": 101,
+            "type": "list",
+            "value": [
+              102,
+              103
+            ]
+          },
+          {
+            "id": 104,
+            "type": "list",
+            "value": []
+          }
+        ]
+      },
+      {
+        "lineNumber": 3,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "duplicate",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "matrix": 101,
+              "answer": 104,
+              "item": 103
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "m1": 101
+            }
+          },
+          {
+            "id": 50,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 60,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 70,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 102,
+            "type": "list",
+            "value": [
+              50,
+              60
+            ]
+          },
+          {
+            "id": 103,
+            "type": "list",
+            "value": [
+              70,
+              80
+            ]
+          },
+          {
+            "id": 101,
+            "type": "list",
+            "value": [
+              102,
+              103
+            ]
+          },
+          {
+            "id": 104,
+            "type": "list",
+            "value": [
+              102
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 5,
+        "answer": [
+          {
+            "id": null,
+            "name": "duplicate",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "matrix": 101,
+              "answer": 104,
+              "item": 103
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "m1": 101
+            }
+          },
+          {
+            "id": 50,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 60,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 70,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 102,
+            "type": "list",
+            "value": [
+              50,
+              60
+            ]
+          },
+          {
+            "id": 103,
+            "type": "list",
+            "value": [
+              70,
+              80
+            ]
+          },
+          {
+            "id": 101,
+            "type": "list",
+            "value": [
+              102,
+              103
+            ]
+          },
+          {
+            "id": 104,
+            "type": "list",
+            "value": [
+              102,
+              103
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 9,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "m1": 101,
+              "m2": 104
+            }
+          },
+          {
+            "id": 50,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 60,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 70,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 102,
+            "type": "list",
+            "value": [
+              50,
+              60
+            ]
+          },
+          {
+            "id": 103,
+            "type": "list",
+            "value": [
+              70,
+              80
+            ]
+          },
+          {
+            "id": 101,
+            "type": "list",
+            "value": [
+              102,
+              103
+            ]
+          },
+          {
+            "id": 104,
+            "type": "list",
+            "value": [
+              102,
+              103
+            ]
+          }
+        ]
+      }
     ]
   },
   {
@@ -540,6 +2723,842 @@
       "Loops",
       "Rebinding",
       "Objects"
+    ],
+    "steps": [
+      {
+        "lineNumber": 15,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "q": 90
+            }
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 81,
+            "type": "int",
+            "value": 21
+          },
+          {
+            "id": 82,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 83,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              80,
+              81,
+              82,
+              83
+            ]
+          },
+          {
+            "id": 90,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 100
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 5,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "filter_queue",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "q": 90,
+              "minimum": 67,
+              "temp_queue": 95,
+              "value": 80
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "q": 90
+            }
+          },
+          {
+            "id": 67,
+            "type": "int",
+            "value": 10
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 81,
+            "type": "int",
+            "value": 21
+          },
+          {
+            "id": 82,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 83,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              81,
+              82,
+              83
+            ]
+          },
+          {
+            "id": 90,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 100
+            }
+          },
+          {
+            "id": 105,
+            "type": "list",
+            "value": []
+          },
+          {
+            "id": 95,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 105
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 5,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "filter_queue",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "q": 90,
+              "minimum": 67,
+              "temp_queue": 95,
+              "value": 81
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "q": 90
+            }
+          },
+          {
+            "id": 67,
+            "type": "int",
+            "value": 10
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 81,
+            "type": "int",
+            "value": 21
+          },
+          {
+            "id": 82,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 83,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              82,
+              83
+            ]
+          },
+          {
+            "id": 90,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 100
+            }
+          },
+          {
+            "id": 105,
+            "type": "list",
+            "value": []
+          },
+          {
+            "id": 95,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 105
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 11,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "q": 90
+            }
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": []
+          },
+          {
+            "id": 90,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 100
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 12,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "q": 90
+            }
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              80
+            ]
+          },
+          {
+            "id": 90,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 100
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 13,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "q": 90
+            }
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 81,
+            "type": "int",
+            "value": 21
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              80,
+              81
+            ]
+          },
+          {
+            "id": 90,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 100
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 14,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "q": 90
+            }
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 81,
+            "type": "int",
+            "value": 21
+          },
+          {
+            "id": 82,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              80,
+              81,
+              82
+            ]
+          },
+          {
+            "id": 90,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 100
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 3,
+        "answer": [
+          {
+            "id": null,
+            "name": "filter_queue",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "q": 90,
+              "minimum": 67,
+              "temp_queue": 95
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "q": 90
+            }
+          },
+          {
+            "id": 67,
+            "type": "int",
+            "value": 10
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 81,
+            "type": "int",
+            "value": 21
+          },
+          {
+            "id": 82,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 83,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              80,
+              81,
+              82,
+              83
+            ]
+          },
+          {
+            "id": 90,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 100
+            }
+          },
+          {
+            "id": 105,
+            "type": "list",
+            "value": []
+          },
+          {
+            "id": 95,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 105
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 7,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "filter_queue",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "q": 90,
+              "minimum": 67,
+              "temp_queue": 95,
+              "value": 81
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "q": 90
+            }
+          },
+          {
+            "id": 67,
+            "type": "int",
+            "value": 10
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 81,
+            "type": "int",
+            "value": 21
+          },
+          {
+            "id": 82,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 83,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              82,
+              83
+            ]
+          },
+          {
+            "id": 90,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 100
+            }
+          },
+          {
+            "id": 105,
+            "type": "list",
+            "value": [
+              81
+            ]
+          },
+          {
+            "id": 95,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 105
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 5,
+        "iterationNumber": 3,
+        "answer": [
+          {
+            "id": null,
+            "name": "filter_queue",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "q": 90,
+              "minimum": 67,
+              "temp_queue": 95,
+              "value": 82
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "q": 90
+            }
+          },
+          {
+            "id": 67,
+            "type": "int",
+            "value": 10
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 81,
+            "type": "int",
+            "value": 21
+          },
+          {
+            "id": 82,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 83,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              83
+            ]
+          },
+          {
+            "id": 90,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 100
+            }
+          },
+          {
+            "id": 105,
+            "type": "list",
+            "value": [
+              81
+            ]
+          },
+          {
+            "id": 95,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 105
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 5,
+        "iterationNumber": 4,
+        "answer": [
+          {
+            "id": null,
+            "name": "filter_queue",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "q": 90,
+              "minimum": 67,
+              "temp_queue": 95,
+              "value": 83
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "q": 90
+            }
+          },
+          {
+            "id": 67,
+            "type": "int",
+            "value": 10
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 81,
+            "type": "int",
+            "value": 21
+          },
+          {
+            "id": 82,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 83,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": []
+          },
+          {
+            "id": 90,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 100
+            }
+          },
+          {
+            "id": 105,
+            "type": "list",
+            "value": [
+              81
+            ]
+          },
+          {
+            "id": 95,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 105
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 8,
+        "answer": [
+          {
+            "id": null,
+            "name": "filter_queue",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "q": 95,
+              "minimum": 67,
+              "temp_queue": 95,
+              "value": 83
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "q": 90
+            }
+          },
+          {
+            "id": 67,
+            "type": "int",
+            "value": 10
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 81,
+            "type": "int",
+            "value": 21
+          },
+          {
+            "id": 82,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 83,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": []
+          },
+          {
+            "id": 90,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 100
+            }
+          },
+          {
+            "id": 105,
+            "type": "list",
+            "value": [
+              81
+            ]
+          },
+          {
+            "id": 95,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 105
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 16,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "q": 90
+            }
+          },
+          {
+            "id": 67,
+            "type": "int",
+            "value": 10
+          },
+          {
+            "id": 80,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 81,
+            "type": "int",
+            "value": 21
+          },
+          {
+            "id": 82,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 83,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": []
+          },
+          {
+            "id": 90,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 100
+            }
+          },
+          {
+            "id": 105,
+            "type": "list",
+            "value": [
+              81
+            ]
+          },
+          {
+            "id": 95,
+            "name": "Queue",
+            "type": "object",
+            "value": {
+              "_items": 105
+            }
+          }
+        ]
+      }
     ]
   },
   {
@@ -621,6 +3640,306 @@
       "Mutation",
       "Rebinding",
       "Lists"
+    ],
+    "steps": [
+      {
+        "lineNumber": 8,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "my_num": 1
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 100
+          }
+        ]
+      },
+      {
+        "lineNumber": 9,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "my_num": 1,
+              "my_lst": 99
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 100
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 99,
+            "type": "list",
+            "value": [
+              2
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "mystery",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "a": 1,
+              "b": 99,
+              "c": 99
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "my_num": 1,
+              "my_lst": 99
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 100
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 99,
+            "type": "list",
+            "value": [
+              2
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 3,
+        "answer": [
+          {
+            "id": null,
+            "name": "mystery",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "a": 1,
+              "b": 99,
+              "c": 99
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "my_num": 1,
+              "my_lst": 99
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 100
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 99,
+            "type": "list",
+            "value": [
+              2,
+              1
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 4,
+        "answer": [
+          {
+            "id": null,
+            "name": "mystery",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "a": 4,
+              "b": 99,
+              "c": 99
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "my_num": 1,
+              "my_lst": 99
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 100
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 101
+          },
+          {
+            "id": 99,
+            "type": "list",
+            "value": [
+              2,
+              1
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 5,
+        "answer": [
+          {
+            "id": null,
+            "name": "mystery",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "a": 4,
+              "b": 100,
+              "c": 99
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "my_num": 1,
+              "my_lst": 99
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 100
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 101
+          },
+          {
+            "id": 99,
+            "type": "list",
+            "value": [
+              2,
+              1
+            ]
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              3
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 10,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "my_num": 1,
+              "my_lst": 99
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 100
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 101
+          },
+          {
+            "id": 99,
+            "type": "list",
+            "value": [
+              2,
+              1
+            ]
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              3
+            ]
+          }
+        ]
+      }
     ]
   },
   {
@@ -726,6 +4045,483 @@
       "Shallow Copy",
       "Lists",
       "Aliasing"
+    ],
+    "steps": [
+      {
+        "lineNumber": 10,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "board": 100
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "O"
+          },
+          {
+            "id": 2,
+            "type": "str",
+            "value": ""
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "X"
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              1,
+              2
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              1,
+              3,
+              3
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              3,
+              2,
+              3
+            ]
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              10,
+              20,
+              30
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "copy_of",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 100,
+              "new_lst": 200
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "board": 100
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "O"
+          },
+          {
+            "id": 2,
+            "type": "str",
+            "value": ""
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "X"
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              1,
+              2
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              1,
+              3,
+              3
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              3,
+              2,
+              3
+            ]
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              10,
+              20,
+              30
+            ]
+          },
+          {
+            "id": 200,
+            "type": "list",
+            "value": []
+          }
+        ]
+      },
+      {
+        "lineNumber": 4,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "copy_of",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 100,
+              "new_lst": 200,
+              "item": 10
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "board": 100
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "O"
+          },
+          {
+            "id": 2,
+            "type": "str",
+            "value": ""
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "X"
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              1,
+              2
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              1,
+              3,
+              3
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              3,
+              2,
+              3
+            ]
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              10,
+              20,
+              30
+            ]
+          },
+          {
+            "id": 200,
+            "type": "list",
+            "value": [
+              10
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 4,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "copy_of",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 100,
+              "new_lst": 200,
+              "item": 20
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "board": 100
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "O"
+          },
+          {
+            "id": 2,
+            "type": "str",
+            "value": ""
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "X"
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              1,
+              2
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              1,
+              3,
+              3
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              3,
+              2,
+              3
+            ]
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              10,
+              20,
+              30
+            ]
+          },
+          {
+            "id": 200,
+            "type": "list",
+            "value": [
+              10,
+              20
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 4,
+        "iterationNumber": 3,
+        "answer": [
+          {
+            "id": null,
+            "name": "copy_of",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 100,
+              "new_lst": 200,
+              "item": 30
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "board": 100
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "O"
+          },
+          {
+            "id": 2,
+            "type": "str",
+            "value": ""
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "X"
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              1,
+              2
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              1,
+              3,
+              3
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              3,
+              2,
+              3
+            ]
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              10,
+              20,
+              30
+            ]
+          },
+          {
+            "id": 200,
+            "type": "list",
+            "value": [
+              10,
+              20,
+              30
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 11,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "board": 100,
+              "temp_board": 200
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "O"
+          },
+          {
+            "id": 2,
+            "type": "str",
+            "value": ""
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "X"
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              1,
+              2
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              1,
+              3,
+              3
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              3,
+              2,
+              3
+            ]
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              10,
+              20,
+              30
+            ]
+          },
+          {
+            "id": 200,
+            "type": "list",
+            "value": [
+              10,
+              20,
+              30
+            ]
+          }
+        ]
+      }
     ]
   },
   {
@@ -833,6 +4629,491 @@
       "Mutation",
       "Loops",
       "Lists"
+    ],
+    "steps": [
+      {
+        "lineNumber": 11,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst1": 100
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              3
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              4,
+              5
+            ]
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              10,
+              20,
+              30
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 4,
+        "answer": [
+          {
+            "id": null,
+            "name": "append_sometimes",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 100,
+              "new": 2,
+              "answer": 100
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst1": 100
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              3
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              4,
+              5
+            ]
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              10,
+              20,
+              30
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 7,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "append_sometimes",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 100,
+              "new": 2,
+              "item": 20,
+              "answer": 100
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst1": 100
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              3,
+              2
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              4,
+              5
+            ]
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              10,
+              20,
+              30
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 7,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "append_sometimes",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 100,
+              "new": 2,
+              "item": 30,
+              "answer": 100
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst1": 100
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              3,
+              2
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              4,
+              5,
+              2
+            ]
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              10,
+              20,
+              30
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 8,
+        "answer": [
+          {
+            "id": null,
+            "name": "append_sometimes",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 100,
+              "new": 2,
+              "item": 30,
+              "answer": 100
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst1": 100
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              3,
+              2
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              4,
+              5,
+              2
+            ]
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              10,
+              20,
+              30
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 12,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst1": 100,
+              "new_lst1": 100
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              3,
+              2
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              4,
+              5,
+              2
+            ]
+          },
+          {
+            "id": 100,
+            "type": "list",
+            "value": [
+              10,
+              20,
+              30
+            ]
+          }
+        ]
+      }
     ]
   },
   {
@@ -915,6 +5196,399 @@
       "Aliasing",
       "Mutation",
       "Objects"
+    ],
+    "steps": [
+      {
+        "lineNumber": 6,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "some_stuff": 10
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "wallet"
+          },
+          {
+            "id": 2,
+            "type": "str",
+            "value": "phone"
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "keys"
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 7,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "some_stuff": 10,
+              "my_stuff": 20
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "wallet"
+          },
+          {
+            "id": 2,
+            "type": "str",
+            "value": "phone"
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "keys"
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3
+            ]
+          },
+          {
+            "id": 20,
+            "name": "BagOfStuff",
+            "type": "object",
+            "value": {
+              "stuff": 10
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 8,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "some_stuff": 10,
+              "my_stuff": 20
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "wallet"
+          },
+          {
+            "id": 2,
+            "type": "str",
+            "value": "phone"
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "keys"
+          },
+          {
+            "id": 4,
+            "type": "str",
+            "value": "snacks"
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          {
+            "id": 20,
+            "name": "BagOfStuff",
+            "type": "object",
+            "value": {
+              "stuff": 10
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 9,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "some_stuff": 10,
+              "my_stuff": 20,
+              "your_stuff": 30
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "wallet"
+          },
+          {
+            "id": 2,
+            "type": "str",
+            "value": "phone"
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "keys"
+          },
+          {
+            "id": 4,
+            "type": "str",
+            "value": "snacks"
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          {
+            "id": 20,
+            "name": "BagOfStuff",
+            "type": "object",
+            "value": {
+              "stuff": 10
+            }
+          },
+          {
+            "id": 30,
+            "name": "BagOfStuff",
+            "type": "object",
+            "value": {
+              "stuff": 10
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 3,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "BagOfStuff.__init__",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 20,
+              "stuff": 10
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "some_stuff": 10
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "wallet"
+          },
+          {
+            "id": 2,
+            "type": "str",
+            "value": "phone"
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "keys"
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3
+            ]
+          },
+          {
+            "id": 20,
+            "name": "BagOfStuff",
+            "type": "object",
+            "value": {
+              "stuff": 10
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 3,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "BagOfStuff.__init__",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 30,
+              "stuff": 10
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "some_stuff": 10,
+              "my_stuff": 20
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "wallet"
+          },
+          {
+            "id": 2,
+            "type": "str",
+            "value": "phone"
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "keys"
+          },
+          {
+            "id": 4,
+            "type": "str",
+            "value": "snacks"
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          {
+            "id": 20,
+            "name": "BagOfStuff",
+            "type": "object",
+            "value": {
+              "stuff": 10
+            }
+          },
+          {
+            "id": 30,
+            "name": "BagOfStuff",
+            "type": "object",
+            "value": {
+              "stuff": 10
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 10,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "some_stuff": 10,
+              "my_stuff": 20,
+              "your_stuff": 30
+            }
+          },
+          {
+            "id": 1,
+            "type": "str",
+            "value": "wallet"
+          },
+          {
+            "id": 2,
+            "type": "str",
+            "value": "phone"
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "keys"
+          },
+          {
+            "id": 4,
+            "type": "str",
+            "value": "snacks"
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          {
+            "id": 20,
+            "name": "BagOfStuff",
+            "type": "object",
+            "value": {
+              "stuff": 10
+            }
+          },
+          {
+            "id": 30,
+            "name": "BagOfStuff",
+            "type": "object",
+            "value": {
+              "stuff": 10
+            }
+          }
+        ]
+      }
     ]
   },
   {
@@ -1019,6 +5693,622 @@
       "Mutation",
       "Loops",
       "Lists"
+    ],
+    "steps": [
+      {
+        "lineNumber": 6,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "original_lst": 30
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 6,
+            "type": "int",
+            "value": 6
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              4,
+              5,
+              6
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              10,
+              20
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 7,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "original_lst": 30,
+              "lst_copy": 40
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 6,
+            "type": "int",
+            "value": 6
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              4,
+              5,
+              6
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              10,
+              20
+            ]
+          },
+          {
+            "id": 40,
+            "type": "list",
+            "value": [
+              10,
+              20
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 3,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "do_something",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 40,
+              "sublst": 10
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "original_lst": 30,
+              "lst_copy": 40
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 6,
+            "type": "int",
+            "value": 6
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 99
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3,
+              7
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              4,
+              5,
+              6
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              10,
+              20
+            ]
+          },
+          {
+            "id": 40,
+            "type": "list",
+            "value": [
+              10,
+              20
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 3,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "do_something",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 40,
+              "sublst": 20
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "original_lst": 30,
+              "lst_copy": 40
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 6,
+            "type": "int",
+            "value": 6
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 99
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3,
+              7
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              4,
+              5,
+              6,
+              7
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              10,
+              20
+            ]
+          },
+          {
+            "id": 40,
+            "type": "list",
+            "value": [
+              10,
+              20
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 2,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "do_something",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 40,
+              "sublst": 10
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "original_lst": 30,
+              "lst_copy": 40
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 6,
+            "type": "int",
+            "value": 6
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              4,
+              5,
+              6
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              10,
+              20
+            ]
+          },
+          {
+            "id": 40,
+            "type": "list",
+            "value": [
+              10,
+              20
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 2,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "do_something",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "lst": 40,
+              "sublst": 20
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "original_lst": 30,
+              "lst_copy": 40
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 6,
+            "type": "int",
+            "value": 6
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 99
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3,
+              7
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              4,
+              5,
+              6
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              10,
+              20
+            ]
+          },
+          {
+            "id": 40,
+            "type": "list",
+            "value": [
+              10,
+              20
+            ]
+          }
+        ]
+      },
+      {
+        "lineNumber": 8,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "original_lst": 30,
+              "lst_copy": 40
+            }
+          },
+          {
+            "id": 1,
+            "type": "int",
+            "value": 1
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 2
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 3
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 4
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 5
+          },
+          {
+            "id": 6,
+            "type": "int",
+            "value": 6
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 99
+          },
+          {
+            "id": 10,
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3,
+              7
+            ]
+          },
+          {
+            "id": 20,
+            "type": "list",
+            "value": [
+              4,
+              5,
+              6,
+              7
+            ]
+          },
+          {
+            "id": 30,
+            "type": "list",
+            "value": [
+              10,
+              20
+            ]
+          },
+          {
+            "id": 40,
+            "type": "list",
+            "value": [
+              10,
+              20
+            ]
+          }
+        ]
+      }
     ]
   }
 ]

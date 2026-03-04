@@ -14,7 +14,7 @@ interface UseCanvasSubmissionParams {
 
 interface UseCanvasSubmissionReturn {
   handleCanvasSubmit: () => Promise<boolean>;
-  handleCanvasSubmitAtLine: (lineNumber: number) => Promise<boolean>;
+  handleCanvasSubmitAtLine: (lineNumber: number, iterationNumber?: number) => Promise<boolean>;
 }
 
 /**
@@ -119,7 +119,7 @@ export function useCanvasSubmission({
     }
   }, []);
 
-  const handleCanvasSubmitAtLine = useCallback(async (lineNumber: number): Promise<boolean> => {
+  const handleCanvasSubmitAtLine = useCallback(async (lineNumber: number, iterationNumber?: number): Promise<boolean> => {
     const index = idxRef.current;
     const qtype = typeRef.current;
     const els = elsRef.current;
@@ -142,7 +142,7 @@ export function useCanvasSubmission({
     }
 
     try {
-      const result = await submitCanvasAtLine(validElements, index, qtype, lineNumber);
+      const result = await submitCanvasAtLine(validElements, index, qtype, lineNumber, iterationNumber);
 
       if (result !== undefined && result !== null) {
         console.log('[useCanvasSubmission] submitAtLine result:', result);

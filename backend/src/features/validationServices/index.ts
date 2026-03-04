@@ -18,11 +18,12 @@ router.post("/submit", async (req, res) => {
 });
 
 router.post("/submitAtLine", async (req, res) => {
-  const { model, questionIndex, questionType, lineNumber } = req.body;
-  console.log(`Canvas data (check at line ${lineNumber}):`, model);
+  const { model, questionIndex, questionType, lineNumber, iterationNumber } = req.body;
+  const iterLabel = iterationNumber !== undefined ? `, iter ${iterationNumber}` : "";
+  console.log(`Canvas data (check at line ${lineNumber}${iterLabel}):`, model);
 
-  const result = await validateAnswerAtLine(model, questionIndex, questionType, lineNumber);
-  console.log(`Line ${lineNumber} check is`, result.correct ? "Correct" : "Incorrect");
+  const result = await validateAnswerAtLine(model, questionIndex, questionType, lineNumber, iterationNumber);
+  console.log(`Line ${lineNumber}${iterLabel} check is`, result.correct ? "Correct" : "Incorrect");
   if (!result.correct) {
     console.log("Errors:");
     result.errors.forEach((err) => console.log(" -", err.message));

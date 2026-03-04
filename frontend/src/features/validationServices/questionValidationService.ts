@@ -19,6 +19,7 @@ export interface SubmissionPayload {
 
 export interface SubmissionAtLinePayload extends SubmissionPayload {
   lineNumber: number;
+  iterationNumber?: number;
 }
 
 /**
@@ -76,6 +77,7 @@ export async function submitCanvasAtLine(
   questionIndex: number,
   questionType: QuestionType,
   lineNumber: number,
+  iterationNumber?: number,
 ) {
   try {
     const payload: SubmissionAtLinePayload = {
@@ -83,6 +85,7 @@ export async function submitCanvasAtLine(
       questionIndex,
       questionType,
       lineNumber,
+      iterationNumber,
     };
 
     const response = await axios.post(

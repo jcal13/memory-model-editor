@@ -945,12 +945,13 @@ export default async function validateAnswer(
 }
 
 /* ---------- line-specific validation ---------- */
-type QuestionStep = { lineNumber: number; answer: unknown };
+type QuestionStep = { lineNumber: number; iterationNumber?: number; answer: unknown };
 
 async function fetchStepsModel(
   questionType: "test" | "practice" | "prep",
   questionId: number,
-  lineNumber: number
+  lineNumber: number,
+  iterationNumber?: number
 ): Promise<MemoryBox[] | "no_steps" | null> {
   const table =
     questionType === "practice"
@@ -969,7 +970,7 @@ async function fetchStepsModel(
   if (!Array.isArray(steps)) return "no_steps";
 
   const step = (steps as QuestionStep[]).find(
-    (s) => s.lineNumber === lineNumber
+    (s) => s.lineNumber === lineNumber && s.iterationNumber === iterationNumber
   );
   if (!step) return "no_steps";
 
@@ -983,9 +984,10 @@ export async function validateAnswerAtLine(
   userModel: MemoryBox[],
   questionId: number,
   questionType: "test" | "practice" | "prep",
-  lineNumber: number
+  lineNumber: number,
+  iterationNumber?: number
 ): Promise<{ correct: boolean; errors: FeedbackError[] }> {
-  const stepModel = await fetchStepsModel(questionType, questionId, lineNumber);
+  const stepModel = await fetchStepsModel(questionType, questionId, lineNumber, iterationNumber);
 
   if (stepModel === null) {
     return {
@@ -1003,7 +1005,7 @@ export async function validateAnswerAtLine(
       correct: false,
       errors: [{
         type: ErrorType.GENERIC_ERROR,
-        message: `No answer defined for line ${lineNumber}`,
+        message: `No answer defined for line ${lineNumber}${iterationNumber !== undefined ? ` iteration ${iterationNumber}` : ""}`,
         severity: 'error'
       }],
     };

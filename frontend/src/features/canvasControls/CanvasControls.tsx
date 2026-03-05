@@ -22,6 +22,8 @@ interface CanvasControlsProps {
   onScaleChange?: (scale: number) => void;
   editorScale?: number;
   onEditorScaleChange?: (scale: number) => void;
+  fontScale?: number;
+  onFontScaleChange?: (delta: number) => void;
 }
 
 type ControlTab = "actions" | "view" | "settings";
@@ -61,6 +63,8 @@ export default function CanvasControls({
   onScaleChange,
   editorScale = 1,
   onEditorScaleChange,
+  fontScale = 1,
+  onFontScaleChange,
 }: CanvasControlsProps) {
   const { theme, toggleTheme } = useTheme();
   const isDarkMode = theme === 'dark';
@@ -128,6 +132,39 @@ export default function CanvasControls({
                 </div>
                 <div className={styles.buttonWrapper}>
                   <ZoomControls scale={editorScale} onScaleChange={onEditorScaleChange} />
+                </div>
+              </>
+            )}
+
+            {onFontScaleChange && (
+              <>
+                <div className={styles.controlItem}>
+                  <label className={styles.controlLabel}>Question Zoom</label>
+                  <span className={styles.scaleValue}>{Math.round(fontScale * 100)}%</span>
+                </div>
+                <div className={styles.buttonWrapper}>
+                  <div className={styles.fontZoomControls}>
+                    <button
+                      type="button"
+                      className={styles.fontZoomBtn}
+                      onClick={() => onFontScaleChange(-0.1)}
+                      disabled={fontScale <= 0.75}
+                      aria-label="Decrease question font size"
+                      title="Decrease question font size"
+                    >
+                      −
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.fontZoomBtn}
+                      onClick={() => onFontScaleChange(0.1)}
+                      disabled={fontScale >= 1.5}
+                      aria-label="Increase question font size"
+                      title="Increase question font size"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
               </>
             )}

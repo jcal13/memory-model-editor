@@ -3,7 +3,7 @@
   padding: 1rem 1.25rem;
   border-radius: 10px;
   overflow-x: auto;
-  font-size: 0.85rem;
+  font-size: calc(0.85rem * var(--font-scale, 1));
   line-height: 1.5;
   background: #1e1e2e;
 }

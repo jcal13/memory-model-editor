@@ -502,7 +502,7 @@ export default function QuestionTab({
               variant="category"
               text="CSC148 Prep Questions"
               subtitle=""
-              icon="🔗"
+              icon="🎓"
               categoryType="prep"
               onClick={() => loadQuestions("prep")}
             />

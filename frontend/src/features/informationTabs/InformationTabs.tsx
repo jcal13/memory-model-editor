@@ -30,6 +30,7 @@ interface InformationTabsProps {
   onQuestionDataChange?: (data: any) => void;
   tabScrollPositions: Record<Tab, number>;
   setTabScrollPositions: React.Dispatch<React.SetStateAction<Record<Tab, number>>>;
+  fontScale?: number;
 }
 
 export default function InformationTabs({
@@ -57,6 +58,7 @@ export default function InformationTabs({
   onQuestionDataChange,
   tabScrollPositions,
   setTabScrollPositions,
+  fontScale = 1,
 }: InformationTabsProps) {
   const tabBodyRef = useRef<HTMLDivElement>(null);
   // Track the last submission context so Resubmit repeats the same check
@@ -165,6 +167,7 @@ export default function InformationTabs({
               currentCanvasState={currentCanvasState}
               onQuestionDataChange={onQuestionDataChange}
               isSandboxMode={isSandboxMode}
+              fontScale={fontScale}
             />
           </div>
 
@@ -185,6 +188,7 @@ export default function InformationTabs({
               isSandboxMode={!isSandboxMode}
               onResubmit={handleResubmit}
               resubmitLine={lastSubmitLine}
+              fontScale={fontScale}
             />
           </div>
         </div>

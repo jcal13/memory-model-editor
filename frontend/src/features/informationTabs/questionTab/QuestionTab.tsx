@@ -75,6 +75,7 @@ interface QuestionTabProps {
   currentCanvasState: { elements: any[]; ids: number[]; classes: string[] };
   onQuestionDataChange?: (data: any) => void;
   isSandboxMode: boolean;
+  fontScale?: number;
 }
 
 function loadQuestionStatus(): QuestionStatusMap {
@@ -114,6 +115,7 @@ export default function QuestionTab({
   currentCanvasState,
   onQuestionDataChange,
   isSandboxMode,
+  fontScale = 1,
 }: QuestionTabProps) {
   const [view, setView] = useState<View>(
     () => (VALID_VIEWS.includes(questionViewProp as View) && questionViewProp !== "loading" ? (questionViewProp as View) : "root")
@@ -556,7 +558,7 @@ export default function QuestionTab({
             (!selectedLineHasIterations || selectedIteration !== undefined);
           return (
             <>
-              <div className={styles.questionArea}>
+              <div className={styles.questionArea} style={{ '--font-scale': fontScale } as React.CSSProperties}>
                 <details className={styles.topicsSection}>
                   <summary className={styles.topicsSummary}>Topics</summary>
                   <div className={styles.topicsContent}>

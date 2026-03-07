@@ -1,10 +1,11 @@
 import { useRef } from "react";
 import { usePaletteBoxEffect } from "../hooks/usePalette";
-import { BoxTypeName } from "../../shared/types";
+import { BoxTypeName, VisualStyle } from "../../shared/types";
 
 interface PaletteBoxProps {
   /** The type of box to render (e.g., "primitive", "list", "dict") */
   boxType: BoxTypeName;
+  visualStyle: VisualStyle;
 }
 
 /**
@@ -13,12 +14,12 @@ interface PaletteBoxProps {
  * preview using `usePaletteBoxEffect`, and supports drag-and-drop to
  * create a new box on the canvas.
  */
-export default function PaletteBox({ boxType }: PaletteBoxProps) {
+export default function PaletteBox({ boxType, visualStyle }: PaletteBoxProps) {
   /** Ref to the div container that will hold the rendered SVG */
   const containerRef = useRef<HTMLDivElement>(null);
 
   /** Custom hook to render the box preview inside the container */
-  usePaletteBoxEffect(containerRef, boxType);
+  usePaletteBoxEffect(containerRef, boxType, visualStyle);
 
   /** Drag-and-drop: set box type on drag start */
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {

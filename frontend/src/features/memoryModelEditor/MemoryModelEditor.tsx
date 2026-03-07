@@ -296,6 +296,7 @@ export default function MemoryModelEditor({
     questionType: state.selectedQuestionType,
     submissionResults: state.submissionResults,
     sandboxMode: state.isSandboxMode,
+    visualStyle: state.visualStyle,
     questionView: state.questionView,
     isInfoPanelOpen: state.isInfoPanelOpen,
     canvasScale,
@@ -484,6 +485,8 @@ export default function MemoryModelEditor({
                 onScaleChange={setCanvasScale}
                 editorScale={editorScale}
                 onEditorScaleChange={setEditorScale}
+                visualStyle={state.visualStyle}
+                onVisualStyleChange={state.setVisualStyle}
               />
             </div>
           </div>
@@ -514,6 +517,7 @@ export default function MemoryModelEditor({
               scale={canvasScale}
               onScaleChange={setCanvasScale}
               editorScale={editorScale}
+              visualStyle={state.visualStyle}
               questionFunctionNames={
                 state.isSandboxMode && currentQuestionData
                   ? getQuestionFunctionNames(currentQuestionData)

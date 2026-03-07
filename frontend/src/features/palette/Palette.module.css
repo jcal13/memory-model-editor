@@ -215,6 +215,15 @@
   gap: 16px;
 }
 
+.emptyState {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  text-align: center;
+  max-width: 220px;
+}
+
 /* Override memory-viz box background fills for light mode in palette */
 :root[data-theme="light"] .paletteBoxes :global(svg g path[fill]:not([fill="none"])),
 .paletteBoxes :global(svg g path[fill]:not([fill="none"])) {

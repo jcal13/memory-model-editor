@@ -174,7 +174,9 @@
 
 .classNameInput,
 .functionNameInput,
-.primitiveValueContainer {
+.primitiveValueContainer,
+.inlineTargetModeSelect,
+.inlineTargetSelect {
   width: 100%;
   font-size: 0.95rem;
   padding: 8px 12px;
@@ -188,10 +190,26 @@
 
 .classNameInput:focus,
 .functionNameInput:focus,
-.primitiveValueContainer:focus {
+.primitiveValueContainer:focus,
+.inlineTargetModeSelect:focus,
+.inlineTargetSelect:focus {
   outline: 2px solid var(--border-focus);
   outline-offset: 1px;
   border-color: transparent;
+}
+
+.inlineTargetEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 220px;
+}
+
+.inlineTargetBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
 }
 
 .variableNameBox {

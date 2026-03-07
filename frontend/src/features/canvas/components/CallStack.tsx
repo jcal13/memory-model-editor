@@ -6,7 +6,10 @@ import React, {
   useState,
   useId,
 } from "react";
-import { CanvasElement } from "../../shared/types";
+import {
+  CanvasElement,
+  VisualStyle,
+} from "../../shared/types";
 import { BoxDimensions } from "../utils/box.types";
 import CanvasBox from "./CanvasBox";
 import styles from "./CallStack.module.css";
@@ -37,6 +40,8 @@ interface CallStackProps {
   y?: number;
   width?: number;
   scale?: number;
+  visualStyle?: VisualStyle;
+  elementsById?: Map<number, CanvasElement>;
 }
 
 interface DragState {
@@ -69,6 +74,8 @@ const CallStack: React.FC<CallStackProps> = ({
   y = 73,
   width = 205,
   scale = 1,
+  visualStyle = "memoryviz",
+  elementsById,
 }) => {
   const clipPathId = useId();
 
@@ -114,15 +121,6 @@ const CallStack: React.FC<CallStackProps> = ({
     100,
     columnHeight - HEADER_HEIGHT - TOP_PADDING - BOTTOM_PADDING
   );
-
-  // Log for debugging - remove after verification
-  console.log('CallStack centering:', {
-    viewportHeight,
-    yPosition,
-    bottomSpacing,
-    columnHeight,
-    'Should be equal': yPosition === bottomSpacing
-  });
 
   const layout = useMemo((): LayoutItem[] => {
     let yOffset = 0;
@@ -367,13 +365,15 @@ const CallStack: React.FC<CallStackProps> = ({
       />
 
       <text
-        className={styles.callStackTitle}
+        className={`${styles.callStackTitle} ${
+          visualStyle === "pythonTutor" ? styles.pythonTutorTitle : ""
+        }`}
         x={x + columnWidth / 2}
         y={yPosition + HEADER_HEIGHT / 2 + 4}
         textAnchor="middle"
         fontSize="10"
       >
-        Call Stack
+        {visualStyle === "pythonTutor" ? "Frames" : "Call Stack"}
       </text>
 
       <clipPath id={clipPathId}>
@@ -406,13 +406,17 @@ const CallStack: React.FC<CallStackProps> = ({
                   boxSizes[frame.boxId]?.width ?? DEFAULT_BOX_WIDTH;
                 return (
                   <rect
-                    className={styles.selectionHighlight}
+                    className={
+                      visualStyle === "pythonTutor"
+                        ? styles.pythonTutorSelectionHighlight
+                        : styles.selectionHighlight
+                    }
                     x={-boxWidth / 2 + 1}
                     y={-height / 2 + 2}
                     width={boxWidth - 4}
                     height={height - 6}
-                    rx={6}
-                    ry={6}
+                    rx={visualStyle === "pythonTutor" ? 2 : 6}
+                    ry={visualStyle === "pythonTutor" ? 2 : 6}
                     style={{ pointerEvents: "none" }}
                   />
                 );
@@ -420,11 +424,13 @@ const CallStack: React.FC<CallStackProps> = ({
 
             <MemoizedCanvasBox
               element={memoizedElements[frame.boxId]}
-              openInterface={() => onSelect(frame)}
+              openInterface={(target) => onSelect(target ?? frame)}
               updatePosition={() => {}}
               onSizeChange={handleBoxSizeChange}
               invalidated={frame.invalidated}
               disableDrag={true}
+              visualStyle={visualStyle}
+              elementsById={elementsById}
             />
           </g>
         ))}

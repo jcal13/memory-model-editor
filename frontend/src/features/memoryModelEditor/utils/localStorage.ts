@@ -1,6 +1,11 @@
 // Storage utility functions - pure functions for localStorage operations
 
-import { CanvasElement, SubmissionResult, Tab } from "../../shared/types";
+import {
+  CanvasElement,
+  SubmissionResult,
+  Tab,
+  VisualStyle,
+} from "../../shared/types";
 
 // Storage keys
 const CANVAS_STORAGE_KEY = "canvas_key";
@@ -22,6 +27,7 @@ const DEFAULT_UI_STATE = {
   questionType: null as "test" | "practice" | "prep" | null,
   submissionResults: null as SubmissionResult | null,
   sandboxMode: null as boolean | null,
+  visualStyle: "memoryviz" as VisualStyle,
 };
 
 export interface CanvasData {
@@ -54,10 +60,15 @@ export interface UIState {
   questionType: "test" | "practice" | "prep" | null;
   submissionResults: SubmissionResult | null;
   sandboxMode: boolean | null;
+  visualStyle?: VisualStyle;
   questionView?: QuestionView;
   isInfoPanelOpen?: boolean;
   canvasScale?: number;
   editorScale?: number;
+}
+
+function normalizeVisualStyle(rawStyle: unknown): VisualStyle {
+  return rawStyle === "pythonTutor" ? "pythonTutor" : "memoryviz";
 }
 
 /**
@@ -109,6 +120,8 @@ export function loadInitialUIData(): UIState {
     const sandboxMode =
       typeof parsed?.sandboxMode === "boolean" ? parsed.sandboxMode : null;
 
+    const visualStyle = normalizeVisualStyle(parsed?.visualStyle);
+
     const validViews = ["root", "loading", "test", "list", "question", "practice", "prep"];
     const questionView =
       typeof parsed?.questionView === "string" && validViews.includes(parsed.questionView) && parsed.questionView !== "loading"
@@ -138,6 +151,7 @@ export function loadInitialUIData(): UIState {
       questionType,
       submissionResults,
       sandboxMode,
+      visualStyle,
       questionView,
       isInfoPanelOpen,
       canvasScale,

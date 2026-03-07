@@ -41,6 +41,8 @@ const BoxEditorModule = ({
   sandbox = true,
   elements = [],
   questionFunctionNames,
+  visualStyle = "memoryviz",
+  onElementsChange,
 }: BoxEditorType) => {
   // Shared hover state for remove button
   const { hoverRemove, setHoverRemove } = useGlobalStates();
@@ -84,6 +86,10 @@ const BoxEditorModule = ({
 
   const collectionData =
     metadata.kind.name === "dict" ? collectionPairs : collectionItems;
+
+  const commitElementKind = (kind: typeof metadata.kind) => {
+    onSave(ownId, kind, invalidated);
+  };
 
   // Hook to sync the module and apply save logic when clicking outside
   useModule(
@@ -134,12 +140,14 @@ const BoxEditorModule = ({
           dataType={dataType}
           value={contentValue}
           setValue={setContentValue}
+          functionName={functionName}
           functionParams={functionParams}
           setFunctionParams={setFunctionParams}
           collectionItems={collectionItems}
           setCollectionItems={setCollectionItems}
           collectionPairs={collectionPairs}
           setCollectionPairs={setCollectionPairs}
+          className={ownClassName}
           ownClassVariables={ownClassVariables}
           setOwnClassVariables={setOwnClassVariables}
           ids={ids}
@@ -147,6 +155,9 @@ const BoxEditorModule = ({
           removeId={removeId}
           sandbox={sandbox}
           elements={elements}
+          visualStyle={visualStyle}
+          onCommitKind={commitElementKind}
+          onElementsChange={onElementsChange}
         />
       </div>
 

@@ -4,6 +4,7 @@ import {
   SubmissionResult,
   Tab,
   PaletteTab,
+  VisualStyle,
 } from "../../shared/types";
 import {
   loadInitialCanvasData,
@@ -48,6 +49,9 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     typeof initialUIData.sandboxMode === "boolean"
       ? initialUIData.sandboxMode
       : sandbox
+  );
+  const [visualStyle, setVisualStyle] = useState<VisualStyle>(
+    initialUIData.visualStyle ?? "memoryviz"
   );
   const [questionView, setQuestionView] = useState<QuestionView>(
     initialUIData.questionView ?? "root"
@@ -101,6 +105,8 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     setSubmissionResults,
     isSandboxMode,
     setIsSandboxMode,
+    visualStyle,
+    setVisualStyle,
     questionView,
     setQuestionView,
     tabScrollPositions,

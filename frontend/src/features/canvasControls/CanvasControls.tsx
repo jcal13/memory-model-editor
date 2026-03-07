@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from "react";
-import { CanvasElement } from "../shared/types";
+import { CanvasElement, VisualStyle } from "../shared/types";
 import { ClearCanvasButton, DownloadButton, ZoomControls, UndoButton, RedoButton, FeedbackButton } from "../canvas/components/CanvasButtons";
 import { useTheme } from "../../contexts/ThemeContext";
 import styles from "./CanvasControls.module.css";
@@ -22,6 +22,8 @@ interface CanvasControlsProps {
   onScaleChange?: (scale: number) => void;
   editorScale?: number;
   onEditorScaleChange?: (scale: number) => void;
+  visualStyle?: VisualStyle;
+  onVisualStyleChange?: (style: VisualStyle) => void;
 }
 
 type ControlTab = "actions" | "view" | "settings";
@@ -61,6 +63,8 @@ export default function CanvasControls({
   onScaleChange,
   editorScale = 1,
   onEditorScaleChange,
+  visualStyle = "memoryviz",
+  onVisualStyleChange,
 }: CanvasControlsProps) {
   const { theme, toggleTheme } = useTheme();
   const isDarkMode = theme === 'dark';
@@ -171,6 +175,35 @@ export default function CanvasControls({
                 <span className={styles.toggleThumb} />
               </button>
             </div>
+
+            {onVisualStyleChange && (
+              <div className={styles.controlItem}>
+                <label
+                  className={styles.controlLabel}
+                  htmlFor="python-tutor-style-toggle"
+                >
+                  Python Tutor Style
+                </label>
+                <button
+                  id="python-tutor-style-toggle"
+                  type="button"
+                  role="switch"
+                  aria-checked={visualStyle === "pythonTutor"}
+                  onClick={() =>
+                    onVisualStyleChange(
+                      visualStyle === "pythonTutor"
+                        ? "memoryviz"
+                        : "pythonTutor"
+                    )
+                  }
+                  className={`${styles.toggle} ${
+                    visualStyle === "pythonTutor" ? styles.toggleActive : ""
+                  }`}
+                >
+                  <span className={styles.toggleThumb} />
+                </button>
+              </div>
+            )}
 
             <div className={`${styles.buttonWrapper} ${styles.feedbackWrapper}`}>
               <FeedbackButton />

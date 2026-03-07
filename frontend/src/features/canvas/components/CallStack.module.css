@@ -34,6 +34,19 @@
   font-size: 1rem;
 }
 
+.pythonTutorTitle {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+.pythonTutorSelectionHighlight {
+  fill: var(--python-tutor-selected-frame-bg);
+  stroke: none;
+  opacity: 0.9;
+}
+
 .selectionHighlight {
   fill: none;
   stroke: var(--accent-blue);

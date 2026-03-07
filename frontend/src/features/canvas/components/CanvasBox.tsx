@@ -14,6 +14,9 @@ export default function CanvasBox({
   invalidated = false,
   disableDrag = false,
   callStackWidth,
+  visualStyle = "memoryviz",
+  elementsById,
+  renderMode = "canvas",
 }: CanvasBoxProps) {
   const { gRef, dragState, dimensions } = useBoxDragState();
 
@@ -27,6 +30,9 @@ export default function CanvasBox({
     invalidated,
     disableDrag,
     callStackWidth,
+    visualStyle,
+    elementsById,
+    renderMode,
   });
 
   // Report size changes for parent components (like CallStack)

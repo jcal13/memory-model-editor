@@ -112,7 +112,13 @@ export default function FeedbackTab({
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <span className={styles.resultText}>Your answer is correct!</span>
+            <span className={styles.resultText}>
+              {resubmitLine != null
+                ? resubmitLine.iteration !== undefined
+                  ? `Your answer is correct up to line ${resubmitLine.line} (iter ${resubmitLine.iteration})!`
+                  : `Your answer is correct up to line ${resubmitLine.line}!`
+                : "Your answer is correct!"}
+            </span>
           </div>
         </div>
       </>

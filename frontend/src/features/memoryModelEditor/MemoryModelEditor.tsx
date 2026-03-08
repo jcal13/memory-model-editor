@@ -59,6 +59,17 @@ export default function MemoryModelEditor({
   const _initialUI = loadInitialUIData();
   const [canvasScale, setCanvasScale] = useState<number>(_initialUI.canvasScale ?? 1);
   const [editorScale, setEditorScale] = useState<number>(_initialUI.editorScale ?? 1);
+  const [fontScale, setFontScale] = useState<number>(() => {
+    const saved = localStorage.getItem("questionFontScale");
+    return saved ? parseFloat(saved) : 1;
+  });
+  const adjustFontScale = (delta: number) => {
+    setFontScale((prev) => {
+      const next = Math.max(0.75, Math.min(1.5, Math.round((prev + delta) * 10) / 10));
+      localStorage.setItem("questionFontScale", String(next));
+      return next;
+    });
+  };
 
   // Initialize undo history
   const { canUndo, canRedo, undo, redo, recordState, clearHistory } = useUndoHistory(
@@ -275,7 +286,7 @@ export default function MemoryModelEditor({
     return Array.from(requiredTypes);
   }, []);
 
-  const { handleCanvasSubmit } = useCanvasSubmission({
+  const { handleCanvasSubmit, handleCanvasSubmitAtLine } = useCanvasSubmission({
     selectedQuestionIndex: state.selectedQuestionIndex,
     selectedQuestionType: state.selectedQuestionType,
     elements: state.elements,
@@ -484,6 +495,8 @@ export default function MemoryModelEditor({
                 onScaleChange={setCanvasScale}
                 editorScale={editorScale}
                 onEditorScaleChange={setEditorScale}
+                fontScale={fontScale}
+                onFontScaleChange={adjustFontScale}
               />
             </div>
           </div>
@@ -509,6 +522,8 @@ export default function MemoryModelEditor({
               addClasses={addElementClass}
               removeClasses={removeElementClass}
               sandbox={!state.isSandboxMode}
+              canManageClasses={!state.isSandboxMode || state.selectedQuestionIndex === null}
+              canManageFunctions={!state.isSandboxMode || state.selectedQuestionIndex === null}
               onClear={() => state.setShowClearCanvasModal(true)}
               onEditorOpenerReady={handleEditorOpenerReady}
               scale={canvasScale}
@@ -555,6 +570,7 @@ export default function MemoryModelEditor({
                 questionView={state.questionView}
                 setQuestionView={state.setQuestionView}
                 onSubmit={handleCanvasSubmit}
+                onSubmitAtLine={handleCanvasSubmitAtLine}
                 setSubmissionResults={state.setSubmissionResults}
                 onClearCanvas={clearCanvas}
                 onRestoreCanvas={restoreCanvas}
@@ -567,6 +583,7 @@ export default function MemoryModelEditor({
                 onQuestionDataChange={setCurrentQuestionData}
                 tabScrollPositions={state.tabScrollPositions}
                 setTabScrollPositions={state.setTabScrollPositions}
+                fontScale={fontScale}
               />
             </div>
           </>

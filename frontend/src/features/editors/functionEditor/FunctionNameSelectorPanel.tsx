@@ -10,6 +10,7 @@ interface Props {
   onClose: () => void;
   onUnassign: () => void;
   sandbox: boolean;
+  canManageFunctions?: boolean;
 }
 
 const FunctionNameSelectorPanel: React.FC<Props> = ({
@@ -20,6 +21,7 @@ const FunctionNameSelectorPanel: React.FC<Props> = ({
   onClose,
   onUnassign,
   sandbox,
+  canManageFunctions = sandbox,
 }) => {
   const [customName, setCustomName] = useState("");
   const [showWarn, setShowWarn] = useState(false);
@@ -65,7 +67,7 @@ const FunctionNameSelectorPanel: React.FC<Props> = ({
               >
                 {name}
               </button>
-              {sandbox && (
+              {canManageFunctions && (
                 <button
                   type="button"
                   className={boxStyles.collectionRemoveId}
@@ -85,7 +87,7 @@ const FunctionNameSelectorPanel: React.FC<Props> = ({
         )}
 
         <div className={panelStyles.panelControlsDiv}>
-          {sandbox && (
+          {canManageFunctions && (
             <>
               <input
                 type="text"

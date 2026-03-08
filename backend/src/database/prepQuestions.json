@@ -167,8 +167,14 @@
             "value": null,
             "className": "_Node",
             "classVariables": [
-              { "key": "item", "value": 5 },
-              { "key": "next", "value": 6 }
+              {
+                "key": "item",
+                "value": 5
+              },
+              {
+                "key": "next",
+                "value": 6
+              }
             ]
           }
         },
@@ -183,8 +189,14 @@
             "value": null,
             "className": "_Node",
             "classVariables": [
-              { "key": "item", "value": 3 },
-              { "key": "next", "value": 4 }
+              {
+                "key": "item",
+                "value": 3
+              },
+              {
+                "key": "next",
+                "value": 4
+              }
             ]
           }
         },
@@ -198,12 +210,3479 @@
             "type": "class",
             "value": null,
             "className": "LinkedList",
-            "classVariables": [{ "key": "_first", "value": 2 }]
+            "classVariables": [
+              {
+                "key": "_first",
+                "value": 2
+              }
+            ]
           }
         }
       ],
-      "ids": [1, 2, 3, 4, 5, 6],
-      "classes": ["_Node", "LinkedList"]
-    }
+      "ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "classes": [
+        "_Node",
+        "LinkedList"
+      ]
+    },
+    "steps": [
+      {
+        "lineNumber": 20,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 7,
+              "next": 6
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 4
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 8,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 7,
+              "next": 6
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 4
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 9,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 7,
+              "next": 6
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 4
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 10,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 2
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 7,
+              "next": 6
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 4
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 9,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 2
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 7,
+              "next": 6
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 4
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 11,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 2,
+              "result": 7
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 7,
+              "next": 6
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 4
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 12,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 2,
+              "result": 7
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 148
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 3,
+              "next": 6
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 4
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 13,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 2,
+              "result": 7
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 148
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 3,
+              "next": 4
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 4
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 14,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 2,
+              "result": 7
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 148
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 2
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 3,
+              "next": 4
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 2
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 15,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 2,
+              "result": 7
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 148
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 6
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 3,
+              "next": 4
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 2
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 17,
+        "answer": [
+          {
+            "id": null,
+            "name": "LinkedList.move_to_back",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "curr": 2,
+              "result": 7
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 148
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 6
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 3,
+              "next": 4
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 2
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 22,
+        "answer": [
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "lst": 1
+            }
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 148
+          },
+          {
+            "id": 5,
+            "type": "int",
+            "value": 165
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 108
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 5,
+              "next": 6
+            }
+          },
+          {
+            "id": 2,
+            "name": "_Node",
+            "type": ".class",
+            "value": {
+              "item": 3,
+              "next": 4
+            }
+          },
+          {
+            "id": 1,
+            "name": "LinkedList",
+            "type": ".class",
+            "value": {
+              "_first": 2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "question": "Draw the memory model for the code below **immediately after** `bst = BST(None)` executes.\n\n**Notes:**\n- You are allowed to use either Practice or Test mode to complete this question.",
+    "code": [
+      "class BST:",
+      "    \"\"\"Binary Search Tree class from the course notes.",
+      "",
+      "    Representation Invariants:",
+      "    - If self._root is None, then so are self._left and self._right;",
+      "      this represents an empty BST.",
+      "    - If self._root is not None, then self._left and self._right",
+      "      are BSTs; in particular, self is a leaf in this case",
+      "      if self._left and self._right are both empty BSTs",
+      "    - (BST Property) If self is not empty, then all items in",
+      "      self._left are <= self._root, and all items in",
+      "      self._right are >= self._root.",
+      "    \"\"\"",
+      "    _root: Any | None",
+      "    _left: BST | None",
+      "    _right: BST | None",
+      "",
+      "    def __init__(self, root: Any | None) -> None:",
+      "        \"\"\"",
+      "        Initialize a new BST containing only the given root value.",
+      "        If <root> is None, initialize an empty tree.",
+      "        \"\"\"",
+      "        if root is None:",
+      "            self._root = None",
+      "            self._left = None",
+      "            self._right = None",
+      "        else:",
+      "            self._root = root",
+      "            self._left = BST(None)",
+      "            self._right = BST(None)",
+      "",
+      "",
+      "if __name__ == '__main__':",
+      "    bst = BST(None)  # draw the memory model here"
+    ],
+    "answer": [
+      {
+        "type": ".frame",
+        "name": "__main__",
+        "id": null,
+        "order": 1,
+        "value": {
+          "bst": 1
+        }
+      },
+      {
+        "type": "object",
+        "name": "BST",
+        "id": 1,
+        "value": {
+          "_root": 2,
+          "_left": 2,
+          "_right": 2
+        }
+      },
+      {
+        "type": "NoneType",
+        "id": 2,
+        "value": "None"
+      }
+    ],
+    "description": null,
+    "topics": [
+      "BST",
+      "Classes",
+      "CSC148"
+    ],
+    "canvasConfig": null,
+    "steps": [
+      {
+        "lineNumber": 18,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {}
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {}
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ],
+        "iterationNumber": 1
+      },
+      {
+        "lineNumber": 23,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {}
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {}
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ],
+        "iterationNumber": 1
+      },
+      {
+        "lineNumber": 24,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {}
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ]
+      },
+      {
+        "lineNumber": 25,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {}
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ]
+      },
+      {
+        "lineNumber": 26,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {}
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ]
+      },
+      {
+        "lineNumber": 34,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ]
+      },
+      {
+        "lineNumber": 18,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 3
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 3,
+            "value": 148
+          }
+        ]
+      },
+      {
+        "lineNumber": 23,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 3
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 3,
+            "value": 148
+          }
+        ]
+      },
+      {
+        "lineNumber": 27,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 3
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 3,
+            "value": 148
+          }
+        ]
+      },
+      {
+        "lineNumber": 28,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 3
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 3,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 3,
+            "value": 148
+          }
+        ]
+      },
+      {
+        "lineNumber": 29,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 3
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 3,
+              "_left": 4,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 3,
+            "value": 148
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 4,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 30,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 3
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 3,
+              "_left": 4,
+              "_right": 5
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 3,
+            "value": 148
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 4,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 5,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "question": "You are given an initially empty BST (the memory model is preloaded on the canvas). Update the memory model to show what it will look like **after** `bst.insert(148)` executes.\n\n**Notes:**\n- The `insert` method is not shown \u00e2\u20ac\u201d use the BST representation invariants to reason about the result.\n- You are allowed to use either Practice or Test mode to complete this question.",
+    "code": [
+      "class BST:",
+      "    \"\"\"Binary Search Tree class from the course notes.",
+      "",
+      "    Representation Invariants:",
+      "    - If self._root is None, then so are self._left and self._right;",
+      "      this represents an empty BST.",
+      "    - If self._root is not None, then self._left and self._right",
+      "      are BSTs; in particular, self is a leaf in this case",
+      "      if self._left and self._right are both empty BSTs",
+      "    - (BST Property) If self is not empty, then all items in",
+      "      self._left are <= self._root, and all items in",
+      "      self._right are >= self._root.",
+      "    \"\"\"",
+      "    _root: Any | None",
+      "    _left: BST | None",
+      "    _right: BST | None",
+      "",
+      "    def __init__(self, root: Any | None) -> None:",
+      "        \"\"\"",
+      "        Initialize a new BST containing only the given root value.",
+      "        If <root> is None, initialize an empty tree.",
+      "        \"\"\"",
+      "        if root is None:",
+      "            self._root = None",
+      "            self._left = None",
+      "            self._right = None",
+      "        else:",
+      "            self._root = root",
+      "            self._left = BST(None)",
+      "            self._right = BST(None)",
+      "",
+      "    # (insert and other methods not shown)",
+      "",
+      "",
+      "if __name__ == '__main__':",
+      "    bst = BST(None)",
+      "    # initial memory model (empty BST) is preloaded on the canvas",
+      "    bst.insert(148)  # update the memory model to show the result"
+    ],
+    "answer": [
+      {
+        "type": ".frame",
+        "name": "__main__",
+        "id": null,
+        "order": 1,
+        "value": {
+          "bst": 1
+        }
+      },
+      {
+        "type": "object",
+        "name": "BST",
+        "id": 1,
+        "value": {
+          "_root": 5,
+          "_left": 3,
+          "_right": 4
+        }
+      },
+      {
+        "type": "NoneType",
+        "id": 2,
+        "value": "None"
+      },
+      {
+        "type": "object",
+        "name": "BST",
+        "id": 3,
+        "value": {
+          "_root": 2,
+          "_left": 2,
+          "_right": 2
+        }
+      },
+      {
+        "type": "object",
+        "name": "BST",
+        "id": 4,
+        "value": {
+          "_root": 2,
+          "_left": 2,
+          "_right": 2
+        }
+      },
+      {
+        "type": "int",
+        "id": 5,
+        "value": 148
+      }
+    ],
+    "description": null,
+    "topics": [
+      "BST",
+      "Classes",
+      "CSC148"
+    ],
+    "canvasConfig": {
+      "elements": [
+        {
+          "boxId": 0,
+          "id": "_",
+          "x": 0,
+          "y": 0,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "value": null,
+            "functionName": "__main__",
+            "params": [
+              {
+                "name": "bst",
+                "targetId": 1
+              }
+            ],
+            "order": 1
+          }
+        },
+        {
+          "boxId": 1,
+          "id": 1,
+          "x": 735,
+          "y": 186,
+          "kind": {
+            "name": "class",
+            "type": "class",
+            "value": null,
+            "className": "BST",
+            "classVariables": [
+              {
+                "key": "_root",
+                "value": 2
+              },
+              {
+                "key": "_left",
+                "value": 2
+              },
+              {
+                "key": "_right",
+                "value": 2
+              }
+            ]
+          }
+        },
+        {
+          "boxId": 2,
+          "id": 2,
+          "x": 738,
+          "y": 396,
+          "kind": {
+            "name": "primitive",
+            "type": "NoneType",
+            "value": "None"
+          }
+        }
+      ],
+      "ids": [
+        1,
+        2
+      ],
+      "classes": [
+        "BST"
+      ]
+    },
+    "steps": [
+      {
+        "lineNumber": 18,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {}
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {}
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ],
+        "iterationNumber": 1
+      },
+      {
+        "lineNumber": 23,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {}
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {}
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ],
+        "iterationNumber": 1
+      },
+      {
+        "lineNumber": 24,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {}
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ]
+      },
+      {
+        "lineNumber": 25,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {}
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ]
+      },
+      {
+        "lineNumber": 26,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {}
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ]
+      },
+      {
+        "lineNumber": 36,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ]
+      },
+      {
+        "lineNumber": 18,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 5
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          }
+        ]
+      },
+      {
+        "lineNumber": 23,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 5
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          }
+        ]
+      },
+      {
+        "lineNumber": 27,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 5
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          }
+        ]
+      },
+      {
+        "lineNumber": 28,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 5
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 5,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          }
+        ]
+      },
+      {
+        "lineNumber": 29,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 5
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 5,
+              "_left": 3,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 3,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 30,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 5
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 5,
+              "_left": 3,
+              "_right": 4
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 3,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 4,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 38,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 5,
+              "_left": 3,
+              "_right": 4
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 3,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 4,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "question": "You are given a BST that is initially only a leaf containing the value 148 (the memory model is preloaded on the canvas). Update the memory model to show what it will look like **after** `bst.insert(108)` executes.\n\n**Hint**: Which of `bst`'s subtrees will be mutated?\n\n**Notes:**\n- The `insert` method is not shown \u00e2\u20ac\u201d use the BST representation invariants to reason about the result.\n- You are allowed to use either Practice or Test mode to complete this question.",
+    "code": [
+      "class BST:",
+      "    \"\"\"Binary Search Tree class from the course notes.",
+      "",
+      "    Representation Invariants:",
+      "    - If self._root is None, then so are self._left and self._right;",
+      "      this represents an empty BST.",
+      "    - If self._root is not None, then self._left and self._right",
+      "      are BSTs; in particular, self is a leaf in this case",
+      "      if self._left and self._right are both empty BSTs",
+      "    - (BST Property) If self is not empty, then all items in",
+      "      self._left are <= self._root, and all items in",
+      "      self._right are >= self._root.",
+      "    \"\"\"",
+      "    _root: Any | None",
+      "    _left: BST | None",
+      "    _right: BST | None",
+      "",
+      "    def __init__(self, root: Any | None) -> None:",
+      "        \"\"\"",
+      "        Initialize a new BST containing only the given root value.",
+      "        If <root> is None, initialize an empty tree.",
+      "        \"\"\"",
+      "        if root is None:",
+      "            self._root = None",
+      "            self._left = None",
+      "            self._right = None",
+      "        else:",
+      "            self._root = root",
+      "            self._left = BST(None)",
+      "            self._right = BST(None)",
+      "",
+      "    # (insert and other methods not shown)",
+      "",
+      "",
+      "if __name__ == '__main__':",
+      "    bst = BST(None)",
+      "    bst.insert(148)",
+      "    # initial memory model (BST with root 148) is preloaded on the canvas",
+      "    bst.insert(108)  # update the memory model to show the result"
+    ],
+    "answer": [
+      {
+        "type": ".frame",
+        "name": "__main__",
+        "id": null,
+        "order": 1,
+        "value": {
+          "bst": 1
+        }
+      },
+      {
+        "type": "object",
+        "name": "BST",
+        "id": 1,
+        "value": {
+          "_root": 5,
+          "_left": 3,
+          "_right": 4
+        }
+      },
+      {
+        "type": "NoneType",
+        "id": 2,
+        "value": "None"
+      },
+      {
+        "type": "object",
+        "name": "BST",
+        "id": 3,
+        "value": {
+          "_root": 8,
+          "_left": 6,
+          "_right": 7
+        }
+      },
+      {
+        "type": "object",
+        "name": "BST",
+        "id": 4,
+        "value": {
+          "_root": 2,
+          "_left": 2,
+          "_right": 2
+        }
+      },
+      {
+        "type": "int",
+        "id": 5,
+        "value": 148
+      },
+      {
+        "type": "object",
+        "name": "BST",
+        "id": 6,
+        "value": {
+          "_root": 2,
+          "_left": 2,
+          "_right": 2
+        }
+      },
+      {
+        "type": "object",
+        "name": "BST",
+        "id": 7,
+        "value": {
+          "_root": 2,
+          "_left": 2,
+          "_right": 2
+        }
+      },
+      {
+        "type": "int",
+        "id": 8,
+        "value": 108
+      }
+    ],
+    "description": null,
+    "topics": [
+      "BST",
+      "Classes",
+      "CSC148"
+    ],
+    "canvasConfig": {
+      "elements": [
+        {
+          "boxId": 0,
+          "id": "_",
+          "x": 0,
+          "y": 0,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "value": null,
+            "functionName": "__main__",
+            "params": [
+              {
+                "name": "bst",
+                "targetId": 1
+              }
+            ],
+            "order": 1
+          }
+        },
+        {
+          "boxId": 1,
+          "id": 1,
+          "x": 735,
+          "y": 186,
+          "kind": {
+            "name": "class",
+            "type": "class",
+            "value": null,
+            "className": "BST",
+            "classVariables": [
+              {
+                "key": "_root",
+                "value": 5
+              },
+              {
+                "key": "_left",
+                "value": 3
+              },
+              {
+                "key": "_right",
+                "value": 4
+              }
+            ]
+          }
+        },
+        {
+          "boxId": 2,
+          "id": 2,
+          "x": 744,
+          "y": 492,
+          "kind": {
+            "name": "primitive",
+            "type": "NoneType",
+            "value": "None"
+          }
+        },
+        {
+          "boxId": 3,
+          "id": 3,
+          "x": 497,
+          "y": 424,
+          "kind": {
+            "name": "class",
+            "type": "class",
+            "value": null,
+            "className": "BST",
+            "classVariables": [
+              {
+                "key": "_root",
+                "value": 2
+              },
+              {
+                "key": "_left",
+                "value": 2
+              },
+              {
+                "key": "_right",
+                "value": 2
+              }
+            ]
+          }
+        },
+        {
+          "boxId": 4,
+          "id": 4,
+          "x": 998,
+          "y": 420,
+          "kind": {
+            "name": "class",
+            "type": "class",
+            "value": null,
+            "className": "BST",
+            "classVariables": [
+              {
+                "key": "_root",
+                "value": 2
+              },
+              {
+                "key": "_left",
+                "value": 2
+              },
+              {
+                "key": "_right",
+                "value": 2
+              }
+            ]
+          }
+        },
+        {
+          "boxId": 5,
+          "id": 5,
+          "x": 963,
+          "y": 140,
+          "kind": {
+            "name": "primitive",
+            "type": "int",
+            "value": "148"
+          }
+        }
+      ],
+      "ids": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "classes": [
+        "BST"
+      ]
+    },
+    "steps": [
+      {
+        "lineNumber": 18,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {}
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {}
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ],
+        "iterationNumber": 1
+      },
+      {
+        "lineNumber": 23,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {}
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {}
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ],
+        "iterationNumber": 1
+      },
+      {
+        "lineNumber": 24,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {}
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ]
+      },
+      {
+        "lineNumber": 25,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {}
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ]
+      },
+      {
+        "lineNumber": 26,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {}
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ]
+      },
+      {
+        "lineNumber": 36,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          }
+        ]
+      },
+      {
+        "lineNumber": 18,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 5
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          }
+        ]
+      },
+      {
+        "lineNumber": 23,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 5
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          }
+        ]
+      },
+      {
+        "lineNumber": 27,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 5
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          }
+        ]
+      },
+      {
+        "lineNumber": 28,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 5
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 5,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          }
+        ]
+      },
+      {
+        "lineNumber": 29,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 5
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 5,
+              "_left": 3,
+              "_right": 2
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 3,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 30,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 1,
+              "root": 5
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 5,
+              "_left": 3,
+              "_right": 4
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 3,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 4,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 37,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 5,
+              "_left": 3,
+              "_right": 4
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 3,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 4,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          }
+        ]
+      },
+      {
+        "lineNumber": 18,
+        "iterationNumber": 3,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 3,
+              "root": 8
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 5,
+              "_left": 3,
+              "_right": 4
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 3,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 4,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          },
+          {
+            "type": "int",
+            "id": 8,
+            "value": 108
+          }
+        ]
+      },
+      {
+        "lineNumber": 23,
+        "iterationNumber": 3,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 3,
+              "root": 8
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 5,
+              "_left": 3,
+              "_right": 4
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 3,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 4,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          },
+          {
+            "type": "int",
+            "id": 8,
+            "value": 108
+          }
+        ]
+      },
+      {
+        "lineNumber": 27,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 3,
+              "root": 8
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 5,
+              "_left": 3,
+              "_right": 4
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 3,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 4,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          },
+          {
+            "type": "int",
+            "id": 8,
+            "value": 108
+          }
+        ]
+      },
+      {
+        "lineNumber": 28,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 3,
+              "root": 8
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 5,
+              "_left": 3,
+              "_right": 4
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 3,
+            "value": {
+              "_root": 8,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 4,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          },
+          {
+            "type": "int",
+            "id": 8,
+            "value": 108
+          }
+        ]
+      },
+      {
+        "lineNumber": 29,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 3,
+              "root": 8
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 5,
+              "_left": 3,
+              "_right": 4
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 3,
+            "value": {
+              "_root": 8,
+              "_left": 6,
+              "_right": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 4,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 6,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "int",
+            "id": 8,
+            "value": 108
+          }
+        ]
+      },
+      {
+        "lineNumber": 30,
+        "iterationNumber": 2,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": ".frame",
+            "name": "BST.__init__",
+            "id": null,
+            "order": 2,
+            "value": {
+              "self": 3,
+              "root": 8
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 5,
+              "_left": 3,
+              "_right": 4
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 3,
+            "value": {
+              "_root": 8,
+              "_left": 6,
+              "_right": 7
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 4,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 6,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 7,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "int",
+            "id": 8,
+            "value": 108
+          }
+        ]
+      },
+      {
+        "lineNumber": 39,
+        "answer": [
+          {
+            "type": ".frame",
+            "name": "__main__",
+            "id": null,
+            "order": 1,
+            "value": {
+              "bst": 1
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 1,
+            "value": {
+              "_root": 5,
+              "_left": 3,
+              "_right": 4
+            }
+          },
+          {
+            "type": "NoneType",
+            "id": 2,
+            "value": "None"
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 3,
+            "value": {
+              "_root": 8,
+              "_left": 6,
+              "_right": 7
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 4,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "int",
+            "id": 5,
+            "value": 148
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 6,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "object",
+            "name": "BST",
+            "id": 7,
+            "value": {
+              "_root": 2,
+              "_left": 2,
+              "_right": 2
+            }
+          },
+          {
+            "type": "int",
+            "id": 8,
+            "value": 108
+          }
+        ]
+      }
+    ]
   }
 ]

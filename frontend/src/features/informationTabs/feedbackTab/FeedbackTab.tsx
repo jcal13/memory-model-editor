@@ -21,6 +21,8 @@ interface FeedbackTabProps {
   onOpenEditor: (element: CanvasElement) => void;
   isSandboxMode: boolean;
   onResubmit: () => Promise<boolean>;
+  resubmitLine?: { line: number; iteration?: number } | null;
+  fontScale?: number;
 }
 
 export default function FeedbackTab({
@@ -34,6 +36,8 @@ export default function FeedbackTab({
   onOpenEditor,
   isSandboxMode,
   onResubmit,
+  resubmitLine,
+  fontScale = 1,
 }: FeedbackTabProps) {
   const renderTitle = () => {
     let questionName = "";
@@ -87,11 +91,13 @@ export default function FeedbackTab({
     );
   }
 
+  const scaleStyle = { '--font-scale': fontScale } as React.CSSProperties;
+
   if (submissionResults.correct) {
     return (
       <>
         {renderTitle()}
-        <div className={styles.content}>
+        <div className={styles.content} style={scaleStyle}>
           <div className={styles.resultBanner + " " + styles.correct}>
             <svg
               className={styles.resultIcon}
@@ -125,22 +131,28 @@ export default function FeedbackTab({
   return (
     <>
       {renderTitle()}
-      <ErrorListDisplay
-        errors={uniqueFeedbackErrors}
-        elements={elements}
-        setElements={setElements}
-        onOpenEditor={onOpenEditor}
-        showTitle={false}
-        isSandboxMode={isSandboxMode}
-      />
-      <div className={styles.resubmitRow}>
-        <button
-          type="button"
-          className={styles.resubmitButton}
-          onClick={onResubmit}
-        >
-          Resubmit
-        </button>
+      <div style={scaleStyle}>
+        <ErrorListDisplay
+          errors={uniqueFeedbackErrors}
+          elements={elements}
+          setElements={setElements}
+          onOpenEditor={onOpenEditor}
+          showTitle={false}
+          isSandboxMode={isSandboxMode}
+        />
+        <div className={styles.resubmitRow}>
+          <button
+            type="button"
+            className={styles.resubmitButton}
+            onClick={onResubmit}
+          >
+            {resubmitLine != null
+              ? resubmitLine.iteration !== undefined
+                ? `Resubmit at line ${resubmitLine.line} (iter ${resubmitLine.iteration})`
+                : `Resubmit at line ${resubmitLine.line}`
+              : "Resubmit"}
+          </button>
+        </div>
       </div>
     </>
   );

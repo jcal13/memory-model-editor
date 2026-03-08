@@ -67,6 +67,8 @@ interface PaletteProps {
   onScaleChange?: (scale: number) => void;
   editorScale?: number;
   onEditorScaleChange?: (scale: number) => void;
+  fontScale?: number;
+  onFontScaleChange?: (delta: number) => void;
 }
 
 // Extract TabButton component inline
@@ -114,6 +116,8 @@ export default function Palette({
   onScaleChange,
   editorScale,
   onEditorScaleChange,
+  fontScale,
+  onFontScaleChange,
 }: PaletteProps) {
   const allBoxes = TAB_BOX_MAPPING[activeTab];
 
@@ -218,6 +222,8 @@ export default function Palette({
             onScaleChange={onScaleChange}
             editorScale={editorScale}
             onEditorScaleChange={onEditorScaleChange}
+            fontScale={fontScale}
+            onFontScaleChange={onFontScaleChange}
           />
         </div>
       </div>

@@ -171,6 +171,8 @@ export interface BoxEditorType {
   removeClasses?: (className: string) => void;
 
   sandbox?: boolean;
+  canManageClasses?: boolean;
+  canManageFunctions?: boolean;
   elements?: any[];
   questionFunctionNames?: string[];
 }

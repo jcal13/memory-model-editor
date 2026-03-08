@@ -39,6 +39,8 @@ const BoxEditorModule = ({
   addClasses,
   removeClasses,
   sandbox = true,
+  canManageClasses = sandbox,
+  canManageFunctions = sandbox,
   elements = [],
   questionFunctionNames,
 }: BoxEditorType) => {
@@ -123,6 +125,8 @@ const BoxEditorModule = ({
         setElementId={setOwnId}
         removeId={removeId}
         sandbox={sandbox}
+        canManageClasses={canManageClasses}
+        canManageFunctions={canManageFunctions}
         elements={elements}
         onClose={onClose}
       />

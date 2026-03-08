@@ -30,6 +30,7 @@ type QuestionRow = {
   question: string;
   code: string[]; // text[]
   answer: unknown; // jsonb
+  steps: unknown | null; // jsonb — optional per-line answer steps
   description: string | null;
   topics: string[] | null; // text[]
   canvasConfig: unknown | null; // jsonb
@@ -56,7 +57,7 @@ router.get("/practicequestions/:id", async (req: Request, res: Response) => {
 
   try {
     const { rows } = await getPool().query<QuestionRow>(
-      'SELECT id, question, code, answer, topics, canvas_config AS "canvasConfig" FROM practice_questions WHERE id = $1',
+      'SELECT id, question, code, answer, steps, topics, canvas_config AS "canvasConfig" FROM practice_questions WHERE id = $1',
       [id]
     );
     if (rows.length === 0) {
@@ -91,7 +92,7 @@ router.get("/testquestions/:id", async (req: Request, res: Response) => {
 
   try {
     const { rows } = await getPool().query<QuestionRow>(
-      'SELECT id, question, code, answer, description, topics, canvas_config AS "canvasConfig" FROM test_questions WHERE id = $1',
+      'SELECT id, question, code, answer, steps, description, topics, canvas_config AS "canvasConfig" FROM test_questions WHERE id = $1',
       [id]
     );
     if (rows.length === 0) {
@@ -126,7 +127,7 @@ router.get("/prepquestions/:id", async (req: Request, res: Response) => {
 
   try {
     const { rows } = await getPool().query<QuestionRow>(
-      'SELECT id, question, code, answer, topics, canvas_config AS "canvasConfig" FROM prep_questions WHERE id = $1',
+      'SELECT id, question, code, answer, steps, topics, canvas_config AS "canvasConfig" FROM prep_questions WHERE id = $1',
       [id]
     );
     if (rows.length === 0) {

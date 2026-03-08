@@ -19,6 +19,7 @@ interface Props {
   buttonClassName?: string;
   editable: boolean;
   sandbox: boolean;
+  canManageClasses?: boolean;
 }
 
 export default function ClassSelector({
@@ -30,6 +31,7 @@ export default function ClassSelector({
   buttonClassName = "",
   editable,
   sandbox,
+  canManageClasses = sandbox,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [list, setList] = useState<ClassID[]>(classes);
@@ -107,6 +109,7 @@ export default function ClassSelector({
                 onSelect={handleSelect}
                 onClose={closeSelf}
                 sandbox={sandbox}
+                canManageClasses={canManageClasses}
               />
             </div>
           </Draggable>,

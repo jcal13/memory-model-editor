@@ -9,6 +9,7 @@ interface Props {
   onRemove: (className: string) => void;
   onClose: () => void;
   sandbox: boolean;
+  canManageClasses?: boolean;
 }
 
 const ClassSelectorPanel: React.FC<Props> = ({
@@ -18,6 +19,7 @@ const ClassSelectorPanel: React.FC<Props> = ({
   onRemove,
   onClose,
   sandbox,
+  canManageClasses = sandbox,
 }) => {
   const [customClass, setCustomClass] = useState("");
   const [showWarn, setShowWarn] = useState(false);
@@ -63,7 +65,7 @@ const ClassSelectorPanel: React.FC<Props> = ({
               >
                 {className}
               </button>
-              {sandbox && (
+              {canManageClasses && (
                 <button
                   type="button"
                   className={boxStyles.collectionRemoveId}
@@ -76,14 +78,14 @@ const ClassSelectorPanel: React.FC<Props> = ({
           ))}
         </div>
 
-        {sandbox && classes.length === 0 && (
+        {canManageClasses && classes.length === 0 && (
           <div className={panelStyles.empty}>
             No classes yet — enter a name and click "Add".
           </div>
         )}
 
         <div className={panelStyles.panelControlsDiv}>
-          {sandbox && (
+          {canManageClasses && (
             <>
               <input
                 type="text"

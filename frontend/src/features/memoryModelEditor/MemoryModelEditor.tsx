@@ -200,12 +200,25 @@ export default function MemoryModelEditor({
   };
 
   const getQuestionFunctionNames = useCallback((questionData: any): string[] => {
-    if (!questionData?.answer || !Array.isArray(questionData.answer)) {
-      return [];
+    const seen = new Set<string>();
+    const collectFrameNames = (boxes: any[]) => {
+      for (const box of boxes) {
+        if (box.type === ".frame" && typeof box.name === "string") {
+          seen.add(box.name);
+        }
+      }
+    };
+    if (Array.isArray(questionData?.answer)) {
+      collectFrameNames(questionData.answer);
     }
-    return questionData.answer
-      .filter((box: any) => box.type === ".frame" && typeof box.name === "string")
-      .map((box: any) => box.name as string);
+    if (Array.isArray(questionData?.steps)) {
+      for (const step of questionData.steps) {
+        if (Array.isArray(step.answer)) {
+          collectFrameNames(step.answer);
+        }
+      }
+    }
+    return Array.from(seen);
   }, []);
 
   const getQuestionClassNames = useCallback((questionData: any): string[] => {

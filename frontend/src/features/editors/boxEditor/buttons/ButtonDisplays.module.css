@@ -6,6 +6,52 @@
   width: 100%;
 }
 
+.invalidateGroup {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.helpIcon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--accent-blue);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.helpIcon .tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e293b;
+  color: #f1f5f9;
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.4;
+  padding: 8px 10px;
+  border-radius: 6px;
+  width: 220px;
+  white-space: normal;
+  z-index: 9999;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+.helpIcon:hover .tooltip {
+  display: block;
+}
+
 .invalidateButton {
   background-color: var(--accent-blue);
   color: white;

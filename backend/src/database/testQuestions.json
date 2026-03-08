@@ -1061,7 +1061,6 @@
       },
       {
         "lineNumber": 4,
-        "iterationNumber": 3,
         "answer": [
           {
             "id": null,
@@ -3771,7 +3770,6 @@
       },
       {
         "lineNumber": 7,
-        "iterationNumber": 2,
         "answer": [
           {
             "id": null,

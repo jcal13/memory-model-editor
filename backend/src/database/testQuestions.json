@@ -1265,6 +1265,91 @@
       },
       {
         "lineNumber": 7,
+        "iterationNumber": 1,
+        "answer": [
+          {
+            "id": null,
+            "name": "RecursiveList.__init__",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "items": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {}
+          },
+          {
+            "id": 2,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 3,
+            "type": "str",
+            "value": "hi"
+          },
+          {
+            "id": 6,
+            "type": "NoneType",
+            "value": "None"
+          },
+          {
+            "id": 4,
+            "type": "list",
+            "value": [
+              2,
+              3
+            ]
+          },
+          {
+            "id": 8,
+            "type": "list",
+            "value": [
+              3
+            ]
+          },
+          {
+            "id": 9,
+            "type": "list",
+            "value": []
+          },
+          {
+            "id": 1,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 2,
+              "_rest": 5
+            }
+          },
+          {
+            "id": 5,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 3,
+              "_rest": 7
+            }
+          },
+          {
+            "id": 7,
+            "name": "RecursiveList",
+            "type": "object",
+            "value": {
+              "_first": 6,
+              "_rest": 6
+            }
+          }
+        ]
+      },
+      {
+        "lineNumber": 7,
         "iterationNumber": 2,
         "answer": [
           {
@@ -1335,91 +1420,6 @@
             "type": "object",
             "value": {
               "_first": 2
-            }
-          },
-          {
-            "id": 5,
-            "name": "RecursiveList",
-            "type": "object",
-            "value": {
-              "_first": 3,
-              "_rest": 7
-            }
-          },
-          {
-            "id": 7,
-            "name": "RecursiveList",
-            "type": "object",
-            "value": {
-              "_first": 6,
-              "_rest": 6
-            }
-          }
-        ]
-      },
-      {
-        "lineNumber": 7,
-        "iterationNumber": 1,
-        "answer": [
-          {
-            "id": null,
-            "name": "RecursiveList.__init__",
-            "type": ".frame",
-            "order": 2,
-            "value": {
-              "self": 1,
-              "items": 4
-            }
-          },
-          {
-            "id": null,
-            "name": "__main__",
-            "type": ".frame",
-            "order": 1,
-            "value": {}
-          },
-          {
-            "id": 2,
-            "type": "int",
-            "value": 7
-          },
-          {
-            "id": 3,
-            "type": "str",
-            "value": "hi"
-          },
-          {
-            "id": 6,
-            "type": "NoneType",
-            "value": "None"
-          },
-          {
-            "id": 4,
-            "type": "list",
-            "value": [
-              2,
-              3
-            ]
-          },
-          {
-            "id": 8,
-            "type": "list",
-            "value": [
-              3
-            ]
-          },
-          {
-            "id": 9,
-            "type": "list",
-            "value": []
-          },
-          {
-            "id": 1,
-            "name": "RecursiveList",
-            "type": "object",
-            "value": {
-              "_first": 2,
-              "_rest": 5
             }
           },
           {

@@ -78,6 +78,8 @@ interface PaletteProps {
   onPythonTutorReferenceArrowsChange?: (value: boolean) => void;
   pythonTutorStandalonePrimitives?: boolean;
   onPythonTutorStandalonePrimitivesChange?: (value: boolean) => void;
+  fontScale?: number;
+  onFontScaleChange?: (delta: number) => void;
 }
 
 // Extract TabButton component inline
@@ -143,6 +145,8 @@ export default function Palette({
   onPythonTutorReferenceArrowsChange,
   pythonTutorStandalonePrimitives = false,
   onPythonTutorStandalonePrimitivesChange,
+  fontScale,
+  onFontScaleChange,
 }: PaletteProps) {
   const allBoxes = TAB_BOX_MAPPING[activeTab];
 
@@ -275,6 +279,8 @@ export default function Palette({
             onPythonTutorStandalonePrimitivesChange={
               onPythonTutorStandalonePrimitivesChange
             }
+            fontScale={fontScale}
+            onFontScaleChange={onFontScaleChange}
           />
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SubmissionResult, Tab, CanvasElement } from "../shared/types";
 import { MasterErrorList } from "../memoryModelEditor/utils/masterErrorList";
 import FeedbackTab from "./feedbackTab/FeedbackTab";
@@ -17,6 +17,7 @@ interface InformationTabsProps {
   questionView: import("../memoryModelEditor/utils/localStorage").QuestionView;
   setQuestionView: (view: import("../memoryModelEditor/utils/localStorage").QuestionView) => void;
   onSubmit: () => Promise<boolean>;
+  onSubmitAtLine: (lineNumber: number, iterationNumber?: number) => Promise<boolean>;
   setSubmissionResults: (results: SubmissionResult | null) => void;
   onClearCanvas: () => void;
   onRestoreCanvas: (elements: any[], ids: number[], classes: string[]) => void;
@@ -29,6 +30,7 @@ interface InformationTabsProps {
   onQuestionDataChange?: (data: any) => void;
   tabScrollPositions: Record<Tab, number>;
   setTabScrollPositions: React.Dispatch<React.SetStateAction<Record<Tab, number>>>;
+  fontScale?: number;
 }
 
 export default function InformationTabs({
@@ -43,6 +45,7 @@ export default function InformationTabs({
   questionView,
   setQuestionView,
   onSubmit,
+  onSubmitAtLine,
   setSubmissionResults,
   onClearCanvas,
   onRestoreCanvas,
@@ -55,8 +58,13 @@ export default function InformationTabs({
   onQuestionDataChange,
   tabScrollPositions,
   setTabScrollPositions,
+  fontScale = 1,
 }: InformationTabsProps) {
   const tabBodyRef = useRef<HTMLDivElement>(null);
+  // Track the last submission context so Resubmit repeats the same check
+  type LastLineCtx = { line: number; iteration?: number } | null;
+  const lastSubmitLineRef = useRef<LastLineCtx>(null);
+  const [lastSubmitLine, setLastSubmitLine] = useState<LastLineCtx>(null);
 
   const saveCurrentScroll = () => {
     if (tabBodyRef.current) {
@@ -105,12 +113,29 @@ export default function InformationTabs({
   );
 
   const handleSubmit = async () => {
+    lastSubmitLineRef.current = null;
+    setLastSubmitLine(null);
     const success = await onSubmit();
     if (success) {
       saveCurrentScroll();
       setActive("feedback");
     }
     return success;
+  };
+
+  const handleSubmitAtLine = async (lineNumber: number, iterationNumber?: number) => {
+    const ctx = { line: lineNumber, iteration: iterationNumber };
+    lastSubmitLineRef.current = ctx;
+    setLastSubmitLine(ctx);
+    return onSubmitAtLine(lineNumber, iterationNumber);
+  };
+
+  const handleResubmit = async () => {
+    const ctx = lastSubmitLineRef.current;
+    if (ctx !== null) {
+      return onSubmitAtLine(ctx.line, ctx.iteration);
+    }
+    return onSubmit();
   };
 
   return (
@@ -135,12 +160,14 @@ export default function InformationTabs({
               questionView={questionView}
               setQuestionView={setQuestionView}
               onSubmit={handleSubmit}
+              onSubmitAtLine={handleSubmitAtLine}
               setSubmissionResults={setSubmissionResults}
               onClearCanvas={onClearCanvas}
               onRestoreCanvas={onRestoreCanvas}
               currentCanvasState={currentCanvasState}
               onQuestionDataChange={onQuestionDataChange}
               isSandboxMode={isSandboxMode}
+              fontScale={fontScale}
             />
           </div>
 
@@ -159,7 +186,9 @@ export default function InformationTabs({
               questionIndex={questionIndex}
               questionType={questionType}
               isSandboxMode={!isSandboxMode}
-              onResubmit={onSubmit}
+              onResubmit={handleResubmit}
+              resubmitLine={lastSubmitLine}
+              fontScale={fontScale}
             />
           </div>
         </div>

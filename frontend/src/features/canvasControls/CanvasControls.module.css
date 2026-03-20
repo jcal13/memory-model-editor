@@ -222,3 +222,53 @@
 .toggleActive .toggleThumb {
   transform: translateX(20px);
 }
+
+/* =======================================
+   === Font Zoom Controls ================
+======================================= */
+
+.fontZoomControls {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  width: 100%;
+}
+
+.fontZoomBtn {
+  all: unset;
+  flex: 1;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1;
+  background-color: var(--button-bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.fontZoomBtn:hover:not(:disabled) {
+  background-color: var(--button-hover);
+  border-color: var(--border-secondary);
+  color: var(--text-primary);
+}
+
+.fontZoomBtn:active:not(:disabled) {
+  background-color: var(--button-active);
+}
+
+.fontZoomBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.fontZoomBtn:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}

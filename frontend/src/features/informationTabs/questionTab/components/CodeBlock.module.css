@@ -3,7 +3,7 @@
   padding: 1rem 1.25rem;
   border-radius: 10px;
   overflow-x: auto;
-  font-size: 0.85rem;
+  font-size: calc(0.85rem * var(--font-scale, 1));
   line-height: 1.5;
   background: #1e1e2e;
 }
@@ -28,4 +28,31 @@
   flex: 1;
   white-space: pre;
   padding-right: 1.25rem;
+}
+
+/* Interactive line selection */
+.checkableLine {
+  cursor: pointer;
+}
+
+.checkableLine:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.checkableGutter {
+  opacity: 1;
+  color: #60a5fa;
+}
+
+.selectedLine {
+  background: rgba(96, 165, 250, 0.2);
+  border-left: 4px solid #3b82f6;
+  padding-left: 0;
+}
+
+.selectedLine .gutter {
+  padding-left: 0;
+  color: #93c5fd;
+  font-weight: bold;
+  opacity: 1;
 }

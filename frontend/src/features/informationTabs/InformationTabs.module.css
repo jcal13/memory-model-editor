@@ -84,3 +84,45 @@
 .hidden {
   display: none;
 }
+
+.zoomControls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+  padding-left: 6px;
+}
+
+.zoomBtn {
+  all: unset;
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  transition: color 160ms ease, background 160ms ease;
+}
+
+.zoomBtn:hover:not(:disabled) {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.zoomBtn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.zoomLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  min-width: 2.8ch;
+  text-align: center;
+  user-select: none;
+}

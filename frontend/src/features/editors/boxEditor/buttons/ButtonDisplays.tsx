@@ -90,10 +90,18 @@ const ButtonDisplays = ({
 
   return (
     <>
-      <button onClick={handleInvalidate} className={styles.invalidateButton}>
-        {invalidated ? "Validate" : "Invalidate"}
-      </button>
-
+      <div className={styles.invalidateGroup}>
+        <button onClick={handleInvalidate} className={styles.invalidateButton}>
+          {invalidated ? "Validate" : "Invalidate"}
+        </button>
+        <span className={styles.helpIcon} aria-label="Invalidate help">
+          ?
+          <span className={styles.tooltip}>
+            Marks this box as invalidated, indicating it is no longer active.
+            A common use case is denoting a stack frame that has been popped off the call stack.
+          </span>
+        </span>
+      </div>
       <button
         onMouseEnter={() => setHoverRemove(true)}
         onMouseLeave={() => setHoverRemove(false)}

@@ -862,27 +862,11 @@ async function fetchAnswerModel(
   return raw as MemoryBox[];
 }
 
-/* ---------- main validation function ---------- */
-export default async function validateAnswer(
+/* ---------- shared comparison logic ---------- */
+function runComparison(
   userModel: MemoryBox[],
-  questionId: number,
-  questionType: "test" | "practice" | "prep"
-): Promise<{
-  correct: boolean;
-  errors: FeedbackError[];
-}> {
-  const answerModel = await fetchAnswerModel(questionType, questionId);
-  if (!answerModel) {
-    return {
-      correct: false,
-      errors: [{
-        type: ErrorType.GENERIC_ERROR,
-        message: `Invalid question id: ${questionId}`,
-        severity: 'error'
-      }],
-    };
-  }
-
+  answerModel: MemoryBox[]
+): { correct: boolean; errors: FeedbackError[] } {
   const errors: FeedbackError[] = [];
 
   // gather frames from both models
@@ -934,4 +918,98 @@ export default async function validateAnswer(
   detectOrphans(inputFrames, inputMap, userModel, answerMap, errors);
 
   return { correct: errors.length === 0, errors };
+}
+
+/* ---------- main validation function ---------- */
+export default async function validateAnswer(
+  userModel: MemoryBox[],
+  questionId: number,
+  questionType: "test" | "practice" | "prep"
+): Promise<{
+  correct: boolean;
+  errors: FeedbackError[];
+}> {
+  const answerModel = await fetchAnswerModel(questionType, questionId);
+  if (!answerModel) {
+    return {
+      correct: false,
+      errors: [{
+        type: ErrorType.GENERIC_ERROR,
+        message: `Invalid question id: ${questionId}`,
+        severity: 'error'
+      }],
+    };
+  }
+
+  return runComparison(userModel, answerModel);
+}
+
+/* ---------- line-specific validation ---------- */
+type QuestionStep = { lineNumber: number; iterationNumber?: number; answer: unknown };
+
+async function fetchStepsModel(
+  questionType: "test" | "practice" | "prep",
+  questionId: number,
+  lineNumber: number,
+  iterationNumber?: number
+): Promise<MemoryBox[] | "no_steps" | null> {
+  const table =
+    questionType === "practice"
+      ? "practice_questions"
+      : questionType === "prep"
+      ? "prep_questions"
+      : "test_questions";
+
+  const result = await getPool().query<{ steps: unknown }>(
+    `SELECT steps FROM ${table} WHERE id = $1`,
+    [questionId]
+  );
+  if (result.rows.length === 0) return null;
+
+  const steps = result.rows[0].steps;
+  if (!Array.isArray(steps)) return "no_steps";
+
+  const step = (steps as QuestionStep[]).find(
+    (s) => s.lineNumber === lineNumber && s.iterationNumber === iterationNumber
+  );
+  if (!step) return "no_steps";
+
+  if (!Array.isArray(step.answer)) {
+    throw new Error(`Step answer for line ${lineNumber} is not an array`);
+  }
+  return step.answer as MemoryBox[];
+}
+
+export async function validateAnswerAtLine(
+  userModel: MemoryBox[],
+  questionId: number,
+  questionType: "test" | "practice" | "prep",
+  lineNumber: number,
+  iterationNumber?: number
+): Promise<{ correct: boolean; errors: FeedbackError[] }> {
+  const stepModel = await fetchStepsModel(questionType, questionId, lineNumber, iterationNumber);
+
+  if (stepModel === null) {
+    return {
+      correct: false,
+      errors: [{
+        type: ErrorType.GENERIC_ERROR,
+        message: `Invalid question id: ${questionId}`,
+        severity: 'error'
+      }],
+    };
+  }
+
+  if (stepModel === "no_steps") {
+    return {
+      correct: false,
+      errors: [{
+        type: ErrorType.GENERIC_ERROR,
+        message: `No answer defined for line ${lineNumber}${iterationNumber !== undefined ? ` iteration ${iterationNumber}` : ""}`,
+        severity: 'error'
+      }],
+    };
+  }
+
+  return runComparison(userModel, stepModel);
 }

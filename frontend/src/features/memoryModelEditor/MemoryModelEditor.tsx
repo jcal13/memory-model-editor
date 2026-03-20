@@ -59,6 +59,17 @@ export default function MemoryModelEditor({
   const _initialUI = loadInitialUIData();
   const [canvasScale, setCanvasScale] = useState<number>(_initialUI.canvasScale ?? 1);
   const [editorScale, setEditorScale] = useState<number>(_initialUI.editorScale ?? 1);
+  const [fontScale, setFontScale] = useState<number>(() => {
+    const saved = localStorage.getItem("questionFontScale");
+    return saved ? parseFloat(saved) : 1;
+  });
+  const adjustFontScale = (delta: number) => {
+    setFontScale((prev) => {
+      const next = Math.max(0.75, Math.min(1.5, Math.round((prev + delta) * 10) / 10));
+      localStorage.setItem("questionFontScale", String(next));
+      return next;
+    });
+  };
 
   // Initialize undo history
   const { canUndo, canRedo, undo, redo, recordState, clearHistory } = useUndoHistory(
@@ -189,12 +200,25 @@ export default function MemoryModelEditor({
   };
 
   const getQuestionFunctionNames = useCallback((questionData: any): string[] => {
-    if (!questionData?.answer || !Array.isArray(questionData.answer)) {
-      return [];
+    const seen = new Set<string>();
+    const collectFrameNames = (boxes: any[]) => {
+      for (const box of boxes) {
+        if (box.type === ".frame" && typeof box.name === "string") {
+          seen.add(box.name);
+        }
+      }
+    };
+    if (Array.isArray(questionData?.answer)) {
+      collectFrameNames(questionData.answer);
     }
-    return questionData.answer
-      .filter((box: any) => box.type === ".frame" && typeof box.name === "string")
-      .map((box: any) => box.name as string);
+    if (Array.isArray(questionData?.steps)) {
+      for (const step of questionData.steps) {
+        if (Array.isArray(step.answer)) {
+          collectFrameNames(step.answer);
+        }
+      }
+    }
+    return Array.from(seen);
   }, []);
 
   const getQuestionClassNames = useCallback((questionData: any): string[] => {
@@ -275,7 +299,7 @@ export default function MemoryModelEditor({
     return Array.from(requiredTypes);
   }, []);
 
-  const { handleCanvasSubmit } = useCanvasSubmission({
+  const { handleCanvasSubmit, handleCanvasSubmitAtLine } = useCanvasSubmission({
     selectedQuestionIndex: state.selectedQuestionIndex,
     selectedQuestionType: state.selectedQuestionType,
     elements: state.elements,
@@ -499,6 +523,8 @@ export default function MemoryModelEditor({
                 onPythonTutorStandalonePrimitivesChange={
                   state.setPythonTutorStandalonePrimitives
                 }
+                fontScale={fontScale}
+                onFontScaleChange={adjustFontScale}
               />
             </div>
           </div>
@@ -524,6 +550,8 @@ export default function MemoryModelEditor({
               addClasses={addElementClass}
               removeClasses={removeElementClass}
               sandbox={!state.isSandboxMode}
+              canManageClasses={!state.isSandboxMode || state.selectedQuestionIndex === null}
+              canManageFunctions={!state.isSandboxMode || state.selectedQuestionIndex === null}
               onClear={() => state.setShowClearCanvasModal(true)}
               onEditorOpenerReady={handleEditorOpenerReady}
               scale={canvasScale}
@@ -575,6 +603,7 @@ export default function MemoryModelEditor({
                 questionView={state.questionView}
                 setQuestionView={state.setQuestionView}
                 onSubmit={handleCanvasSubmit}
+                onSubmitAtLine={handleCanvasSubmitAtLine}
                 setSubmissionResults={state.setSubmissionResults}
                 onClearCanvas={clearCanvas}
                 onRestoreCanvas={restoreCanvas}
@@ -587,6 +616,7 @@ export default function MemoryModelEditor({
                 onQuestionDataChange={setCurrentQuestionData}
                 tabScrollPositions={state.tabScrollPositions}
                 setTabScrollPositions={state.setTabScrollPositions}
+                fontScale={fontScale}
               />
             </div>
           </>

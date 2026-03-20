@@ -24,6 +24,7 @@ import {
   createElementsByIdMap,
 } from "./utils/pythonTutorReferences";
 import { findOrphanedGeneratedPrimitiveIds } from "../editors/utils/pythonTutorInlinePrimitives";
+import PythonTutorReferenceArrows from "./components/PythonTutorReferenceArrows";
 
 const EDITOR_MAP: Record<BoxType["name"], React.FC<any>> = {
   primitive: BoxEditor,
@@ -54,6 +55,8 @@ interface FloatingEditorProps {
   editorScale: number;
   questionFunctionNames?: string[];
   visualStyle?: VisualStyle;
+  pythonTutorReferenceArrows?: boolean;
+  pythonTutorStandalonePrimitives?: boolean;
   onElementsChange: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
 }
 
@@ -76,6 +79,8 @@ function FloatingEditor({
   editorScale,
   questionFunctionNames,
   visualStyle = "memoryviz",
+  pythonTutorReferenceArrows = false,
+  pythonTutorStandalonePrimitives = false,
   onElementsChange,
 }: FloatingEditorProps) {
   const nodeRef = useRef<HTMLDivElement>(null);
@@ -123,6 +128,7 @@ function FloatingEditor({
             elements={elements}
             questionFunctionNames={questionFunctionNames}
             visualStyle={visualStyle}
+            pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}
             onElementsChange={onElementsChange}
           />
         </div>
@@ -148,6 +154,8 @@ interface CanvasProps {
   editorScale?: number;
   questionFunctionNames?: string[]; 
   visualStyle?: VisualStyle;
+  pythonTutorReferenceArrows?: boolean;
+  pythonTutorStandalonePrimitives?: boolean;
 }
 
 function Canvas({
@@ -165,6 +173,8 @@ function Canvas({
   editorScale = 1,
   questionFunctionNames,
   visualStyle = "memoryviz",
+  pythonTutorReferenceArrows = false,
+  pythonTutorStandalonePrimitives = false,
 }: CanvasProps) {
   const [openEditors, setOpenEditors] = useState<CanvasElement[]>([]);
   const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(
@@ -179,6 +189,8 @@ function Canvas({
 
   const { svgRef } = useCanvasRefs();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const useInlinePythonTutorPrimitives =
+    visualStyle === "pythonTutor" && !pythonTutorStandalonePrimitives;
 
   const initialVB =
     typeof window !== "undefined"
@@ -327,7 +339,7 @@ function Canvas({
         "primitive",
       ]);
 
-      if (visualStyle === "pythonTutor" && primitiveBoxTypes.has(boxType)) {
+      if (useInlinePythonTutorPrimitives && primitiveBoxTypes.has(boxType)) {
         return;
       }
 
@@ -361,7 +373,14 @@ function Canvas({
         return [...prev, newElement];
       });
     },
-    [elements, ids, sandbox, svgRef, setElements, visualStyle]
+    [
+      elements,
+      ids,
+      sandbox,
+      svgRef,
+      setElements,
+      useInlinePythonTutorPrimitives,
+    ]
   );
 
   const saveElement = useCallback(
@@ -399,14 +418,14 @@ function Canvas({
 
   const openElementEditor = useCallback(
     (element: CanvasElement) => {
-      if (visualStyle === "pythonTutor" && element.kind.name === "primitive") {
+      if (useInlinePythonTutorPrimitives && element.kind.name === "primitive") {
         return;
       }
 
       setOpenEditors([element]);
       setSelectedElement(element);
     },
-    [visualStyle]
+    [useInlinePythonTutorPrimitives]
   );
 
   const closeElementEditor = useCallback((boxId: number) => {
@@ -422,7 +441,7 @@ function Canvas({
   }, [onEditorOpenerReady, openElementEditor]);
 
   useEffect(() => {
-    if (visualStyle !== "pythonTutor") {
+    if (!useInlinePythonTutorPrimitives) {
       return;
     }
 
@@ -432,7 +451,7 @@ function Canvas({
     setSelectedElement((prev) =>
       prev?.kind.name === "primitive" ? null : prev
     );
-  }, [visualStyle]);
+  }, [useInlinePythonTutorPrimitives]);
 
   // Close all open editors when Escape is pressed
   useEffect(() => {
@@ -454,12 +473,18 @@ function Canvas({
     () =>
       elements.filter((el) => {
         if (el.kind.name === "function") return false;
-        return !(visualStyle === "pythonTutor" && el.kind.name === "primitive");
+        return !(
+          useInlinePythonTutorPrimitives && el.kind.name === "primitive"
+        );
       }),
-    [elements, visualStyle]
+    [elements, useInlinePythonTutorPrimitives]
   );
 
   useEffect(() => {
+    if (!useInlinePythonTutorPrimitives) {
+      return;
+    }
+
     const orphanedGeneratedPrimitiveIds = findOrphanedGeneratedPrimitiveIds(elements);
     if (orphanedGeneratedPrimitiveIds.length === 0) {
       return;
@@ -499,7 +524,7 @@ function Canvas({
 
       return prev;
     });
-  }, [elements, removeId, setElements]);
+  }, [elements, removeId, setElements, useInlinePythonTutorPrimitives]);
 
   const handleCallStackReorder = useCallback(
     (fromIndex: number, toIndex: number) => {
@@ -562,6 +587,10 @@ function Canvas({
             onWidthChange={setCallStackWidth}
             scale={scale}
             visualStyle={visualStyle}
+            pythonTutorReferenceArrows={pythonTutorReferenceArrows}
+            pythonTutorStandalonePrimitives={
+              pythonTutorStandalonePrimitives
+            }
             elementsById={elementsById}
           />
 
@@ -575,10 +604,23 @@ function Canvas({
                   invalidated={el.invalidated}
                   callStackWidth={callStackWidth}
                   visualStyle={visualStyle}
+                  pythonTutorReferenceArrows={pythonTutorReferenceArrows}
+                  pythonTutorStandalonePrimitives={
+                    pythonTutorStandalonePrimitives
+                  }
                   elementsById={elementsById}
                 />
               ))}
           </g>
+
+          <PythonTutorReferenceArrows
+            svgRef={svgRef}
+            enabled={
+              visualStyle === "pythonTutor" && pythonTutorReferenceArrows
+            }
+            includePrimitiveTargets={pythonTutorStandalonePrimitives}
+            elements={elements}
+          />
         </svg>
       </div>
 
@@ -607,6 +649,8 @@ function Canvas({
             editorScale={editorScale}
             questionFunctionNames={questionFunctionNames}
             visualStyle={visualStyle}
+            pythonTutorReferenceArrows={pythonTutorReferenceArrows}
+            pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}
             onElementsChange={setElements}
           />
         );
@@ -691,7 +735,10 @@ const areEqual = (prev: Readonly<CanvasProps>, next: Readonly<CanvasProps>) => {
     prev.scale === next.scale &&
     prev.editorScale === next.editorScale &&
     prev.questionFunctionNames === next.questionFunctionNames &&
-    prev.visualStyle === next.visualStyle
+    prev.visualStyle === next.visualStyle &&
+    prev.pythonTutorReferenceArrows === next.pythonTutorReferenceArrows &&
+    prev.pythonTutorStandalonePrimitives ===
+      next.pythonTutorStandalonePrimitives
   );
 };
 

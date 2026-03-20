@@ -13,6 +13,10 @@ export interface PythonTutorReferenceDisplay {
   targetId: number | null;
 }
 
+interface ResolveInlineDisplayOptions {
+  showPrimitiveReferencesAsObjects?: boolean;
+}
+
 function normalizeNumericId(value: ReferenceTarget): number | null {
   if (typeof value === "number" && Number.isInteger(value)) {
     return value;
@@ -106,7 +110,8 @@ export function formatPrimitiveValue(kind: PrimitiveKind): string {
 
 export function resolveInlineDisplay(
   targetId: ReferenceTarget,
-  elementsById?: Map<number, CanvasElement>
+  elementsById?: Map<number, CanvasElement>,
+  options: ResolveInlineDisplayOptions = {}
 ): PythonTutorReferenceDisplay {
   const numericId = normalizeNumericId(targetId);
 
@@ -128,6 +133,14 @@ export function resolveInlineDisplay(
   }
 
   if (isPrimitiveElement(target)) {
+    if (options.showPrimitiveReferencesAsObjects) {
+      return {
+        kind: "reference",
+        label: `id${numericId}`,
+        targetId: numericId,
+      };
+    }
+
     return {
       kind: "primitive",
       label: formatPrimitiveValue(target.kind),

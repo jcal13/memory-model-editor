@@ -20,6 +20,8 @@ export function useUILocalStorage(state: UIState): void {
     state.submissionResults,
     state.sandboxMode,
     state.visualStyle,
+    state.pythonTutorReferenceArrows,
+    state.pythonTutorStandalonePrimitives,
     state.questionView,
     state.isInfoPanelOpen,
     state.canvasScale,

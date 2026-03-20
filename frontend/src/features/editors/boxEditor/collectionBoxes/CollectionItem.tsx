@@ -27,6 +27,7 @@ interface Props {
   elements?: any[]; // All canvas elements for ID usage tracking
   ownerElement: CanvasElement;
   visualStyle?: VisualStyle;
+  pythonTutorStandalonePrimitives?: boolean;
   onCommitKind?: (kind: BoxType) => void;
   onElementsChange?: Dispatch<SetStateAction<CanvasElement[]>>;
 }
@@ -47,9 +48,13 @@ const CollectionItem = ({
   elements = [],
   ownerElement,
   visualStyle = "memoryviz",
+  pythonTutorStandalonePrimitives = false,
   onCommitKind,
   onElementsChange,
 }: Props) => {
+  const useInlineTargetEditor =
+    visualStyle === "pythonTutor" && !pythonTutorStandalonePrimitives;
+
   const removeItem = (idx: number) =>
     setItems((prev) => prev.filter((_, i) => i !== idx));
 
@@ -80,7 +85,7 @@ const CollectionItem = ({
           const fieldErrors = getErrorsForId(validationErrors, itemId);
           return (
             <div key={idx} className={styles.idSelectButtonWrapper}>
-              {visualStyle === "pythonTutor" ? (
+              {useInlineTargetEditor ? (
                 <InlineTargetEditor
                   ownerElement={ownerElement}
                   currentTarget={itemId}
@@ -147,7 +152,7 @@ const CollectionItem = ({
           <div key={idx} className={styles.collectionPairContainer}>
             {/* KEY ID */}
             <div className={styles.idSelectButtonWrapper}>
-              {visualStyle === "pythonTutor" ? (
+              {useInlineTargetEditor ? (
                 <InlineTargetEditor
                   ownerElement={ownerElement}
                   currentTarget={keyId}
@@ -191,7 +196,7 @@ const CollectionItem = ({
 
             {/* VALUE ID + REMOVE */}
             <div className={styles.idSelectButtonWrapper}>
-              {visualStyle === "pythonTutor" ? (
+              {useInlineTargetEditor ? (
                 <InlineTargetEditor
                   ownerElement={ownerElement}
                   currentTarget={valId}

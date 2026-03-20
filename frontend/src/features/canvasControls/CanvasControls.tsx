@@ -24,6 +24,10 @@ interface CanvasControlsProps {
   onEditorScaleChange?: (scale: number) => void;
   visualStyle?: VisualStyle;
   onVisualStyleChange?: (style: VisualStyle) => void;
+  pythonTutorReferenceArrows?: boolean;
+  onPythonTutorReferenceArrowsChange?: (value: boolean) => void;
+  pythonTutorStandalonePrimitives?: boolean;
+  onPythonTutorStandalonePrimitivesChange?: (value: boolean) => void;
 }
 
 type ControlTab = "actions" | "view" | "settings";
@@ -65,6 +69,10 @@ export default function CanvasControls({
   onEditorScaleChange,
   visualStyle = "memoryviz",
   onVisualStyleChange,
+  pythonTutorReferenceArrows = false,
+  onPythonTutorReferenceArrowsChange,
+  pythonTutorStandalonePrimitives = false,
+  onPythonTutorStandalonePrimitivesChange,
 }: CanvasControlsProps) {
   const { theme, toggleTheme } = useTheme();
   const isDarkMode = theme === 'dark';
@@ -204,6 +212,68 @@ export default function CanvasControls({
                 </button>
               </div>
             )}
+
+            {visualStyle === "pythonTutor" &&
+              onPythonTutorStandalonePrimitivesChange && (
+                <div
+                  className={`${styles.controlItem} ${styles.nestedControlItem}`}
+                >
+                  <label
+                    className={styles.controlLabel}
+                    htmlFor="python-tutor-standalone-primitives-toggle"
+                  >
+                    Standalone Primitives
+                  </label>
+                  <button
+                    id="python-tutor-standalone-primitives-toggle"
+                    type="button"
+                    role="switch"
+                    aria-checked={pythonTutorStandalonePrimitives}
+                    onClick={() =>
+                      onPythonTutorStandalonePrimitivesChange(
+                        !pythonTutorStandalonePrimitives
+                      )
+                    }
+                    className={`${styles.toggle} ${
+                      pythonTutorStandalonePrimitives
+                        ? styles.toggleActive
+                        : ""
+                    }`}
+                  >
+                    <span className={styles.toggleThumb} />
+                  </button>
+                </div>
+              )}
+
+            {visualStyle === "pythonTutor" &&
+              onPythonTutorReferenceArrowsChange && (
+                <div
+                  className={`${styles.controlItem} ${styles.nestedControlItem}`}
+                >
+                  <label
+                    className={styles.controlLabel}
+                    htmlFor="python-tutor-reference-arrows-toggle"
+                  >
+                    Reference Arrows
+                  </label>
+                  <button
+                    id="python-tutor-reference-arrows-toggle"
+                    type="button"
+                    role="switch"
+                    aria-checked={pythonTutorReferenceArrows}
+                    onClick={() =>
+                      onPythonTutorReferenceArrowsChange(
+                        !pythonTutorReferenceArrows
+                      )
+                    }
+                    className={`${styles.toggle} ${
+                      pythonTutorReferenceArrows ? styles.toggleActive : ""
+                    }`}
+                  >
+                    <span className={styles.toggleThumb} />
+                  </button>
+                </div>
+              )}
 
             <div className={`${styles.buttonWrapper} ${styles.feedbackWrapper}`}>
               <FeedbackButton />

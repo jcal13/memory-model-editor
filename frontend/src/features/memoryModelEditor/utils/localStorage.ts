@@ -28,6 +28,8 @@ const DEFAULT_UI_STATE = {
   submissionResults: null as SubmissionResult | null,
   sandboxMode: null as boolean | null,
   visualStyle: "memoryviz" as VisualStyle,
+  pythonTutorReferenceArrows: false,
+  pythonTutorStandalonePrimitives: false,
 };
 
 export interface CanvasData {
@@ -61,6 +63,8 @@ export interface UIState {
   submissionResults: SubmissionResult | null;
   sandboxMode: boolean | null;
   visualStyle?: VisualStyle;
+  pythonTutorReferenceArrows?: boolean;
+  pythonTutorStandalonePrimitives?: boolean;
   questionView?: QuestionView;
   isInfoPanelOpen?: boolean;
   canvasScale?: number;
@@ -121,6 +125,10 @@ export function loadInitialUIData(): UIState {
       typeof parsed?.sandboxMode === "boolean" ? parsed.sandboxMode : null;
 
     const visualStyle = normalizeVisualStyle(parsed?.visualStyle);
+    const pythonTutorReferenceArrows =
+      parsed?.pythonTutorReferenceArrows === true;
+    const pythonTutorStandalonePrimitives =
+      parsed?.pythonTutorStandalonePrimitives === true;
 
     const validViews = ["root", "loading", "test", "list", "question", "practice", "prep"];
     const questionView =
@@ -152,6 +160,8 @@ export function loadInitialUIData(): UIState {
       submissionResults,
       sandboxMode,
       visualStyle,
+      pythonTutorReferenceArrows,
+      pythonTutorStandalonePrimitives,
       questionView,
       isInfoPanelOpen,
       canvasScale,

@@ -135,6 +135,11 @@
   min-width: 0;
 }
 
+.nestedControlItem {
+  padding-left: 20px;
+  padding-top: 8px;
+}
+
 .controlLabel {
   font-size: 0.9rem;
   font-weight: 500;

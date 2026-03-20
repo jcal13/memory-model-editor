@@ -15,6 +15,8 @@ export default function CanvasBox({
   disableDrag = false,
   callStackWidth,
   visualStyle = "memoryviz",
+  pythonTutorReferenceArrows = false,
+  pythonTutorStandalonePrimitives = false,
   elementsById,
   renderMode = "canvas",
 }: CanvasBoxProps) {
@@ -31,6 +33,8 @@ export default function CanvasBox({
     disableDrag,
     callStackWidth,
     visualStyle,
+    pythonTutorReferenceArrows,
+    pythonTutorStandalonePrimitives,
     elementsById,
     renderMode,
   });
@@ -136,5 +140,15 @@ export default function CanvasBox({
     };
   }, [checkAndConstrainPosition, disableDrag, element.kind.name]);
 
-  return <g ref={gRef} />;
+  return (
+    <g
+      ref={gRef}
+      data-canvas-box-id={element.boxId}
+      data-canvas-kind={element.kind.name}
+      data-canvas-render-mode={renderMode}
+      data-canvas-element-id={
+        typeof element.id === "number" ? element.id : undefined
+      }
+    />
+  );
 }

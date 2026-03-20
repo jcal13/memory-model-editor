@@ -25,6 +25,7 @@ interface Props {
   elements?: any[]; // All canvas elements for ID usage tracking
   ownerElement: CanvasElement;
   visualStyle?: VisualStyle;
+  pythonTutorStandalonePrimitives?: boolean;
   onCommitKind?: (kind: BoxType) => void;
   onElementsChange?: Dispatch<SetStateAction<CanvasElement[]>>;
 }
@@ -49,6 +50,7 @@ const CollectionContent = ({
   elements = [],
   ownerElement,
   visualStyle = "memoryviz",
+  pythonTutorStandalonePrimitives = false,
   onCommitKind,
   onElementsChange,
 }: Props) => {
@@ -66,6 +68,7 @@ const CollectionContent = ({
         elements={elements}
         ownerElement={ownerElement}
         visualStyle={visualStyle}
+        pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}
         onCommitKind={onCommitKind}
         onElementsChange={onElementsChange}
       />

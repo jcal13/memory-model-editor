@@ -45,6 +45,8 @@ export function createBoxRenderer(
   element: CanvasElement,
   options: {
     visualStyle?: VisualStyle;
+    pythonTutorReferenceArrows?: boolean;
+    pythonTutorStandalonePrimitives?: boolean;
     elementsById?: Map<number, CanvasElement>;
     renderMode?: RenderMode;
   } = {}
@@ -53,6 +55,10 @@ export function createBoxRenderer(
     const svg = createPythonTutorBoxRenderer(element, {
       elementsById: options.elementsById,
       renderMode: options.renderMode,
+      showReferenceArrows:
+        options.renderMode === "canvas" && options.pythonTutorReferenceArrows,
+      showPrimitiveReferencesAsObjects:
+        options.pythonTutorStandalonePrimitives,
     });
 
     if (element.color) {

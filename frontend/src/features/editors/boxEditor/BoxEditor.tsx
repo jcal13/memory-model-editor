@@ -42,6 +42,7 @@ const BoxEditorModule = ({
   elements = [],
   questionFunctionNames,
   visualStyle = "memoryviz",
+  pythonTutorStandalonePrimitives = false,
   onElementsChange,
 }: BoxEditorType) => {
   // Shared hover state for remove button
@@ -156,6 +157,7 @@ const BoxEditorModule = ({
           sandbox={sandbox}
           elements={elements}
           visualStyle={visualStyle}
+          pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}
           onCommitKind={commitElementKind}
           onElementsChange={onElementsChange}
         />

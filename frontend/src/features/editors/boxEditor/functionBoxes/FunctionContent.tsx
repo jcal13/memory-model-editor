@@ -27,6 +27,7 @@ interface Props {
   elements?: any[]; // All canvas elements for ID usage tracking
   ownerElement: CanvasElement;
   visualStyle?: VisualStyle;
+  pythonTutorStandalonePrimitives?: boolean;
   onCommitKind?: (kind: BoxType) => void;
   onElementsChange?: Dispatch<SetStateAction<CanvasElement[]>>;
 }
@@ -46,9 +47,13 @@ const FunctionContent = ({
   elements = [],
   ownerElement,
   visualStyle = "memoryviz",
+  pythonTutorStandalonePrimitives = false,
   onCommitKind,
   onElementsChange,
 }: Props) => {
+  const useInlineTargetEditor =
+    visualStyle === "pythonTutor" && !pythonTutorStandalonePrimitives;
+
   // Add a new empty parameter to the list
   const addParam = () =>
     setParams([...functionParams, { name: "", targetId: "_" }]);
@@ -97,7 +102,7 @@ const FunctionContent = ({
                   className={styles.variableNameBox}
                 />
                 <div className={styles.idSelectButtonWrapper}>
-                  {visualStyle === "pythonTutor" ? (
+                  {useInlineTargetEditor ? (
                     <InlineTargetEditor
                       ownerElement={ownerElement}
                       currentTarget={p.targetId}

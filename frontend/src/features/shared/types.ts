@@ -173,6 +173,7 @@ export interface BoxEditorType {
   elements?: any[];
   questionFunctionNames?: string[];
   visualStyle?: VisualStyle;
+  pythonTutorStandalonePrimitives?: boolean;
   onElementsChange?: Dispatch<SetStateAction<CanvasElement[]>>;
 }
 

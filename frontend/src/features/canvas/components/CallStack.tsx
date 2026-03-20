@@ -41,6 +41,8 @@ interface CallStackProps {
   width?: number;
   scale?: number;
   visualStyle?: VisualStyle;
+  pythonTutorReferenceArrows?: boolean;
+  pythonTutorStandalonePrimitives?: boolean;
   elementsById?: Map<number, CanvasElement>;
 }
 
@@ -75,6 +77,8 @@ const CallStack: React.FC<CallStackProps> = ({
   width = 205,
   scale = 1,
   visualStyle = "memoryviz",
+  pythonTutorReferenceArrows = false,
+  pythonTutorStandalonePrimitives = false,
   elementsById,
 }) => {
   const clipPathId = useId();
@@ -430,6 +434,10 @@ const CallStack: React.FC<CallStackProps> = ({
               invalidated={frame.invalidated}
               disableDrag={true}
               visualStyle={visualStyle}
+              pythonTutorReferenceArrows={pythonTutorReferenceArrows}
+              pythonTutorStandalonePrimitives={
+                pythonTutorStandalonePrimitives
+              }
               elementsById={elementsById}
             />
           </g>

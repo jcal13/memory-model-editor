@@ -42,11 +42,23 @@ const COLORS = {
 interface RenderContext {
   elementsById?: Map<number, CanvasElement>;
   renderMode?: RenderMode;
+  showReferenceArrows?: boolean;
+  showPrimitiveReferencesAsObjects?: boolean;
 }
 
 interface KeyValueRow {
   left: string;
   right: PythonTutorReferenceDisplay;
+}
+
+function resolveDisplay(
+  targetId: number | string | null | "_" | undefined,
+  context: RenderContext
+): PythonTutorReferenceDisplay {
+  return resolveInlineDisplay(targetId, context.elementsById, {
+    showPrimitiveReferencesAsObjects:
+      context.showPrimitiveReferencesAsObjects,
+  });
 }
 
 function createSvg(width: number, height: number): SVGSVGElement {
@@ -187,6 +199,90 @@ function isClickableReference(display: PythonTutorReferenceDisplay): boolean {
   return display.kind === "reference";
 }
 
+function shouldRenderReferenceSourceMarker(
+  display: PythonTutorReferenceDisplay,
+  context: RenderContext
+): boolean {
+  return Boolean(
+    context.showReferenceArrows &&
+      context.renderMode === "canvas" &&
+      display.kind === "reference" &&
+      display.targetId !== null
+  );
+}
+
+function getRenderedDisplayLabel(
+  display: PythonTutorReferenceDisplay,
+  context: RenderContext
+): string {
+  return shouldRenderReferenceSourceMarker(display, context) ? "" : display.label;
+}
+
+function appendReferenceSourceMarker(
+  svg: SVGSVGElement,
+  x: number,
+  y: number,
+  targetId: number | null
+): void {
+  if (targetId === null) return;
+
+  const marker = createNode("circle");
+  marker.setAttribute("cx", `${x}`);
+  marker.setAttribute("cy", `${y}`);
+  marker.setAttribute("r", "4");
+  marker.style.fill = COLORS.referenceText;
+  marker.setAttribute("data-ref-source-target-id", `${targetId}`);
+  svg.appendChild(marker);
+}
+
+function appendDisplayValue(
+  svg: SVGSVGElement,
+  display: PythonTutorReferenceDisplay,
+  context: RenderContext,
+  options: {
+    x: number;
+    y: number;
+    fontSize: number;
+    anchor?: "start" | "middle" | "end";
+    markerX?: number;
+    markerY?: number;
+    hitRect?: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    };
+  }
+): void {
+  const showMarker = shouldRenderReferenceSourceMarker(display, context);
+
+  if (showMarker) {
+    appendReferenceSourceMarker(
+      svg,
+      options.markerX ?? options.x,
+      options.markerY ?? options.y,
+      display.targetId
+    );
+  } else if (display.label) {
+    appendText(svg, display.label, options.x, options.y, {
+      anchor: options.anchor,
+      fill: getReferenceColor(display),
+      fontSize: options.fontSize,
+    });
+  }
+
+  if (options.hitRect && isClickableReference(display)) {
+    appendReferenceHitRect(
+      svg,
+      options.hitRect.x,
+      options.hitRect.y,
+      options.hitRect.width,
+      options.hitRect.height,
+      display.targetId
+    );
+  }
+}
+
 function getIdLabel(element: CanvasElement): string {
   return typeof element.id === "number" ? `id${element.id}` : "";
 }
@@ -237,32 +333,33 @@ function appendFrameSlot(
   x: number,
   y: number,
   width: number,
-  height: number
+  height: number,
+  context: RenderContext
 ): void {
   appendFrameBracket(svg, x, y, height);
 
-  if (!display.label) {
+  if (!display.label && !shouldRenderReferenceSourceMarker(display, context)) {
     return;
   }
 
-  appendText(svg, display.label, x + 16, y + height / 2, {
-    fill: getReferenceColor(display),
-    fontSize: VALUE_FONT_SIZE,
-  });
-
-  if (!isClickableReference(display)) {
-    return;
-  }
-
-  const textWidth = measureText(display.label, VALUE_FONT_SIZE);
-  appendReferenceHitRect(
-    svg,
-    x,
-    y - 2,
-    Math.max(width, textWidth + 18),
-    height + 4,
-    display.targetId
+  const textWidth = measureText(
+    getRenderedDisplayLabel(display, context),
+    VALUE_FONT_SIZE
   );
+
+  appendDisplayValue(svg, display, context, {
+    x: x + 16,
+    y: y + height / 2,
+    fontSize: VALUE_FONT_SIZE,
+    markerX: x + 20,
+    markerY: y + height / 2,
+    hitRect: {
+      x,
+      y: y - 2,
+      width: Math.max(width, textWidth + 18),
+      height: height + 4,
+    },
+  });
 }
 
 function renderFrameBox(
@@ -271,12 +368,12 @@ function renderFrameBox(
 ): SVGSVGElement {
   const rows = (element.kind.params || []).map((param) => ({
     left: param.name,
-    right: resolveInlineDisplay(param.targetId, context.elementsById),
+    right: resolveDisplay(param.targetId, context),
   }));
   const bodyRows =
     rows.length > 0
       ? rows
-      : [{ left: "", right: resolveInlineDisplay(null, context.elementsById) }];
+      : [{ left: "", right: resolveDisplay(null, context) }];
   const title = getPythonTutorFrameTitle(element.kind.functionName);
   const leftWidth = Math.max(
     44,
@@ -284,7 +381,9 @@ function renderFrameBox(
   );
   const rightWidth = Math.max(
     46,
-    ...bodyRows.map((row) => measureText(row.right.label, VALUE_FONT_SIZE))
+    ...bodyRows.map((row) =>
+      measureText(getRenderedDisplayLabel(row.right, context), VALUE_FONT_SIZE)
+    )
   );
   const slotWidth = Math.max(44, rightWidth + 18);
   const width = Math.max(
@@ -309,7 +408,15 @@ function renderFrameBox(
       fill: COLORS.bodyText,
       fontSize: 16,
     });
-    appendFrameSlot(svg, row.right, slotX, rowTop + 4, slotWidth, SLOT_HEIGHT);
+    appendFrameSlot(
+      svg,
+      row.right,
+      slotX,
+      rowTop + 4,
+      slotWidth,
+      SLOT_HEIGHT,
+      context
+    );
   });
 
   return svg;
@@ -347,7 +454,7 @@ function renderSequenceBox(
 ): SVGSVGElement {
   const values = Array.isArray(element.kind.value) ? element.kind.value : [];
   const displays = values.map((value) =>
-    resolveInlineDisplay(value, context.elementsById)
+    resolveDisplay(value, context)
   );
   const label = getObjectLabel(
     getPythonTutorDisplayType(element),
@@ -356,7 +463,10 @@ function renderSequenceBox(
   const hasIndexes =
     element.kind.name === "list" || element.kind.name === "tuple";
   const cellWidths = displays.map((display) =>
-    Math.max(CELL_MIN_WIDTH, measureText(display.label, VALUE_FONT_SIZE) + 22)
+    Math.max(
+      CELL_MIN_WIDTH,
+      measureText(getRenderedDisplayLabel(display, context), VALUE_FONT_SIZE) + 22
+    )
   );
   const bodyWidth =
     cellWidths.length > 0
@@ -393,28 +503,20 @@ function renderSequenceBox(
       });
     }
 
-    appendText(
-      svg,
-      display.label,
-      currentX + cellWidth / 2,
-      OBJECT_TOP + 32,
-      {
-        anchor: "middle",
-        fill: getReferenceColor(display),
-        fontSize: VALUE_FONT_SIZE,
-      }
-    );
-
-    if (isClickableReference(display)) {
-      appendReferenceHitRect(
-        svg,
-        currentX,
-        OBJECT_TOP,
-        cellWidth,
-        CELL_HEIGHT,
-        display.targetId
-      );
-    }
+    appendDisplayValue(svg, display, context, {
+      x: currentX + cellWidth / 2,
+      y: OBJECT_TOP + 32,
+      anchor: "middle",
+      fontSize: VALUE_FONT_SIZE,
+      markerX: currentX + cellWidth / 2,
+      markerY: OBJECT_TOP + 32,
+      hitRect: {
+        x: currentX,
+        y: OBJECT_TOP,
+        width: cellWidth,
+        height: CELL_HEIGHT,
+      },
+    });
 
     currentX += cellWidth;
   });
@@ -427,26 +529,30 @@ function renderDictBox(
   context: RenderContext
 ): SVGSVGElement {
   const rows = Object.entries(element.kind.value || {}).map(([key, value]) => ({
-    left: resolveInlineDisplay(key, context.elementsById),
-    right: resolveInlineDisplay(value, context.elementsById),
+    left: resolveDisplay(key, context),
+    right: resolveDisplay(value, context),
   }));
   const bodyRows =
     rows.length > 0
       ? rows
       : [
           {
-            left: resolveInlineDisplay(null, context.elementsById),
-            right: resolveInlineDisplay(null, context.elementsById),
+            left: resolveDisplay(null, context),
+            right: resolveDisplay(null, context),
           },
         ];
   const label = getObjectLabel("dict", getIdLabel(element));
   const leftWidth = Math.max(
     50,
-    ...bodyRows.map((row) => measureText(row.left.label, 14) + 12)
+    ...bodyRows.map((row) =>
+      measureText(getRenderedDisplayLabel(row.left, context), 14) + 12
+    )
   );
   const rightWidth = Math.max(
     50,
-    ...bodyRows.map((row) => measureText(row.right.label, 14) + 12)
+    ...bodyRows.map((row) =>
+      measureText(getRenderedDisplayLabel(row.right, context), 14) + 12
+    )
   );
   const dividerGap = 12;
   const width = Math.max(
@@ -472,50 +578,34 @@ function renderDictBox(
       appendLine(svg, 0, rowTop, width, rowTop);
     }
 
-    appendText(
-      svg,
-      row.left.label,
-      leftColumnWidth / 2,
-      rowTop + ROW_HEIGHT / 2,
-      {
-        anchor: "middle",
-        fill: getReferenceColor(row.left),
-        fontSize: 14,
-      }
-    );
-    appendText(
-      svg,
-      row.right.label,
-      rightStart + rightColumnWidth / 2,
-      rowTop + ROW_HEIGHT / 2,
-      {
-        anchor: "middle",
-        fill: getReferenceColor(row.right),
-        fontSize: 14,
-      }
-    );
-
-    if (isClickableReference(row.left)) {
-      appendReferenceHitRect(
-        svg,
-        0,
-        rowTop,
-        leftColumnWidth,
-        ROW_HEIGHT,
-        row.left.targetId
-      );
-    }
-
-    if (isClickableReference(row.right)) {
-      appendReferenceHitRect(
-        svg,
-        rightStart,
-        rowTop,
-        rightColumnWidth,
-        ROW_HEIGHT,
-        row.right.targetId
-      );
-    }
+    appendDisplayValue(svg, row.left, context, {
+      x: leftColumnWidth / 2,
+      y: rowTop + ROW_HEIGHT / 2,
+      anchor: "middle",
+      fontSize: 14,
+      markerX: leftColumnWidth / 2,
+      markerY: rowTop + ROW_HEIGHT / 2,
+      hitRect: {
+        x: 0,
+        y: rowTop,
+        width: leftColumnWidth,
+        height: ROW_HEIGHT,
+      },
+    });
+    appendDisplayValue(svg, row.right, context, {
+      x: rightStart + rightColumnWidth / 2,
+      y: rowTop + ROW_HEIGHT / 2,
+      anchor: "middle",
+      fontSize: 14,
+      markerX: rightStart + rightColumnWidth / 2,
+      markerY: rowTop + ROW_HEIGHT / 2,
+      hitRect: {
+        x: rightStart,
+        y: rowTop,
+        width: rightColumnWidth,
+        height: ROW_HEIGHT,
+      },
+    });
   });
 
   return svg;
@@ -525,12 +615,12 @@ function renderKeyValueObjectBox(
   title: string,
   idLabel: string,
   rows: KeyValueRow[],
-  renderMode: RenderMode = "canvas"
+  context: RenderContext
 ): SVGSVGElement {
   const bodyRows =
     rows.length > 0
       ? rows
-      : [{ left: "", right: resolveInlineDisplay(null) }];
+      : [{ left: "", right: resolveDisplay(null, context) }];
   const label = getObjectLabel(title, idLabel);
   const leftWidth = Math.max(
     52,
@@ -538,10 +628,12 @@ function renderKeyValueObjectBox(
   );
   const rightWidth = Math.max(
     58,
-    ...bodyRows.map((row) => measureText(row.right.label, 14) + 14)
+    ...bodyRows.map((row) =>
+      measureText(getRenderedDisplayLabel(row.right, context), 14) + 14
+    )
   );
   const width = Math.max(
-    renderMode === "palette" ? 170 : 144,
+    context.renderMode === "palette" ? 170 : 144,
     leftWidth + rightWidth + PADDING_X * 2,
     measureText(label, LABEL_FONT_SIZE) + 8
   );
@@ -564,27 +656,19 @@ function renderKeyValueObjectBox(
       fill: COLORS.bodyText,
       fontSize: 14,
     });
-    appendText(
-      svg,
-      row.right.label,
-      dividerX + 8,
-      rowTop + ROW_HEIGHT / 2,
-      {
-        fill: getReferenceColor(row.right),
-        fontSize: 14,
-      }
-    );
-
-    if (isClickableReference(row.right)) {
-      appendReferenceHitRect(
-        svg,
-        dividerX,
-        rowTop,
-        width - dividerX,
-        ROW_HEIGHT,
-        row.right.targetId
-      );
-    }
+    appendDisplayValue(svg, row.right, context, {
+      x: dividerX + 8,
+      y: rowTop + ROW_HEIGHT / 2,
+      fontSize: 14,
+      markerX: dividerX + (width - dividerX) / 2,
+      markerY: rowTop + ROW_HEIGHT / 2,
+      hitRect: {
+        x: dividerX,
+        y: rowTop,
+        width: width - dividerX,
+        height: ROW_HEIGHT,
+      },
+    });
   });
 
   return svg;
@@ -596,18 +680,20 @@ function renderClassBox(
 ): SVGSVGElement {
   const rows = (element.kind.classVariables || []).map((variable) => ({
     left: variable.name,
-    right: resolveInlineDisplay(variable.targetId, context.elementsById),
+    right: resolveDisplay(variable.targetId, context),
   }));
 
   return renderKeyValueObjectBox(
     element.kind.className || "object",
     getIdLabel(element),
     rows,
-    context.renderMode
+    context
   );
 }
 
-function getFunctionSignature(element: CanvasElement & { kind: FunctionKind }): string {
+function getFunctionSignature(
+  element: CanvasElement & { kind: FunctionKind }
+): string {
   const name = element.kind.functionName || "function";
   const params = (element.kind.params || [])
     .map((param) => param.name || "_")
@@ -655,7 +741,10 @@ export function createPythonTutorBoxRenderer(
             element as CanvasElement & { kind: FunctionKind },
             context
           )
-        : renderFrameBox(element as CanvasElement & { kind: FunctionKind }, context);
+        : renderFrameBox(
+            element as CanvasElement & { kind: FunctionKind },
+            context
+          );
     case "list":
     case "tuple":
     case "set":

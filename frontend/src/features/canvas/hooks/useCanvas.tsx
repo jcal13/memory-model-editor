@@ -132,6 +132,8 @@ export function useDraggableBox({
   disableDrag = false,
   callStackWidth,
   visualStyle = "memoryviz",
+  pythonTutorReferenceArrows = false,
+  pythonTutorStandalonePrimitives = false,
   elementsById,
   renderMode = "canvas",
 }: {
@@ -145,6 +147,8 @@ export function useDraggableBox({
   disableDrag?: boolean;
   callStackWidth?: number;
   visualStyle?: VisualStyle;
+  pythonTutorReferenceArrows?: boolean;
+  pythonTutorStandalonePrimitives?: boolean;
   elementsById?: Map<number, CanvasElement>;
   renderMode?: RenderMode;
 }) {
@@ -279,7 +283,11 @@ export function useDraggableBox({
         const target = elementsById.get(targetId);
         if (
           target &&
-          !(visualStyle === "pythonTutor" && target.kind.name === "primitive")
+          !(
+            visualStyle === "pythonTutor" &&
+            !pythonTutorStandalonePrimitives &&
+            target.kind.name === "primitive"
+          )
         ) {
           return target;
         }
@@ -287,7 +295,7 @@ export function useDraggableBox({
 
       return null;
     },
-    [elementsById, visualStyle]
+    [elementsById, pythonTutorStandalonePrimitives, visualStyle]
   );
 
   const handleMouseDown = useCallback(
@@ -332,6 +340,8 @@ export function useDraggableBox({
 
     const svgElement = createBoxRenderer(element, {
       visualStyle,
+      pythonTutorReferenceArrows,
+      pythonTutorStandalonePrimitives,
       elementsById,
       renderMode,
     });
@@ -427,6 +437,8 @@ export function useDraggableBox({
     dimensions,
     disableDrag,
     visualStyle,
+    pythonTutorReferenceArrows,
+    pythonTutorStandalonePrimitives,
     elementsById,
     renderMode,
     findReferencedElement,

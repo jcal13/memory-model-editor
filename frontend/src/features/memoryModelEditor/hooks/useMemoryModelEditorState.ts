@@ -53,6 +53,10 @@ export function useMemoryModelEditorState(sandbox: boolean) {
   const [visualStyle, setVisualStyle] = useState<VisualStyle>(
     initialUIData.visualStyle ?? "memoryviz"
   );
+  const [pythonTutorReferenceArrows, setPythonTutorReferenceArrows] =
+    useState<boolean>(initialUIData.pythonTutorReferenceArrows ?? false);
+  const [pythonTutorStandalonePrimitives, setPythonTutorStandalonePrimitives] =
+    useState<boolean>(initialUIData.pythonTutorStandalonePrimitives ?? false);
   const [questionView, setQuestionView] = useState<QuestionView>(
     initialUIData.questionView ?? "root"
   );
@@ -107,6 +111,10 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     setIsSandboxMode,
     visualStyle,
     setVisualStyle,
+    pythonTutorReferenceArrows,
+    setPythonTutorReferenceArrows,
+    pythonTutorStandalonePrimitives,
+    setPythonTutorStandalonePrimitives,
     questionView,
     setQuestionView,
     tabScrollPositions,

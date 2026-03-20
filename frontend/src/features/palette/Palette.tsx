@@ -74,6 +74,10 @@ interface PaletteProps {
   onEditorScaleChange?: (scale: number) => void;
   visualStyle?: VisualStyle;
   onVisualStyleChange?: (style: VisualStyle) => void;
+  pythonTutorReferenceArrows?: boolean;
+  onPythonTutorReferenceArrowsChange?: (value: boolean) => void;
+  pythonTutorStandalonePrimitives?: boolean;
+  onPythonTutorStandalonePrimitivesChange?: (value: boolean) => void;
 }
 
 // Extract TabButton component inline
@@ -106,9 +110,10 @@ function filterBoxesByRequired(
 
 function filterBoxesByVisualStyle(
   boxes: readonly BoxTypeName[],
-  visualStyle: VisualStyle
+  visualStyle: VisualStyle,
+  pythonTutorStandalonePrimitives: boolean
 ): BoxTypeName[] {
-  if (visualStyle !== "pythonTutor") {
+  if (visualStyle !== "pythonTutor" || pythonTutorStandalonePrimitives) {
     return [...boxes];
   }
 
@@ -134,6 +139,10 @@ export default function Palette({
   onEditorScaleChange,
   visualStyle = "memoryviz",
   onVisualStyleChange,
+  pythonTutorReferenceArrows = false,
+  onPythonTutorReferenceArrowsChange,
+  pythonTutorStandalonePrimitives = false,
+  onPythonTutorStandalonePrimitivesChange,
 }: PaletteProps) {
   const allBoxes = TAB_BOX_MAPPING[activeTab];
 
@@ -141,7 +150,11 @@ export default function Palette({
     isPracticeMode && requiredBoxes
       ? filterBoxesByRequired(allBoxes, requiredBoxes)
       : allBoxes;
-  const visibleBoxes = filterBoxesByVisualStyle(boxes, visualStyle);
+  const visibleBoxes = filterBoxesByVisualStyle(
+    boxes,
+    visualStyle,
+    pythonTutorStandalonePrimitives
+  );
 
   const { topHeight, handleMouseDown, containerRef } = useResizable({
     initialTopPercent: 60,
@@ -215,7 +228,8 @@ export default function Palette({
                   ))
                 ) : (
                   <p className={styles.emptyState}>
-                    {visualStyle === "pythonTutor"
+                    {visualStyle === "pythonTutor" &&
+                    !pythonTutorStandalonePrimitives
                       ? "Primitive values are created inline in Python Tutor mode."
                       : "No boxes available in this tab."}
                   </p>
@@ -253,6 +267,14 @@ export default function Palette({
             onEditorScaleChange={onEditorScaleChange}
             visualStyle={visualStyle}
             onVisualStyleChange={onVisualStyleChange}
+            pythonTutorReferenceArrows={pythonTutorReferenceArrows}
+            onPythonTutorReferenceArrowsChange={
+              onPythonTutorReferenceArrowsChange
+            }
+            pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}
+            onPythonTutorStandalonePrimitivesChange={
+              onPythonTutorStandalonePrimitivesChange
+            }
           />
         </div>
       </div>

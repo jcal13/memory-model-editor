@@ -29,6 +29,7 @@ interface Props {
   sandbox: boolean;
   elements?: any[]; // All canvas elements for ID usage tracking
   visualStyle?: VisualStyle;
+  pythonTutorStandalonePrimitives?: boolean;
   onCommitKind?: (kind: BoxType) => void;
   onElementsChange?: Dispatch<SetStateAction<any[]>>;
 }
@@ -63,6 +64,7 @@ const Content = ({
   sandbox,
   elements = [],
   visualStyle = "memoryviz",
+  pythonTutorStandalonePrimitives = false,
   onCommitKind,
   onElementsChange,
 }: Props) => {
@@ -88,6 +90,7 @@ const Content = ({
         elements={elements}
         ownerElement={metadata}
         visualStyle={visualStyle}
+        pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}
         onCommitKind={onCommitKind}
         onElementsChange={onElementsChange}
       />
@@ -108,6 +111,7 @@ const Content = ({
         elements={elements}
         ownerElement={metadata}
         visualStyle={visualStyle}
+        pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}
         onCommitKind={onCommitKind}
         onElementsChange={onElementsChange}
       />
@@ -128,6 +132,7 @@ const Content = ({
         elements={elements}
         ownerElement={metadata}
         visualStyle={visualStyle}
+        pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}
         onCommitKind={onCommitKind}
         onElementsChange={onElementsChange}
       />
@@ -148,6 +153,7 @@ const Content = ({
         elements={elements}
         ownerElement={metadata}
         visualStyle={visualStyle}
+        pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}
         onCommitKind={onCommitKind}
         onElementsChange={onElementsChange}
       />

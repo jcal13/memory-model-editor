@@ -33,6 +33,12 @@ export interface CanvasBoxProps {
   /** Active visual style for rendering */
   visualStyle?: VisualStyle;
 
+  /** Whether Python Tutor mode should render reference arrows */
+  pythonTutorReferenceArrows?: boolean;
+
+  /** Whether Python Tutor mode should treat primitives as standalone objects */
+  pythonTutorStandalonePrimitives?: boolean;
+
   /** Lookup map for resolving ID references in alternate renderers */
   elementsById?: Map<number, CanvasElement>;
 

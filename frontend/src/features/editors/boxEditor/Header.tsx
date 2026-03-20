@@ -29,6 +29,8 @@ interface Props {
   removeClasses?: (className: string) => void;
   elements?: any[];
   onClose: () => void;
+  isLockedMainFrame?: boolean;
+  reservedFunctionNames?: string[];
 }
 
 const KIND_LABELS: Record<string, string> = {
@@ -67,6 +69,8 @@ const Header = ({
   removeClasses = () => {},
   elements = [],
   onClose,
+  isLockedMainFrame = false,
+  reservedFunctionNames = [],
 }: Props) => {
   const kind = element.kind.name;
   const titleLabel = KIND_LABELS[kind] ?? kind;
@@ -80,6 +84,9 @@ const Header = ({
       : KIND_LABELS[kind] ?? kind;
 
   const handleFunctionAdd = (name: string) => {
+    if (reservedFunctionNames.includes(name)) {
+      return;
+    }
     if (!functionNames.includes(name)) {
       setFunctionNames((prev) => [...prev, name]);
     }
@@ -131,9 +138,10 @@ const Header = ({
               onAdd={handleFunctionAdd}
               onRemove={handleFunctionRemove}
               buttonClassName={styles.moduleIdBox}
-              editable={true}
+              editable={!isLockedMainFrame}
               sandbox={sandbox}
               canManageFunctions={canManageFunctions}
+              reservedNames={reservedFunctionNames}
             />
           ) : (
             <span className={styles.typeChip}>{typeLabel}</span>

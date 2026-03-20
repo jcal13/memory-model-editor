@@ -547,6 +547,7 @@ export default function MemoryModelEditor({
                   ? getQuestionFunctionNames(currentQuestionData)
                   : undefined
               }
+              isQuestionMode={state.selectedQuestionIndex !== null}
             />
           </div>
 

@@ -43,6 +43,8 @@ const BoxEditorModule = ({
   canManageFunctions = sandbox,
   elements = [],
   questionFunctionNames,
+  isLockedMainFrame = false,
+  reservedFunctionNames,
 }: BoxEditorType) => {
   // Shared hover state for remove button
   const { hoverRemove, setHoverRemove } = useGlobalStates();
@@ -129,6 +131,8 @@ const BoxEditorModule = ({
         canManageFunctions={canManageFunctions}
         elements={elements}
         onClose={onClose}
+        isLockedMainFrame={isLockedMainFrame}
+        reservedFunctionNames={reservedFunctionNames}
       />
 
       {/* Middle section: editable content */}
@@ -171,6 +175,8 @@ const BoxEditorModule = ({
           onToggleInvalidate={setInvalidated}
           ownClassVariables={ownClassVariables}
           items={collectionItems}
+          disableRemove={isLockedMainFrame}
+          disableInvalidate={isLockedMainFrame}
         />
       </div>
     </div>

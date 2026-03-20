@@ -92,6 +92,7 @@ export interface CanvasElement {
   x: number;
   y: number;
   kind: BoxType;
+  questionFrameRole?: "main";
   invalidated?: boolean;
   errors?: ElementError[]; // Unified error system (validation + feedback)
   color?: string; // Optional color to apply to the element (e.g., for errors, warnings, etc.)
@@ -175,6 +176,9 @@ export interface BoxEditorType {
   canManageFunctions?: boolean;
   elements?: any[];
   questionFunctionNames?: string[];
+  isLockedMainFrame?: boolean;
+  reservedFunctionNames?: string[];
+  isQuestionMode?: boolean;
 }
 
 export type Tab = "feedback" | "question";

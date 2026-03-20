@@ -5,7 +5,6 @@ import React, {
   useRef,
   useCallback,
   useLayoutEffect,
-  useMemo,
 } from "react";
 import Draggable from "react-draggable";
 import { CanvasElement, BoxType, ID } from "../shared/types";
@@ -14,6 +13,11 @@ import BoxEditor from "../editors/boxEditor/BoxEditor";
 import CallStack from "./components/CallStack";
 import { useCanvasRefs } from "./hooks/useCanvas";
 import { validateElements } from "./utils/validation";
+import {
+  QUESTION_MAIN_FRAME_NAME,
+  isLockedMainFrame,
+  reorderFunctionFramesWithLockedMain,
+} from "../memoryModelEditor/utils/questionFrames";
 import styles from "./Canvas.module.css";
 
 const EDITOR_MAP: Record<BoxType["name"], React.FC<any>> = {
@@ -46,6 +50,9 @@ interface FloatingEditorProps {
   elements: CanvasElement[];
   editorScale: number;
   questionFunctionNames?: string[];
+  isLockedMainFrame?: boolean;
+  reservedFunctionNames?: string[];
+  isQuestionMode?: boolean;
 }
 
 function FloatingEditor({
@@ -68,6 +75,9 @@ function FloatingEditor({
   elements,
   editorScale,
   questionFunctionNames,
+  isLockedMainFrame: lockMainFrame = false,
+  reservedFunctionNames,
+  isQuestionMode = false,
 }: FloatingEditorProps) {
   const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -115,6 +125,9 @@ function FloatingEditor({
             canManageFunctions={canManageFunctions ?? sandbox}
             elements={elements}
             questionFunctionNames={questionFunctionNames}
+            isLockedMainFrame={lockMainFrame}
+            reservedFunctionNames={reservedFunctionNames}
+            isQuestionMode={isQuestionMode}
           />
         </div>
       </div>
@@ -140,6 +153,7 @@ interface CanvasProps {
   onScaleChange?: (scale: number) => void;
   editorScale?: number;
   questionFunctionNames?: string[];
+  isQuestionMode?: boolean;
 }
 
 function Canvas({
@@ -158,6 +172,7 @@ function Canvas({
   scale: externalScale,
   editorScale = 1,
   questionFunctionNames,
+  isQuestionMode = false,
 }: CanvasProps) {
   const [openEditors, setOpenEditors] = useState<CanvasElement[]>([]);
   const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(
@@ -169,6 +184,10 @@ function Canvas({
 
   // Use external scale if provided, otherwise use internal
   const scale = externalScale !== undefined ? externalScale : internalScale;
+  const isProtectedMainFrame = useCallback(
+    (element: CanvasElement) => isQuestionMode && isLockedMainFrame(element),
+    [isQuestionMode]
+  );
 
   const { svgRef } = useCanvasRefs();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -278,13 +297,6 @@ function Canvas({
   }, [elements]);
 
   // Validate elements whenever they change
-  // Create a stable signature of elements for comparison
-  const elementsSignature = useMemo(() => {
-    return elements.map(el => 
-      `${el.boxId}-${el.id}-${el.invalidated || false}-${typeof el.kind.value === 'object' ? JSON.stringify(el.kind.value) : el.kind.value}`
-    ).join('|');
-  }, [elements]);
-
   useEffect(() => {
     const validatedElements = validateElements(elements);
     
@@ -307,7 +319,7 @@ function Canvas({
     if (hasChanges) {
       setElements(validatedElements);
     }
-  }, [elementsSignature]); // Only depend on the signature, not elements directly
+  }, [elements, setElements]);
 
   const createPositionUpdater = useCallback(
     (boxId: number) => (x: number, y: number) => {
@@ -353,7 +365,7 @@ function Canvas({
         return [...prev, newElement];
       });
     },
-    [elements, ids, sandbox, svgRef, setElements]
+    [ids, sandbox, svgRef, setElements]
   );
 
   const saveElement = useCallback(
@@ -366,19 +378,32 @@ function Canvas({
       setElements((prev) =>
         prev.map((el) => {
           if (el.boxId !== boxId) return el;
-          const updated = { ...el, id: updatedId, kind: updatedKind };
+          const nextKind =
+            isProtectedMainFrame(el) && updatedKind.name === "function"
+              ? {
+                  ...updatedKind,
+                  functionName: QUESTION_MAIN_FRAME_NAME,
+                }
+              : updatedKind;
+          const updated = { ...el, id: updatedId, kind: nextKind };
           return invalidated !== undefined
-            ? { ...updated, invalidated }
+            ? {
+                ...updated,
+                invalidated: isProtectedMainFrame(el) ? false : invalidated,
+              }
             : updated;
         })
       );
     },
-    [setElements]
+    [isProtectedMainFrame, setElements]
   );
 
   const removeElement = useCallback(
     (boxId: number) => {
       const removed = elements.find((el) => el.boxId === boxId);
+      if (removed && isProtectedMainFrame(removed)) {
+        return;
+      }
       if (removed && typeof removed.id === "number") {
         removeId(removed.id);
       }
@@ -386,7 +411,7 @@ function Canvas({
       setOpenEditors((prev) => prev.filter((el) => el.boxId !== boxId));
       setSelectedElement((prev) => (prev?.boxId === boxId ? null : prev));
     },
-    [elements, setElements, removeId]
+    [elements, isProtectedMainFrame, setElements, removeId]
   );
 
   const openElementEditor = useCallback((element: CanvasElement) => {
@@ -426,20 +451,9 @@ function Canvas({
     (fromIndex: number, toIndex: number) => {
       if (fromIndex === toIndex) return;
 
-      setElements((prev) => {
-        const functionIndices = prev
-          .map((el, i) => ({ el, i }))
-          .filter(({ el }) => el.kind.name === "function");
-
-        const sourceIndex = functionIndices[fromIndex].i;
-        const targetIndex = functionIndices[toIndex].i;
-
-        const reordered = [...prev];
-        const [movedElement] = reordered.splice(sourceIndex, 1);
-        reordered.splice(targetIndex, 0, movedElement);
-
-        return reordered;
-      });
+      setElements((prev) =>
+        reorderFunctionFramesWithLockedMain(prev, fromIndex, toIndex)
+      );
     },
     [setElements]
   );
@@ -527,6 +541,11 @@ function Canvas({
             elements={elements}
             editorScale={editorScale}
             questionFunctionNames={questionFunctionNames}
+            isLockedMainFrame={isProtectedMainFrame(element)}
+            reservedFunctionNames={
+              isQuestionMode ? [QUESTION_MAIN_FRAME_NAME] : undefined
+            }
+            isQuestionMode={isQuestionMode}
           />
         );
       })}
@@ -609,7 +628,8 @@ const areEqual = (prev: Readonly<CanvasProps>, next: Readonly<CanvasProps>) => {
     prev.sandbox === next.sandbox &&
     prev.scale === next.scale &&
     prev.editorScale === next.editorScale &&
-    prev.questionFunctionNames === next.questionFunctionNames
+    prev.questionFunctionNames === next.questionFunctionNames &&
+    prev.isQuestionMode === next.isQuestionMode
   );
 };
 

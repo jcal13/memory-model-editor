@@ -629,19 +629,13 @@ function compareFrames(
   }
 }
 
-// Detect orphans in the user model
-function detectOrphans(
-  inputFrames: MemoryBox[],
-  inputMap: Map<number, MemoryBox>,
-  model: MemoryBox[],
-  answerMap: Map<number, MemoryBox>,
-  errors: FeedbackError[]
-) {
+// Returns the set of object IDs reachable by following pointers from the given frames
+function computeReachable(frames: MemoryBox[], objectMap: Map<number, MemoryBox>): Set<number> {
   const reachable = new Set<number>();
   function mark(id: number) {
     if (reachable.has(id)) return;
     reachable.add(id);
-    const e = inputMap.get(id);
+    const e = objectMap.get(id);
     if (!e || !isContainer(e.type)) return;
     if (isArrayType(e.type) || isSetType(e.type))
       e.value.forEach((c: number) => mark(c));
@@ -650,20 +644,58 @@ function detectOrphans(
     else if (isObjectType(e.type))
       Object.values(e.value).forEach((c) => mark(c as number));
   }
+  for (const frame of frames)
+    Object.values(frame.value as Record<string, number>).forEach(mark);
+  return reachable;
+}
 
-  for (const frame of inputFrames)
-    Object.values(frame.value as Record<string, number>).forEach((id) =>
-      mark(id)
+function detectOrphans(
+  answerFrames: MemoryBox[],
+  inputFrames: MemoryBox[],
+  answerMap: Map<number, MemoryBox>,
+  inputMap: Map<number, MemoryBox>,
+  answerModel: MemoryBox[],
+  userModel: MemoryBox[],
+  dup: Set<number>,
+  errors: FeedbackError[]
+) {
+  const answerReachable = computeReachable(answerFrames, answerMap);
+  const userReachable   = computeReachable(inputFrames,  inputMap);
+
+  // Non-frame elements not reachable from their respective frames
+  const answerOrphans = answerModel.filter(
+    e => e.id !== null && e.type !== '.frame' && !answerReachable.has(e.id as number)
+  );
+  const userOrphans = userModel.filter(
+    e => e.id !== null && e.type !== '.frame' && !userReachable.has(e.id as number) && !dup.has(e.id as number)
+  );
+
+  // Greedily match user orphans to answer orphans by (type, value)
+  const remainingUser = [...userOrphans];
+  for (const aOrphan of answerOrphans) {
+    const idx = remainingUser.findIndex(
+      u => u.type === aOrphan.type && JSON.stringify(u.value) === JSON.stringify(aOrphan.value)
     );
-
-  for (const e of model)
-    if (e.id !== null && !reachable.has(e.id) && !answerMap.has(e.id))
+    if (idx === -1) {
       errors.push({
-        type: ErrorType.ORPHANED_ELEMENT,
-        message: `Unmapped box: id=${e.id}`,
-        elementId: e.id,
+        type: ErrorType.MISSING_ELEMENT,
+        message: `Missing unattached object: ${aOrphan.type} ${aOrphan.value}`,
         severity: 'error'
       });
+    } else {
+      remainingUser.splice(idx, 1);
+    }
+  }
+
+  // Any unmatched user orphans are extra
+  for (const uOrphan of remainingUser) {
+    errors.push({
+      type: ErrorType.UNEXPECTED_ELEMENT,
+      message: `Unexpected unattached object: id=${uOrphan.id}`,
+      elementId: uOrphan.id as number,
+      severity: 'error'
+    });
+  }
 }
 
 // Compare IDs between the answer and user models
@@ -922,7 +954,7 @@ function runComparison(
   );
 
   // detect orphans in the user model
-  detectOrphans(inputFrames, inputMap, userModel, answerMap, errors);
+  detectOrphans(answerFrames, inputFrames, answerMap, inputMap, answerModel, userModel, dup, errors);
 
   return { correct: errors.length === 0, errors };
 }

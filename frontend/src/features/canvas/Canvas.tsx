@@ -411,8 +411,6 @@ function Canvas({
     if (openEditors.length === 0) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      const tag = (e.target as HTMLElement).tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
       setOpenEditors([]);
       setSelectedElement(null);
     };

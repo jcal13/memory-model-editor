@@ -27,6 +27,8 @@ interface Props {
   className?: string;
   ownClassVariables?: any[];
   items: any;
+  disableRemove?: boolean;
+  disableInvalidate?: boolean;
 }
 
 /**
@@ -49,6 +51,8 @@ const ButtonDisplays = ({
   className,
   ownClassVariables = [],
   items,
+  disableRemove = false,
+  disableInvalidate = false,
 }: Props) => {
   const kind = element.kind.name;
 
@@ -79,19 +83,29 @@ const ButtonDisplays = ({
 
   // Save and remove actions
   const handleClick = () => {
+    if (disableRemove) {
+      return;
+    }
     onSave(element.id, saveParams, invalidated);
     onRemove();
   };
 
   // Invalidate / uninvalidate actions
   const handleInvalidate = () => {
+    if (disableInvalidate) {
+      return;
+    }
     onToggleInvalidate();
   };
 
   return (
     <>
       <div className={styles.invalidateGroup}>
-        <button onClick={handleInvalidate} className={styles.invalidateButton}>
+        <button
+          onClick={handleInvalidate}
+          className={styles.invalidateButton}
+          disabled={disableInvalidate}
+        >
           {invalidated ? "Validate" : "Invalidate"}
         </button>
         <span className={styles.helpIcon} aria-label="Invalidate help">
@@ -102,14 +116,16 @@ const ButtonDisplays = ({
           </span>
         </span>
       </div>
-      <button
-        onMouseEnter={() => setHoverRemove(true)}
-        onMouseLeave={() => setHoverRemove(false)}
-        onClick={handleClick}
-        className={styles.removeButton}
-      >
-        Remove Box
-      </button>
+      {!disableRemove && (
+        <button
+          onMouseEnter={() => setHoverRemove(true)}
+          onMouseLeave={() => setHoverRemove(false)}
+          onClick={handleClick}
+          className={styles.removeButton}
+        >
+          Remove Box
+        </button>
+      )}
     </>
   );
 };

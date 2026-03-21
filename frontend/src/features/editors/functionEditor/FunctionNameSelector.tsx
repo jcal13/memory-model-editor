@@ -22,6 +22,7 @@ interface Props {
   editable: boolean;
   sandbox: boolean;
   canManageFunctions?: boolean;
+  reservedNames?: string[];
 }
 
 export default function FunctionNameSelector({
@@ -34,6 +35,7 @@ export default function FunctionNameSelector({
   editable,
   sandbox,
   canManageFunctions = sandbox,
+  reservedNames = [],
 }: Props) {
   const [open, setOpen] = useState(false);
   const [list, setList] = useState<string[]>(names);
@@ -44,6 +46,7 @@ export default function FunctionNameSelector({
   useSingleFunctionPanelRegistry(open, closeSelf);
 
   const displayName = currentName || NO_FUNCTION_NAME;
+  const visibleNames = list.filter((name) => !reservedNames.includes(name));
 
   if (!editable) {
     return (
@@ -56,6 +59,9 @@ export default function FunctionNameSelector({
   const toggleOpen = () => setOpen((v) => !v);
 
   const handleAdd = (name: string) => {
+    if (reservedNames.includes(name)) {
+      return;
+    }
     if (!list.includes(name)) {
       setList((prev) => [...prev, name]);
       onAdd?.(name);
@@ -68,6 +74,9 @@ export default function FunctionNameSelector({
   };
 
   const handleSelect = (name: string) => {
+    if (reservedNames.includes(name)) {
+      return;
+    }
     onSelect(name);
     closeSelf();
   };
@@ -108,7 +117,7 @@ export default function FunctionNameSelector({
               data-editor-ignore
             >
               <FunctionNameSelectorPanel
-                names={list}
+                names={visibleNames}
                 onAdd={handleAdd}
                 onRemove={handleRemove}
                 onSelect={handleSelect}
@@ -116,6 +125,7 @@ export default function FunctionNameSelector({
                 onUnassign={handleUnassign}
                 sandbox={sandbox}
                 canManageFunctions={canManageFunctions}
+                reservedNames={reservedNames}
               />
             </div>
           </Draggable>,

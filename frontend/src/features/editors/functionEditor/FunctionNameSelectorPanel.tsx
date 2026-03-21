@@ -11,6 +11,7 @@ interface Props {
   onUnassign: () => void;
   sandbox: boolean;
   canManageFunctions?: boolean;
+  reservedNames?: string[];
 }
 
 const FunctionNameSelectorPanel: React.FC<Props> = ({
@@ -22,27 +23,38 @@ const FunctionNameSelectorPanel: React.FC<Props> = ({
   onUnassign,
   sandbox,
   canManageFunctions = sandbox,
+  reservedNames = [],
 }) => {
   const [customName, setCustomName] = useState("");
   const [showWarn, setShowWarn] = useState(false);
   const [showDup, setShowDup] = useState(false);
+  const [showReserved, setShowReserved] = useState(false);
 
   const handleAdd = () => {
     const trimmed = customName.trim();
     if (trimmed !== "") {
+      if (reservedNames.includes(trimmed)) {
+        setShowReserved(true);
+        setShowWarn(false);
+        setShowDup(false);
+        return;
+      }
       if (names.includes(trimmed)) {
         setShowDup(true);
         setShowWarn(false);
+        setShowReserved(false);
         return;
       }
       onAdd(trimmed);
       setCustomName("");
       setShowWarn(false);
       setShowDup(false);
+      setShowReserved(false);
       return;
     }
     setShowWarn(true);
     setShowDup(false);
+    setShowReserved(false);
   };
 
   return (
@@ -96,6 +108,7 @@ const FunctionNameSelectorPanel: React.FC<Props> = ({
                   setCustomName(e.target.value);
                   setShowWarn(false);
                   setShowDup(false);
+                  setShowReserved(false);
                 }}
                 placeholder="Enter function name"
                 className={panelStyles.nameInputBox}
@@ -127,6 +140,11 @@ const FunctionNameSelectorPanel: React.FC<Props> = ({
         {showDup && (
           <span style={{ color: "#dc2626", fontSize: "0.8rem" }}>
             Name already added
+          </span>
+        )}
+        {showReserved && (
+          <span style={{ color: "#dc2626", fontSize: "0.8rem" }}>
+            This function name is reserved for the question main frame
           </span>
         )}
       </div>

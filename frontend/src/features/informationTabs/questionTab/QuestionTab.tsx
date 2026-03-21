@@ -18,6 +18,7 @@ import {
   saveQuestionCanvasData,
   setDoNotRemindCanvasClear,
 } from "../../memoryModelEditor/utils/localStorage";
+import { normalizeQuestionCanvasData } from "../../memoryModelEditor/utils/questionFrames";
 import ConfirmationModal from "../../memoryModelEditor/components/ConfirmationModal";
 
 type View = "root" | "loading" | "test" | "list" | "question" | "practice" | "prep" | "experiment";
@@ -308,10 +309,8 @@ export default function QuestionTab({
       setView("question");
 
       setTimeout(() => {
-        const resolvedCanvas = resolveQuestionCanvasData(
-          type,
-          id,
-          data.canvasConfig ?? null
+        const resolvedCanvas = normalizeQuestionCanvasData(
+          resolveQuestionCanvasData(type, id, data.canvasConfig ?? null)
         );
         onRestoreCanvas(
           resolvedCanvas.elements,
@@ -411,13 +410,33 @@ export default function QuestionTab({
           if (onQuestionDataChange) {
             onQuestionDataChange(data);
           }
+
+          const resolvedCanvas = normalizeQuestionCanvasData(
+            resolveQuestionCanvasData(
+              questionType,
+              questionIndex,
+              data.canvasConfig ?? null
+            )
+          );
+          onRestoreCanvas(
+            resolvedCanvas.elements,
+            resolvedCanvas.ids,
+            resolvedCanvas.classes
+          );
         } catch (error) {
           console.error("Failed to hydrate question:", error);
           setView("list");
         }
       })();
     }
-  }, [view, questionType, questionIndex, questionData, onQuestionDataChange]);
+  }, [
+    view,
+    questionType,
+    questionIndex,
+    questionData,
+    onQuestionDataChange,
+    onRestoreCanvas,
+  ]);
 
   const getHeading = (): string => {
     if (view === "question" && questionIndex !== null) {
@@ -445,10 +464,12 @@ export default function QuestionTab({
   const handleResetConfirm = () => {
     if (questionType && questionIndex !== null) {
       deleteQuestionCanvasData(questionType, questionIndex);
-      const resolvedCanvas = resolveQuestionCanvasData(
-        questionType,
-        questionIndex,
-        questionData?.canvasConfig ?? null
+      const resolvedCanvas = normalizeQuestionCanvasData(
+        resolveQuestionCanvasData(
+          questionType,
+          questionIndex,
+          questionData?.canvasConfig ?? null
+        )
       );
       onRestoreCanvas(
         resolvedCanvas.elements,

@@ -20,8 +20,8 @@ import {
 } from "../../memoryModelEditor/utils/localStorage";
 import ConfirmationModal from "../../memoryModelEditor/components/ConfirmationModal";
 
-type View = "root" | "loading" | "test" | "list" | "question" | "practice" | "prep";
-type QuestionType = "test" | "practice" | "prep";
+type View = "root" | "loading" | "test" | "list" | "question" | "practice" | "prep" | "experiment";
+type QuestionType = "test" | "practice" | "prep" | "experiment";
 type QuestionStatus = "unattempted" | "attempted" | "completed";
 
 const QUESTION_STATUS_KEY = "questionStatus";
@@ -33,6 +33,7 @@ const VALID_VIEWS: View[] = [
   "question",
   "practice",
   "prep",
+  "experiment",
 ];
 
 interface QuestionStatusMap {
@@ -63,8 +64,8 @@ function formatSource(description: string): string {
 interface QuestionTabProps {
   questionIndex: number | null;
   setQuestionIndex: (index: number | null) => void;
-  questionType: "test" | "practice" | "prep" | null;
-  setQuestionType: (type: "test" | "practice" | "prep" | null) => void;
+  questionType: "test" | "practice" | "prep" | "experiment" | null;
+  setQuestionType: (type: "test" | "practice" | "prep" | "experiment" | null) => void;
   questionView: QuestionView;
   setQuestionView: (view: QuestionView) => void;
   onSubmit: () => Promise<boolean>;
@@ -127,7 +128,7 @@ export default function QuestionTab({
   );
   const [showCanvasClearModal, setShowCanvasClearModal] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<{
-    type: "test" | "practice" | "prep";
+    type: "test" | "practice" | "prep" | "experiment";
     index: number;
   } | null>(null);
   const [showResetModal, setShowResetModal] = useState(false);
@@ -137,7 +138,7 @@ export default function QuestionTab({
   const hydratedList = useRef<boolean>(false);
   const hydratedQuestion = useRef<boolean>(false);
   const previousQuestionRef = useRef<{
-    type: "test" | "practice" | "prep";
+    type: "test" | "practice" | "prep" | "experiment";
     index: number;
   } | null>(null);
   const prevSandboxModeRef = useRef<boolean>(isSandboxMode);
@@ -431,6 +432,9 @@ export default function QuestionTab({
     if (view === "list" && questionType === "prep") {
       return "CSC148 Prep Questions";
     }
+    if (view === "list" && questionType === "experiment") {
+      return "Experiment Questions";
+    }
     return "Questions";
   };
 
@@ -507,6 +511,14 @@ export default function QuestionTab({
               icon="🎓"
               categoryType="prep"
               onClick={() => loadQuestions("prep")}
+            />
+            <QuestionSelector
+              variant="category"
+              text="Experiment Questions"
+              subtitle=""
+              icon="🧪"
+              categoryType="experiment"
+              onClick={() => loadQuestions("experiment")}
             />
           </div>
         )}

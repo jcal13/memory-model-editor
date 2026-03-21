@@ -12,8 +12,8 @@ interface InformationTabsProps {
   questionSelected: boolean;
   questionIndex: number | null;
   setQuestionIndex: (index: number | null) => void;
-  questionType: "test" | "practice" | "prep" | null;
-  setQuestionType: (type: "test" | "practice" | "prep" | null) => void;
+  questionType: "test" | "practice" | "prep" | "experiment" | null;
+  setQuestionType: (type: "test" | "practice" | "prep" | "experiment" | null) => void;
   questionView: import("../memoryModelEditor/utils/localStorage").QuestionView;
   setQuestionView: (view: import("../memoryModelEditor/utils/localStorage").QuestionView) => void;
   onSubmit: () => Promise<boolean>;

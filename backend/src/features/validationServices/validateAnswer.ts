@@ -828,7 +828,7 @@ function checkCallStackOrder(
 }
 
 async function fetchAnswerModel(
-  questionType: "test" | "practice" | "prep",
+  questionType: "test" | "practice" | "prep" | "experiment",
   questionId: number
 ): Promise<MemoryBox[] | null> {
   let rows: { answer: unknown }[] = [];
@@ -842,6 +842,13 @@ async function fetchAnswerModel(
   } else if (questionType === "prep") {
     const result = await getPool().query<{ answer: unknown }>(
       "SELECT answer FROM prep_questions WHERE id = $1",
+      [questionId]
+    );
+    rows = result.rows;
+    if (rows.length === 0) return null;
+  } else if (questionType === "experiment") {
+    const result = await getPool().query<{ answer: unknown }>(
+      "SELECT answer FROM experiment_questions WHERE id = $1",
       [questionId]
     );
     rows = result.rows;
@@ -924,7 +931,7 @@ function runComparison(
 export default async function validateAnswer(
   userModel: MemoryBox[],
   questionId: number,
-  questionType: "test" | "practice" | "prep"
+  questionType: "test" | "practice" | "prep" | "experiment"
 ): Promise<{
   correct: boolean;
   errors: FeedbackError[];

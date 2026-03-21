@@ -89,6 +89,17 @@
   color: #fbbf24;
 }
 
+.categoryIcon.experiment {
+  background: #e0e7ff;
+  color: #6366f1;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+:root[data-theme="dark"] .categoryIcon.experiment {
+  background: #312e4d;
+  color: #93c5fd;
+}
+
 .categoryLabel {
   display: flex;
   flex-direction: column;

@@ -39,7 +39,31 @@
     "description": null,
     "topics": [],
     "canvasConfig": {
-      "elements": [],
+      "elements": [
+        {
+          "boxId": 0,
+          "id": "_",
+          "x": 0,
+          "y": 0,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "value": null,
+            "functionName": "__main__",
+            "params": [
+              {
+                "name": "x",
+                "targetId": "_"
+              },
+              {
+                "name": "y",
+                "targetId": "_"
+              }
+            ],
+            "order": 1
+          }
+        }
+      ],
       "ids": [],
       "classes": []
     },
@@ -199,7 +223,31 @@
     "description": null,
     "topics": [],
     "canvasConfig": {
-      "elements": [],
+      "elements": [
+        {
+          "boxId": 0,
+          "id": "_",
+          "x": 0,
+          "y": 0,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "value": null,
+            "functionName": "__main__",
+            "params": [
+              {
+                "name": "a",
+                "targetId": "_"
+              },
+              {
+                "name": "b",
+                "targetId": "_"
+              }
+            ],
+            "order": 1
+          }
+        }
+      ],
       "ids": [],
       "classes": []
     },
@@ -328,7 +376,31 @@
     "description": null,
     "topics": [],
     "canvasConfig": {
-      "elements": [],
+      "elements": [
+        {
+          "boxId": 0,
+          "id": "_",
+          "x": 0,
+          "y": 0,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "value": null,
+            "functionName": "__main__",
+            "params": [
+              {
+                "name": "inner",
+                "targetId": "_"
+              },
+              {
+                "name": "outer",
+                "targetId": "_"
+              }
+            ],
+            "order": 1
+          }
+        }
+      ],
       "ids": [],
       "classes": []
     },
@@ -435,7 +507,35 @@
     "description": null,
     "topics": [],
     "canvasConfig": {
-      "elements": [],
+      "elements": [
+        {
+          "boxId": 0,
+          "id": "_",
+          "x": 0,
+          "y": 0,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "value": null,
+            "functionName": "__main__",
+            "params": [
+              {
+                "name": "x",
+                "targetId": "_"
+              },
+              {
+                "name": "y",
+                "targetId": "_"
+              },
+              {
+                "name": "z",
+                "targetId": "_"
+              }
+            ],
+            "order": 1
+          }
+        }
+      ],
       "ids": [],
       "classes": []
     },
@@ -581,7 +681,35 @@
     "description": null,
     "topics": [],
     "canvasConfig": {
-      "elements": [],
+      "elements": [
+        {
+          "boxId": 0,
+          "id": "_",
+          "x": 0,
+          "y": 0,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "value": null,
+            "functionName": "__main__",
+            "params": [
+              {
+                "name": "x",
+                "targetId": "_"
+              },
+              {
+                "name": "y",
+                "targetId": "_"
+              },
+              {
+                "name": "z",
+                "targetId": "_"
+              }
+            ],
+            "order": 1
+          }
+        }
+      ],
       "ids": [],
       "classes": []
     },
@@ -748,7 +876,35 @@
     "description": null,
     "topics": [],
     "canvasConfig": {
-      "elements": [],
+      "elements": [
+        {
+          "boxId": 0,
+          "id": "_",
+          "x": 0,
+          "y": 0,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "value": null,
+            "functionName": "__main__",
+            "params": [
+              {
+                "name": "a",
+                "targetId": "_"
+              },
+              {
+                "name": "b",
+                "targetId": "_"
+              },
+              {
+                "name": "c",
+                "targetId": "_"
+              }
+            ],
+            "order": 1
+          }
+        }
+      ],
       "ids": [],
       "classes": []
     },

@@ -955,7 +955,7 @@ export default async function validateAnswer(
 type QuestionStep = { lineNumber: number; iterationNumber?: number; answer: unknown };
 
 async function fetchStepsModel(
-  questionType: "test" | "practice" | "prep",
+  questionType: "test" | "practice" | "prep" | "experiment",
   questionId: number,
   lineNumber: number,
   iterationNumber?: number
@@ -965,6 +965,8 @@ async function fetchStepsModel(
       ? "practice_questions"
       : questionType === "prep"
       ? "prep_questions"
+      : questionType === "experiment"
+      ? "experiment_questions"
       : "test_questions";
 
   const result = await getPool().query<{ steps: unknown }>(
@@ -990,7 +992,7 @@ async function fetchStepsModel(
 export async function validateAnswerAtLine(
   userModel: MemoryBox[],
   questionId: number,
-  questionType: "test" | "practice" | "prep",
+  questionType: "test" | "practice" | "prep" | "experiment",
   lineNumber: number,
   iterationNumber?: number
 ): Promise<{ correct: boolean; errors: FeedbackError[] }> {

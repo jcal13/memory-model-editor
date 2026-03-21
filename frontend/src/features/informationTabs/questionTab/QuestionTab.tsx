@@ -461,16 +461,31 @@ export default function QuestionTab({
     setShowResetModal(true);
   };
 
-  const handleResetConfirm = () => {
-    if (questionType && questionIndex !== null) {
-      deleteQuestionCanvasData(questionType, questionIndex);
-      const resolvedCanvas = normalizeQuestionCanvasData(
-        resolveQuestionCanvasData(
-          questionType,
-          questionIndex,
-          questionData?.canvasConfig ?? null
-        )
+  const handleResetConfirm = async () => {
+    if (!questionType || questionIndex === null) {
+      setShowResetModal(false);
+      return;
+    }
+
+    try {
+      const freshQuestionData = await fetchQuestion<QuestionData>(
+        questionIndex,
+        questionType
       );
+
+      deleteQuestionCanvasData(questionType, questionIndex);
+      setQuestionData(freshQuestionData);
+
+      if (onQuestionDataChange) {
+        onQuestionDataChange(freshQuestionData);
+      }
+
+      const resolvedCanvas = resolveQuestionCanvasData(
+        questionType,
+        questionIndex,
+        freshQuestionData.canvasConfig ?? null
+      );
+
       onRestoreCanvas(
         resolvedCanvas.elements,
         resolvedCanvas.ids,
@@ -478,8 +493,11 @@ export default function QuestionTab({
       );
       setSubmissionResults(null);
       updateQuestionStatus(questionType, questionIndex, "unattempted");
+    } catch (error) {
+      console.error("Failed to reset question:", error);
+    } finally {
+      setShowResetModal(false);
     }
-    setShowResetModal(false);
   };
 
   const handleResetCancel = () => {

@@ -46,7 +46,15 @@ export function normalizeCanvasData(raw: unknown): CanvasData {
   };
 }
 
-export type QuestionView = "root" | "loading" | "test" | "list" | "question" | "practice" | "prep";
+export type QuestionView =
+  | "root"
+  | "loading"
+  | "test"
+  | "list"
+  | "question"
+  | "practice"
+  | "prep"
+  | "experiment";
 
 export interface UIState {
   activeTab: Tab;
@@ -109,7 +117,16 @@ export function loadInitialUIData(): UIState {
     const sandboxMode =
       typeof parsed?.sandboxMode === "boolean" ? parsed.sandboxMode : null;
 
-    const validViews = ["root", "loading", "test", "list", "question", "practice", "prep"];
+    const validViews = [
+      "root",
+      "loading",
+      "test",
+      "list",
+      "question",
+      "practice",
+      "prep",
+      "experiment",
+    ];
     const questionView =
       typeof parsed?.questionView === "string" && validViews.includes(parsed.questionView) && parsed.questionView !== "loading"
         ? parsed.questionView

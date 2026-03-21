@@ -39,7 +39,22 @@
     "description": null,
     "topics": [],
     "canvasConfig": {
-      "elements": [],
+      "elements": [
+        {
+          "boxId": 0,
+          "id": "_",
+          "x": 0,
+          "y": 0,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "value": null,
+            "functionName": "__main__",
+            "params": [],
+            "order": 1
+          }
+        }
+      ],
       "ids": [],
       "classes": []
     },
@@ -199,7 +214,22 @@
     "description": null,
     "topics": [],
     "canvasConfig": {
-      "elements": [],
+      "elements": [
+        {
+          "boxId": 0,
+          "id": "_",
+          "x": 0,
+          "y": 0,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "value": null,
+            "functionName": "__main__",
+            "params": [],
+            "order": 1
+          }
+        }
+      ],
       "ids": [],
       "classes": []
     },
@@ -328,7 +358,22 @@
     "description": null,
     "topics": [],
     "canvasConfig": {
-      "elements": [],
+      "elements": [
+        {
+          "boxId": 0,
+          "id": "_",
+          "x": 0,
+          "y": 0,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "value": null,
+            "functionName": "__main__",
+            "params": [],
+            "order": 1
+          }
+        }
+      ],
       "ids": [],
       "classes": []
     },
@@ -435,7 +480,22 @@
     "description": null,
     "topics": [],
     "canvasConfig": {
-      "elements": [],
+      "elements": [
+        {
+          "boxId": 0,
+          "id": "_",
+          "x": 0,
+          "y": 0,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "value": null,
+            "functionName": "__main__",
+            "params": [],
+            "order": 1
+          }
+        }
+      ],
       "ids": [],
       "classes": []
     },
@@ -581,7 +641,22 @@
     "description": null,
     "topics": [],
     "canvasConfig": {
-      "elements": [],
+      "elements": [
+        {
+          "boxId": 0,
+          "id": "_",
+          "x": 0,
+          "y": 0,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "value": null,
+            "functionName": "__main__",
+            "params": [],
+            "order": 1
+          }
+        }
+      ],
       "ids": [],
       "classes": []
     },
@@ -748,7 +823,22 @@
     "description": null,
     "topics": [],
     "canvasConfig": {
-      "elements": [],
+      "elements": [
+        {
+          "boxId": 0,
+          "id": "_",
+          "x": 0,
+          "y": 0,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "value": null,
+            "functionName": "__main__",
+            "params": [],
+            "order": 1
+          }
+        }
+      ],
       "ids": [],
       "classes": []
     },

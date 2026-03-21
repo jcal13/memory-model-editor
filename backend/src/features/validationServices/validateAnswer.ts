@@ -828,7 +828,7 @@ function checkCallStackOrder(
 }
 
 async function fetchAnswerModel(
-  questionType: "test" | "practice" | "prep",
+  questionType: "test" | "practice" | "prep" | "experiment",
   questionId: number
 ): Promise<MemoryBox[] | null> {
   let rows: { answer: unknown }[] = [];
@@ -842,6 +842,13 @@ async function fetchAnswerModel(
   } else if (questionType === "prep") {
     const result = await getPool().query<{ answer: unknown }>(
       "SELECT answer FROM prep_questions WHERE id = $1",
+      [questionId]
+    );
+    rows = result.rows;
+    if (rows.length === 0) return null;
+  } else if (questionType === "experiment") {
+    const result = await getPool().query<{ answer: unknown }>(
+      "SELECT answer FROM experiment_questions WHERE id = $1",
       [questionId]
     );
     rows = result.rows;
@@ -924,7 +931,7 @@ function runComparison(
 export default async function validateAnswer(
   userModel: MemoryBox[],
   questionId: number,
-  questionType: "test" | "practice" | "prep"
+  questionType: "test" | "practice" | "prep" | "experiment"
 ): Promise<{
   correct: boolean;
   errors: FeedbackError[];
@@ -948,7 +955,7 @@ export default async function validateAnswer(
 type QuestionStep = { lineNumber: number; iterationNumber?: number; answer: unknown };
 
 async function fetchStepsModel(
-  questionType: "test" | "practice" | "prep",
+  questionType: "test" | "practice" | "prep" | "experiment",
   questionId: number,
   lineNumber: number,
   iterationNumber?: number
@@ -958,6 +965,8 @@ async function fetchStepsModel(
       ? "practice_questions"
       : questionType === "prep"
       ? "prep_questions"
+      : questionType === "experiment"
+      ? "experiment_questions"
       : "test_questions";
 
   const result = await getPool().query<{ steps: unknown }>(
@@ -983,7 +992,7 @@ async function fetchStepsModel(
 export async function validateAnswerAtLine(
   userModel: MemoryBox[],
   questionId: number,
-  questionType: "test" | "practice" | "prep",
+  questionType: "test" | "practice" | "prep" | "experiment",
   lineNumber: number,
   iterationNumber?: number
 ): Promise<{ correct: boolean; errors: FeedbackError[] }> {

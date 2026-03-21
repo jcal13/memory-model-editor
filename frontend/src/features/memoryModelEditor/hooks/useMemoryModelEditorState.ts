@@ -39,7 +39,7 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     number | null
   >(initialUIData.questionIndex);
   const [selectedQuestionType, setSelectedQuestionType] = useState<
-    "test" | "practice" | "prep" | null
+    "test" | "practice" | "prep" | "experiment" | null
   >(initialUIData.questionType);
   const [submissionResults, setSubmissionResults] = useState<SubmissionResult | null>(
     initialUIData.submissionResults

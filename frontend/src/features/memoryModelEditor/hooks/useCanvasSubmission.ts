@@ -5,7 +5,7 @@ import { applyFeedbackErrors, clearFeedbackErrors } from "../utils/feedbackError
 
 interface UseCanvasSubmissionParams {
   selectedQuestionIndex: number | null;
-  selectedQuestionType: "test" | "practice" | "prep" | null;
+  selectedQuestionType: "test" | "practice" | "prep" | "experiment" | null;
   elements: CanvasElement[];
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
   setSubmissionResults: (results: SubmissionResult | null) => void;

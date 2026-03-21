@@ -12,7 +12,7 @@ const API_URL =
  */
 export async function fetchQuestion<T = any>(
   id: number,
-  type: "test" | "practice" | "prep",
+  type: "test" | "practice" | "prep" | "experiment",
 ): Promise<T> {
   try {
     const response = await axios.get(
@@ -33,7 +33,7 @@ export async function fetchQuestion<T = any>(
  * @returns Promise with question count
  */
 export async function fetchQuestionCount(
-  type: "test" | "practice" | "prep",
+  type: "test" | "practice" | "prep" | "experiment",
 ): Promise<number> {
   try {
     const url = `${API_URL}/questions/${type}questions`;

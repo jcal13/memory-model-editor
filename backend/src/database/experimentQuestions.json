@@ -250,7 +250,7 @@
         { "id": 1, "type": "int", "value": 1 },
         { "id": 2, "type": "int", "value": 2 },
         { "id": 3, "type": "int", "value": 4 },
-        { "id": 5, "type": "list", "value": [1, 2, 3, 4] }
+        { "id": 5, "type": "list", "value": [1, 2, 3] }
         ]
     },
     {
@@ -268,7 +268,7 @@
         { "id": 2, "type": "int", "value": 2 },
         { "id": 3, "type": "int", "value": 4 },
         { "id": 4, "type": "int", "value": 5 },
-        { "id": 5, "type": "list", "value": [1, 2, 3, 4, 5] }
+        { "id": 5, "type": "list", "value": [1, 2, 3, 4] }
         ]
     }
     ]

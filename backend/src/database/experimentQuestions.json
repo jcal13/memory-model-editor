@@ -50,16 +50,7 @@
             "type": "function",
             "value": null,
             "functionName": "__main__",
-            "params": [
-              {
-                "name": "x",
-                "targetId": "_"
-              },
-              {
-                "name": "y",
-                "targetId": "_"
-              }
-            ],
+            "params": [],
             "order": 1
           }
         }
@@ -234,16 +225,7 @@
             "type": "function",
             "value": null,
             "functionName": "__main__",
-            "params": [
-              {
-                "name": "a",
-                "targetId": "_"
-              },
-              {
-                "name": "b",
-                "targetId": "_"
-              }
-            ],
+            "params": [],
             "order": 1
           }
         }
@@ -387,16 +369,7 @@
             "type": "function",
             "value": null,
             "functionName": "__main__",
-            "params": [
-              {
-                "name": "inner",
-                "targetId": "_"
-              },
-              {
-                "name": "outer",
-                "targetId": "_"
-              }
-            ],
+            "params": [],
             "order": 1
           }
         }
@@ -518,20 +491,7 @@
             "type": "function",
             "value": null,
             "functionName": "__main__",
-            "params": [
-              {
-                "name": "x",
-                "targetId": "_"
-              },
-              {
-                "name": "y",
-                "targetId": "_"
-              },
-              {
-                "name": "z",
-                "targetId": "_"
-              }
-            ],
+            "params": [],
             "order": 1
           }
         }
@@ -692,20 +652,7 @@
             "type": "function",
             "value": null,
             "functionName": "__main__",
-            "params": [
-              {
-                "name": "x",
-                "targetId": "_"
-              },
-              {
-                "name": "y",
-                "targetId": "_"
-              },
-              {
-                "name": "z",
-                "targetId": "_"
-              }
-            ],
+            "params": [],
             "order": 1
           }
         }
@@ -887,20 +834,7 @@
             "type": "function",
             "value": null,
             "functionName": "__main__",
-            "params": [
-              {
-                "name": "a",
-                "targetId": "_"
-              },
-              {
-                "name": "b",
-                "targetId": "_"
-              },
-              {
-                "name": "c",
-                "targetId": "_"
-              }
-            ],
+            "params": [],
             "order": 1
           }
         }

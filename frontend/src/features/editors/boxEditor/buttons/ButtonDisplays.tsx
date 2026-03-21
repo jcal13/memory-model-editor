@@ -116,15 +116,16 @@ const ButtonDisplays = ({
           </span>
         </span>
       </div>
-      <button
-        onMouseEnter={() => setHoverRemove(true)}
-        onMouseLeave={() => setHoverRemove(false)}
-        onClick={handleClick}
-        className={styles.removeButton}
-        disabled={disableRemove}
-      >
-        Remove Box
-      </button>
+      {!disableRemove && (
+        <button
+          onMouseEnter={() => setHoverRemove(true)}
+          onMouseLeave={() => setHoverRemove(false)}
+          onClick={handleClick}
+          className={styles.removeButton}
+        >
+          Remove Box
+        </button>
+      )}
     </>
   );
 };

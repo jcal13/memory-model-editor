@@ -494,7 +494,9 @@ export default function MemoryModelEditor({
                 setActive={state.setActivePaletteTab}
                 requiredBoxes={
                   effectiveSandboxMode && currentQuestionData
-                    ? getRequiredBoxTypeNames(currentQuestionData)
+                    ? getRequiredBoxTypeNames(currentQuestionData).filter(
+                        (type) => !(state.selectedQuestionType === "experiment" && type === "function")
+                      )
                     : undefined
                 }
                 isPracticeMode={effectiveSandboxMode}

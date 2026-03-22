@@ -138,10 +138,12 @@ export default function MemoryModelEditor({
     clearHistory();
   };
 
+  const effectiveSandboxMode = state.isSandboxMode || state.selectedQuestionType === "experiment";
+
   // When a question loads in practice mode, seed elementClasses with the class names
   // from the question's answer so the class selector shows them as pre-built options.
   useEffect(() => {
-    if (!state.isSandboxMode || !currentQuestionData) return;
+    if (!effectiveSandboxMode || !currentQuestionData) return;
     const questionClassNames = getQuestionClassNames(currentQuestionData);
     if (questionClassNames.length === 0) return;
     state.setElementClasses((prev) => {
@@ -153,7 +155,7 @@ export default function MemoryModelEditor({
       }
       return merged;
     });
-  }, [currentQuestionData, state.isSandboxMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentQuestionData, effectiveSandboxMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const masterErrorList: MasterErrorList = useMemo(
     () => createMasterErrorList(state.elements),
@@ -491,13 +493,13 @@ export default function MemoryModelEditor({
                 activeTab={state.activePaletteTab}
                 setActive={state.setActivePaletteTab}
                 requiredBoxes={
-                  state.isSandboxMode && currentQuestionData
+                  effectiveSandboxMode && currentQuestionData
                     ? getRequiredBoxTypeNames(currentQuestionData)
                     : undefined
                 }
-                isPracticeMode={state.isSandboxMode}
-                isSandboxMode={state.isSandboxMode}
-                onModeToggle={() => state.setShowModeToggleModal(true)}
+                isPracticeMode={effectiveSandboxMode}
+                isSandboxMode={effectiveSandboxMode}
+                onModeToggle={state.selectedQuestionType === "experiment" ? undefined : () => state.setShowModeToggleModal(true)}
                 onClear={() => state.setShowClearCanvasModal(true)}
                 onUndo={undo}
                 onRedo={redo}
@@ -534,16 +536,16 @@ export default function MemoryModelEditor({
               classes={state.elementClasses}
               addClasses={addElementClass}
               removeClasses={removeElementClass}
-              sandbox={!state.isSandboxMode}
-              canManageClasses={!state.isSandboxMode || state.selectedQuestionIndex === null}
-              canManageFunctions={!state.isSandboxMode || state.selectedQuestionIndex === null}
+              sandbox={!effectiveSandboxMode}
+              canManageClasses={!effectiveSandboxMode || state.selectedQuestionIndex === null}
+              canManageFunctions={!effectiveSandboxMode || state.selectedQuestionIndex === null}
               onClear={() => state.setShowClearCanvasModal(true)}
               onEditorOpenerReady={handleEditorOpenerReady}
               scale={canvasScale}
               onScaleChange={setCanvasScale}
               editorScale={editorScale}
               questionFunctionNames={
-                state.isSandboxMode && currentQuestionData
+                effectiveSandboxMode && currentQuestionData
                   ? getQuestionFunctionNames(currentQuestionData)
                   : undefined
               }

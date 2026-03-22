@@ -480,10 +480,12 @@ export default function QuestionTab({
         onQuestionDataChange(freshQuestionData);
       }
 
-      const resolvedCanvas = resolveQuestionCanvasData(
-        questionType,
-        questionIndex,
-        freshQuestionData.canvasConfig ?? null
+      const resolvedCanvas = normalizeQuestionCanvasData(
+        resolveQuestionCanvasData(
+          questionType,
+          questionIndex,
+          freshQuestionData.canvasConfig ?? null
+        )
       );
 
       onRestoreCanvas(

@@ -399,6 +399,7 @@ export default function QuestionTab({
       !hydratedQuestion.current
     ) {
       hydratedQuestion.current = true;
+      setSubmissionResults(null);
       (async () => {
         try {
           const data = await fetchQuestion<QuestionData>(

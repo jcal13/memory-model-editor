@@ -31,7 +31,7 @@ const isSetType = (t: string) => t === "set";
 const isDictType = (t: string) => t === "dict";
 const isObjectType = (t: string) => t === "object";
 const isContainer = (t: string) =>
-  isArrayType(t) || isSetType(t) || isDictType(t) || isObjectType(t);
+  isArrayType(t) || isSetType(t) || isDictType(t) || isClassInstanceType(t);
 
 // Extract all element IDs involved in an error path for multi-element highlighting
 function extractPathElementIds(
@@ -641,7 +641,7 @@ function computeReachable(frames: MemoryBox[], objectMap: Map<number, MemoryBox>
       e.value.forEach((c: number) => mark(c));
     else if (isDictType(e.type))
       Object.values(e.value).forEach((c) => mark(c as number));
-    else if (isObjectType(e.type))
+    else if (isClassInstanceType(e.type))
       Object.values(e.value).forEach((c) => mark(c as number));
   }
   for (const frame of frames)

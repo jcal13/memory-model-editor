@@ -10,7 +10,7 @@ import {
   useMemoryModelEditorState,
   clearCanvasStorage,
 } from "./hooks/useMemoryModelEditorState";
-import { loadInitialUIData } from "./utils/localStorage";
+import { loadInitialUIData, deleteQuestionCanvasData } from "./utils/localStorage";
 import { useMemoryModelEditorRefs } from "./hooks/useRef";
 import {
   useCanvasLocalStorage,
@@ -115,6 +115,9 @@ export default function MemoryModelEditor({
   }, [state.elements, state.elementIds, state.elementClasses, recordState]);
 
   const clearCanvas = () => {
+    if (state.selectedQuestionIndex !== null && state.selectedQuestionType !== null) {
+      deleteQuestionCanvasData(state.selectedQuestionType, state.selectedQuestionIndex);
+    }
     state.setElements([]);
     state.setElementIds([]);
     state.setElementClasses([]);

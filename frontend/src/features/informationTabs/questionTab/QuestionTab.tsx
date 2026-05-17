@@ -41,7 +41,7 @@ interface QuestionStatusMap {
   [key: string]: QuestionStatus;
 }
 
-interface QuestionData {
+export interface QuestionData {
   id: number;
   question: string;
   code: string[];
@@ -53,8 +53,6 @@ interface QuestionData {
 }
 
 function formatSource(description: string): string {
-  // "CSC148 2023 midterm 1" → "CSC148 · 2023 · Midterm 1"
-  // "CSC148 2024 final"     → "CSC148 · 2024 · Final"
   const parts = description.trim().split(/\s+/);
   if (parts.length < 2) return description;
   const [course, year, ...rest] = parts;
@@ -102,6 +100,33 @@ function getQuestionKey(type: QuestionType, index: number): string {
   return `${type}_${index}`;
 }
 
+export function getCheckableLines(questionData: QuestionData | null): Set<number> {
+  return new Set(questionData?.steps?.map((s) => s.lineNumber) ?? []);
+}
+
+export function sortCheckableLines(checkableLines: Set<number>): number[] {
+  return Array.from(checkableLines).sort((a, b) => a - b);
+}
+
+export function buildLineIterations(questionData: QuestionData | null): Map<number, number[]> {
+  const map = new Map<number, number[]>();
+  for (const s of questionData?.steps ?? []) {
+    if (s.iterationNumber !== undefined) {
+      const arr = map.get(s.lineNumber) ?? [];
+      arr.push(s.iterationNumber);
+      map.set(s.lineNumber, arr);
+    }
+  }
+  map.forEach((values) => values.sort((a: number, b: number) => a - b));
+  return map;
+}
+
+export function getNextCheckableLine(sortedLines: number[], line: number | null): number | null {
+  if (line === null) return null;
+  const idx = sortedLines.indexOf(line);
+  return idx >= 0 && idx + 1 < sortedLines.length ? sortedLines[idx + 1] : null;
+}
+
 export default function QuestionTab({
   questionIndex,
   setQuestionIndex,
@@ -137,25 +162,11 @@ export default function QuestionTab({
   const [selectedIteration, setSelectedIteration] = useState<number | undefined>(undefined);
   const [autoAdvance, setAutoAdvance] = useState(false);
 
-  const checkableLines = useMemo(
-    () => new Set(questionData?.steps?.map((s) => s.lineNumber) ?? []),
-    [questionData]
-  );
+  const checkableLines = useMemo(() => getCheckableLines(questionData), [questionData]);
 
-  const sortedLines = useMemo(() => Array.from(checkableLines).sort((a, b) => a - b), [checkableLines]);
+  const sortedLines = useMemo(() => sortCheckableLines(checkableLines), [checkableLines]);
 
-  const lineIterations = useMemo(() => {
-    const map = new Map<number, number[]>();
-    for (const s of questionData?.steps ?? []) {
-      if (s.iterationNumber !== undefined) {
-        const arr = map.get(s.lineNumber) ?? [];
-        arr.push(s.iterationNumber);
-        map.set(s.lineNumber, arr);
-      }
-    }
-    map.forEach((values) => values.sort((a: number, b: number) => a - b));
-    return map;
-  }, [questionData]);
+  const lineIterations = useMemo(() => buildLineIterations(questionData), [questionData]);
 
   const getNextCheckableLine = (line: number | null): number | null => {
     if (line === null) return null;

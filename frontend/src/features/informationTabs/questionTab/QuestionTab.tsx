@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import {
   fetchQuestionCount,
@@ -135,6 +135,33 @@ export default function QuestionTab({
   const [showResetModal, setShowResetModal] = useState(false);
   const [selectedLine, setSelectedLine] = useState<number | null>(null);
   const [selectedIteration, setSelectedIteration] = useState<number | undefined>(undefined);
+  const [autoAdvance, setAutoAdvance] = useState(false);
+
+  const checkableLines = useMemo(
+    () => new Set(questionData?.steps?.map((s) => s.lineNumber) ?? []),
+    [questionData]
+  );
+
+  const sortedLines = useMemo(() => Array.from(checkableLines).sort((a, b) => a - b), [checkableLines]);
+
+  const lineIterations = useMemo(() => {
+    const map = new Map<number, number[]>();
+    for (const s of questionData?.steps ?? []) {
+      if (s.iterationNumber !== undefined) {
+        const arr = map.get(s.lineNumber) ?? [];
+        arr.push(s.iterationNumber);
+        map.set(s.lineNumber, arr);
+      }
+    }
+    map.forEach((values) => values.sort((a: number, b: number) => a - b));
+    return map;
+  }, [questionData]);
+
+  const getNextCheckableLine = (line: number | null): number | null => {
+    if (line === null) return null;
+    const idx = sortedLines.indexOf(line);
+    return idx >= 0 && idx + 1 < sortedLines.length ? sortedLines[idx + 1] : null;
+  };
 
   const hydratedList = useRef<boolean>(false);
   const hydratedQuestion = useRef<boolean>(false);
@@ -212,13 +239,26 @@ export default function QuestionTab({
   };
 
   const handleSubmitAtLine = async (lineNumber: number, iterationNumber?: number) => {
-    if (questionType && questionIndex !== null) {
-      try {
-        await onSubmitAtLine(lineNumber, iterationNumber);
-        // line-check results don't change question completion status
-      } catch (error) {
-        console.error("Error during line submission:", error);
+    if (!questionType || questionIndex === null) {
+      return false;
+    }
+
+    try {
+      const success = await onSubmitAtLine(lineNumber, iterationNumber);
+
+      if (success && autoAdvance) {
+        const nextLine = getNextCheckableLine(lineNumber);
+        if (nextLine !== null) {
+          setSelectedLine(nextLine);
+          const nextIter = lineIterations.get(nextLine) ?? [];
+          setSelectedIteration(nextIter.length > 0 ? nextIter[0] : undefined);
+        }
       }
+
+      return success;
+    } catch (error) {
+      console.error("Error during line submission:", error);
+      return false;
     }
   };
 
@@ -592,18 +632,6 @@ export default function QuestionTab({
         )}
 
         {view === "question" && questionData && (() => {
-          const checkableLines = new Set(
-            questionData.steps?.map((s) => s.lineNumber) ?? []
-          );
-          // Map from lineNumber → sorted iteration numbers (empty array = no iterations)
-          const lineIterations = new Map<number, number[]>();
-          for (const s of questionData.steps ?? []) {
-            if (s.iterationNumber !== undefined) {
-              const arr = lineIterations.get(s.lineNumber) ?? [];
-              arr.push(s.iterationNumber);
-              lineIterations.set(s.lineNumber, arr);
-            }
-          }
           const selectedLineHasIterations =
             selectedLine !== null && (lineIterations.get(selectedLine)?.length ?? 0) > 0;
           const canCheckAtLine =
@@ -654,6 +682,24 @@ export default function QuestionTab({
                   <p className={styles.lineHint}>
                     Click a highlighted line number to check your answer at that point.
                   </p>
+                )}
+
+                {checkableLines.size > 0 && (
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      marginTop: "0.5rem",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={autoAdvance}
+                      onChange={(event) => setAutoAdvance(event.target.checked)}
+                    />
+                    Auto advance to next checkable line
+                  </label>
                 )}
 
                 {selectedLine !== null && selectedLineHasIterations && (

@@ -181,4 +181,4 @@ export interface BoxEditorType {
   isQuestionMode?: boolean;
 }
 
-export type Tab = "feedback" | "question";
+export type Tab = "question";

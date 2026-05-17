@@ -310,7 +310,6 @@ export default function MemoryModelEditor({
     elements: state.elements,
     setElements: state.setElements,
     setSubmissionResults: state.setSubmissionResults,
-    setActiveInfoTab: state.setActiveInfoTab,
   });
 
   useCanvasLocalStorage({
@@ -581,8 +580,6 @@ export default function MemoryModelEditor({
             >
               <InformationTabs
                 submissionResults={state.submissionResults}
-                activeTab={state.activeInfoTab}
-                setActive={state.setActiveInfoTab}
                 questionSelected={state.selectedQuestionIndex !== null}
                 questionIndex={state.selectedQuestionIndex}
                 setQuestionIndex={state.setSelectedQuestionIndex}

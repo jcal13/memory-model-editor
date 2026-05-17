@@ -31,7 +31,7 @@ export default function CodeBlock({
         >
           {tokens.map((line, index) => {
             const lineNumber = startLineNumber + index;
-            const { key: _lineKey, ...lineProps } = getLineProps({ line, key: index });
+            const lineProps = getLineProps({ line, key: index });
             const isCheckable = checkableLines?.has(lineNumber) ?? false;
             const isSelected = selectedLine === lineNumber;
 
@@ -72,10 +72,7 @@ export default function CodeBlock({
                   {line.map((token, tokenIndex) => (
                     <span
                       key={tokenIndex}
-                      {...(() => {
-                        const { key: _tokenKey, ...tokenProps } = getTokenProps({ token, key: tokenIndex });
-                        return tokenProps;
-                      })()}
+                      {...getTokenProps({ token, key: tokenIndex })}
                     />
                   ))}
                 </span>

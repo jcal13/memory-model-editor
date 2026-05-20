@@ -33,6 +33,42 @@ export interface FeedbackError {
  * @returns Structured feedback error
  */
 export function structureError(message: string): FeedbackError {
+  // Pattern: "In name: variable "x" is missing"
+  const inFrameMissingMatch = message.match(/^In (.+?): variable "(.+?)" is missing$/);
+  if (inFrameMissingMatch) {
+    return {
+      type: ErrorType.MISSING_ELEMENT,
+      message,
+      path: `function "${inFrameMissingMatch[1]}" → var "${inFrameMissingMatch[2]}"`,
+      field: inFrameMissingMatch[2],
+      severity: 'error',
+    };
+  }
+  
+  // Pattern: "In name: variable "x" should not be present"
+  const inFrameUnexpectedMatch = message.match(/^In (.+?): variable "(.+?)" should not be present$/);
+  if (inFrameUnexpectedMatch) {
+    return {
+      type: ErrorType.UNEXPECTED_ELEMENT,
+      message,
+      path: `function "${inFrameUnexpectedMatch[1]}" → var "${inFrameUnexpectedMatch[2]}"`,
+      field: inFrameUnexpectedMatch[2],
+      severity: 'error',
+    };
+  }
+  
+  // Pattern: "In name: variable "x" needs to be assigned to an object"
+  const inFrameUnassignedMatch = message.match(/^In (.+?): variable "(.+?)" needs to be assigned/);
+  if (inFrameUnassignedMatch) {
+    return {
+      type: ErrorType.GENERIC_ERROR,
+      message,
+      path: `function "${inFrameUnassignedMatch[1]}" → var "${inFrameUnassignedMatch[2]}"`,
+      field: inFrameUnassignedMatch[2],
+      severity: 'error',
+    };
+  }
+
   // Pattern: "At X: expected Y, but got Z" (value or type mismatch)
   const atExpectedMatch = message.match(/^At (.+?): expected .+, but got .+$/);
   if (atExpectedMatch) {

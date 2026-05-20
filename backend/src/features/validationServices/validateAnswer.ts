@@ -1,5 +1,6 @@
 import { Pool } from "pg";
 import { FeedbackError, ErrorType } from "./errorStructuring";
+import { ERROR_MESSAGES } from "./errorMessages";
 
 let pool: Pool | null = null;
 function getPool(): Pool {
@@ -82,7 +83,7 @@ function ensureBijection(
     if (prev.target !== inputID) {
       if (!isVar) errors.push({
         type: ErrorType.GENERIC_ERROR,
-        message: `ID mapping conflict between ${formatPathForUser(prev.path)} and ${formatPathForUser(path)}`,
+        message: ERROR_MESSAGES.id_mapping_conflict(formatPathForUser(prev.path), formatPathForUser(path)),
         elementId: contextFrameId ?? inputID, // Use frame ID if available, otherwise the conflicting object
         path,
         severity: 'error'
@@ -97,7 +98,7 @@ function ensureBijection(
     if (prev.target !== answerID) {
       if (!isVar) errors.push({
         type: ErrorType.GENERIC_ERROR,
-        message: `ID mapping conflict between ${formatPathForUser(prev.path)} and ${formatPathForUser(path)}`,
+        message: ERROR_MESSAGES.id_mapping_conflict(formatPathForUser(prev.path), formatPathForUser(path)),
         elementId: contextFrameId ?? inputID, // Use frame ID if available, otherwise the conflicting object
         path,
         severity: 'error'
@@ -165,8 +166,8 @@ function checkTypeMismatch(
   // For class instances: wrong type means ID is assigned incorrectly/incompletely, not a type error
   const loc = formatPathForUser(path);
   const message = isClassInstanceType(answerBox.type)
-    ? `ID incorrectly or incompletely assigned at ${loc}`
-    : `At ${loc}: expected ${formatTypeForUser(answerBox.type)}, but got ${formatTypeForUser(inputBox.type)}`;
+    ? ERROR_MESSAGES.object_incorrectly_connected(loc)
+    : ERROR_MESSAGES.type_mismatch(loc, formatTypeForUser(answerBox.type), formatTypeForUser(inputBox.type));
   errors.push({
     type: ErrorType.TYPE_MISMATCH,
     message,
@@ -201,7 +202,7 @@ function comparePrimitives(
       const gotStr = isNoneValue(inpVal) ? "None" : String(inpVal);
       errors.push({
         type: ErrorType.VALUE_MISMATCH,
-        message: `At ${loc}: expected ${expectedStr}, but got ${gotStr}`,
+        message: ERROR_MESSAGES.value_mismatch(loc, expectedStr, gotStr),
         elementId: contextFrameId ?? inputBox.id ?? undefined,
         relatedIds: inputBox.id !== null && inputBox.id !== contextFrameId ? [inputBox.id] : undefined,
         path,
@@ -235,7 +236,7 @@ function checkArray(
     for (let i = actualLen; i < expectedLen; i++)
       errors.push({
         type: ErrorType.MISSING_ELEMENT,
-        message: `Missing element: ${path}[${i}] id=${answerMemoryBox.value[i]}`,
+        message: ERROR_MESSAGES.missing_element_at_index(path, i, answerMemoryBox.value[i]),
         elementId: inputMemoryBox.id ?? undefined, // The container that's missing elements
         path: `${path}[${i}]`,
         severity: 'error'
@@ -245,7 +246,7 @@ function checkArray(
     for (let j = expectedLen; j < actualLen; j++)
       errors.push({
         type: ErrorType.UNEXPECTED_ELEMENT,
-        message: `Unexpected element: ${path}[${j}] id=${inputMemoryBox.value[j]}`,
+        message: ERROR_MESSAGES.unexpected_element_at_index(path, j, inputMemoryBox.value[j]),
         elementId: inputMemoryBox.id ?? undefined, // The container with unexpected elements
         path: `${path}[${j}]`,
         severity: 'error'
@@ -314,7 +315,7 @@ function checkSet(
     }
     if (!matched) errors.push({
       type: ErrorType.MISSING_ELEMENT,
-      message: `Missing element: ${path} id=${answerChild}`,
+      message: ERROR_MESSAGES.missing_element_in_set(path, answerChild),
       elementId: inputMemoryBox.id ?? undefined, // The container that's missing elements
       path,
       severity: 'error'
@@ -325,7 +326,7 @@ function checkSet(
   for (const extraId of unmatched)
     errors.push({
       type: ErrorType.UNEXPECTED_ELEMENT,
-      message: `Unexpected element: ${path} id=${extraId}`,
+      message: ERROR_MESSAGES.unexpected_element_in_set(path, extraId as number),
       elementId: inputMemoryBox.id ?? undefined, // The container with unexpected elements
       path,
       severity: 'error'
@@ -352,7 +353,7 @@ function checkDict(
       const missingId = answerMemoryBox.value[key];
       errors.push({
         type: ErrorType.MISSING_ELEMENT,
-        message: `Missing key: ${path} key=${key}, id=${missingId}`,
+        message: ERROR_MESSAGES.missing_dict_key(path, key, missingId),
         elementId: inputMemoryBox.id ?? undefined, // The container that's missing keys
         path,
         field: key,
@@ -383,7 +384,7 @@ function checkDict(
       const extraId = inputMemoryBox.value[key];
       errors.push({
         type: ErrorType.UNEXPECTED_ELEMENT,
-        message: `Unexpected key: ${path} key=${key}, id=${extraId}`,
+        message: ERROR_MESSAGES.unexpected_dict_key(path, key, extraId),
         elementId: inputMemoryBox.id ?? undefined, // The container with unexpected keys
         path,
         field: key,
@@ -411,7 +412,7 @@ function checkObject(
     const loc = formatPathForUser(path);
     errors.push({
       type: ErrorType.GENERIC_ERROR,
-      message: `At ${loc}: expected ${answerMemoryBox.name} object, but got ${inputMemoryBox.name}`,
+      message: ERROR_MESSAGES.object_name_mismatch(loc, answerMemoryBox.name!, inputMemoryBox.name!),
       elementId: inputMemoryBox.id ?? undefined,
       path,
       severity: 'error'
@@ -428,7 +429,7 @@ function checkObject(
       const loc = formatPathForUser(path);
       errors.push({
         type: ErrorType.MISSING_ELEMENT,
-        message: `At ${loc}: ${answerMemoryBox.name} is missing the "${prop}" attribute`,
+        message: ERROR_MESSAGES.missing_attribute(loc, answerMemoryBox.name!, prop),
         elementId: inputMemoryBox.id ?? undefined, // The container that's missing properties
         path,
         field: prop,
@@ -460,7 +461,7 @@ function checkObject(
       const loc = formatPathForUser(path);
       errors.push({
         type: ErrorType.UNEXPECTED_ELEMENT,
-        message: `At ${loc}: ${inputMemoryBox.name} has an unexpected "${prop}" attribute`,
+        message: ERROR_MESSAGES.unexpected_attribute(loc, inputMemoryBox.name!, prop),
         elementId: inputMemoryBox.id ?? undefined,
         path,
         field: prop,
@@ -482,7 +483,7 @@ function gatherFrames(
   if (answerFrames.length !== inputFrames.length)
     errors.push({
       type: ErrorType.FRAME_MISMATCH,
-      message: `Call stack should have ${answerFrames.length} function(s), but has ${inputFrames.length}`,
+      message: ERROR_MESSAGES.call_stack_count(answerFrames.length, inputFrames.length),
       severity: 'error'
     });
 
@@ -503,14 +504,14 @@ function gatherFrames(
     if (inputCount === 0) {
       errors.push({
         type: ErrorType.MISSING_ELEMENT,
-        message: `Call stack is missing the ${name} function`,
+        message: ERROR_MESSAGES.missing_function(name),
         path: `function "${name}"`,
         severity: 'error'
       });
     } else if (inputCount !== count) {
       errors.push({
         type: ErrorType.FRAME_MISMATCH,
-        message: `Call stack should have ${count} ${name} function(s), but has ${inputCount}`,
+        message: ERROR_MESSAGES.function_count_mismatch(count, name, inputCount),
         severity: 'error'
       });
     }
@@ -520,7 +521,7 @@ function gatherFrames(
     if (!answerNameCounts.has(name)) {
       errors.push({
         type: ErrorType.UNEXPECTED_ELEMENT,
-        message: `Call stack has an unexpected ${name} function`,
+        message: ERROR_MESSAGES.unexpected_function(name),
         path: `function "${name}"`,
         severity: 'error'
       });
@@ -541,7 +542,7 @@ function scanDuplicates(model: MemoryBox[], errors: FeedbackError[]): Set<number
     }
   dup.forEach((id) => errors.push({
     type: ErrorType.DUPLICATE_ID,
-    message: `Duplicate ID: ${id}`,
+    message: ERROR_MESSAGES.duplicate_id(),
     elementId: id,
     severity: 'error'
   }));
@@ -582,7 +583,7 @@ function compareFrames(
       if (!(k in uVars))
         errors.push({
           type: ErrorType.MISSING_ELEMENT,
-          message: `In ${name} (call stack position ${aFrame.order}): variable "${k}" is missing`,
+          message: ERROR_MESSAGES.variable_missing(name, k),
           elementId: uFrame.id ?? undefined,
           path: `function "${name}" → var "${k}"`,
           severity: 'error'
@@ -591,7 +592,7 @@ function compareFrames(
       if (!(k in aVars))
         errors.push({
           type: ErrorType.UNEXPECTED_ELEMENT,
-          message: `In ${name} (call stack position ${aFrame.order}): variable "${k}" should not be present`,
+          message: ERROR_MESSAGES.variable_unexpected(name, k),
           elementId: uFrame.id ?? undefined,
           path: `function "${name}" → var "${k}"`,
           severity: 'error'
@@ -605,7 +606,7 @@ function compareFrames(
       if (uid === "_") {
         errors.push({
           type: ErrorType.GENERIC_ERROR,
-          message: `In ${name} (call stack position ${aFrame.order}): variable "${k}" needs to be assigned to an object`,
+          message: ERROR_MESSAGES.variable_unassigned(name, k),
           path: `function "${name}" → var "${k}"`,
           severity: 'error'
         });
@@ -679,7 +680,7 @@ function detectOrphans(
     if (idx === -1) {
       errors.push({
         type: ErrorType.MISSING_ELEMENT,
-        message: `Missing unattached object: ${aOrphan.type} ${aOrphan.value}`,
+        message: ERROR_MESSAGES.missing_unattached_object(aOrphan.type, aOrphan.value),
         severity: 'error'
       });
     } else {
@@ -691,7 +692,7 @@ function detectOrphans(
   for (const uOrphan of remainingUser) {
     errors.push({
       type: ErrorType.UNEXPECTED_ELEMENT,
-      message: `Unexpected unattached object: id=${uOrphan.id}`,
+      message: ERROR_MESSAGES.unexpected_unattached_object(),
       elementId: uOrphan.id as number,
       severity: 'error'
     });
@@ -731,10 +732,17 @@ function compareIds(
   const inputMemoryBox = inputMap.get(inputID);
   if (!answerMemoryBox || !inputMemoryBox) {
     // if either ID is not found in the respective map
+    const cleanPath = path.endsWith('→') ? path.slice(0, -1) : path;
+    const frameMatch = cleanPath.match(/function "([^"]+)"/);
+    const varMatch = cleanPath.match(/var "([^"]+)"/);
+    const frameName = frameMatch ? frameMatch[1] : cleanPath;
+    const varName = varMatch ? varMatch[1] : cleanPath;
+    const unmappedMessage = frameMatch && varMatch
+      ? `Variable "${varName}" in ${frameName} is pointing to an object that doesn't exist`
+      : ERROR_MESSAGES.unmapped_id_fallback(cleanPath);
     errors.push({
       type: ErrorType.ORPHANED_ELEMENT,
-      // Remove → from end of path (if it is there)
-      message: `Unmapped ID: ${path.endsWith('→') ? path.slice(0, -1) : path}`,
+      message: unmappedMessage,
       path,
       severity: 'error'
     });
@@ -851,7 +859,7 @@ function checkCallStackOrder(
     if (sortedAnswer[i].name !== sortedInput[i].name) {
       errors.push({
         type: ErrorType.CALL_STACK_ORDER,
-        message: "Call stack functions are in the wrong order",
+        message: ERROR_MESSAGES.call_stack_order(),
         severity: 'error'
       });
       break;
@@ -918,9 +926,9 @@ function runComparison(
   // check for function + function call stack errors
   const hasFunctionErrors = errors.some(
     (e) =>
-      e.message.startsWith("Function count mismatch") ||
-      e.message.startsWith("Missing function") ||
-      e.message.startsWith("Unexpected function")
+      e.message.startsWith("Call stack should have") ||
+      e.message.startsWith("Call stack is missing") ||
+      e.message.startsWith("Call stack has an unexpected")
   );
   if (!hasFunctionErrors) {
     checkCallStackOrder(answerFrames, inputFrames, errors);
@@ -974,7 +982,7 @@ export default async function validateAnswer(
       correct: false,
       errors: [{
         type: ErrorType.GENERIC_ERROR,
-        message: `Invalid question id: ${questionId}`,
+        message: ERROR_MESSAGES.invalid_question_id(questionId),
         severity: 'error'
       }],
     };
@@ -1035,7 +1043,7 @@ export async function validateAnswerAtLine(
       correct: false,
       errors: [{
         type: ErrorType.GENERIC_ERROR,
-        message: `Invalid question id: ${questionId}`,
+        message: ERROR_MESSAGES.invalid_question_id(questionId),
         severity: 'error'
       }],
     };
@@ -1046,7 +1054,7 @@ export async function validateAnswerAtLine(
       correct: false,
       errors: [{
         type: ErrorType.GENERIC_ERROR,
-        message: `No answer defined for line ${lineNumber}${iterationNumber !== undefined ? ` iteration ${iterationNumber}` : ""}`,
+        message: ERROR_MESSAGES.no_answer_for_line(lineNumber, iterationNumber),
         severity: 'error'
       }],
     };

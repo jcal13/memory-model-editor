@@ -102,8 +102,11 @@ export default function MemoryModelEditor({
     };
 
     // Check if state has actually changed
+    const stripTransient = (els: CanvasElement[]) =>
+      els.map(({ color, ...rest }) => rest);
+    
     const hasChanged =
-      JSON.stringify(prevState.elements) !== JSON.stringify(currentState.elements) ||
+      JSON.stringify(stripTransient(prevState.elements)) !== JSON.stringify(stripTransient(currentState.elements)) ||
       JSON.stringify(prevState.ids) !== JSON.stringify(currentState.ids) ||
       JSON.stringify(prevState.classes) !== JSON.stringify(currentState.classes);
 

@@ -109,7 +109,7 @@ const BoxEditorModule = ({
     invalidated,
   );
   return (
-    <div ref={moduleRef} className={`drag-handle ${styles.boxEditorModule}`}>
+    <div ref={moduleRef} className={styles.boxEditorModule}>
       {/* Top section: header with id, type, name + close button */}
       <Header
         element={metadata}

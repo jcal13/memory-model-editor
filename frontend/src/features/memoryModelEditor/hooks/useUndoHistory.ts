@@ -13,12 +13,15 @@ interface UndoHistoryReturn {
   undo: () => void;
   redo: () => void;
   recordState: (state: CanvasState) => void;
-  clearHistory: () => void;
+  clearHistory: (baselineState?: CanvasState) => void;
 }
 
 const MAX_HISTORY_SIZE = 50;
 const HISTORY_STORAGE_KEY = "canvas_undo_history";
 const HISTORY_INDEX_STORAGE_KEY = "canvas_undo_history_index";
+
+const normalizeElements = (elements: CanvasElement[]) =>
+  elements.map(({ color, invalidated, ...rest }) => rest);
 
 export function useUndoHistory(
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>,
@@ -59,39 +62,49 @@ export function useUndoHistory(
   const recordState = useCallback((state: CanvasState) => {
     // Don't record while we're undoing/redoing to prevent recursion
     if (isUndoRedoing.current) return;
-
+    
     setHistory((prev) => {
       // If we're in the middle of history (after undo), discard future states
       const currentHistory = prev.slice(0, historyIndex + 1);
-
+    
       // Deep clone the state to prevent mutations
       const clonedState: CanvasState = {
         elements: JSON.parse(JSON.stringify(state.elements)),
         ids: [...state.ids],
         classes: [...state.classes],
       };
-
+    
       // Add new state
+      const lastState = currentHistory[currentHistory.length - 1];
+    
+      const isDuplicate =
+        lastState &&
+        JSON.stringify(normalizeElements(lastState.elements)) ===
+          JSON.stringify(normalizeElements(clonedState.elements));
+    
+      if (isDuplicate) {
+        return prev;
+      }
+    
       const updatedHistory = [...currentHistory, clonedState];
-
+    
       // Limit history size
       if (updatedHistory.length > MAX_HISTORY_SIZE) {
         const trimmed = updatedHistory.slice(1);
         // Adjust index since we removed from the beginning
-        setHistoryIndex((prev) => Math.max(-1, prev - 1));
+        setHistoryIndex(trimmed.length - 1);
         return trimmed;
       }
-
+    
+      setHistoryIndex(updatedHistory.length - 1);
       return updatedHistory;
     });
-
-    setHistoryIndex((prev) => prev + 1);
   }, [historyIndex]);
 
   const undo = useCallback(() => {
     // Need at least 2 states in history to undo (index 1 to go back to index 0)
     if (historyIndex < 1) return;
-
+    
     isUndoRedoing.current = true;
 
     const previousIndex = historyIndex - 1;
@@ -138,12 +151,19 @@ export function useUndoHistory(
     }, 0);
   }, [history, historyIndex, setElements, setElementIds, setElementClasses]);
 
-  const clearHistory = useCallback(() => {
-    setHistory([]);
-    setHistoryIndex(-1);
+  const clearHistory = useCallback((baselineState?: CanvasState) => {
+    const initialState: CanvasState = baselineState ?? {
+      elements: [],
+      ids: [],
+      classes: [],
+    };
+  
+    setHistory([initialState]);
+    setHistoryIndex(0);
+  
     try {
-      localStorage.removeItem(HISTORY_STORAGE_KEY);
-      localStorage.removeItem(HISTORY_INDEX_STORAGE_KEY);
+      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify([initialState]));
+      localStorage.setItem(HISTORY_INDEX_STORAGE_KEY, "0");
     } catch (error) {
       console.error("Failed to clear undo history from localStorage:", error);
     }

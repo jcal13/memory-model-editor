@@ -130,7 +130,14 @@ export default function MemoryModelEditor({
     state.setActiveInfoTab("question");
     state.setCanvasResetKey((prev) => prev + 1);
     clearCanvasStorage();
-    clearHistory();
+    const baselineState = {
+      elements: [],
+      ids: [],
+      classes: [],
+    };
+    
+    prevStateRef.current = baselineState;
+    clearHistory(baselineState);
   };
 
   const restoreCanvas = (
@@ -138,10 +145,20 @@ export default function MemoryModelEditor({
     ids: number[],
     classes: string[]
   ) => {
-    state.setElements(spreadOverlappingElements(elements));
+    const restoredElements = spreadOverlappingElements(elements);
+
+    const baselineState = {
+      elements: restoredElements,
+      ids,
+      classes,
+    };
+
+    state.setElements(restoredElements);
     state.setElementIds(ids);
     state.setElementClasses(classes);
-    clearHistory();
+
+    prevStateRef.current = baselineState;
+    clearHistory(baselineState);
   };
 
   const effectiveSandboxMode = state.isSandboxMode || state.selectedQuestionType === "experiment";

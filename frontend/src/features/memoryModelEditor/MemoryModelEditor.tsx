@@ -102,8 +102,11 @@ export default function MemoryModelEditor({
     };
 
     // Check if state has actually changed
+    const stripTransient = (els: CanvasElement[]) =>
+      els.map(({ color, ...rest }) => rest);
+    
     const hasChanged =
-      JSON.stringify(prevState.elements) !== JSON.stringify(currentState.elements) ||
+      JSON.stringify(stripTransient(prevState.elements)) !== JSON.stringify(stripTransient(currentState.elements)) ||
       JSON.stringify(prevState.ids) !== JSON.stringify(currentState.ids) ||
       JSON.stringify(prevState.classes) !== JSON.stringify(currentState.classes);
 
@@ -127,7 +130,14 @@ export default function MemoryModelEditor({
     state.setActiveInfoTab("question");
     state.setCanvasResetKey((prev) => prev + 1);
     clearCanvasStorage();
-    clearHistory();
+    const baselineState = {
+      elements: [],
+      ids: [],
+      classes: [],
+    };
+    
+    prevStateRef.current = baselineState;
+    clearHistory(baselineState);
   };
 
   const restoreCanvas = (
@@ -135,10 +145,20 @@ export default function MemoryModelEditor({
     ids: number[],
     classes: string[]
   ) => {
-    state.setElements(spreadOverlappingElements(elements));
+    const restoredElements = spreadOverlappingElements(elements);
+
+    const baselineState = {
+      elements: restoredElements,
+      ids,
+      classes,
+    };
+
+    state.setElements(restoredElements);
     state.setElementIds(ids);
     state.setElementClasses(classes);
-    clearHistory();
+
+    prevStateRef.current = baselineState;
+    clearHistory(baselineState);
   };
 
   const effectiveSandboxMode = state.isSandboxMode || state.selectedQuestionType === "experiment";

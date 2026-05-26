@@ -1062,7 +1062,7 @@
     },
     "steps": [
       {
-        "lineNumber": 5,
+        "lineNumber": 6,
         "answer": [
           {
             "id": null,
@@ -1096,7 +1096,7 @@
         ]
       },
       {
-        "lineNumber": 6,
+        "lineNumber": 7,
         "answer": [
           {
             "id": null,
@@ -1145,7 +1145,7 @@
         ]
       },
       {
-        "lineNumber": 7,
+        "lineNumber": 8,
         "answer": [
           {
             "id": null,
@@ -1209,7 +1209,7 @@
         ]
       },
       {
-        "lineNumber": 8,
+        "lineNumber": 10,
         "answer": [
           {
             "id": null,
@@ -1273,7 +1273,7 @@
         ]
       },
       {
-        "lineNumber": 9,
+        "lineNumber": 11,
         "answer": [
           {
             "id": null,

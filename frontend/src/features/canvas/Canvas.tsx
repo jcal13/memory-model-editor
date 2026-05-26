@@ -13,12 +13,22 @@ import BoxEditor from "../editors/boxEditor/BoxEditor";
 import CallStack from "./components/CallStack";
 import { useCanvasRefs } from "./hooks/useCanvas";
 import { validateElements } from "./utils/validation";
+import { getBoxDimensions } from "./utils/box.renderer";
+import {
+  getCallStackBounds,
+  smoothlyConstrainDragPosition,
+} from "./utils/boundary.helpers";
 import {
   QUESTION_MAIN_FRAME_NAME,
   isLockedMainFrame,
   reorderFunctionFramesWithLockedMain,
 } from "../memoryModelEditor/utils/questionFrames";
 import styles from "./Canvas.module.css";
+
+const NEW_BOX_BOUNDARY_DIMENSIONS = {
+  width: 200,
+  height: 110,
+};
 
 const EDITOR_MAP: Record<BoxType["name"], React.FC<any>> = {
   primitive: BoxEditor,
@@ -192,6 +202,43 @@ function Canvas({
   const { svgRef } = useCanvasRefs();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
+  const constrainCanvasElementPosition = useCallback(
+    (
+      element: CanvasElement,
+      x: number,
+      y: number,
+      dimensions?: { width: number; height: number },
+    ) => {
+      if (element.kind.name === "function") {
+        return { x, y };
+      }
+
+      const svg = svgRef.current;
+      const vb = svg?.viewBox.baseVal;
+
+      if (!vb || !vb.width || !vb.height) {
+        return { x, y };
+      }
+
+      const elementDimensions = dimensions ?? getBoxDimensions(element);
+
+      const callStackBounds = getCallStackBounds(
+        vb.height,
+        0,
+        0,
+        callStackWidth,
+      );
+
+      return smoothlyConstrainDragPosition(
+        { x, y },
+        elementDimensions,
+        callStackBounds,
+        { width: vb.width, height: vb.height },
+      );
+    },
+    [svgRef, callStackWidth],
+  );
+
   const initialVB =
     typeof window !== "undefined"
       ? `0 0 ${window.innerWidth} ${window.innerHeight}`
@@ -299,20 +346,20 @@ function Canvas({
   // Validate elements whenever they change
   useEffect(() => {
     const validatedElements = validateElements(elements);
-    
+
     // Check if any validation errors have changed
     const hasChanges = validatedElements.some((validatedEl, index) => {
       const currentEl = elements[index];
       if (!currentEl) return true;
-      
+
       const validatedErrors = validatedEl.errors;
       const currentErrors = currentEl.errors;
-      
+
       // Compare errors
       if (!validatedErrors && !currentErrors) return false;
       if (!validatedErrors || !currentErrors) return true;
       if (validatedErrors.length !== currentErrors.length) return true;
-      
+
       return JSON.stringify(validatedErrors) !== JSON.stringify(currentErrors);
     });
 
@@ -324,10 +371,23 @@ function Canvas({
   const createPositionUpdater = useCallback(
     (boxId: number) => (x: number, y: number) => {
       setElements((prev) =>
-        prev.map((el) => (el.boxId === boxId ? { ...el, x, y } : el))
+        prev.map((el) => {
+          if (el.boxId !== boxId) return el;
+
+          const constrained = constrainCanvasElementPosition(el, x, y);
+          if (el.x === constrained.x && el.y === constrained.y) {
+            return el;
+          }
+
+          return {
+            ...el,
+            x: constrained.x,
+            y: constrained.y,
+          };
+        }),
       );
     },
-    [setElements]
+    [setElements, constrainCanvasElementPosition],
   );
 
   const handleCanvasDrop = useCallback(
@@ -354,7 +414,7 @@ function Canvas({
         const newId =
           sandbox || newKind.name === "function" ? "_" : getNextElementId(ids);
 
-        const newElement: CanvasElement = {
+        const baseElement: CanvasElement = {
           boxId: newBoxId,
           id: newId,
           kind: newKind,
@@ -362,10 +422,23 @@ function Canvas({
           y: coords.y,
         };
 
+        const constrained = constrainCanvasElementPosition(
+          baseElement,
+          coords.x,
+          coords.y,
+          NEW_BOX_BOUNDARY_DIMENSIONS,
+        );
+
+        const newElement: CanvasElement = {
+          ...baseElement,
+          x: constrained.x,
+          y: constrained.y,
+        };
+
         return [...prev, newElement];
       });
     },
-    [ids, sandbox, svgRef, setElements]
+    [ids, sandbox, svgRef, setElements, constrainCanvasElementPosition],
   );
 
   const saveElement = useCallback(

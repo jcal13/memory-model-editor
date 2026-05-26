@@ -126,7 +126,41 @@ export function isElementOverlappingCallStack(
 /**
  * Minimum spacing between elements and the call stack boundary.
  */
-export const CALLSTACK_PADDING = 10;
+export const CALLSTACK_PADDING = 25;
+
+export function getSafeXRightOfCallStack(
+  callStackBounds: CallStackBounds,
+  elementDimensions: ElementDimensions,
+  padding: number = CALLSTACK_PADDING,
+): number {
+  return (
+    callStackBounds.x +
+    callStackBounds.width +
+    padding +
+    elementDimensions.width / 2
+  );
+}
+
+export function clampPositionInsideCanvas(
+  position: Position,
+  elementDimensions: ElementDimensions,
+  canvasBounds: { width: number; height: number },
+  padding: number = CALLSTACK_PADDING,
+): Position {
+  const halfW = elementDimensions.width / 2;
+  const halfH = elementDimensions.height / 2;
+
+  return {
+    x: Math.max(
+      halfW + padding,
+      Math.min(canvasBounds.width - halfW - padding, position.x),
+    ),
+    y: Math.max(
+      halfH + padding,
+      Math.min(canvasBounds.height - halfH - padding, position.y),
+    ),
+  };
+}
 
 /**
  * Adjusts an element's position to avoid overlap with the call stack.
@@ -232,7 +266,20 @@ export function smoothlyConstrainDragPosition(
   // constrain the X position to keep the element's left edge at the boundary
   if (verticalOverlap && elementLeft < callStackRight) {
     // Position the element so its left edge just touches the right edge of the callstack boundary
-    constrainedX = callStackRight + elementHalfWidth;
+    constrainedX = getSafeXRightOfCallStack(callStackBounds, elementDimensions);
+  }
+
+  // Re-apply canvas bounds after call stack correction.
+  // This prevents pushing the box away from the call stack from causing right-side overflow.
+  if (canvasBounds && canvasBounds.width > 0 && canvasBounds.height > 0) {
+    const clamped = clampPositionInsideCanvas(
+      { x: constrainedX, y: constrainedY },
+      elementDimensions,
+      canvasBounds,
+    );
+
+    constrainedX = clamped.x;
+    constrainedY = clamped.y;
   }
 
   return { x: constrainedX, y: constrainedY };

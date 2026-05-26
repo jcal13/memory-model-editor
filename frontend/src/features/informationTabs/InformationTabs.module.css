@@ -6,6 +6,7 @@
   display: flex;
   flex-direction: column;
   padding: 0;
+  overflow: hidden;
 }
 
 .tabHeaders {
@@ -79,6 +80,67 @@
   overflow-y: auto;
   margin-top: 8px;
   transition: background-color 200ms ease, border-color 200ms ease;
+}
+
+.questionPanel {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+  padding: 16px 20px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  box-sizing: border-box;
+  transition: background-color 200ms ease, border-color 200ms ease;
+}
+
+.feedbackPanel {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+  padding: 16px 20px;
+  overflow-y: auto;
+  flex-shrink: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  transition: background-color 200ms ease, border-color 200ms ease;
+}
+
+.resizeDivider {
+  height: 8px;
+  background: transparent;
+  cursor: ns-resize;
+  position: relative;
+  flex-shrink: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms ease;
+}
+
+.resizeDivider:hover {
+  background: var(--bg-hover);
+}
+
+.resizeDivider::before {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 3px;
+  background: transparent;
+  border-radius: 3px;
+  transition: background 150ms ease;
+}
+
+.resizeDivider:hover::before {
+  background: var(--accent-blue);
+}
+
+.resizeDivider:active::before {
+  background: var(--accent-blue-hover);
 }
 
 .hidden {

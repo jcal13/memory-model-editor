@@ -3,6 +3,7 @@ import { SubmissionResult, Tab, CanvasElement } from "../shared/types";
 import { MasterErrorList } from "../memoryModelEditor/utils/masterErrorList";
 import FeedbackTab from "./feedbackTab/FeedbackTab";
 import QuestionTab from "./questionTab/QuestionTab";
+import { useResizable } from "../palette/hooks/useResizable";
 import styles from "./InformationTabs.module.css";
 
 interface InformationTabsProps {
@@ -57,6 +58,11 @@ export default function InformationTabs({
   fontScale = 1,
 }: InformationTabsProps) {
   const tabBodyRef = useRef<HTMLDivElement>(null);
+  const { topHeight, handleMouseDown, containerRef } = useResizable({
+    initialTopPercent: 60,
+    minTopPercent: 30,
+    maxTopPercent: 85,
+  });
   // Track the last submission context so Resubmit repeats the same check
   type LastLineCtx = { line: number; iteration?: number } | null;
   const lastSubmitLineRef = useRef<LastLineCtx>(null);
@@ -106,8 +112,12 @@ export default function InformationTabs({
 
   return (
     <div className={styles.containerWrapper}>
-      <div className={styles.container}>
-        <div className={styles.tabBody} ref={tabBodyRef}>
+      <div className={styles.container} ref={containerRef}>
+        <div
+          className={styles.questionPanel}
+          ref={tabBodyRef}
+          style={questionSelected ? { height: `${topHeight}%` } : undefined}
+        >
           <QuestionTab
             questionIndex={questionIndex}
             setQuestionIndex={setQuestionIndex}
@@ -125,22 +135,37 @@ export default function InformationTabs({
             isSandboxMode={isSandboxMode}
             fontScale={fontScale}
           />
-
-          <FeedbackTab
-            submissionResults={submissionResults}
-            masterErrorList={masterErrorList}
-            elements={elements}
-            setElements={setElements}
-            onOpenEditor={onOpenEditor}
-            questionSelected={questionSelected}
-            questionIndex={questionIndex}
-            questionType={questionType}
-            isSandboxMode={!isSandboxMode}
-            onResubmit={handleResubmit}
-            resubmitLine={lastSubmitLine}
-            fontScale={fontScale}
-          />
         </div>
+
+        {questionSelected && (
+          <>
+            <div
+              className={styles.resizeDivider}
+              onMouseDown={handleMouseDown}
+              role="separator"
+              aria-orientation="horizontal"
+            />
+            <div
+              className={styles.feedbackPanel}
+              style={{ height: `${100 - topHeight}%` }}
+            >
+              <FeedbackTab
+                submissionResults={submissionResults}
+                masterErrorList={masterErrorList}
+                elements={elements}
+                setElements={setElements}
+                onOpenEditor={onOpenEditor}
+                questionSelected={questionSelected}
+                questionIndex={questionIndex}
+                questionType={questionType}
+                isSandboxMode={!isSandboxMode}
+                onResubmit={handleResubmit}
+                resubmitLine={lastSubmitLine}
+                fontScale={fontScale}
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

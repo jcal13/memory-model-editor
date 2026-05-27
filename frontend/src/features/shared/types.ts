@@ -120,12 +120,15 @@ export enum ErrorType {
   CALL_STACK_ORDER = "CALL_STACK_ORDER",
   PROPERTY_MISMATCH = "PROPERTY_MISMATCH",
   GENERIC_ERROR = "GENERIC_ERROR",
+  INVALID_REFERENCE = "INVALID_REFERENCE",
+  UNREACHABLE_OBJECT = "UNREACHABLE_OBJECT",
 }
 
 export interface ElementError {
   source: ErrorSource;
   type: ErrorType;
   message: string;
+  title?: string;
   field?: string; // e.g., "value[0]", "params[1]", "classVariables[2]"
   invalidId?: number; // The specific ID that is invalid
   relatedElementIds?: (number | "_")[]; // All element IDs involved in this error (for multi-element highlighting)
@@ -136,6 +139,7 @@ export interface ElementError {
 export interface FeedbackError {
   type: ErrorType;
   message: string;
+  title?: string;
   elementId?: number | "_"; // ID of the element this error relates to
   field?: string; // Specific field within the element
   relatedIds?: (number | "_")[]; // Other IDs involved in the error

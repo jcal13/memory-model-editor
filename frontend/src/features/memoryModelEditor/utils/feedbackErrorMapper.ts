@@ -196,6 +196,7 @@ export function applyFeedbackErrors(
         return {
           source: ErrorSource.FEEDBACK,
           type: feedbackError.type,
+          title: feedbackError.title,
           message: feedbackError.message,
           field: feedbackError.field,
           relatedElementIds: relatedIds.length > 0 ? relatedIds : undefined,
@@ -241,6 +242,7 @@ export function applyFeedbackErrors(
         source: ErrorSource.FEEDBACK,
         type: feedbackError.type,
         message: feedbackError.message,
+        title: feedbackError.title,
         field: feedbackError.field,
         severity: feedbackError.severity || "error",
       })

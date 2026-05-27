@@ -26,6 +26,50 @@ export type MemoryBox = {
   order?: number;
 };
 
+// Assign concise titles to validation errors for the feedback panel.
+function getErrorTitle(type: ErrorType): string {
+  switch (type) {
+    case ErrorType.TYPE_MISMATCH:
+      return "Type mismatch";
+    case ErrorType.VALUE_MISMATCH:
+      return "Value mismatch";
+    case ErrorType.MISSING_ELEMENT:
+      return "Missing element";
+    case ErrorType.UNEXPECTED_ELEMENT:
+      return "Unexpected element";
+    case ErrorType.DUPLICATE_ID:
+      return "Duplicate ID";
+    case ErrorType.ORPHANED_ELEMENT:
+      return "Unreachable object";
+    case ErrorType.FRAME_MISMATCH:
+      return "Function mismatch";
+    case ErrorType.CALL_STACK_ORDER:
+      return "Call stack order mismatch";
+    case ErrorType.PROPERTY_MISMATCH:
+      return "Property mismatch";
+    case ErrorType.INVALID_REFERENCE:
+      return "Invalid reference";
+    case ErrorType.UNREACHABLE_OBJECT:
+      return "Unreachable object";
+    default:
+      return "Error";
+  }
+}
+
+// Build feedback errors in one place so titles stay consistent with messages.
+function makeFeedbackError(
+  type: ErrorType,
+  message: string,
+  details: Omit<FeedbackError, "type" | "message"> = {}
+): FeedbackError {
+  return {
+    type,
+    title: details.title ?? getErrorTitle(type),
+    message,
+    ...details,
+  };
+}
+
 /* ---------- helpers ---------- */
 const isArrayType = (t: string) => ["list", "tuple"].includes(t);
 const isSetType = (t: string) => t === "set";
@@ -244,13 +288,17 @@ function checkArray(
 
   if (actualLen > expectedLen)
     for (let j = expectedLen; j < actualLen; j++)
-      errors.push({
-        type: ErrorType.UNEXPECTED_ELEMENT,
-        message: ERROR_MESSAGES.unexpected_element_at_index(path, j, inputMemoryBox.value[j]),
-        elementId: inputMemoryBox.id ?? undefined, // The container with unexpected elements
-        path: `${path}[${j}]`,
-        severity: 'error'
-      });
+      errors.push(
+        makeFeedbackError(
+          ErrorType.UNEXPECTED_ELEMENT,
+          ERROR_MESSAGES.unexpected_element_at_index(path, j, inputMemoryBox.value[j]),
+          {
+            elementId: inputMemoryBox.id ?? undefined,
+            path: `${path}[${j}]`,
+            severity: 'error',
+          }
+        )
+      );
 
   // next, we compare each element 1:1 recursively; we do it this way because order matters
   const minLen = Math.min(expectedLen, actualLen);
@@ -324,13 +372,17 @@ function checkSet(
 
   // any IDs still in unmatched are unexpected extras supplied by the user
   for (const extraId of unmatched)
-    errors.push({
-      type: ErrorType.UNEXPECTED_ELEMENT,
-      message: ERROR_MESSAGES.unexpected_element_in_set(path, extraId as number),
-      elementId: inputMemoryBox.id ?? undefined, // The container with unexpected elements
-      path,
-      severity: 'error'
-    });
+    errors.push(
+      makeFeedbackError(
+        ErrorType.UNEXPECTED_ELEMENT,
+        ERROR_MESSAGES.unexpected_element_in_set(path, extraId as number),
+        {
+          elementId: inputMemoryBox.id ?? undefined,
+          path,
+          severity: 'error',
+        }
+      )
+    );
 }
 
 // Check if the answer box is a dict and compare keys and values recursively
@@ -382,14 +434,18 @@ function checkDict(
   for (const key of Object.keys(inputMemoryBox.value)) {
     if (!(key in answerMemoryBox.value)) {
       const extraId = inputMemoryBox.value[key];
-      errors.push({
-        type: ErrorType.UNEXPECTED_ELEMENT,
-        message: ERROR_MESSAGES.unexpected_dict_key(path, key, extraId),
-        elementId: inputMemoryBox.id ?? undefined, // The container with unexpected keys
-        path,
-        field: key,
-        severity: 'error'
-      });
+      errors.push(
+        makeFeedbackError(
+          ErrorType.UNEXPECTED_ELEMENT,
+          ERROR_MESSAGES.unexpected_dict_key(path, key, extraId),
+          {
+            elementId: inputMemoryBox.id ?? undefined,
+            path,
+            field: key,
+            severity: 'error',
+          }
+        )
+      );
     }
   }
 }
@@ -459,14 +515,18 @@ function checkObject(
     if (typeof prop !== "string" || !prop.trim()) continue;
     if (!(prop in answerProps)) {
       const loc = formatPathForUser(path);
-      errors.push({
-        type: ErrorType.UNEXPECTED_ELEMENT,
-        message: ERROR_MESSAGES.unexpected_attribute(loc, inputMemoryBox.name!, prop),
-        elementId: inputMemoryBox.id ?? undefined,
-        path,
-        field: prop,
-        severity: 'error'
-      });
+      errors.push(
+        makeFeedbackError(
+          ErrorType.UNEXPECTED_ELEMENT,
+          ERROR_MESSAGES.unexpected_attribute(loc, inputMemoryBox.name!, prop),
+          {
+            elementId: inputMemoryBox.id ?? undefined,
+            path,
+            field: prop,
+            severity: 'error',
+          }
+        )
+      );
     }
   }
 }
@@ -519,12 +579,16 @@ function gatherFrames(
 
   for (const [name, count] of inputNameCounts.entries()) {
     if (!answerNameCounts.has(name)) {
-      errors.push({
-        type: ErrorType.UNEXPECTED_ELEMENT,
-        message: ERROR_MESSAGES.unexpected_function(name),
-        path: `function "${name}"`,
-        severity: 'error'
-      });
+      errors.push(
+        makeFeedbackError(
+          ErrorType.UNEXPECTED_ELEMENT,
+          ERROR_MESSAGES.unexpected_function(name),
+          {
+            path: `function "${name}"`,
+            severity: 'error',
+          }
+        )
+      );
     }
   }
 
@@ -579,24 +643,32 @@ function compareFrames(
     const uVars = uFrame.value as Record<string, number>;
 
     // variable-list mismatches
-    for (const k of Object.keys(aVars))
-      if (!(k in uVars))
-        errors.push({
-          type: ErrorType.MISSING_ELEMENT,
-          message: ERROR_MESSAGES.variable_missing(name, k),
-          elementId: uFrame.id ?? undefined,
-          path: `function "${name}" → var "${k}"`,
-          severity: 'error'
-        });
+    for (const k of Object.keys(aVars)) {
+      if (!(k in uVars)) {
+        const message = ERROR_MESSAGES.variable_missing(name, k);
+    
+        errors.push(
+          makeFeedbackError(ErrorType.MISSING_ELEMENT, message, {
+            elementId: uFrame.id ?? undefined,
+            path: `function "${name}" → var "${k}"`,
+            severity: 'error',
+          })
+        );
+      }
+    }
     for (const k of Object.keys(uVars))
       if (!(k in aVars))
-        errors.push({
-          type: ErrorType.UNEXPECTED_ELEMENT,
-          message: ERROR_MESSAGES.variable_unexpected(name, k),
-          elementId: uFrame.id ?? undefined,
-          path: `function "${name}" → var "${k}"`,
-          severity: 'error'
-        });
+        errors.push(
+          makeFeedbackError(
+            ErrorType.UNEXPECTED_ELEMENT,
+            ERROR_MESSAGES.variable_unexpected(name, k),
+            {
+              elementId: uFrame.id ?? undefined,
+              path: `function "${name}" → var "${k}"`,
+              severity: 'error',
+            }
+          )
+        );
 
     // deep comparison for shared variables
     for (const k of Object.keys(aVars)) {
@@ -688,14 +760,16 @@ function detectOrphans(
     }
   }
 
-  // Any unmatched user orphans are extra
+  // Any unmatched user orphan is unreachable from the call stack.
   for (const uOrphan of remainingUser) {
-    errors.push({
-      type: ErrorType.UNEXPECTED_ELEMENT,
-      message: ERROR_MESSAGES.unexpected_unattached_object(),
-      elementId: uOrphan.id as number,
-      severity: 'error'
-    });
+    const message = ERROR_MESSAGES.unexpected_unattached_object(uOrphan.id as number);
+
+    errors.push(
+      makeFeedbackError(ErrorType.UNREACHABLE_OBJECT, message, {
+        elementId: uOrphan.id as number,
+        severity: 'error',
+      })
+    );
   }
 }
 
@@ -738,14 +812,15 @@ function compareIds(
     const frameName = frameMatch ? frameMatch[1] : cleanPath;
     const varName = varMatch ? varMatch[1] : cleanPath;
     const unmappedMessage = frameMatch && varMatch
-      ? `Variable "${varName}" in ${frameName} is pointing to an object that doesn't exist`
+      ? ERROR_MESSAGES.unmapped_variable(varName, frameName)
       : ERROR_MESSAGES.unmapped_id_fallback(cleanPath);
-    errors.push({
-      type: ErrorType.ORPHANED_ELEMENT,
-      message: unmappedMessage,
-      path,
-      severity: 'error'
-    });
+    
+    errors.push(
+      makeFeedbackError(ErrorType.INVALID_REFERENCE, unmappedMessage, {
+        path,
+        severity: 'error',
+      })
+    );
     return;
   }
 

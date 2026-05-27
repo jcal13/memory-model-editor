@@ -4,6 +4,7 @@
  * All user-facing error messages are defined here as functions.
  * To customize any message, edit the corresponding function below.
  */
+const cleanLocation = (loc: string) => loc.replace(/:+$/, "");
 
 export const ERROR_MESSAGES = {
 
@@ -13,9 +14,9 @@ export const ERROR_MESSAGES = {
   id_mapping_conflict: (pathA: string, pathB: string) =>
     `Variable ${pathA} and variable ${pathB} cannot point to the same object`,
 
-  // Pattern: "Variable "b" in __main__ is pointing to an object that doesn't exist"
+  // Pattern: "Variable "b" in __main__ is missing a valid reference"
   unmapped_variable: (varName: string, frameName: string) =>
-    `Variable "${varName}" in ${frameName} is pointing to an object that doesn't exist`,
+    `Variable "${varName}" in ${frameName} is missing a valid reference`,
 
   // Pattern: "Unmapped ID: function "__main__" → var "b"" (fallback for non-variable paths)
   unmapped_id_fallback: (cleanPath: string) =>
@@ -29,15 +30,15 @@ export const ERROR_MESSAGES = {
 
   // Pattern: "At a: expected int, but got str"
   type_mismatch: (loc: string, expectedType: string, gotType: string) =>
-    `At ${loc}: expected ${expectedType}, but got ${gotType}`,
+    `At ${cleanLocation(loc)}: expected ${expectedType}, but got ${gotType}`,
 
   // Pattern: "At a: object is incorrectly or incompletely connected"
   object_incorrectly_connected: (loc: string) =>
-    `At ${loc}: object is incorrectly or incompletely connected`,
+    `At ${cleanLocation(loc)}: object is incorrectly or incompletely connected`,
 
   // Pattern: "At a: expected 5, but got 3"
   value_mismatch: (loc: string, expected: string, got: string) =>
-    `At ${loc}: expected ${expected}, but got ${got}`,
+    `At ${cleanLocation(loc)}: expected ${expected}, but got ${got}`,
 
   // Array / list / tuple errors
 
@@ -73,15 +74,15 @@ export const ERROR_MESSAGES = {
 
   // Pattern: "At a: expected Dog object, but got Cat"
   object_name_mismatch: (loc: string, expected: string, got: string) =>
-    `At ${loc}: expected ${expected} object, but got ${got}`,
+    `At ${cleanLocation(loc)}: expected ${expected} object, but got ${got}`,
 
   // Pattern: "At a: Dog is missing the "name" attribute"
   missing_attribute: (loc: string, objectName: string, prop: string) =>
-    `At ${loc}: ${objectName} is missing the "${prop}" attribute`,
+    `At ${cleanLocation(loc)}: ${objectName} is missing the "${prop}" attribute`,
 
   // Pattern: "At a: Dog has an unexpected "name" attribute"
   unexpected_attribute: (loc: string, objectName: string, prop: string) =>
-    `At ${loc}: ${objectName} has an unexpected "${prop}" attribute`,
+    `At ${cleanLocation(loc)}: ${objectName} has an unexpected "${prop}" attribute`,
 
   // Call stack / frame errors
 
@@ -125,9 +126,9 @@ export const ERROR_MESSAGES = {
   missing_unattached_object: (type: string, value: unknown) =>
     `Missing object: expected a free-floating ${type} with value ${value}`,
 
-  // Pattern: "Unexpected object: this object should not be on the canvas"
-  unexpected_unattached_object: () =>
-    `Unexpected object: this object should not be on the canvas`,
+  // Pattern: "This object is unreachable because no variable or attribute points to it"
+  unexpected_unattached_object: (id: number) =>
+    `Object id${id} is unreachable because no variable or attribute points to it`,
 
   // System / question errors
 

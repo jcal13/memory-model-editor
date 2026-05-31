@@ -164,15 +164,7 @@ export default function QuestionTab({
 
   const checkableLines = useMemo(() => getCheckableLines(questionData), [questionData]);
 
-  const sortedLines = useMemo(() => sortCheckableLines(checkableLines), [checkableLines]);
-
   const lineIterations = useMemo(() => buildLineIterations(questionData), [questionData]);
-
-  const getNextCheckableLine = (line: number | null): number | null => {
-    if (line === null) return null;
-    const idx = sortedLines.indexOf(line);
-    return idx >= 0 && idx + 1 < sortedLines.length ? sortedLines[idx + 1] : null;
-  };
 
   const hydratedList = useRef<boolean>(false);
   const hydratedQuestion = useRef<boolean>(false);
@@ -249,6 +241,19 @@ export default function QuestionTab({
     return questionStatus[key] || "unattempted";
   };
 
+  const getNextStep = (
+    lineNumber: number,
+    iterationNumber?: number
+  ): { lineNumber: number; iterationNumber?: number } | null => {
+    const steps = questionData?.steps;
+    if (!steps) return null;
+    const idx = steps.findIndex(
+      (s) => s.lineNumber === lineNumber && s.iterationNumber === iterationNumber
+    );
+    if (idx < 0 || idx + 1 >= steps.length) return null;
+    return steps[idx + 1];
+  };
+
   const handleSubmitAtLine = async (lineNumber: number, iterationNumber?: number) => {
     if (!questionType || questionIndex === null) {
       return false;
@@ -258,11 +263,10 @@ export default function QuestionTab({
       const success = await onSubmitAtLine(lineNumber, iterationNumber);
 
       if (success && autoAdvance) {
-        const nextLine = getNextCheckableLine(lineNumber);
-        if (nextLine !== null) {
-          setSelectedLine(nextLine);
-          const nextIter = lineIterations.get(nextLine) ?? [];
-          setSelectedIteration(nextIter.length > 0 ? nextIter[0] : undefined);
+        const nextStep = getNextStep(lineNumber, iterationNumber);
+        if (nextStep !== null) {
+          setSelectedLine(nextStep.lineNumber);
+          setSelectedIteration(nextStep.iterationNumber);
         }
       }
 

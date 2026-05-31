@@ -3,7 +3,9 @@ import ReactMarkdown from "react-markdown";
 import {
   fetchQuestionCount,
   fetchQuestion,
+  fetchQuestionTopics,
 } from "./utils/FetchQuestionService";
+import { deriveAllTopics, filterQuestionIds } from "./utils/topicFilter";
 import QuestionSelector from "./components/QuestionSelector";
 import CodeBlock from "./components/CodeBlock";
 import styles from "./QuestionTab.module.css";
@@ -160,6 +162,15 @@ export default function QuestionTab({
   const [showResetModal, setShowResetModal] = useState(false);
   const [selectedLine, setSelectedLine] = useState<number | null>(null);
   const [selectedIteration, setSelectedIteration] = useState<number | undefined>(undefined);
+  const [topicMap, setTopicMap] = useState<Map<number, string[]>>(new Map());
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+
+  const allTopics = useMemo(() => deriveAllTopics(topicMap), [topicMap]);
+
+  const filteredQuestionIds = useMemo(
+    () => filterQuestionIds(topicMap, questionCount, selectedTopic),
+    [selectedTopic, topicMap, questionCount]
+  );
   const [autoAdvance, setAutoAdvance] = useState(false);
 
   const checkableLines = useMemo(() => getCheckableLines(questionData), [questionData]);
@@ -227,6 +238,8 @@ export default function QuestionTab({
     setQuestionIndex(null);
     setQuestionType(null);
     setQuestionView("root");
+    setTopicMap(new Map());
+    setSelectedTopic(null);
     hydratedList.current = false;
     hydratedQuestion.current = false;
     previousQuestionRef.current = null;
@@ -294,9 +307,14 @@ export default function QuestionTab({
   const loadQuestions = async (questionType: QuestionType): Promise<void> => {
     onClearCanvas();
     setView("loading");
+    setSelectedTopic(null);
     try {
-      const count = await fetchQuestionCount(questionType);
+      const [count, topicData] = await Promise.all([
+        fetchQuestionCount(questionType),
+        fetchQuestionTopics(questionType),
+      ]);
       setQuestionCount(count);
+      setTopicMap(new Map(topicData.map(({ id, topics }) => [id, topics ?? []])));
       setQuestionType(questionType);
       setQuestionIndex(null);
       setView("list");
@@ -432,8 +450,14 @@ export default function QuestionTab({
   useEffect(() => {
     if (view === "list" && questionType && !hydratedList.current) {
       hydratedList.current = true;
-      fetchQuestionCount(questionType)
-        .then((count) => setQuestionCount(count))
+      Promise.all([
+        fetchQuestionCount(questionType),
+        fetchQuestionTopics(questionType),
+      ])
+        .then(([count, topicData]) => {
+          setQuestionCount(count);
+          setTopicMap(new Map(topicData.map(({ id, topics }) => [id, topics ?? []])));
+        })
         .catch((error) => {
           console.error("Failed to hydrate list:", error);
           setView("root");
@@ -620,10 +644,30 @@ export default function QuestionTab({
 
         {view === "list" && (
           <>
+            {allTopics.length > 0 && (
+              <div className={styles.topicFilter}>
+                <button
+                  type="button"
+                  className={`${styles.topicFilterChip} ${selectedTopic === null ? styles.topicFilterChipActive : ""}`}
+                  onClick={() => setSelectedTopic(null)}
+                >
+                  All
+                </button>
+                {allTopics.map((topic) => (
+                  <button
+                    key={topic}
+                    type="button"
+                    className={`${styles.topicFilterChip} ${selectedTopic === topic ? styles.topicFilterChipActive : ""}`}
+                    onClick={() => setSelectedTopic((prev) => (prev === topic ? null : topic))}
+                  >
+                    {topic}
+                  </button>
+                ))}
+              </div>
+            )}
             <div className={styles.scroller}>
               <div className={styles.questionGrid}>
-                {Array.from({ length: questionCount }, (_, index) => {
-                  const questionNum = index + 1;
+                {filteredQuestionIds.map((questionNum) => {
                   const status = questionType
                     ? getQuestionStatus(questionType, questionNum)
                     : "unattempted";

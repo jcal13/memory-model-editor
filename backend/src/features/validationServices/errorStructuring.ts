@@ -17,6 +17,8 @@ export enum ErrorType {
   GENERIC_ERROR = 'GENERIC_ERROR',
   INVALID_REFERENCE = "INVALID_REFERENCE",
   UNREACHABLE_OBJECT = "UNREACHABLE_OBJECT",
+  REFERENCE_MISMATCH = "REFERENCE_MISMATCH",
+  DUPLICATE_NONE_OBJECT = "DUPLICATE_NONE_OBJECT",
 }
 
 export interface FeedbackError {
@@ -54,6 +56,10 @@ function titleForError(type: ErrorType): string {
       return "Invalid reference";
     case ErrorType.UNREACHABLE_OBJECT:
       return "Unreachable object";
+    case ErrorType.REFERENCE_MISMATCH:
+      return "Reference mismatch";
+    case ErrorType.DUPLICATE_NONE_OBJECT:
+      return "Duplicate None object";
     default:
       return "Error";
   }

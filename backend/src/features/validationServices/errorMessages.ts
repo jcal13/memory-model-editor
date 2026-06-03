@@ -10,9 +10,19 @@ export const ERROR_MESSAGES = {
 
   // ID / pointer errors
 
-  // Pattern: "Variable a and variable b cannot point to the same object"
-  id_mapping_conflict: (pathA: string, pathB: string) =>
-    `Variable ${pathA} and variable ${pathB} cannot point to the same object`,
+  // Pattern: "head.next and second should point to the same object"
+  reference_should_match: (pathA: string, pathB: string) =>
+    `${pathA} and ${pathB} should point to the same object`,
+  
+  // Pattern: "head.next and second should not point to the same object"
+  reference_should_differ: (pathA: string, pathB: string) =>
+    `${pathA} and ${pathB} should not point to the same object`,
+
+  // Pattern: "Only one NoneType object should be drawn, but found multiple: id7, id3. All references to None should point to the same object."
+  duplicate_none_objects: (ids: number[]) =>
+  `Only one NoneType object should be drawn, but found multiple: ${ids
+    .map((id) => `id${id}`)
+    .join(", ")}. All references to None should point to the same object.`,
 
   // Pattern: "Variable "b" in __main__ is missing a valid reference"
   unmapped_variable: (varName: string, frameName: string) =>

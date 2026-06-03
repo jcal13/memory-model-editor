@@ -129,4 +129,66 @@ describe("QuestionTab component", () => {
       })
     ).toBeInTheDocument();
   });
+
+  it("auto-advances back to a lower line number when the next step loops back to an earlier line", async () => {
+    const onSubmitAtLine = jest.fn().mockResolvedValue(true);
+    const user = userEvent;
+
+    const loopQuestion: QuestionData = {
+      ...questionData,
+      code: ["lst = [1, 2]", "for item in lst:", "    lst.append(item, 88)"],
+      steps: [
+        { lineNumber: 3, iterationNumber: 1, answer: null },
+        { lineNumber: 2, iterationNumber: 2, answer: null },
+      ],
+    };
+    mockedFetchQuestion.mockResolvedValueOnce(loopQuestion);
+
+    render(<QuestionTab {...baseProps} onSubmitAtLine={onSubmitAtLine} />);
+
+    await screen.findByText(/draw the memory model/i);
+    await waitFor(() => expect(mockedFetchQuestion).toHaveBeenCalledTimes(1));
+
+    await user.click(
+      screen.getByRole("checkbox", { name: /auto advance to next checkable line/i })
+    );
+
+    // Select line 3 then pick iteration 1
+    await user.click(screen.getByTitle("Check answer at line 3"));
+    await user.click(await screen.findByRole("button", { name: "1" }));
+
+    // Submit the check at line 3, iter 1
+    await user.click(await screen.findByRole("button", { name: /check answer at line 3/i }));
+    expect(onSubmitAtLine).toHaveBeenCalledWith(3, 1);
+
+    // Auto-advance should jump back to line 2 with iteration 2 already selected
+    await waitFor(() => {
+      const btn = screen.getByRole("button", { name: /check answer at line 2/i });
+      expect(btn).toBeInTheDocument();
+      expect(btn).toHaveTextContent("iter 2");
+    });
+  });
+
+  it("does not auto-advance when the check fails", async () => {
+    const onSubmitAtLine = jest.fn().mockResolvedValue(false);
+    const user = userEvent;
+
+    render(<QuestionTab {...baseProps} onSubmitAtLine={onSubmitAtLine} />);
+
+    await screen.findByText(/draw the memory model/i);
+    await waitFor(() => expect(mockedFetchQuestion).toHaveBeenCalledTimes(1));
+
+    await user.click(
+      screen.getByRole("checkbox", { name: /auto advance to next checkable line/i })
+    );
+
+    await user.click(screen.getByTitle("Check answer at line 1"));
+    await user.click(await screen.findByRole("button", { name: /check answer at line 1/i }));
+
+    await waitFor(() => expect(onSubmitAtLine).toHaveBeenCalledWith(1, undefined));
+    // Line 1 should still be selected (no advance)
+    expect(
+      screen.getByRole("button", { name: /check answer at line 1/i })
+    ).toBeInTheDocument();
+  });
 });

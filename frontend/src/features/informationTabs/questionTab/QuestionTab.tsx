@@ -700,38 +700,51 @@ export default function QuestionTab({
                 )}
 
                 {checkableLines.size > 0 && (
-                  <label
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                      marginTop: "0.5rem",
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={autoAdvance}
-                      onChange={(event) => setAutoAdvance(event.target.checked)}
-                    />
-                    Auto advance to next checkable line
-                  </label>
-                )}
+                  <div className={styles.autoToolbar}>
+                    <div
+                      className={`${styles.toggleTrack} ${autoAdvance ? styles.toggleOn : ""}`}
+                      onClick={() => setAutoAdvance(v => !v)}
+                      role="switch"
+                      aria-checked={autoAdvance}
+                      aria-label="Auto advance to next checkable line"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === " " && setAutoAdvance(v => !v)}
+                    >
+                      <div className={styles.toggleThumb} />
+                    </div>
+                    <span className={styles.toolbarText}>auto-advance</span>
 
-                {selectedLine !== null && selectedLineHasIterations && (
-                  <div className={styles.iterationPicker}>
-                    <span className={styles.iterationLabel}>After iteration:</span>
-                    {(lineIterations.get(selectedLine) ?? []).map((iter) => (
-                      <button
-                        key={iter}
-                        type="button"
-                        className={`${styles.iterationBtn} ${selectedIteration === iter ? styles.iterationBtnActive : ""}`}
-                        onClick={() =>
-                          setSelectedIteration((prev) => (prev === iter ? undefined : iter))
-                        }
-                      >
-                        {iter}
-                      </button>
-                    ))}
+                    {selectedLine !== null && (lineIterations.get(selectedLine)?.length ?? 0) > 0 && (
+                      <>
+                        <div className={styles.toolbarDivider} />
+                        <span className={styles.toolbarText}>iter:</span>
+                        {(lineIterations.get(selectedLine) ?? []).map((iter) => (
+                          <button
+                            key={iter}
+                            type="button"
+                            className={`${styles.iterationBtn} ${selectedIteration === iter ? styles.iterationBtnActive : ""}`}
+                            onClick={() => setSelectedIteration(prev => prev === iter ? undefined : iter)}
+                          >
+                            {iter}
+                          </button>
+                        ))}
+                      </>
+                    )}
+
+                    {canCheckAtLine && (
+                      <>
+                        <div className={styles.toolbarDivider} />
+                        <button
+                          type="button"
+                          className={styles.checkAtLineButton}
+                          onClick={() => handleSubmitAtLine(selectedLine!, selectedIteration)}
+                          aria-label={`Check answer at line ${selectedLine}`}
+                          title={`Check answer at line ${selectedLine}`}
+                        >
+                          check line {selectedLine}{selectedIteration !== undefined ? ` · iter ${selectedIteration}` : ""}
+                        </button>
+                      </>
+                    )}
                   </div>
                 )}
 
@@ -745,19 +758,6 @@ export default function QuestionTab({
                   >
                     Reset
                   </button>
-                  {canCheckAtLine && (
-                    <button
-                      type="button"
-                      className={styles.checkAtLineButton}
-                      onClick={() => handleSubmitAtLine(selectedLine!, selectedIteration)}
-                      aria-label={`Check answer at line ${selectedLine}`}
-                      title={`Check answer at line ${selectedLine}`}
-                    >
-                      {selectedIteration !== undefined
-                        ? `Check at line ${selectedLine} (iter ${selectedIteration})`
-                        : `Check at line ${selectedLine}`}
-                    </button>
-                  )}
                   <button
                     type="button"
                     className={styles.submitButton}

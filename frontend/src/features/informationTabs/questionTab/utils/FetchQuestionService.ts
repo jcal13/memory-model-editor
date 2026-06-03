@@ -28,6 +28,23 @@ export async function fetchQuestion<T = any>(
 }
 
 /**
+ * Fetches all question IDs with their topics for a given type
+ */
+export async function fetchQuestionTopics(
+  type: "test" | "practice" | "prep" | "experiment",
+): Promise<{ id: number; topics: string[] | null }[]> {
+  try {
+    const response = await axios.get(`${API_URL}/questions/${type}questions/topics`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(`Failed to fetch question topics: ${error.message}`);
+    }
+    throw error;
+  }
+}
+
+/**
  * Fetches the total count of questions for a given type
  * @param type - Question type ("test" or "practice")
  * @returns Promise with question count

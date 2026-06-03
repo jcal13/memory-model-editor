@@ -48,6 +48,18 @@ router.post("/practicequestions", async (_req: Request, res: Response) => {
   }
 });
 
+router.get("/practicequestions/topics", async (_req: Request, res: Response) => {
+  try {
+    const { rows } = await getPool().query<{ id: number; topics: string[] | null }>(
+      "SELECT id, topics FROM practice_questions ORDER BY id"
+    );
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch practice question topics" });
+  }
+});
+
 router.get("/practicequestions/:id", async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id)) {
@@ -80,6 +92,18 @@ router.post("/testquestions", async (_req: Request, res: Response) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to count test questions" });
+  }
+});
+
+router.get("/testquestions/topics", async (_req: Request, res: Response) => {
+  try {
+    const { rows } = await getPool().query<{ id: number; topics: string[] | null }>(
+      "SELECT id, topics FROM test_questions ORDER BY id"
+    );
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch test question topics" });
   }
 });
 
@@ -118,6 +142,18 @@ router.post("/prepquestions", async (_req: Request, res: Response) => {
   }
 });
 
+router.get("/prepquestions/topics", async (_req: Request, res: Response) => {
+  try {
+    const { rows } = await getPool().query<{ id: number; topics: string[] | null }>(
+      "SELECT id, topics FROM prep_questions ORDER BY id"
+    );
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch prep question topics" });
+  }
+});
+
 router.get("/prepquestions/:id", async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id)) {
@@ -150,6 +186,18 @@ router.post("/experimentquestions", async (_req: Request, res: Response) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to count experiment questions" });
+  }
+});
+
+router.get("/experimentquestions/topics", async (_req: Request, res: Response) => {
+  try {
+    const { rows } = await getPool().query<{ id: number; topics: string[] | null }>(
+      "SELECT id, topics FROM experiment_questions ORDER BY id"
+    );
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch experiment question topics" });
   }
 });
 

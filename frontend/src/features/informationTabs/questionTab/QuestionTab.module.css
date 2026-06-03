@@ -51,6 +51,56 @@
   gap: 0.5rem;
 }
 
+.topicFilter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.875rem;
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.topicFilterChip {
+  padding: 0.2rem 0.65rem;
+  border: 1px solid var(--border-primary);
+  border-radius: 9999px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 140ms ease;
+  white-space: nowrap;
+}
+
+.topicFilterChip:hover {
+  border-color: var(--border-secondary);
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.topicFilterChipActive {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.topicFilterChipActive:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #ffffff;
+}
+
+:root[data-theme="dark"] .topicFilterChipActive {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+:root[data-theme="dark"] .topicFilterChipActive:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
 .questionGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(3.5rem, 1fr));

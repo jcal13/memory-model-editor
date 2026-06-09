@@ -5,6 +5,7 @@ import React, {
   useRef,
   useCallback,
   useLayoutEffect,
+  useMemo,
 } from "react";
 import Draggable from "react-draggable";
 import {

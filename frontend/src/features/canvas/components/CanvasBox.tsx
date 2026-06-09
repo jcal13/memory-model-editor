@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useBoxDragState, useDraggableBox } from "../hooks/useCanvas";
+import { constrainPositionAwayFromCallStack, getCallStackBounds } from "../utils/boundary.helpers";
 import { CanvasBoxProps } from "../utils/box.types";
 
 export default function CanvasBox({

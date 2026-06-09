@@ -24,7 +24,7 @@ const DEFAULT_CANVAS_DATA = {
 const DEFAULT_UI_STATE = {
   activeTab: "question" as Tab,
   questionIndex: null as number | null,
-  questionType: null as "test" | "practice" | "prep" | null,
+  questionType: null as "test" | "practice" | "prep" | "experiment" | null,
   submissionResults: null as SubmissionResult | null,
   sandboxMode: null as boolean | null,
   visualStyle: "memoryviz" as VisualStyle,
@@ -54,12 +54,20 @@ export function normalizeCanvasData(raw: unknown): CanvasData {
   };
 }
 
-export type QuestionView = "root" | "loading" | "test" | "list" | "question" | "practice" | "prep";
+export type QuestionView =
+  | "root"
+  | "loading"
+  | "test"
+  | "list"
+  | "question"
+  | "practice"
+  | "prep"
+  | "experiment";
 
 export interface UIState {
   activeTab: Tab;
   questionIndex: number | null;
-  questionType: "test" | "practice" | "prep" | null;
+  questionType: "test" | "practice" | "prep" | "experiment" | null;
   submissionResults: SubmissionResult | null;
   sandboxMode: boolean | null;
   visualStyle?: VisualStyle;
@@ -113,7 +121,7 @@ export function loadInitialUIData(): UIState {
       typeof parsed?.questionIndex === "number" ? parsed.questionIndex : null;
 
     const questionType =
-      parsed?.questionType === "test" || parsed?.questionType === "practice" || parsed?.questionType === "prep"
+      parsed?.questionType === "test" || parsed?.questionType === "practice" || parsed?.questionType === "prep" || parsed?.questionType === "experiment"
         ? parsed.questionType
         : null;
 
@@ -229,7 +237,7 @@ export function clearCanvasStorage(): void {
  * Gets the storage key for a specific question's canvas
  */
 function getQuestionCanvasKey(
-  type: "test" | "practice" | "prep",
+  type: "test" | "practice" | "prep" | "experiment",
   index: number
 ): string {
   return `${QUESTION_CANVAS_PREFIX}${type}_${index}`;
@@ -239,7 +247,7 @@ function getQuestionCanvasKey(
  * Saves canvas data for a specific question
  */
 export function saveQuestionCanvasData(
-  type: "test" | "practice" | "prep",
+  type: "test" | "practice" | "prep" | "experiment",
   index: number,
   data: CanvasData
 ): void {
@@ -255,7 +263,7 @@ export function saveQuestionCanvasData(
  * Loads canvas data for a specific question
  */
 export function loadQuestionCanvasData(
-  type: "test" | "practice" | "prep",
+  type: "test" | "practice" | "prep" | "experiment",
   index: number
 ): CanvasData | null {
   try {
@@ -276,7 +284,7 @@ export function loadQuestionCanvasData(
  * LocalStorage takes precedence; fallback is used only if no saved state exists.
  */
 export function resolveQuestionCanvasData(
-  type: "test" | "practice" | "prep",
+  type: "test" | "practice" | "prep" | "experiment",
   index: number,
   fallback?: CanvasData | null
 ): CanvasData {
@@ -313,7 +321,7 @@ export function setDoNotRemindCanvasClear(value: boolean): void {
  * Deletes canvas data for a specific question
  */
 export function deleteQuestionCanvasData(
-  type: "test" | "practice" | "prep",
+  type: "test" | "practice" | "prep" | "experiment",
   index: number
 ): void {
   try {

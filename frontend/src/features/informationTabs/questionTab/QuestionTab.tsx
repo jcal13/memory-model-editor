@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import {
   fetchQuestionCount,
   fetchQuestion,
+  fetchQuestionTopics,
 } from "./utils/FetchQuestionService";
+import { deriveAllTopics, filterQuestionIds } from "./utils/topicFilter";
 import QuestionSelector from "./components/QuestionSelector";
 import CodeBlock from "./components/CodeBlock";
 import styles from "./QuestionTab.module.css";
@@ -18,10 +20,11 @@ import {
   saveQuestionCanvasData,
   setDoNotRemindCanvasClear,
 } from "../../memoryModelEditor/utils/localStorage";
+import { normalizeQuestionCanvasData } from "../../memoryModelEditor/utils/questionFrames";
 import ConfirmationModal from "../../memoryModelEditor/components/ConfirmationModal";
 
-type View = "root" | "loading" | "test" | "list" | "question" | "practice" | "prep";
-type QuestionType = "test" | "practice" | "prep";
+type View = "root" | "loading" | "test" | "list" | "question" | "practice" | "prep" | "experiment";
+type QuestionType = "test" | "practice" | "prep" | "experiment";
 type QuestionStatus = "unattempted" | "attempted" | "completed";
 
 const QUESTION_STATUS_KEY = "questionStatus";
@@ -33,13 +36,14 @@ const VALID_VIEWS: View[] = [
   "question",
   "practice",
   "prep",
+  "experiment",
 ];
 
 interface QuestionStatusMap {
   [key: string]: QuestionStatus;
 }
 
-interface QuestionData {
+export interface QuestionData {
   id: number;
   question: string;
   code: string[];
@@ -51,8 +55,6 @@ interface QuestionData {
 }
 
 function formatSource(description: string): string {
-  // "CSC148 2023 midterm 1" → "CSC148 · 2023 · Midterm 1"
-  // "CSC148 2024 final"     → "CSC148 · 2024 · Final"
   const parts = description.trim().split(/\s+/);
   if (parts.length < 2) return description;
   const [course, year, ...rest] = parts;
@@ -63,8 +65,8 @@ function formatSource(description: string): string {
 interface QuestionTabProps {
   questionIndex: number | null;
   setQuestionIndex: (index: number | null) => void;
-  questionType: "test" | "practice" | "prep" | null;
-  setQuestionType: (type: "test" | "practice" | "prep" | null) => void;
+  questionType: "test" | "practice" | "prep" | "experiment" | null;
+  setQuestionType: (type: "test" | "practice" | "prep" | "experiment" | null) => void;
   questionView: QuestionView;
   setQuestionView: (view: QuestionView) => void;
   onSubmit: () => Promise<boolean>;
@@ -100,6 +102,33 @@ function getQuestionKey(type: QuestionType, index: number): string {
   return `${type}_${index}`;
 }
 
+export function getCheckableLines(questionData: QuestionData | null): Set<number> {
+  return new Set(questionData?.steps?.map((s) => s.lineNumber) ?? []);
+}
+
+export function sortCheckableLines(checkableLines: Set<number>): number[] {
+  return Array.from(checkableLines).sort((a, b) => a - b);
+}
+
+export function buildLineIterations(questionData: QuestionData | null): Map<number, number[]> {
+  const map = new Map<number, number[]>();
+  for (const s of questionData?.steps ?? []) {
+    if (s.iterationNumber !== undefined) {
+      const arr = map.get(s.lineNumber) ?? [];
+      arr.push(s.iterationNumber);
+      map.set(s.lineNumber, arr);
+    }
+  }
+  map.forEach((values) => values.sort((a: number, b: number) => a - b));
+  return map;
+}
+
+export function getNextCheckableLine(sortedLines: number[], line: number | null): number | null {
+  if (line === null) return null;
+  const idx = sortedLines.indexOf(line);
+  return idx >= 0 && idx + 1 < sortedLines.length ? sortedLines[idx + 1] : null;
+}
+
 export default function QuestionTab({
   questionIndex,
   setQuestionIndex,
@@ -127,17 +156,31 @@ export default function QuestionTab({
   );
   const [showCanvasClearModal, setShowCanvasClearModal] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<{
-    type: "test" | "practice" | "prep";
+    type: "test" | "practice" | "prep" | "experiment";
     index: number;
   } | null>(null);
   const [showResetModal, setShowResetModal] = useState(false);
   const [selectedLine, setSelectedLine] = useState<number | null>(null);
   const [selectedIteration, setSelectedIteration] = useState<number | undefined>(undefined);
+  const [topicMap, setTopicMap] = useState<Map<number, string[]>>(new Map());
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+
+  const allTopics = useMemo(() => deriveAllTopics(topicMap), [topicMap]);
+
+  const filteredQuestionIds = useMemo(
+    () => filterQuestionIds(topicMap, questionCount, selectedTopic),
+    [selectedTopic, topicMap, questionCount]
+  );
+  const [autoAdvance, setAutoAdvance] = useState(false);
+
+  const checkableLines = useMemo(() => getCheckableLines(questionData), [questionData]);
+
+  const lineIterations = useMemo(() => buildLineIterations(questionData), [questionData]);
 
   const hydratedList = useRef<boolean>(false);
   const hydratedQuestion = useRef<boolean>(false);
   const previousQuestionRef = useRef<{
-    type: "test" | "practice" | "prep";
+    type: "test" | "practice" | "prep" | "experiment";
     index: number;
   } | null>(null);
   const prevSandboxModeRef = useRef<boolean>(isSandboxMode);
@@ -187,6 +230,8 @@ export default function QuestionTab({
     setQuestionIndex(null);
     setQuestionType(null);
     setQuestionView("root");
+    setTopicMap(new Map());
+    setSelectedTopic(null);
     hydratedList.current = false;
     hydratedQuestion.current = false;
     previousQuestionRef.current = null;
@@ -209,14 +254,39 @@ export default function QuestionTab({
     return questionStatus[key] || "unattempted";
   };
 
+  const getNextStep = (
+    lineNumber: number,
+    iterationNumber?: number
+  ): { lineNumber: number; iterationNumber?: number } | null => {
+    const steps = questionData?.steps;
+    if (!steps) return null;
+    const idx = steps.findIndex(
+      (s) => s.lineNumber === lineNumber && s.iterationNumber === iterationNumber
+    );
+    if (idx < 0 || idx + 1 >= steps.length) return null;
+    return steps[idx + 1];
+  };
+
   const handleSubmitAtLine = async (lineNumber: number, iterationNumber?: number) => {
-    if (questionType && questionIndex !== null) {
-      try {
-        await onSubmitAtLine(lineNumber, iterationNumber);
-        // line-check results don't change question completion status
-      } catch (error) {
-        console.error("Error during line submission:", error);
+    if (!questionType || questionIndex === null) {
+      return false;
+    }
+
+    try {
+      const success = await onSubmitAtLine(lineNumber, iterationNumber);
+
+      if (success && autoAdvance) {
+        const nextStep = getNextStep(lineNumber, iterationNumber);
+        if (nextStep !== null) {
+          setSelectedLine(nextStep.lineNumber);
+          setSelectedIteration(nextStep.iterationNumber);
+        }
       }
+
+      return success;
+    } catch (error) {
+      console.error("Error during line submission:", error);
+      return false;
     }
   };
 
@@ -241,9 +311,14 @@ export default function QuestionTab({
   const loadQuestions = async (questionType: QuestionType): Promise<void> => {
     onClearCanvas();
     setView("loading");
+    setSelectedTopic(null);
     try {
-      const count = await fetchQuestionCount(questionType);
+      const [count, topicData] = await Promise.all([
+        fetchQuestionCount(questionType),
+        fetchQuestionTopics(questionType),
+      ]);
       setQuestionCount(count);
+      setTopicMap(new Map(topicData.map(({ id, topics }) => [id, topics ?? []])));
       setQuestionType(questionType);
       setQuestionIndex(null);
       setView("list");
@@ -307,10 +382,8 @@ export default function QuestionTab({
       setView("question");
 
       setTimeout(() => {
-        const resolvedCanvas = resolveQuestionCanvasData(
-          type,
-          id,
-          data.canvasConfig ?? null
+        const resolvedCanvas = normalizeQuestionCanvasData(
+          resolveQuestionCanvasData(type, id, data.canvasConfig ?? null)
         );
         onRestoreCanvas(
           resolvedCanvas.elements,
@@ -381,8 +454,14 @@ export default function QuestionTab({
   useEffect(() => {
     if (view === "list" && questionType && !hydratedList.current) {
       hydratedList.current = true;
-      fetchQuestionCount(questionType)
-        .then((count) => setQuestionCount(count))
+      Promise.all([
+        fetchQuestionCount(questionType),
+        fetchQuestionTopics(questionType),
+      ])
+        .then(([count, topicData]) => {
+          setQuestionCount(count);
+          setTopicMap(new Map(topicData.map(({ id, topics }) => [id, topics ?? []])));
+        })
         .catch((error) => {
           console.error("Failed to hydrate list:", error);
           setView("root");
@@ -399,6 +478,7 @@ export default function QuestionTab({
       !hydratedQuestion.current
     ) {
       hydratedQuestion.current = true;
+      setSubmissionResults(null);
       (async () => {
         try {
           const data = await fetchQuestion<QuestionData>(
@@ -410,13 +490,33 @@ export default function QuestionTab({
           if (onQuestionDataChange) {
             onQuestionDataChange(data);
           }
+
+          const resolvedCanvas = normalizeQuestionCanvasData(
+            resolveQuestionCanvasData(
+              questionType,
+              questionIndex,
+              data.canvasConfig ?? null
+            )
+          );
+          onRestoreCanvas(
+            resolvedCanvas.elements,
+            resolvedCanvas.ids,
+            resolvedCanvas.classes
+          );
         } catch (error) {
           console.error("Failed to hydrate question:", error);
           setView("list");
         }
       })();
     }
-  }, [view, questionType, questionIndex, questionData, onQuestionDataChange]);
+  }, [
+    view,
+    questionType,
+    questionIndex,
+    questionData,
+    onQuestionDataChange,
+    onRestoreCanvas,
+  ]);
 
   const getHeading = (): string => {
     if (view === "question" && questionIndex !== null) {
@@ -431,6 +531,9 @@ export default function QuestionTab({
     if (view === "list" && questionType === "prep") {
       return "CSC148 Prep Questions";
     }
+    if (view === "list" && questionType === "experiment") {
+      return "Experiment Questions";
+    }
     return "Questions";
   };
 
@@ -438,14 +541,33 @@ export default function QuestionTab({
     setShowResetModal(true);
   };
 
-  const handleResetConfirm = () => {
-    if (questionType && questionIndex !== null) {
-      deleteQuestionCanvasData(questionType, questionIndex);
-      const resolvedCanvas = resolveQuestionCanvasData(
-        questionType,
+  const handleResetConfirm = async () => {
+    if (!questionType || questionIndex === null) {
+      setShowResetModal(false);
+      return;
+    }
+
+    try {
+      const freshQuestionData = await fetchQuestion<QuestionData>(
         questionIndex,
-        questionData?.canvasConfig ?? null
+        questionType
       );
+
+      deleteQuestionCanvasData(questionType, questionIndex);
+      setQuestionData(freshQuestionData);
+
+      if (onQuestionDataChange) {
+        onQuestionDataChange(freshQuestionData);
+      }
+
+      const resolvedCanvas = normalizeQuestionCanvasData(
+        resolveQuestionCanvasData(
+          questionType,
+          questionIndex,
+          freshQuestionData.canvasConfig ?? null
+        )
+      );
+
       onRestoreCanvas(
         resolvedCanvas.elements,
         resolvedCanvas.ids,
@@ -453,8 +575,11 @@ export default function QuestionTab({
       );
       setSubmissionResults(null);
       updateQuestionStatus(questionType, questionIndex, "unattempted");
+    } catch (error) {
+      console.error("Failed to reset question:", error);
+    } finally {
+      setShowResetModal(false);
     }
-    setShowResetModal(false);
   };
 
   const handleResetCancel = () => {
@@ -508,6 +633,14 @@ export default function QuestionTab({
               categoryType="prep"
               onClick={() => loadQuestions("prep")}
             />
+            <QuestionSelector
+              variant="category"
+              text="Experiment Questions"
+              subtitle=""
+              icon="🧪"
+              categoryType="experiment"
+              onClick={() => loadQuestions("experiment")}
+            />
           </div>
         )}
 
@@ -515,10 +648,30 @@ export default function QuestionTab({
 
         {view === "list" && (
           <>
+            {allTopics.length > 0 && (
+              <div className={styles.topicFilter}>
+                <button
+                  type="button"
+                  className={`${styles.topicFilterChip} ${selectedTopic === null ? styles.topicFilterChipActive : ""}`}
+                  onClick={() => setSelectedTopic(null)}
+                >
+                  All
+                </button>
+                {allTopics.map((topic) => (
+                  <button
+                    key={topic}
+                    type="button"
+                    className={`${styles.topicFilterChip} ${selectedTopic === topic ? styles.topicFilterChipActive : ""}`}
+                    onClick={() => setSelectedTopic((prev) => (prev === topic ? null : topic))}
+                  >
+                    {topic}
+                  </button>
+                ))}
+              </div>
+            )}
             <div className={styles.scroller}>
               <div className={styles.questionGrid}>
-                {Array.from({ length: questionCount }, (_, index) => {
-                  const questionNum = index + 1;
+                {filteredQuestionIds.map((questionNum) => {
                   const status = questionType
                     ? getQuestionStatus(questionType, questionNum)
                     : "unattempted";
@@ -538,18 +691,6 @@ export default function QuestionTab({
         )}
 
         {view === "question" && questionData && (() => {
-          const checkableLines = new Set(
-            questionData.steps?.map((s) => s.lineNumber) ?? []
-          );
-          // Map from lineNumber → sorted iteration numbers (empty array = no iterations)
-          const lineIterations = new Map<number, number[]>();
-          for (const s of questionData.steps ?? []) {
-            if (s.iterationNumber !== undefined) {
-              const arr = lineIterations.get(s.lineNumber) ?? [];
-              arr.push(s.iterationNumber);
-              lineIterations.set(s.lineNumber, arr);
-            }
-          }
           const selectedLineHasIterations =
             selectedLine !== null && (lineIterations.get(selectedLine)?.length ?? 0) > 0;
           const canCheckAtLine =
@@ -602,21 +743,52 @@ export default function QuestionTab({
                   </p>
                 )}
 
-                {selectedLine !== null && selectedLineHasIterations && (
-                  <div className={styles.iterationPicker}>
-                    <span className={styles.iterationLabel}>After iteration:</span>
-                    {(lineIterations.get(selectedLine) ?? []).map((iter) => (
-                      <button
-                        key={iter}
-                        type="button"
-                        className={`${styles.iterationBtn} ${selectedIteration === iter ? styles.iterationBtnActive : ""}`}
-                        onClick={() =>
-                          setSelectedIteration((prev) => (prev === iter ? undefined : iter))
-                        }
-                      >
-                        {iter}
-                      </button>
-                    ))}
+                {checkableLines.size > 0 && (
+                  <div className={styles.autoToolbar}>
+                    <div
+                      className={`${styles.toggleTrack} ${autoAdvance ? styles.toggleOn : ""}`}
+                      onClick={() => setAutoAdvance(v => !v)}
+                      role="switch"
+                      aria-checked={autoAdvance}
+                      aria-label="Auto advance to next checkable line"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === " " && setAutoAdvance(v => !v)}
+                    >
+                      <div className={styles.toggleThumb} />
+                    </div>
+                    <span className={styles.toolbarText}>auto-advance</span>
+
+                    {selectedLine !== null && (lineIterations.get(selectedLine)?.length ?? 0) > 0 && (
+                      <>
+                        <div className={styles.toolbarDivider} />
+                        <span className={styles.toolbarText}>iter:</span>
+                        {(lineIterations.get(selectedLine) ?? []).map((iter) => (
+                          <button
+                            key={iter}
+                            type="button"
+                            className={`${styles.iterationBtn} ${selectedIteration === iter ? styles.iterationBtnActive : ""}`}
+                            onClick={() => setSelectedIteration(prev => prev === iter ? undefined : iter)}
+                          >
+                            {iter}
+                          </button>
+                        ))}
+                      </>
+                    )}
+
+                    {canCheckAtLine && (
+                      <>
+                        <div className={styles.toolbarDivider} />
+                        <button
+                          type="button"
+                          className={styles.checkAtLineButton}
+                          onClick={() => handleSubmitAtLine(selectedLine!, selectedIteration)}
+                          aria-label={`Check answer at line ${selectedLine}`}
+                          title={`Check answer at line ${selectedLine}`}
+                        >
+                          check line {selectedLine}{selectedIteration !== undefined ? ` · iter ${selectedIteration}` : ""}
+                        </button>
+                      </>
+                    )}
                   </div>
                 )}
 
@@ -630,19 +802,6 @@ export default function QuestionTab({
                   >
                     Reset
                   </button>
-                  {canCheckAtLine && (
-                    <button
-                      type="button"
-                      className={styles.checkAtLineButton}
-                      onClick={() => handleSubmitAtLine(selectedLine!, selectedIteration)}
-                      aria-label={`Check answer at line ${selectedLine}`}
-                      title={`Check answer at line ${selectedLine}`}
-                    >
-                      {selectedIteration !== undefined
-                        ? `Check at line ${selectedLine} (iter ${selectedIteration})`
-                        : `Check at line ${selectedLine}`}
-                    </button>
-                  )}
                   <button
                     type="button"
                     className={styles.submitButton}

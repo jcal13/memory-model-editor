@@ -1,5 +1,6 @@
 import { Pool } from "pg";
 import { FeedbackError, ErrorType } from "./errorStructuring";
+import { ERROR_MESSAGES } from "./errorMessages";
 
 let pool: Pool | null = null;
 function getPool(): Pool {
@@ -25,13 +26,61 @@ export type MemoryBox = {
   order?: number;
 };
 
+// Assign concise titles to validation errors for the feedback panel.
+function getErrorTitle(type: ErrorType): string {
+  switch (type) {
+    case ErrorType.TYPE_MISMATCH:
+      return "Type mismatch";
+    case ErrorType.VALUE_MISMATCH:
+      return "Value mismatch";
+    case ErrorType.MISSING_ELEMENT:
+      return "Missing element";
+    case ErrorType.UNEXPECTED_ELEMENT:
+      return "Unexpected element";
+    case ErrorType.DUPLICATE_ID:
+      return "Duplicate ID";
+    case ErrorType.ORPHANED_ELEMENT:
+      return "Unreachable object";
+    case ErrorType.FRAME_MISMATCH:
+      return "Function mismatch";
+    case ErrorType.CALL_STACK_ORDER:
+      return "Call stack order mismatch";
+    case ErrorType.PROPERTY_MISMATCH:
+      return "Property mismatch";
+    case ErrorType.INVALID_REFERENCE:
+      return "Invalid reference";
+    case ErrorType.UNREACHABLE_OBJECT:
+      return "Unreachable object";
+    case ErrorType.REFERENCE_MISMATCH:
+      return "Reference mismatch";
+    case ErrorType.DUPLICATE_NONE_OBJECT:
+      return "Duplicate None object";
+    default:
+      return "Error";
+  }
+}
+
+// Build feedback errors in one place so titles stay consistent with messages.
+function makeFeedbackError(
+  type: ErrorType,
+  message: string,
+  details: Omit<FeedbackError, "type" | "message"> = {}
+): FeedbackError {
+  return {
+    type,
+    title: details.title ?? getErrorTitle(type),
+    message,
+    ...details,
+  };
+}
+
 /* ---------- helpers ---------- */
 const isArrayType = (t: string) => ["list", "tuple"].includes(t);
 const isSetType = (t: string) => t === "set";
 const isDictType = (t: string) => t === "dict";
 const isObjectType = (t: string) => t === "object";
 const isContainer = (t: string) =>
-  isArrayType(t) || isSetType(t) || isDictType(t) || isObjectType(t);
+  isArrayType(t) || isSetType(t) || isDictType(t) || isClassInstanceType(t);
 
 // Extract all element IDs involved in an error path for multi-element highlighting
 function extractPathElementIds(
@@ -71,37 +120,63 @@ function ensureBijection(
   inputID: number,
   answerToInputMap: Map<number, { target: number; path: string }>,
   inputToAnswerMap: Map<number, { target: number; path: string }>,
+  answerMap: Map<number, MemoryBox>,
   isVar: boolean,
   path: string,
   errors: FeedbackError[],
   contextFrameId?: number
 ): boolean {
-  // check if the answer ID is already mapped to an input ID
+  const cleanPathForUser = (p: string) =>
+    formatPathForUser(p)
+      .replace(/: [^.]+\.?/g, ".")
+      .replace(/:\s*$/g, "");
+  const currentPath = cleanPathForUser(path);
+
+  // Case 1: one expected object maps to multiple drawn objects.
   if (answerToInputMap.has(answerID)) {
     const prev = answerToInputMap.get(answerID)!;
+
     if (prev.target !== inputID) {
-      if (!isVar) errors.push({
-        type: ErrorType.GENERIC_ERROR,
-        message: `ID mapping conflict between ${formatPathForUser(prev.path)} and ${formatPathForUser(path)}`,
-        elementId: contextFrameId ?? inputID, // Use frame ID if available, otherwise the conflicting object
-        path,
-        severity: 'error'
-      });
+      if (!isVar) {
+        const previousPath = cleanPathForUser(prev.path);
+        const answerBox = answerMap.get(answerID);
+
+        const message = ERROR_MESSAGES.reference_should_match(previousPath, currentPath);
+
+        errors.push(
+          makeFeedbackError(ErrorType.REFERENCE_MISMATCH, message, {
+            elementId: contextFrameId ?? inputID,
+            path,
+            severity: 'error'
+          })
+        );
+      }
+
       return true;
     }
   }
 
-  // check if the input ID is already mapped to an answer ID
+  // Case 2: one drawn object maps to multiple expected objects.
   if (inputToAnswerMap.has(inputID)) {
     const prev = inputToAnswerMap.get(inputID)!;
+
     if (prev.target !== answerID) {
-      if (!isVar) errors.push({
-        type: ErrorType.GENERIC_ERROR,
-        message: `ID mapping conflict between ${formatPathForUser(prev.path)} and ${formatPathForUser(path)}`,
-        elementId: contextFrameId ?? inputID, // Use frame ID if available, otherwise the conflicting object
-        path,
-        severity: 'error'
-      });
+      if (!isVar) {
+        const previousPath = cleanPathForUser(prev.path);
+
+        errors.push(
+          makeFeedbackError(
+            ErrorType.REFERENCE_MISMATCH,
+            ERROR_MESSAGES.reference_should_differ(previousPath, currentPath),
+            {
+              elementId: contextFrameId ?? inputID,
+              path,
+              severity: 'error'
+            }
+          )
+        );
+      }
+
       return true;
     }
   }
@@ -126,6 +201,23 @@ function formatPathForUser(path: string): string {
     .replace(/function\s+"[^"]*"\s*→\s*var\s+"([^"]+)"→/g, "$1: ")
     .replace(/object\s+"([^"]+)"\.([^→]+)→/g, "$1.$2 → ");
   return s.replace(/\s*→\s*$/, "").trim() || path;
+}
+
+// Check whether a reference mismatch has already been reported for this path
+function hasReferenceMismatchAtPath(errors: FeedbackError[], path: string): boolean {
+  const formattedPath = formatPathForUser(path);
+
+  return errors.some((error) => {
+    if (error.type !== ErrorType.REFERENCE_MISMATCH) return false;
+
+    const errorPath = error.path ? formatPathForUser(error.path) : "";
+
+    return (
+      error.path === path ||
+      errorPath === formattedPath ||
+      error.message.includes(formattedPath)
+    );
+  });
 }
 
 // Map backend/internal types to user-friendly names
@@ -164,17 +256,41 @@ function checkTypeMismatch(
   if (isNoneType(answerBox.type) && isNoneType(inputBox.type)) return false;
   // For class instances: wrong type means ID is assigned incorrectly/incompletely, not a type error
   const loc = formatPathForUser(path);
-  const message = isClassInstanceType(answerBox.type)
-    ? `ID incorrectly or incompletely assigned at ${loc}`
-    : `At ${loc}: expected ${formatTypeForUser(answerBox.type)}, but got ${formatTypeForUser(inputBox.type)}`;
-  errors.push({
-    type: ErrorType.TYPE_MISMATCH,
-    message,
-    elementId: contextFrameId ?? inputBox.id ?? undefined,
-    relatedIds: inputBox.id !== null && inputBox.id !== contextFrameId ? [inputBox.id] : undefined,
-    path,
-    severity: 'error'
-  });
+  const cleanLoc = loc.replace(/: [^.]+\.?/g, ".");
+  if (isClassInstanceType(answerBox.type)) {
+    if (!hasReferenceMismatchAtPath(errors, path)) {
+      errors.push(
+        makeFeedbackError(
+          ErrorType.INVALID_REFERENCE,
+          ERROR_MESSAGES.object_incorrectly_connected(cleanLoc),
+          {
+            elementId: contextFrameId ?? inputBox.id ?? undefined,
+            relatedIds: inputBox.id !== null && inputBox.id !== contextFrameId ? [inputBox.id] : undefined,
+            path,
+            severity: 'error'
+          }
+        )
+      );
+    }
+    return true;
+  }
+  
+  errors.push(
+    makeFeedbackError(
+      ErrorType.TYPE_MISMATCH,
+      ERROR_MESSAGES.type_mismatch(
+        loc,
+        formatTypeForUser(answerBox.type),
+        formatTypeForUser(inputBox.type)
+      ),
+      {
+        elementId: contextFrameId ?? inputBox.id ?? undefined,
+        relatedIds: inputBox.id !== null && inputBox.id !== contextFrameId ? [inputBox.id] : undefined,
+        path,
+        severity: 'error'
+      }
+    )
+  );
   return true;
 }
 
@@ -199,14 +315,18 @@ function comparePrimitives(
       const loc = formatPathForUser(path);
       const expectedStr = isNoneValue(ansVal) ? "None" : String(ansVal);
       const gotStr = isNoneValue(inpVal) ? "None" : String(inpVal);
-      errors.push({
-        type: ErrorType.VALUE_MISMATCH,
-        message: `At ${loc}: expected ${expectedStr}, but got ${gotStr}`,
-        elementId: contextFrameId ?? inputBox.id ?? undefined,
-        relatedIds: inputBox.id !== null && inputBox.id !== contextFrameId ? [inputBox.id] : undefined,
-        path,
-        severity: 'error'
-      });
+      errors.push(
+        makeFeedbackError(
+          ErrorType.VALUE_MISMATCH,
+          ERROR_MESSAGES.value_mismatch(loc, expectedStr, gotStr),
+          {
+            elementId: contextFrameId ?? inputBox.id ?? undefined,
+            relatedIds: inputBox.id !== null && inputBox.id !== contextFrameId ? [inputBox.id] : undefined,
+            path,
+            severity: 'error'
+          }
+        )
+      );
     }
     return true;
   }
@@ -233,23 +353,31 @@ function checkArray(
   // report exact missing / unexpected elements
   if (actualLen < expectedLen)
     for (let i = actualLen; i < expectedLen; i++)
-      errors.push({
-        type: ErrorType.MISSING_ELEMENT,
-        message: `Missing element: ${path}[${i}] id=${answerMemoryBox.value[i]}`,
-        elementId: inputMemoryBox.id ?? undefined, // The container that's missing elements
-        path: `${path}[${i}]`,
-        severity: 'error'
-      });
+      errors.push(
+        makeFeedbackError(
+          ErrorType.MISSING_ELEMENT,
+          ERROR_MESSAGES.missing_element_at_index(path, i, answerMemoryBox.value[i]),
+          {
+            elementId: inputMemoryBox.id ?? undefined, // The container that's missing elements
+            path: `${path}[${i}]`,
+            severity: 'error'
+          }
+        )
+      );
 
   if (actualLen > expectedLen)
     for (let j = expectedLen; j < actualLen; j++)
-      errors.push({
-        type: ErrorType.UNEXPECTED_ELEMENT,
-        message: `Unexpected element: ${path}[${j}] id=${inputMemoryBox.value[j]}`,
-        elementId: inputMemoryBox.id ?? undefined, // The container with unexpected elements
-        path: `${path}[${j}]`,
-        severity: 'error'
-      });
+      errors.push(
+        makeFeedbackError(
+          ErrorType.UNEXPECTED_ELEMENT,
+          ERROR_MESSAGES.unexpected_element_at_index(path, j, inputMemoryBox.value[j]),
+          {
+            elementId: inputMemoryBox.id ?? undefined,
+            path: `${path}[${j}]`,
+            severity: 'error',
+          }
+        )
+      );
 
   // next, we compare each element 1:1 recursively; we do it this way because order matters
   const minLen = Math.min(expectedLen, actualLen);
@@ -312,24 +440,33 @@ function checkSet(
         break;
       }
     }
-    if (!matched) errors.push({
-      type: ErrorType.MISSING_ELEMENT,
-      message: `Missing element: ${path} id=${answerChild}`,
-      elementId: inputMemoryBox.id ?? undefined, // The container that's missing elements
-      path,
-      severity: 'error'
-    });
+    if (!matched)
+      errors.push(
+        makeFeedbackError(
+          ErrorType.MISSING_ELEMENT,
+          ERROR_MESSAGES.missing_element_in_set(path, answerChild),
+          {
+            elementId: inputMemoryBox.id ?? undefined, // The container that's missing elements
+            path,
+            severity: 'error'
+          }
+        )
+      );
   }
 
   // any IDs still in unmatched are unexpected extras supplied by the user
   for (const extraId of unmatched)
-    errors.push({
-      type: ErrorType.UNEXPECTED_ELEMENT,
-      message: `Unexpected element: ${path} id=${extraId}`,
-      elementId: inputMemoryBox.id ?? undefined, // The container with unexpected elements
-      path,
-      severity: 'error'
-    });
+    errors.push(
+      makeFeedbackError(
+        ErrorType.UNEXPECTED_ELEMENT,
+        ERROR_MESSAGES.unexpected_element_in_set(path, extraId as number),
+        {
+          elementId: inputMemoryBox.id ?? undefined,
+          path,
+          severity: 'error',
+        }
+      )
+    );
 }
 
 // Check if the answer box is a dict and compare keys and values recursively
@@ -350,14 +487,18 @@ function checkDict(
     if (!(key in inputMemoryBox.value)) {
       // key missing entirely in the user dict
       const missingId = answerMemoryBox.value[key];
-      errors.push({
-        type: ErrorType.MISSING_ELEMENT,
-        message: `Missing key: ${path} key=${key}, id=${missingId}`,
-        elementId: inputMemoryBox.id ?? undefined, // The container that's missing keys
-        path,
-        field: key,
-        severity: 'error'
-      });
+      errors.push(
+        makeFeedbackError(
+          ErrorType.MISSING_ELEMENT,
+          ERROR_MESSAGES.missing_dict_key(path, key, missingId),
+          {
+            elementId: inputMemoryBox.id ?? undefined, // The container that's missing keys
+            path,
+            field: key,
+            severity: 'error'
+          }
+        )
+      );
       continue;
     }
 
@@ -381,14 +522,18 @@ function checkDict(
   for (const key of Object.keys(inputMemoryBox.value)) {
     if (!(key in answerMemoryBox.value)) {
       const extraId = inputMemoryBox.value[key];
-      errors.push({
-        type: ErrorType.UNEXPECTED_ELEMENT,
-        message: `Unexpected key: ${path} key=${key}, id=${extraId}`,
-        elementId: inputMemoryBox.id ?? undefined, // The container with unexpected keys
-        path,
-        field: key,
-        severity: 'error'
-      });
+      errors.push(
+        makeFeedbackError(
+          ErrorType.UNEXPECTED_ELEMENT,
+          ERROR_MESSAGES.unexpected_dict_key(path, key, extraId),
+          {
+            elementId: inputMemoryBox.id ?? undefined,
+            path,
+            field: key,
+            severity: 'error',
+          }
+        )
+      );
     }
   }
 }
@@ -409,13 +554,17 @@ function checkObject(
   // Check if object names match
   if (answerMemoryBox.name !== inputMemoryBox.name) {
     const loc = formatPathForUser(path);
-    errors.push({
-      type: ErrorType.GENERIC_ERROR,
-      message: `At ${loc}: expected ${answerMemoryBox.name} object, but got ${inputMemoryBox.name}`,
-      elementId: inputMemoryBox.id ?? undefined,
-      path,
-      severity: 'error'
-    });
+    errors.push(
+      makeFeedbackError(
+        ErrorType.TYPE_MISMATCH,
+        ERROR_MESSAGES.object_name_mismatch(loc, answerMemoryBox.name!, inputMemoryBox.name!),
+        {
+          elementId: inputMemoryBox.id ?? undefined,
+          path,
+          severity: 'error'
+        }
+      )
+    );
     return;
   }
 
@@ -426,14 +575,18 @@ function checkObject(
   for (const prop of Object.keys(answerProps)) {
     if (!(prop in inputProps)) {
       const loc = formatPathForUser(path);
-      errors.push({
-        type: ErrorType.MISSING_ELEMENT,
-        message: `At ${loc}: ${answerMemoryBox.name} is missing the "${prop}" attribute`,
-        elementId: inputMemoryBox.id ?? undefined, // The container that's missing properties
-        path,
-        field: prop,
-        severity: 'error'
-      });
+      errors.push(
+        makeFeedbackError(
+          ErrorType.MISSING_ELEMENT,
+          ERROR_MESSAGES.missing_attribute(loc, answerMemoryBox.name!, prop),
+          {
+            elementId: inputMemoryBox.id ?? undefined, // The container that's missing properties
+            path,
+            field: prop,
+            severity: 'error'
+          }
+        )
+      );
       continue;
     }
 
@@ -458,14 +611,18 @@ function checkObject(
     if (typeof prop !== "string" || !prop.trim()) continue;
     if (!(prop in answerProps)) {
       const loc = formatPathForUser(path);
-      errors.push({
-        type: ErrorType.UNEXPECTED_ELEMENT,
-        message: `At ${loc}: ${inputMemoryBox.name} has an unexpected "${prop}" attribute`,
-        elementId: inputMemoryBox.id ?? undefined,
-        path,
-        field: prop,
-        severity: 'error'
-      });
+      errors.push(
+        makeFeedbackError(
+          ErrorType.UNEXPECTED_ELEMENT,
+          ERROR_MESSAGES.unexpected_attribute(loc, inputMemoryBox.name!, prop),
+          {
+            elementId: inputMemoryBox.id ?? undefined,
+            path,
+            field: prop,
+            severity: 'error',
+          }
+        )
+      );
     }
   }
 }
@@ -480,11 +637,15 @@ function gatherFrames(
   const inputFrames = inputModel.filter((e) => e.type === ".frame");
 
   if (answerFrames.length !== inputFrames.length)
-    errors.push({
-      type: ErrorType.FRAME_MISMATCH,
-      message: `Call stack should have ${answerFrames.length} function(s), but has ${inputFrames.length}`,
-      severity: 'error'
-    });
+    errors.push(
+      makeFeedbackError(
+        ErrorType.FRAME_MISMATCH,
+        ERROR_MESSAGES.call_stack_count(answerFrames.length, inputFrames.length),
+        {
+          severity: 'error'
+        }
+      )
+    );
 
   // Count frames by name to handle multiple frames with the same name
   const answerNameCounts = new Map<string, number>();
@@ -501,29 +662,41 @@ function gatherFrames(
   for (const [name, count] of answerNameCounts.entries()) {
     const inputCount = inputNameCounts.get(name) ?? 0;
     if (inputCount === 0) {
-      errors.push({
-        type: ErrorType.MISSING_ELEMENT,
-        message: `Call stack is missing the ${name} function`,
-        path: `function "${name}"`,
-        severity: 'error'
-      });
+      errors.push(
+        makeFeedbackError(
+          ErrorType.MISSING_ELEMENT,
+          ERROR_MESSAGES.missing_function(name),
+          {
+            path: `function "${name}"`,
+            severity: 'error'
+          }
+        )
+      );
     } else if (inputCount !== count) {
-      errors.push({
-        type: ErrorType.FRAME_MISMATCH,
-        message: `Call stack should have ${count} ${name} function(s), but has ${inputCount}`,
-        severity: 'error'
-      });
+      errors.push(
+        makeFeedbackError(
+          ErrorType.FRAME_MISMATCH,
+          ERROR_MESSAGES.function_count_mismatch(count, name, inputCount),
+          {
+            severity: 'error'
+          }
+        )
+      );
     }
   }
 
   for (const [name, count] of inputNameCounts.entries()) {
     if (!answerNameCounts.has(name)) {
-      errors.push({
-        type: ErrorType.UNEXPECTED_ELEMENT,
-        message: `Call stack has an unexpected ${name} function`,
-        path: `function "${name}"`,
-        severity: 'error'
-      });
+      errors.push(
+        makeFeedbackError(
+          ErrorType.UNEXPECTED_ELEMENT,
+          ERROR_MESSAGES.unexpected_function(name),
+          {
+            path: `function "${name}"`,
+            severity: 'error',
+          }
+        )
+      );
     }
   }
 
@@ -539,12 +712,18 @@ function scanDuplicates(model: MemoryBox[], errors: FeedbackError[]): Set<number
       if (seen[e.id]) dup.add(e.id);
       else seen[e.id] = true;
     }
-  dup.forEach((id) => errors.push({
-    type: ErrorType.DUPLICATE_ID,
-    message: `Duplicate ID: ${id}`,
-    elementId: id,
-    severity: 'error'
-  }));
+    dup.forEach((id) =>
+      errors.push(
+        makeFeedbackError(
+          ErrorType.DUPLICATE_ID,
+          ERROR_MESSAGES.duplicate_id(),
+          {
+            elementId: id,
+            severity: 'error'
+          }
+        )
+      )
+    );
   return dup;
 }
 
@@ -578,24 +757,32 @@ function compareFrames(
     const uVars = uFrame.value as Record<string, number>;
 
     // variable-list mismatches
-    for (const k of Object.keys(aVars))
-      if (!(k in uVars))
-        errors.push({
-          type: ErrorType.MISSING_ELEMENT,
-          message: `In ${name} (call stack position ${aFrame.order}): variable "${k}" is missing`,
-          elementId: uFrame.id ?? undefined,
-          path: `function "${name}" → var "${k}"`,
-          severity: 'error'
-        });
+    for (const k of Object.keys(aVars)) {
+      if (!(k in uVars)) {
+        const message = ERROR_MESSAGES.variable_missing(name, k);
+    
+        errors.push(
+          makeFeedbackError(ErrorType.MISSING_ELEMENT, message, {
+            elementId: uFrame.id ?? undefined,
+            path: `function "${name}" → var "${k}"`,
+            severity: 'error',
+          })
+        );
+      }
+    }
     for (const k of Object.keys(uVars))
       if (!(k in aVars))
-        errors.push({
-          type: ErrorType.UNEXPECTED_ELEMENT,
-          message: `In ${name} (call stack position ${aFrame.order}): variable "${k}" should not be present`,
-          elementId: uFrame.id ?? undefined,
-          path: `function "${name}" → var "${k}"`,
-          severity: 'error'
-        });
+        errors.push(
+          makeFeedbackError(
+            ErrorType.UNEXPECTED_ELEMENT,
+            ERROR_MESSAGES.variable_unexpected(name, k),
+            {
+              elementId: uFrame.id ?? undefined,
+              path: `function "${name}" → var "${k}"`,
+              severity: 'error',
+            }
+          )
+        );
 
     // deep comparison for shared variables
     for (const k of Object.keys(aVars)) {
@@ -603,12 +790,16 @@ function compareFrames(
 
       const uid = (uVars as Record<string, any>)[k];
       if (uid === "_") {
-        errors.push({
-          type: ErrorType.GENERIC_ERROR,
-          message: `In ${name} (call stack position ${aFrame.order}): variable "${k}" needs to be assigned to an object`,
-          path: `function "${name}" → var "${k}"`,
-          severity: 'error'
-        });
+        errors.push(
+          makeFeedbackError(
+            ErrorType.INVALID_REFERENCE,
+            ERROR_MESSAGES.variable_unassigned(name, k),
+            {
+              path: `function "${name}" → var "${k}"`,
+              severity: 'error'
+            }
+          )
+        );
         continue;
       }
 
@@ -629,41 +820,79 @@ function compareFrames(
   }
 }
 
-// Detect orphans in the user model
-function detectOrphans(
-  inputFrames: MemoryBox[],
-  inputMap: Map<number, MemoryBox>,
-  model: MemoryBox[],
-  answerMap: Map<number, MemoryBox>,
-  errors: FeedbackError[]
-) {
+// Returns the set of object IDs reachable by following pointers from the given frames
+function computeReachable(frames: MemoryBox[], objectMap: Map<number, MemoryBox>): Set<number> {
   const reachable = new Set<number>();
   function mark(id: number) {
     if (reachable.has(id)) return;
     reachable.add(id);
-    const e = inputMap.get(id);
+    const e = objectMap.get(id);
     if (!e || !isContainer(e.type)) return;
     if (isArrayType(e.type) || isSetType(e.type))
       e.value.forEach((c: number) => mark(c));
     else if (isDictType(e.type))
       Object.values(e.value).forEach((c) => mark(c as number));
-    else if (isObjectType(e.type))
+    else if (isClassInstanceType(e.type))
       Object.values(e.value).forEach((c) => mark(c as number));
   }
+  for (const frame of frames)
+    Object.values(frame.value as Record<string, number>).forEach(mark);
+  return reachable;
+}
 
-  for (const frame of inputFrames)
-    Object.values(frame.value as Record<string, number>).forEach((id) =>
-      mark(id)
+function detectOrphans(
+  answerFrames: MemoryBox[],
+  inputFrames: MemoryBox[],
+  answerMap: Map<number, MemoryBox>,
+  inputMap: Map<number, MemoryBox>,
+  answerModel: MemoryBox[],
+  userModel: MemoryBox[],
+  dup: Set<number>,
+  errors: FeedbackError[]
+) {
+  const answerReachable = computeReachable(answerFrames, answerMap);
+  const userReachable   = computeReachable(inputFrames,  inputMap);
+
+  // Non-frame elements not reachable from their respective frames
+  const answerOrphans = answerModel.filter(
+    e => e.id !== null && e.type !== '.frame' && !answerReachable.has(e.id as number)
+  );
+  const userOrphans = userModel.filter(
+    e => e.id !== null && e.type !== '.frame' && !userReachable.has(e.id as number) && !dup.has(e.id as number)
+  );
+
+  // Greedily match user orphans to answer orphans by (type, value)
+  const remainingUser = [...userOrphans];
+  for (const aOrphan of answerOrphans) {
+    const idx = remainingUser.findIndex(
+      u => u.type === aOrphan.type && JSON.stringify(u.value) === JSON.stringify(aOrphan.value)
     );
+    if (idx === -1) {
+      errors.push(
+        makeFeedbackError(
+          ErrorType.MISSING_ELEMENT,
+          ERROR_MESSAGES.missing_unattached_object(aOrphan.type, aOrphan.value),
+          {
+            severity: 'error'
+          }
+        )
+      );
+    } else {
+      remainingUser.splice(idx, 1);
+    }
+  }
 
-  for (const e of model)
-    if (e.id !== null && !reachable.has(e.id) && !answerMap.has(e.id))
-      errors.push({
-        type: ErrorType.ORPHANED_ELEMENT,
-        message: `Unmapped box: id=${e.id}`,
-        elementId: e.id,
-        severity: 'error'
-      });
+  // Any unmatched user orphan is unreachable from the call stack.
+  for (const uOrphan of remainingUser) {
+    const message = ERROR_MESSAGES.unexpected_unattached_object(uOrphan.id as number);
+
+    errors.push(
+      makeFeedbackError(ErrorType.UNREACHABLE_OBJECT, message, {
+        elementId: uOrphan.id as number,
+        severity: 'error',
+      })
+    );
+  }
 }
 
 // Compare IDs between the answer and user models
@@ -699,13 +928,21 @@ function compareIds(
   const inputMemoryBox = inputMap.get(inputID);
   if (!answerMemoryBox || !inputMemoryBox) {
     // if either ID is not found in the respective map
-    errors.push({
-      type: ErrorType.ORPHANED_ELEMENT,
-      // Remove → from end of path (if it is there)
-      message: `Unmapped ID: ${path.endsWith('→') ? path.slice(0, -1) : path}`,
-      path,
-      severity: 'error'
-    });
+    const cleanPath = path.endsWith('→') ? path.slice(0, -1) : path;
+    const frameMatch = cleanPath.match(/function "([^"]+)"/);
+    const varMatch = cleanPath.match(/var "([^"]+)"/);
+    const frameName = frameMatch ? frameMatch[1] : cleanPath;
+    const varName = varMatch ? varMatch[1] : cleanPath;
+    const unmappedMessage = frameMatch && varMatch
+      ? ERROR_MESSAGES.unmapped_variable(varName, frameName)
+      : ERROR_MESSAGES.unmapped_id_fallback(cleanPath);
+    
+    errors.push(
+      makeFeedbackError(ErrorType.INVALID_REFERENCE, unmappedMessage, {
+        path,
+        severity: 'error',
+      })
+    );
     return;
   }
 
@@ -717,6 +954,7 @@ function compareIds(
       inputID,
       answerToInputMap,
       inputToAnswerMap,
+      answerMap,
       isVar,
       path,
       errors,
@@ -817,18 +1055,22 @@ function checkCallStackOrder(
 
   for (let i = 0; i < sortedAnswer.length; i++) {
     if (sortedAnswer[i].name !== sortedInput[i].name) {
-      errors.push({
-        type: ErrorType.CALL_STACK_ORDER,
-        message: "Call stack functions are in the wrong order",
-        severity: 'error'
-      });
+      errors.push(
+        makeFeedbackError(
+          ErrorType.CALL_STACK_ORDER,
+          ERROR_MESSAGES.call_stack_order(),
+          {
+            severity: 'error'
+          }
+        )
+      );
       break;
     }
   }
 }
 
 async function fetchAnswerModel(
-  questionType: "test" | "practice" | "prep",
+  questionType: "test" | "practice" | "prep" | "experiment",
   questionId: number
 ): Promise<MemoryBox[] | null> {
   let rows: { answer: unknown }[] = [];
@@ -842,6 +1084,13 @@ async function fetchAnswerModel(
   } else if (questionType === "prep") {
     const result = await getPool().query<{ answer: unknown }>(
       "SELECT answer FROM prep_questions WHERE id = $1",
+      [questionId]
+    );
+    rows = result.rows;
+    if (rows.length === 0) return null;
+  } else if (questionType === "experiment") {
+    const result = await getPool().query<{ answer: unknown }>(
+      "SELECT answer FROM experiment_questions WHERE id = $1",
       [questionId]
     );
     rows = result.rows;
@@ -863,6 +1112,30 @@ async function fetchAnswerModel(
 }
 
 /* ---------- shared comparison logic ---------- */
+function checkDuplicateNoneObjects(
+  inputMap: Map<number, MemoryBox>,
+  errors: FeedbackError[]
+): void {
+  const noneIds = Array.from(inputMap.values())
+    .filter((box) => box.type === "NoneType" && box.id !== null)
+    .map((box) => box.id as number);
+
+  if (noneIds.length <= 1) return;
+
+  errors.push(
+    makeFeedbackError(
+      ErrorType.DUPLICATE_NONE_OBJECT,
+      ERROR_MESSAGES.duplicate_none_objects(noneIds),
+      {
+        elementId: noneIds[0],
+        relatedIds: noneIds.slice(1),
+        path: "None",
+        severity: "error"
+      }
+    )
+  );
+}
+
 function runComparison(
   userModel: MemoryBox[],
   answerModel: MemoryBox[]
@@ -879,9 +1152,9 @@ function runComparison(
   // check for function + function call stack errors
   const hasFunctionErrors = errors.some(
     (e) =>
-      e.message.startsWith("Function count mismatch") ||
-      e.message.startsWith("Missing function") ||
-      e.message.startsWith("Unexpected function")
+      e.message.startsWith("Call stack should have") ||
+      e.message.startsWith("Call stack is missing") ||
+      e.message.startsWith("Call stack has an unexpected")
   );
   if (!hasFunctionErrors) {
     checkCallStackOrder(answerFrames, inputFrames, errors);
@@ -915,7 +1188,9 @@ function runComparison(
   );
 
   // detect orphans in the user model
-  detectOrphans(inputFrames, inputMap, userModel, answerMap, errors);
+  detectOrphans(answerFrames, inputFrames, answerMap, inputMap, answerModel, userModel, dup, errors);
+
+  checkDuplicateNoneObjects(inputMap, errors);
 
   return { correct: errors.length === 0, errors };
 }
@@ -924,7 +1199,7 @@ function runComparison(
 export default async function validateAnswer(
   userModel: MemoryBox[],
   questionId: number,
-  questionType: "test" | "practice" | "prep"
+  questionType: "test" | "practice" | "prep" | "experiment"
 ): Promise<{
   correct: boolean;
   errors: FeedbackError[];
@@ -935,7 +1210,7 @@ export default async function validateAnswer(
       correct: false,
       errors: [{
         type: ErrorType.GENERIC_ERROR,
-        message: `Invalid question id: ${questionId}`,
+        message: ERROR_MESSAGES.invalid_question_id(questionId),
         severity: 'error'
       }],
     };
@@ -948,7 +1223,7 @@ export default async function validateAnswer(
 type QuestionStep = { lineNumber: number; iterationNumber?: number; answer: unknown };
 
 async function fetchStepsModel(
-  questionType: "test" | "practice" | "prep",
+  questionType: "test" | "practice" | "prep" | "experiment",
   questionId: number,
   lineNumber: number,
   iterationNumber?: number
@@ -958,6 +1233,8 @@ async function fetchStepsModel(
       ? "practice_questions"
       : questionType === "prep"
       ? "prep_questions"
+      : questionType === "experiment"
+      ? "experiment_questions"
       : "test_questions";
 
   const result = await getPool().query<{ steps: unknown }>(
@@ -983,7 +1260,7 @@ async function fetchStepsModel(
 export async function validateAnswerAtLine(
   userModel: MemoryBox[],
   questionId: number,
-  questionType: "test" | "practice" | "prep",
+  questionType: "test" | "practice" | "prep" | "experiment",
   lineNumber: number,
   iterationNumber?: number
 ): Promise<{ correct: boolean; errors: FeedbackError[] }> {
@@ -994,7 +1271,7 @@ export async function validateAnswerAtLine(
       correct: false,
       errors: [{
         type: ErrorType.GENERIC_ERROR,
-        message: `Invalid question id: ${questionId}`,
+        message: ERROR_MESSAGES.invalid_question_id(questionId),
         severity: 'error'
       }],
     };
@@ -1005,7 +1282,7 @@ export async function validateAnswerAtLine(
       correct: false,
       errors: [{
         type: ErrorType.GENERIC_ERROR,
-        message: `No answer defined for line ${lineNumber}${iterationNumber !== undefined ? ` iteration ${iterationNumber}` : ""}`,
+        message: ERROR_MESSAGES.no_answer_for_line(lineNumber, iterationNumber),
         severity: 'error'
       }],
     };

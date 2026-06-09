@@ -40,7 +40,7 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     number | null
   >(initialUIData.questionIndex);
   const [selectedQuestionType, setSelectedQuestionType] = useState<
-    "test" | "practice" | "prep" | null
+    "test" | "practice" | "prep" | "experiment" | null
   >(initialUIData.questionType);
   const [submissionResults, setSubmissionResults] = useState<SubmissionResult | null>(
     initialUIData.submissionResults
@@ -64,7 +64,6 @@ export function useMemoryModelEditorState(sandbox: boolean) {
   // Scroll positions for info panel tabs (persists across panel close/open)
   const [tabScrollPositions, setTabScrollPositions] = useState<Record<Tab, number>>({
     question: 0,
-    feedback: 0,
   });
 
   // Panel state

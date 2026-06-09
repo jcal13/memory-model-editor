@@ -14,7 +14,7 @@ interface FeedbackTabProps {
   submissionResults: SubmissionResult | null;
   questionSelected: boolean;
   questionIndex: number | null;
-  questionType: "test" | "practice" | "prep" | null;
+  questionType: "test" | "practice" | "prep" | "experiment" | null;
   masterErrorList: MasterErrorList;
   elements: CanvasElement[];
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
@@ -42,7 +42,7 @@ export default function FeedbackTab({
   const renderTitle = () => {
     let questionName = "";
     if (questionType && questionIndex !== null) {
-      const typeLabel = questionType === "test" ? "Test" : questionType === "prep" ? "CSC148 Prep" : "Practice";
+      const typeLabel = questionType === "test" ? "Test" : questionType === "prep" ? "CSC148 Prep" : questionType === "experiment" ? "Experiment" : "Practice";
       questionName = ` - ${typeLabel} Question ${questionIndex}`;
     }
 

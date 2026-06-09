@@ -97,6 +97,7 @@ export interface CanvasElement {
   y: number;
   kind: BoxType;
   generatedInlinePrimitive?: boolean;
+  questionFrameRole?: "main";
   invalidated?: boolean;
   errors?: ElementError[]; // Unified error system (validation + feedback)
   color?: string; // Optional color to apply to the element (e.g., for errors, warnings, etc.)
@@ -124,12 +125,17 @@ export enum ErrorType {
   CALL_STACK_ORDER = "CALL_STACK_ORDER",
   PROPERTY_MISMATCH = "PROPERTY_MISMATCH",
   GENERIC_ERROR = "GENERIC_ERROR",
+  INVALID_REFERENCE = "INVALID_REFERENCE",
+  UNREACHABLE_OBJECT = "UNREACHABLE_OBJECT",
+  REFERENCE_MISMATCH = "REFERENCE_MISMATCH",
+  DUPLICATE_NONE_OBJECT = "DUPLICATE_NONE_OBJECT",
 }
 
 export interface ElementError {
   source: ErrorSource;
   type: ErrorType;
   message: string;
+  title?: string;
   field?: string; // e.g., "value[0]", "params[1]", "classVariables[2]"
   invalidId?: number; // The specific ID that is invalid
   relatedElementIds?: (number | "_")[]; // All element IDs involved in this error (for multi-element highlighting)
@@ -140,6 +146,7 @@ export interface ElementError {
 export interface FeedbackError {
   type: ErrorType;
   message: string;
+  title?: string;
   elementId?: number | "_"; // ID of the element this error relates to
   field?: string; // Specific field within the element
   relatedIds?: (number | "_")[]; // Other IDs involved in the error
@@ -177,6 +184,9 @@ export interface BoxEditorType {
   visualStyle?: VisualStyle;
   pythonTutorStandalonePrimitives?: boolean;
   onElementsChange?: Dispatch<SetStateAction<CanvasElement[]>>;
+  isLockedMainFrame?: boolean;
+  reservedFunctionNames?: string[];
+  isQuestionMode?: boolean;
 }
 
-export type Tab = "feedback" | "question";
+export type Tab = "question";

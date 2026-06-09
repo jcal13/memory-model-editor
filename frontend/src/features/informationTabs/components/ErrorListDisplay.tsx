@@ -79,12 +79,18 @@ export default function ErrorListDisplay({
   };
 
   const parseErrorMessage = (
-    message: string,
+    error: ElementError,
     isSandboxMode: boolean
   ) => {
-    let displayMessage = processErrorMessage(message, isSandboxMode);
+    const message = error.message;
+    const displayMessage = processErrorMessage(message, isSandboxMode);
+  
+    if (error.title) {
+      return { displayMessage, errorType: error.title };
+    }
+  
     let errorType = "";
-
+  
     if (message.includes("Missing variable")) {
       errorType = "Missing variable";
     } else if (message.includes("Unexpected variable")) {
@@ -104,7 +110,7 @@ export default function ErrorListDisplay({
     } else {
       errorType = "Error";
     }
-
+  
     return { displayMessage, errorType };
   };
 
@@ -131,7 +137,7 @@ export default function ErrorListDisplay({
         <ul className={styles.errorList}>
           {errors.map((item, index) => {
             const { displayMessage, errorType } = parseErrorMessage(
-              item.error.message,
+              item.error,
               isSandboxMode
             );
 

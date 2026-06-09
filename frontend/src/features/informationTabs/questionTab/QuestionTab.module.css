@@ -51,6 +51,56 @@
   gap: 0.5rem;
 }
 
+.topicFilter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.875rem;
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.topicFilterChip {
+  padding: 0.2rem 0.65rem;
+  border: 1px solid var(--border-primary);
+  border-radius: 9999px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 140ms ease;
+  white-space: nowrap;
+}
+
+.topicFilterChip:hover {
+  border-color: var(--border-secondary);
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.topicFilterChipActive {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.topicFilterChipActive:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #ffffff;
+}
+
+:root[data-theme="dark"] .topicFilterChipActive {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+:root[data-theme="dark"] .topicFilterChipActive:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
 .questionGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(3.5rem, 1fr));
@@ -364,4 +414,61 @@
   background: #1a2d3a;
   color: #93c5fd;
   border-color: #2d4a6a;
+}
+
+/* Auto-advance toolbar */
+.autoToolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  width: fit-content;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.toggleTrack {
+  width: 28px;
+  height: 15px;
+  border-radius: 99px;
+  background: var(--border-secondary);
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.toggleOn {
+  background: #0369a1;
+}
+
+.toggleThumb {
+  width: 11px;
+  height: 11px;
+  background: var(--bg-primary);
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: left 0.15s;
+}
+
+.toggleOn .toggleThumb {
+  left: 15px;
+}
+
+.toolbarText {
+  font-size: calc(0.82rem * var(--font-scale, 1));
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.toolbarDivider {
+  width: 1px;
+  height: 14px;
+  background: var(--border-primary);
+  flex-shrink: 0;
 }

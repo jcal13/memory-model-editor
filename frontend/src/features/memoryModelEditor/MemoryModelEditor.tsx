@@ -10,7 +10,7 @@ import {
   useMemoryModelEditorState,
   clearCanvasStorage,
 } from "./hooks/useMemoryModelEditorState";
-import { loadInitialUIData } from "./utils/localStorage";
+import { loadInitialUIData, deleteQuestionCanvasData } from "./utils/localStorage";
 import { useMemoryModelEditorRefs } from "./hooks/useRef";
 import {
   useCanvasLocalStorage,
@@ -102,8 +102,11 @@ export default function MemoryModelEditor({
     };
 
     // Check if state has actually changed
+    const stripTransient = (els: CanvasElement[]) =>
+      els.map(({ color, ...rest }) => rest);
+    
     const hasChanged =
-      JSON.stringify(prevState.elements) !== JSON.stringify(currentState.elements) ||
+      JSON.stringify(stripTransient(prevState.elements)) !== JSON.stringify(stripTransient(currentState.elements)) ||
       JSON.stringify(prevState.ids) !== JSON.stringify(currentState.ids) ||
       JSON.stringify(prevState.classes) !== JSON.stringify(currentState.classes);
 
@@ -115,6 +118,9 @@ export default function MemoryModelEditor({
   }, [state.elements, state.elementIds, state.elementClasses, recordState]);
 
   const clearCanvas = () => {
+    if (state.selectedQuestionIndex !== null && state.selectedQuestionType !== null) {
+      deleteQuestionCanvasData(state.selectedQuestionType, state.selectedQuestionIndex);
+    }
     state.setElements([]);
     state.setElementIds([]);
     state.setElementClasses([]);
@@ -124,7 +130,14 @@ export default function MemoryModelEditor({
     state.setActiveInfoTab("question");
     state.setCanvasResetKey((prev) => prev + 1);
     clearCanvasStorage();
-    clearHistory();
+    const baselineState = {
+      elements: [],
+      ids: [],
+      classes: [],
+    };
+    
+    prevStateRef.current = baselineState;
+    clearHistory(baselineState);
   };
 
   const restoreCanvas = (
@@ -132,16 +145,28 @@ export default function MemoryModelEditor({
     ids: number[],
     classes: string[]
   ) => {
-    state.setElements(spreadOverlappingElements(elements));
+    const restoredElements = spreadOverlappingElements(elements);
+
+    const baselineState = {
+      elements: restoredElements,
+      ids,
+      classes,
+    };
+
+    state.setElements(restoredElements);
     state.setElementIds(ids);
     state.setElementClasses(classes);
-    clearHistory();
+
+    prevStateRef.current = baselineState;
+    clearHistory(baselineState);
   };
+
+  const effectiveSandboxMode = state.isSandboxMode || state.selectedQuestionType === "experiment";
 
   // When a question loads in practice mode, seed elementClasses with the class names
   // from the question's answer so the class selector shows them as pre-built options.
   useEffect(() => {
-    if (!state.isSandboxMode || !currentQuestionData) return;
+    if (!effectiveSandboxMode || !currentQuestionData) return;
     const questionClassNames = getQuestionClassNames(currentQuestionData);
     if (questionClassNames.length === 0) return;
     state.setElementClasses((prev) => {
@@ -153,7 +178,7 @@ export default function MemoryModelEditor({
       }
       return merged;
     });
-  }, [currentQuestionData, state.isSandboxMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentQuestionData, effectiveSandboxMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const masterErrorList: MasterErrorList = useMemo(
     () => createMasterErrorList(state.elements),
@@ -305,7 +330,6 @@ export default function MemoryModelEditor({
     elements: state.elements,
     setElements: state.setElements,
     setSubmissionResults: state.setSubmissionResults,
-    setActiveInfoTab: state.setActiveInfoTab,
   });
 
   useCanvasLocalStorage({
@@ -494,13 +518,15 @@ export default function MemoryModelEditor({
                 activeTab={state.activePaletteTab}
                 setActive={state.setActivePaletteTab}
                 requiredBoxes={
-                  state.isSandboxMode && currentQuestionData
-                    ? getRequiredBoxTypeNames(currentQuestionData)
+                  effectiveSandboxMode && currentQuestionData
+                    ? getRequiredBoxTypeNames(currentQuestionData).filter(
+                        (type) => !(state.selectedQuestionType === "experiment" && type === "function")
+                      )
                     : undefined
                 }
-                isPracticeMode={state.isSandboxMode}
-                isSandboxMode={state.isSandboxMode}
-                onModeToggle={() => state.setShowModeToggleModal(true)}
+                isPracticeMode={effectiveSandboxMode}
+                isSandboxMode={effectiveSandboxMode}
+                onModeToggle={state.selectedQuestionType === "experiment" ? undefined : () => state.setShowModeToggleModal(true)}
                 onClear={() => state.setShowClearCanvasModal(true)}
                 onUndo={undo}
                 onRedo={redo}
@@ -549,9 +575,9 @@ export default function MemoryModelEditor({
               classes={state.elementClasses}
               addClasses={addElementClass}
               removeClasses={removeElementClass}
-              sandbox={!state.isSandboxMode}
-              canManageClasses={!state.isSandboxMode || state.selectedQuestionIndex === null}
-              canManageFunctions={!state.isSandboxMode || state.selectedQuestionIndex === null}
+              sandbox={!effectiveSandboxMode}
+              canManageClasses={!effectiveSandboxMode || state.selectedQuestionIndex === null}
+              canManageFunctions={!effectiveSandboxMode || state.selectedQuestionIndex === null}
               onClear={() => state.setShowClearCanvasModal(true)}
               onEditorOpenerReady={handleEditorOpenerReady}
               scale={canvasScale}
@@ -563,10 +589,11 @@ export default function MemoryModelEditor({
                 state.pythonTutorStandalonePrimitives
               }
               questionFunctionNames={
-                state.isSandboxMode && currentQuestionData
+                effectiveSandboxMode && currentQuestionData
                   ? getQuestionFunctionNames(currentQuestionData)
                   : undefined
               }
+              isQuestionMode={state.selectedQuestionIndex !== null}
             />
           </div>
 
@@ -593,8 +620,6 @@ export default function MemoryModelEditor({
             >
               <InformationTabs
                 submissionResults={state.submissionResults}
-                activeTab={state.activeInfoTab}
-                setActive={state.setActiveInfoTab}
                 questionSelected={state.selectedQuestionIndex !== null}
                 questionIndex={state.selectedQuestionIndex}
                 setQuestionIndex={state.setSelectedQuestionIndex}

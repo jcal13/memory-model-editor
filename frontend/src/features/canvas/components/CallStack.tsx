@@ -29,6 +29,7 @@ import {
   BUTTON_HEIGHT,
   ADDITIONAL_HEIGHT_OFFSET,
 } from "../constants";
+import { isLockedMainFrame } from "../../memoryModelEditor/utils/questionFrames";
 
 interface CallStackProps {
   frames: CanvasElement[];
@@ -178,6 +179,10 @@ const CallStack: React.FC<CallStackProps> = ({
   const dragState = useRef<DragState | null>(null);
   const [insertIndex, setInsertIndex] = useState<number | null>(null);
   const [dropMarkerY, setDropMarkerY] = useState<number | null>(null);
+  const lockedFrameIndex = useMemo(
+    () => layout.findIndex(({ f }) => isLockedMainFrame(f)),
+    [layout]
+  );
 
   const computeDropPosition = useCallback(
     (ghostCenterY: number, draggedIndex: number) => {
@@ -208,6 +213,10 @@ const CallStack: React.FC<CallStackProps> = ({
 
   const handlePointerDown = useCallback(
     (index: number) => (event: React.PointerEvent<SVGGElement>) => {
+      if (isLockedMainFrame(orderedFrames[index])) {
+        return;
+      }
+
       event.preventDefault();
       event.stopPropagation();
 
@@ -222,7 +231,7 @@ const CallStack: React.FC<CallStackProps> = ({
         active: false,
       };
     },
-    []
+    [orderedFrames]
   );
 
   const handlePointerMove: React.PointerEventHandler = useCallback(
@@ -399,7 +408,7 @@ const CallStack: React.FC<CallStackProps> = ({
             transform={`translate(0, ${
               yLocal + scrollPosition + VERTICAL_OFFSET
             })`}
-            style={{ cursor: "grab" }}
+            style={{ cursor: isLockedMainFrame(frame) ? "default" : "grab" }}
             onPointerDown={handlePointerDown(index)}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
@@ -443,7 +452,8 @@ const CallStack: React.FC<CallStackProps> = ({
           </g>
         ))}
 
-        {dropMarkerY !== null && (
+        {dropMarkerY !== null &&
+          !(lockedFrameIndex === 0 && insertIndex === layout.length - 1) && (
           <rect
             className={styles.dropMarker}
             x={-columnWidth / 2 + 10}

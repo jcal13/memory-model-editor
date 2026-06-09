@@ -43,6 +43,8 @@ const BoxEditorModule = ({
   canManageFunctions = sandbox,
   elements = [],
   questionFunctionNames,
+  isLockedMainFrame = false,
+  reservedFunctionNames,
   visualStyle = "memoryviz",
   pythonTutorStandalonePrimitives = false,
   onElementsChange,
@@ -136,6 +138,8 @@ const BoxEditorModule = ({
         canManageFunctions={canManageFunctions}
         elements={elements}
         onClose={onClose}
+        isLockedMainFrame={isLockedMainFrame}
+        reservedFunctionNames={reservedFunctionNames}
       />
 
       {/* Middle section: editable content */}
@@ -184,6 +188,8 @@ const BoxEditorModule = ({
           onToggleInvalidate={setInvalidated}
           ownClassVariables={ownClassVariables}
           items={collectionItems}
+          disableRemove={isLockedMainFrame}
+          disableInvalidate={isLockedMainFrame}
         />
       </div>
     </div>

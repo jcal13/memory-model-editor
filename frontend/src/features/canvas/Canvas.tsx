@@ -5,7 +5,6 @@ import React, {
   useRef,
   useCallback,
   useLayoutEffect,
-  useMemo,
 } from "react";
 import Draggable from "react-draggable";
 import {
@@ -19,12 +18,27 @@ import BoxEditor from "../editors/boxEditor/BoxEditor";
 import CallStack from "./components/CallStack";
 import { useCanvasRefs } from "./hooks/useCanvas";
 import { validateElements } from "./utils/validation";
+import { getBoxDimensions } from "./utils/box.renderer";
+import {
+  getCallStackBounds,
+  smoothlyConstrainDragPosition,
+} from "./utils/boundary.helpers";
+import {
+  QUESTION_MAIN_FRAME_NAME,
+  isLockedMainFrame,
+  reorderFunctionFramesWithLockedMain,
+} from "../memoryModelEditor/utils/questionFrames";
 import styles from "./Canvas.module.css";
 import {
   createElementsByIdMap,
 } from "./utils/pythonTutorReferences";
 import { findOrphanedGeneratedPrimitiveIds } from "../editors/utils/pythonTutorInlinePrimitives";
 import PythonTutorReferenceArrows from "./components/PythonTutorReferenceArrows";
+
+const NEW_BOX_BOUNDARY_DIMENSIONS = {
+  width: 200,
+  height: 110,
+};
 
 const EDITOR_MAP: Record<BoxType["name"], React.FC<any>> = {
   primitive: BoxEditor,
@@ -56,6 +70,9 @@ interface FloatingEditorProps {
   elements: CanvasElement[];
   editorScale: number;
   questionFunctionNames?: string[];
+  isLockedMainFrame?: boolean;
+  reservedFunctionNames?: string[];
+  isQuestionMode?: boolean;
   visualStyle?: VisualStyle;
   pythonTutorReferenceArrows?: boolean;
   pythonTutorStandalonePrimitives?: boolean;
@@ -82,6 +99,9 @@ function FloatingEditor({
   elements,
   editorScale,
   questionFunctionNames,
+  isLockedMainFrame: lockMainFrame = false,
+  reservedFunctionNames,
+  isQuestionMode = false,
   visualStyle = "memoryviz",
   pythonTutorReferenceArrows = false,
   pythonTutorStandalonePrimitives = false,
@@ -133,6 +153,9 @@ function FloatingEditor({
             canManageFunctions={canManageFunctions ?? sandbox}
             elements={elements}
             questionFunctionNames={questionFunctionNames}
+            isLockedMainFrame={lockMainFrame}
+            reservedFunctionNames={reservedFunctionNames}
+            isQuestionMode={isQuestionMode}
             visualStyle={visualStyle}
             pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}
             onElementsChange={onElementsChange}
@@ -164,6 +187,7 @@ interface CanvasProps {
   visualStyle?: VisualStyle;
   pythonTutorReferenceArrows?: boolean;
   pythonTutorStandalonePrimitives?: boolean;
+  isQuestionMode?: boolean;
 }
 
 function Canvas({
@@ -185,6 +209,7 @@ function Canvas({
   visualStyle = "memoryviz",
   pythonTutorReferenceArrows = false,
   pythonTutorStandalonePrimitives = false,
+  isQuestionMode = false,
 }: CanvasProps) {
   const [openEditors, setOpenEditors] = useState<CanvasElement[]>([]);
   const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(
@@ -196,11 +221,52 @@ function Canvas({
 
   // Use external scale if provided, otherwise use internal
   const scale = externalScale !== undefined ? externalScale : internalScale;
+  const isProtectedMainFrame = useCallback(
+    (element: CanvasElement) => isQuestionMode && isLockedMainFrame(element),
+    [isQuestionMode]
+  );
 
   const { svgRef } = useCanvasRefs();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const useInlinePythonTutorPrimitives =
     visualStyle === "pythonTutor" && !pythonTutorStandalonePrimitives;
+
+  const constrainCanvasElementPosition = useCallback(
+    (
+      element: CanvasElement,
+      x: number,
+      y: number,
+      dimensions?: { width: number; height: number },
+    ) => {
+      if (element.kind.name === "function") {
+        return { x, y };
+      }
+
+      const svg = svgRef.current;
+      const vb = svg?.viewBox.baseVal;
+
+      if (!vb || !vb.width || !vb.height) {
+        return { x, y };
+      }
+
+      const elementDimensions = dimensions ?? getBoxDimensions(element);
+
+      const callStackBounds = getCallStackBounds(
+        vb.height,
+        0,
+        0,
+        callStackWidth,
+      );
+
+      return smoothlyConstrainDragPosition(
+        { x, y },
+        elementDimensions,
+        callStackBounds,
+        { width: vb.width, height: vb.height },
+      );
+    },
+    [svgRef, callStackWidth],
+  );
 
   const initialVB =
     typeof window !== "undefined"
@@ -307,44 +373,50 @@ function Canvas({
   }, [elements]);
 
   // Validate elements whenever they change
-  // Create a stable signature of elements for comparison
-  const elementsSignature = useMemo(() => {
-    return elements.map(el => 
-      `${el.boxId}-${el.id}-${el.invalidated || false}-${typeof el.kind.value === 'object' ? JSON.stringify(el.kind.value) : el.kind.value}`
-    ).join('|');
-  }, [elements]);
-
   useEffect(() => {
     const validatedElements = validateElements(elements);
-    
+
     // Check if any validation errors have changed
     const hasChanges = validatedElements.some((validatedEl, index) => {
       const currentEl = elements[index];
       if (!currentEl) return true;
-      
+
       const validatedErrors = validatedEl.errors;
       const currentErrors = currentEl.errors;
-      
+
       // Compare errors
       if (!validatedErrors && !currentErrors) return false;
       if (!validatedErrors || !currentErrors) return true;
       if (validatedErrors.length !== currentErrors.length) return true;
-      
+
       return JSON.stringify(validatedErrors) !== JSON.stringify(currentErrors);
     });
 
     if (hasChanges) {
       setElements(validatedElements);
     }
-  }, [elementsSignature]); // Only depend on the signature, not elements directly
+  }, [elements, setElements]);
 
   const createPositionUpdater = useCallback(
     (boxId: number) => (x: number, y: number) => {
       setElements((prev) =>
-        prev.map((el) => (el.boxId === boxId ? { ...el, x, y } : el))
+        prev.map((el) => {
+          if (el.boxId !== boxId) return el;
+
+          const constrained = constrainCanvasElementPosition(el, x, y);
+          if (el.x === constrained.x && el.y === constrained.y) {
+            return el;
+          }
+
+          return {
+            ...el,
+            x: constrained.x,
+            y: constrained.y,
+          };
+        }),
       );
     },
-    [setElements]
+    [setElements, constrainCanvasElementPosition],
   );
 
   const handleCanvasDrop = useCallback(
@@ -383,12 +455,25 @@ function Canvas({
         const newId =
           sandbox || newKind.name === "function" ? "_" : getNextElementId(ids);
 
-        const newElement: CanvasElement = {
+        const baseElement: CanvasElement = {
           boxId: newBoxId,
           id: newId,
           kind: newKind,
           x: coords.x,
           y: coords.y,
+        };
+
+        const constrained = constrainCanvasElementPosition(
+          baseElement,
+          coords.x,
+          coords.y,
+          NEW_BOX_BOUNDARY_DIMENSIONS,
+        );
+
+        const newElement: CanvasElement = {
+          ...baseElement,
+          x: constrained.x,
+          y: constrained.y,
         };
 
         return [...prev, newElement];
@@ -414,19 +499,32 @@ function Canvas({
       setElements((prev) =>
         prev.map((el) => {
           if (el.boxId !== boxId) return el;
-          const updated = { ...el, id: updatedId, kind: updatedKind };
+          const nextKind =
+            isProtectedMainFrame(el) && updatedKind.name === "function"
+              ? {
+                  ...updatedKind,
+                  functionName: QUESTION_MAIN_FRAME_NAME,
+                }
+              : updatedKind;
+          const updated = { ...el, id: updatedId, kind: nextKind };
           return invalidated !== undefined
-            ? { ...updated, invalidated }
+            ? {
+                ...updated,
+                invalidated: isProtectedMainFrame(el) ? false : invalidated,
+              }
             : updated;
         })
       );
     },
-    [setElements]
+    [isProtectedMainFrame, setElements]
   );
 
   const removeElement = useCallback(
     (boxId: number) => {
       const removed = elements.find((el) => el.boxId === boxId);
+      if (removed && isProtectedMainFrame(removed)) {
+        return;
+      }
       if (removed && typeof removed.id === "number") {
         removeId(removed.id);
       }
@@ -434,7 +532,7 @@ function Canvas({
       setOpenEditors((prev) => prev.filter((el) => el.boxId !== boxId));
       setSelectedElement((prev) => (prev?.boxId === boxId ? null : prev));
     },
-    [elements, setElements, removeId]
+    [elements, isProtectedMainFrame, setElements, removeId]
   );
 
   const openElementEditor = useCallback(
@@ -479,8 +577,6 @@ function Canvas({
     if (openEditors.length === 0) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      const tag = (e.target as HTMLElement).tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
       setOpenEditors([]);
       setSelectedElement(null);
     };
@@ -551,20 +647,9 @@ function Canvas({
     (fromIndex: number, toIndex: number) => {
       if (fromIndex === toIndex) return;
 
-      setElements((prev) => {
-        const functionIndices = prev
-          .map((el, i) => ({ el, i }))
-          .filter(({ el }) => el.kind.name === "function");
-
-        const sourceIndex = functionIndices[fromIndex].i;
-        const targetIndex = functionIndices[toIndex].i;
-
-        const reordered = [...prev];
-        const [movedElement] = reordered.splice(sourceIndex, 1);
-        reordered.splice(targetIndex, 0, movedElement);
-
-        return reordered;
-      });
+      setElements((prev) =>
+        reorderFunctionFramesWithLockedMain(prev, fromIndex, toIndex)
+      );
     },
     [setElements]
   );
@@ -671,6 +756,11 @@ function Canvas({
             elements={elements}
             editorScale={editorScale}
             questionFunctionNames={questionFunctionNames}
+            isLockedMainFrame={isProtectedMainFrame(element)}
+            reservedFunctionNames={
+              isQuestionMode ? [QUESTION_MAIN_FRAME_NAME] : undefined
+            }
+            isQuestionMode={isQuestionMode}
             visualStyle={visualStyle}
             pythonTutorReferenceArrows={pythonTutorReferenceArrows}
             pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}

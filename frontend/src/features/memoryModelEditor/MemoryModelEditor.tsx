@@ -344,6 +344,9 @@ export default function MemoryModelEditor({
     questionType: state.selectedQuestionType,
     submissionResults: state.submissionResults,
     sandboxMode: state.isSandboxMode,
+    visualStyle: state.visualStyle,
+    pythonTutorReferenceArrows: state.pythonTutorReferenceArrows,
+    pythonTutorStandalonePrimitives: state.pythonTutorStandalonePrimitives,
     questionView: state.questionView,
     isInfoPanelOpen: state.isInfoPanelOpen,
     canvasScale,
@@ -534,6 +537,18 @@ export default function MemoryModelEditor({
                 onScaleChange={setCanvasScale}
                 editorScale={editorScale}
                 onEditorScaleChange={setEditorScale}
+                visualStyle={state.visualStyle}
+                onVisualStyleChange={state.setVisualStyle}
+                pythonTutorReferenceArrows={state.pythonTutorReferenceArrows}
+                onPythonTutorReferenceArrowsChange={
+                  state.setPythonTutorReferenceArrows
+                }
+                pythonTutorStandalonePrimitives={
+                  state.pythonTutorStandalonePrimitives
+                }
+                onPythonTutorStandalonePrimitivesChange={
+                  state.setPythonTutorStandalonePrimitives
+                }
                 fontScale={fontScale}
                 onFontScaleChange={adjustFontScale}
               />
@@ -568,6 +583,11 @@ export default function MemoryModelEditor({
               scale={canvasScale}
               onScaleChange={setCanvasScale}
               editorScale={editorScale}
+              visualStyle={state.visualStyle}
+              pythonTutorReferenceArrows={state.pythonTutorReferenceArrows}
+              pythonTutorStandalonePrimitives={
+                state.pythonTutorStandalonePrimitives
+              }
               questionFunctionNames={
                 effectiveSandboxMode && currentQuestionData
                   ? getQuestionFunctionNames(currentQuestionData)

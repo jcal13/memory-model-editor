@@ -1,7 +1,14 @@
 import CollectionItem from "./CollectionItem";
 import CollectionAddButton from "./CollectionAddButton";
 import styles from "../../Editor.module.css";
-import { ID, ElementError } from "../../../shared/types";
+import type { Dispatch, SetStateAction } from "react";
+import {
+  BoxType,
+  CanvasElement,
+  ID,
+  ElementError,
+  VisualStyle,
+} from "../../../shared/types";
 
 /**
  * Props for the CollectionContent component.
@@ -16,6 +23,11 @@ interface Props {
   sandbox: boolean;
   validationErrors?: ElementError[]; // Validation errors for highlighting
   elements?: any[]; // All canvas elements for ID usage tracking
+  ownerElement: CanvasElement;
+  visualStyle?: VisualStyle;
+  pythonTutorStandalonePrimitives?: boolean;
+  onCommitKind?: (kind: BoxType) => void;
+  onElementsChange?: Dispatch<SetStateAction<CanvasElement[]>>;
 }
 
 /**
@@ -36,6 +48,11 @@ const CollectionContent = ({
   sandbox,
   validationErrors,
   elements = [],
+  ownerElement,
+  visualStyle = "memoryviz",
+  pythonTutorStandalonePrimitives = false,
+  onCommitKind,
+  onElementsChange,
 }: Props) => {
   return (
     <div className={styles.contentContainer}>
@@ -49,6 +66,11 @@ const CollectionContent = ({
         sandbox={sandbox}
         validationErrors={validationErrors}
         elements={elements}
+        ownerElement={ownerElement}
+        visualStyle={visualStyle}
+        pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}
+        onCommitKind={onCommitKind}
+        onElementsChange={onElementsChange}
       />
       <CollectionAddButton mode={mode} items={items} setItems={setItems} />
     </div>

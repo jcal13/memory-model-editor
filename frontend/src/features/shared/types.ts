@@ -1,6 +1,10 @@
+import type { Dispatch, SetStateAction } from "react";
+
 export type PrimitiveType = "NoneType" | "int" | "float" | "str" | "bool";
 export type CollectionType = "list" | "tuple" | "set" | "dict";
 export type SpecialType = "function" | "class";
+export type VisualStyle = "memoryviz" | "pythonTutor";
+export type RenderMode = "canvas" | "palette";
 
 /**
  * Box type names (used for palette and box configuration lookup)
@@ -92,6 +96,7 @@ export interface CanvasElement {
   x: number;
   y: number;
   kind: BoxType;
+  generatedInlinePrimitive?: boolean;
   questionFrameRole?: "main";
   invalidated?: boolean;
   errors?: ElementError[]; // Unified error system (validation + feedback)
@@ -158,14 +163,8 @@ export type ID = number | "_";
 export type ClassID = string | "_";
 
 export interface BoxEditorType {
-  metadata: {
-    id: ID;
-    kind: BoxType;
-    className?: ClassID;
-    errors?: ElementError[]; // Updated to use unified error system
-    invalidated?: boolean;
-  };
-  onSave: (id: ID, kind: BoxType) => void;
+  metadata: CanvasElement;
+  onSave: (id: ID, kind: BoxType, invalidated?: boolean) => void;
   onRemove: () => void;
   onClose: () => void;
 
@@ -182,6 +181,9 @@ export interface BoxEditorType {
   canManageFunctions?: boolean;
   elements?: any[];
   questionFunctionNames?: string[];
+  visualStyle?: VisualStyle;
+  pythonTutorStandalonePrimitives?: boolean;
+  onElementsChange?: Dispatch<SetStateAction<CanvasElement[]>>;
   isLockedMainFrame?: boolean;
   reservedFunctionNames?: string[];
   isQuestionMode?: boolean;

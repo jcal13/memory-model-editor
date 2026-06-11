@@ -5,7 +5,7 @@
 
 import { useEffect, RefObject } from "react";
 import { createBoxRenderer } from "../utils/BoxRenderer";
-import { BoxTypeName } from "../../shared/types";
+import { BoxTypeName, VisualStyle } from "../../shared/types";
 
 /**
  * Renders a static preview SVG for a palette box type.
@@ -21,14 +21,15 @@ import { BoxTypeName } from "../../shared/types";
  */
 export const usePaletteBoxEffect = (
   containerRef: RefObject<HTMLDivElement | null>,
-  boxType: BoxTypeName
+  boxType: BoxTypeName,
+  visualStyle: VisualStyle
 ) => {
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     try {
-      const svg = createBoxRenderer(boxType);
+      const svg = createBoxRenderer(boxType, visualStyle);
 
       container.innerHTML = "";
       container.appendChild(svg);
@@ -40,5 +41,5 @@ export const usePaletteBoxEffect = (
     } catch (error) {
       console.error(`Failed to render box type ${boxType}:`, error);
     }
-  }, [boxType, containerRef]);
+  }, [boxType, containerRef, visualStyle]);
 };

@@ -1,4 +1,9 @@
-import { CanvasElement, ID } from "../../shared/types";
+import {
+  CanvasElement,
+  ID,
+  RenderMode,
+  VisualStyle,
+} from "../../shared/types";
 
 /**
  * Core props for the CanvasBox component
@@ -24,6 +29,21 @@ export interface CanvasBoxProps {
 
   /** Actual rendered width of the call stack (x + columnWidth), used for constraints */
   callStackWidth?: number;
+
+  /** Active visual style for rendering */
+  visualStyle?: VisualStyle;
+
+  /** Whether Python Tutor mode should render reference arrows */
+  pythonTutorReferenceArrows?: boolean;
+
+  /** Whether Python Tutor mode should treat primitives as standalone objects */
+  pythonTutorStandalonePrimitives?: boolean;
+
+  /** Lookup map for resolving ID references in alternate renderers */
+  elementsById?: Map<number, CanvasElement>;
+
+  /** Renderer mode for size/layout differences */
+  renderMode?: RenderMode;
 }
 
 /**

@@ -4,12 +4,13 @@
  */
 
 import MemoryViz from "memory-viz";
-import { CanvasElement } from "../../shared/types";
+import { CanvasElement, RenderMode, VisualStyle } from "../../shared/types";
 import { MemoryVizConfig } from "./box.types";
 import {
   getBoxConfig,
   DEFAULT_CANVAS_STYLE,
 } from "../../shared/boxConfig";
+import { createPythonTutorBoxRenderer } from "./pythonTutorRenderer";
 
 /**
  * Base MemoryViz configuration for all canvas boxes.
@@ -40,7 +41,33 @@ const DEFAULT_MEMORY_VIZ_CONFIG: Partial<MemoryVizConfig> = {
  * const svg = createBoxRenderer(element);
  * container.appendChild(svg);
  */
-export function createBoxRenderer(element: CanvasElement): SVGSVGElement {
+export function createBoxRenderer(
+  element: CanvasElement,
+  options: {
+    visualStyle?: VisualStyle;
+    pythonTutorReferenceArrows?: boolean;
+    pythonTutorStandalonePrimitives?: boolean;
+    elementsById?: Map<number, CanvasElement>;
+    renderMode?: RenderMode;
+  } = {}
+): SVGSVGElement {
+  if (options.visualStyle === "pythonTutor") {
+    const svg = createPythonTutorBoxRenderer(element, {
+      elementsById: options.elementsById,
+      renderMode: options.renderMode,
+      showReferenceArrows:
+        options.renderMode === "canvas" && options.pythonTutorReferenceArrows,
+      showPrimitiveReferencesAsObjects:
+        options.pythonTutorStandalonePrimitives,
+    });
+
+    if (element.color) {
+      applyErrorStyling(svg, element.color);
+    }
+
+    return svg;
+  }
+
   const { MemoryModel } = MemoryViz;
   const { kind, id, boxId } = element;
   const kindName = kind.name;

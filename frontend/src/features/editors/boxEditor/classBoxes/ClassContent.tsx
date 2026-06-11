@@ -1,8 +1,16 @@
 import styles from "../../Editor.module.css";
-import { ID, ElementError } from "../../../shared/types";
+import type { Dispatch, SetStateAction } from "react";
+import {
+  BoxType,
+  CanvasElement,
+  ID,
+  ElementError,
+  VisualStyle,
+} from "../../../shared/types";
 import IdSelector from "../../idEditor/IdEditor";
 import { isIdInvalid, getErrorsForId } from "../../utils/validationHelpers";
 import FieldValidationTooltip from "../FieldValidationTooltip";
+import InlineTargetEditor from "../InlineTargetEditor";
 
 /**
  * Props for the ClassContent component.
@@ -10,12 +18,18 @@ import FieldValidationTooltip from "../FieldValidationTooltip";
 interface Props {
   classVariables: any; // Array of variable objects for the class
   setVariables: any; // Setter to update the list of variables
+  className: string;
   ids: any;
   addId: (id: ID) => void;
   removeId: (id: ID) => void;
   sandbox: boolean;
   validationErrors?: ElementError[]; // Validation errors for highlighting
   elements?: any[]; // All canvas elements for ID usage tracking
+  ownerElement: CanvasElement;
+  visualStyle?: VisualStyle;
+  pythonTutorStandalonePrimitives?: boolean;
+  onCommitKind?: (kind: BoxType) => void;
+  onElementsChange?: Dispatch<SetStateAction<CanvasElement[]>>;
 }
 
 /**
@@ -31,13 +45,22 @@ interface Props {
 const ClassContent = ({
   classVariables,
   setVariables,
+  className,
   ids,
   addId,
   removeId,
   sandbox,
   validationErrors,
   elements = [],
+  ownerElement,
+  visualStyle = "memoryviz",
+  pythonTutorStandalonePrimitives = false,
+  onCommitKind,
+  onElementsChange,
 }: Props) => {
+  const useInlineTargetEditor =
+    visualStyle === "pythonTutor" && !pythonTutorStandalonePrimitives;
+
   // Add a new empty variable to the list
   const addVariable = () =>
     setVariables([...classVariables, { name: "", targetId: "_" }]);
@@ -56,11 +79,19 @@ const ClassContent = ({
 
   // Update the targetId of a variable at a given index
   const setTargetId = (i: number, id: ID) =>
-    setVariables(
-      classVariables.map((v: any, idx: any) =>
+    {
+      const nextVariables = classVariables.map((v: any, idx: any) =>
         idx === i ? { ...v, targetId: id } : v
-      )
-    );
+      );
+      setVariables(nextVariables);
+      onCommitKind?.({
+        name: "class",
+        type: "class",
+        value: null,
+        className,
+        classVariables: nextVariables,
+      });
+    };
 
   return (
     <div className={styles.contentContainer}>
@@ -78,21 +109,33 @@ const ClassContent = ({
                   className={styles.variableNameBox}
                 />
                 <div className={styles.idSelectButtonWrapper}>
-                  <FieldValidationTooltip errors={fieldErrors}>
-                    <IdSelector
-                      currentId={v.targetId}
-                      ids={ids}
-                      onAdd={addId}
-                      onSelect={(id) => setTargetId(idx, id)}
-                      onRemove={removeId}
-                      buttonClassName={`${styles.collectionIdBox} ${
-                        hasError ? styles.errorId : ""
-                      }`}
-                      sandbox={sandbox}
-                      editable={true}
+                  {useInlineTargetEditor ? (
+                    <InlineTargetEditor
+                      ownerElement={ownerElement}
+                      currentTarget={v.targetId}
+                      onTargetChange={(id) => setTargetId(idx, id as ID)}
+                      addId={addId}
                       elements={elements}
+                      onElementsChange={onElementsChange}
+                      validationErrors={fieldErrors}
                     />
-                  </FieldValidationTooltip>
+                  ) : (
+                    <FieldValidationTooltip errors={fieldErrors}>
+                      <IdSelector
+                        currentId={v.targetId}
+                        ids={ids}
+                        onAdd={addId}
+                        onSelect={(id) => setTargetId(idx, id)}
+                        onRemove={removeId}
+                        buttonClassName={`${styles.collectionIdBox} ${
+                          hasError ? styles.errorId : ""
+                        }`}
+                        sandbox={sandbox}
+                        editable={true}
+                        elements={elements}
+                      />
+                    </FieldValidationTooltip>
+                  )}
                 </div>
                 <button
                   onClick={() => removeVariable(idx)}

@@ -3,7 +3,12 @@ import PaletteBox from "./components/PaletteBox";
 import CanvasControls from "../canvasControls/CanvasControls";
 import { useResizable } from "./hooks/useResizable";
 import styles from "./Palette.module.css";
-import { PaletteTab, BoxTypeName, CanvasElement } from "../shared/types";
+import {
+  PaletteTab,
+  BoxTypeName,
+  CanvasElement,
+  VisualStyle,
+} from "../shared/types";
 
 // Move constants here for better organization
 const ALL_TYPES: readonly BoxTypeName[] = [
@@ -67,6 +72,12 @@ interface PaletteProps {
   onScaleChange?: (scale: number) => void;
   editorScale?: number;
   onEditorScaleChange?: (scale: number) => void;
+  visualStyle?: VisualStyle;
+  onVisualStyleChange?: (style: VisualStyle) => void;
+  pythonTutorReferenceArrows?: boolean;
+  onPythonTutorReferenceArrowsChange?: (value: boolean) => void;
+  pythonTutorStandalonePrimitives?: boolean;
+  onPythonTutorStandalonePrimitivesChange?: (value: boolean) => void;
   fontScale?: number;
   onFontScaleChange?: (delta: number) => void;
 }
@@ -99,6 +110,18 @@ function filterBoxesByRequired(
   return boxes.filter((boxType) => requiredBoxes.includes(boxType));
 }
 
+function filterBoxesByVisualStyle(
+  boxes: readonly BoxTypeName[],
+  visualStyle: VisualStyle,
+  pythonTutorStandalonePrimitives: boolean
+): BoxTypeName[] {
+  if (visualStyle !== "pythonTutor" || pythonTutorStandalonePrimitives) {
+    return [...boxes];
+  }
+
+  return boxes.filter((boxType) => !PRIMITIVE_TYPES.includes(boxType));
+}
+
 export default function Palette({
   activeTab,
   setActive,
@@ -116,6 +139,12 @@ export default function Palette({
   onScaleChange,
   editorScale,
   onEditorScaleChange,
+  visualStyle = "memoryviz",
+  onVisualStyleChange,
+  pythonTutorReferenceArrows = false,
+  onPythonTutorReferenceArrowsChange,
+  pythonTutorStandalonePrimitives = false,
+  onPythonTutorStandalonePrimitivesChange,
   fontScale,
   onFontScaleChange,
 }: PaletteProps) {
@@ -125,6 +154,11 @@ export default function Palette({
     isPracticeMode && requiredBoxes
       ? filterBoxesByRequired(allBoxes, requiredBoxes)
       : allBoxes;
+  const visibleBoxes = filterBoxesByVisualStyle(
+    boxes,
+    visualStyle,
+    pythonTutorStandalonePrimitives
+  );
 
   const { topHeight, handleMouseDown, containerRef } = useResizable({
     initialTopPercent: 60,
@@ -188,9 +222,22 @@ export default function Palette({
                   transition: 'transform 0.2s ease',
                 }}
               >
-                {boxes.map((boxType) => (
-                  <PaletteBox key={boxType} boxType={boxType} />
-                ))}
+                {visibleBoxes.length > 0 ? (
+                  visibleBoxes.map((boxType) => (
+                    <PaletteBox
+                      key={boxType}
+                      boxType={boxType}
+                      visualStyle={visualStyle}
+                    />
+                  ))
+                ) : (
+                  <p className={styles.emptyState}>
+                    {visualStyle === "pythonTutor" &&
+                    !pythonTutorStandalonePrimitives
+                      ? "Primitive values are created inline in Python Tutor mode."
+                      : "No boxes available in this tab."}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -222,6 +269,16 @@ export default function Palette({
             onScaleChange={onScaleChange}
             editorScale={editorScale}
             onEditorScaleChange={onEditorScaleChange}
+            visualStyle={visualStyle}
+            onVisualStyleChange={onVisualStyleChange}
+            pythonTutorReferenceArrows={pythonTutorReferenceArrows}
+            onPythonTutorReferenceArrowsChange={
+              onPythonTutorReferenceArrowsChange
+            }
+            pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}
+            onPythonTutorStandalonePrimitivesChange={
+              onPythonTutorStandalonePrimitivesChange
+            }
             fontScale={fontScale}
             onFontScaleChange={onFontScaleChange}
           />

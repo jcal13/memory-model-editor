@@ -4,6 +4,7 @@ import {
   SubmissionResult,
   Tab,
   PaletteTab,
+  VisualStyle,
 } from "../../shared/types";
 import {
   loadInitialCanvasData,
@@ -49,6 +50,13 @@ export function useMemoryModelEditorState(sandbox: boolean) {
       ? initialUIData.sandboxMode
       : sandbox
   );
+  const [visualStyle, setVisualStyle] = useState<VisualStyle>(
+    initialUIData.visualStyle ?? "memoryviz"
+  );
+  const [pythonTutorReferenceArrows, setPythonTutorReferenceArrows] =
+    useState<boolean>(initialUIData.pythonTutorReferenceArrows ?? false);
+  const [pythonTutorStandalonePrimitives, setPythonTutorStandalonePrimitives] =
+    useState<boolean>(initialUIData.pythonTutorStandalonePrimitives ?? false);
   const [questionView, setQuestionView] = useState<QuestionView>(
     initialUIData.questionView ?? "root"
   );
@@ -100,6 +108,12 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     setSubmissionResults,
     isSandboxMode,
     setIsSandboxMode,
+    visualStyle,
+    setVisualStyle,
+    pythonTutorReferenceArrows,
+    setPythonTutorReferenceArrows,
+    pythonTutorStandalonePrimitives,
+    setPythonTutorStandalonePrimitives,
     questionView,
     setQuestionView,
     tabScrollPositions,

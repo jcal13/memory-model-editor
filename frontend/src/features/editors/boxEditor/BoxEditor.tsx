@@ -45,6 +45,9 @@ const BoxEditorModule = ({
   questionFunctionNames,
   isLockedMainFrame = false,
   reservedFunctionNames,
+  visualStyle = "memoryviz",
+  pythonTutorStandalonePrimitives = false,
+  onElementsChange,
 }: BoxEditorType) => {
   // Shared hover state for remove button
   const { hoverRemove, setHoverRemove } = useGlobalStates();
@@ -89,6 +92,10 @@ const BoxEditorModule = ({
   const collectionData =
     metadata.kind.name === "dict" ? collectionPairs : collectionItems;
 
+  const commitElementKind = (kind: typeof metadata.kind) => {
+    onSave(ownId, kind, invalidated);
+  };
+
   // Hook to sync the module and apply save logic when clicking outside
   useModule(
     onSave,
@@ -104,7 +111,7 @@ const BoxEditorModule = ({
     invalidated,
   );
   return (
-    <div ref={moduleRef} className={`drag-handle ${styles.boxEditorModule}`}>
+    <div ref={moduleRef} className={styles.boxEditorModule}>
       {/* Top section: header with id, type, name + close button */}
       <Header
         element={metadata}
@@ -142,12 +149,14 @@ const BoxEditorModule = ({
           dataType={dataType}
           value={contentValue}
           setValue={setContentValue}
+          functionName={functionName}
           functionParams={functionParams}
           setFunctionParams={setFunctionParams}
           collectionItems={collectionItems}
           setCollectionItems={setCollectionItems}
           collectionPairs={collectionPairs}
           setCollectionPairs={setCollectionPairs}
+          className={ownClassName}
           ownClassVariables={ownClassVariables}
           setOwnClassVariables={setOwnClassVariables}
           ids={ids}
@@ -155,6 +164,10 @@ const BoxEditorModule = ({
           removeId={removeId}
           sandbox={sandbox}
           elements={elements}
+          visualStyle={visualStyle}
+          pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}
+          onCommitKind={commitElementKind}
+          onElementsChange={onElementsChange}
         />
       </div>
 

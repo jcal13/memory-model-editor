@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useBoxDragState, useDraggableBox } from "../hooks/useCanvas";
+import { constrainPositionAwayFromCallStack, getCallStackBounds } from "../utils/boundary.helpers";
 import { CanvasBoxProps } from "../utils/box.types";
 
 export default function CanvasBox({
@@ -10,6 +11,11 @@ export default function CanvasBox({
   invalidated = false,
   disableDrag = false,
   callStackWidth,
+  visualStyle = "memoryviz",
+  pythonTutorReferenceArrows = false,
+  pythonTutorStandalonePrimitives = false,
+  elementsById,
+  renderMode = "canvas",
 }: CanvasBoxProps) {
   const { gRef, dragState, dimensions } = useBoxDragState();
 
@@ -23,6 +29,11 @@ export default function CanvasBox({
     invalidated,
     disableDrag,
     callStackWidth,
+    visualStyle,
+    pythonTutorReferenceArrows,
+    pythonTutorStandalonePrimitives,
+    elementsById,
+    renderMode,
   });
 
   // Report size changes for parent components (like CallStack)
@@ -35,5 +46,106 @@ export default function CanvasBox({
     }
   }, [element, onSizeChange, dimensions]);
 
-  return <g ref={gRef} />;
+  // Auto-constraint effect: automatically move boxes away from callstack after render
+  const checkAndConstrainPosition = useCallback(() => {
+    if (disableDrag || !gRef.current) return;
+
+    const { width, height } = dimensions.current;
+    if (width <= 0 || height <= 0) return;
+
+    // Skip constraint for function elements (they belong in the callstack)
+    if (element.kind.name === "function") return;
+
+    const svg = gRef.current.ownerSVGElement;
+    const vb = svg?.viewBox.baseVal;
+    const canvasBounds = vb
+      ? { width: vb.width, height: vb.height }
+      : undefined;
+    const callStackBounds = getCallStackBounds(
+      vb?.height || window.innerHeight,
+      0,
+      0,
+      callStackWidth ?? 225
+    );
+
+    const constrainedPosition = constrainPositionAwayFromCallStack(
+      { x: element.x, y: element.y },
+      { width, height },
+      callStackBounds,
+      canvasBounds
+    );
+
+    // Clamp position to stay within canvas bounds (prevents boxes from being cut off)
+    if (canvasBounds && canvasBounds.width > 0 && canvasBounds.height > 0) {
+      const halfW = width / 2;
+      const halfH = height / 2;
+      constrainedPosition.x = Math.max(
+        halfW,
+        Math.min(canvasBounds.width - halfW, constrainedPosition.x)
+      );
+      constrainedPosition.y = Math.max(
+        halfH,
+        Math.min(canvasBounds.height - halfH, constrainedPosition.y)
+      );
+    }
+
+    // Only update position if it actually changed
+    if (
+      constrainedPosition.x !== element.x ||
+      constrainedPosition.y !== element.y
+    ) {
+      updatePosition(constrainedPosition.x, constrainedPosition.y);
+    }
+  }, [
+    element.x,
+    element.y,
+    element.kind.name,
+    dimensions.current.width,
+    dimensions.current.height,
+    disableDrag,
+    updatePosition,
+    callStackWidth,
+  ]);
+
+  useEffect(() => {
+    checkAndConstrainPosition();
+  }, [checkAndConstrainPosition]);
+
+  // Canvas resize effect: re-constrain position when canvas size changes
+  // Uses ResizeObserver on the parent SVG so it fires for both window resizes
+  // and panel resizes (e.g. dragging the question tab wider)
+  useEffect(() => {
+    if (disableDrag || element.kind.name === "function") return;
+
+    const svg = gRef.current?.ownerSVGElement;
+    if (!svg) return;
+
+    let resizeTimeoutId: NodeJS.Timeout;
+
+    const resizeObserver = new ResizeObserver(() => {
+      clearTimeout(resizeTimeoutId);
+      resizeTimeoutId = setTimeout(() => {
+        checkAndConstrainPosition();
+      }, 100);
+    });
+
+    resizeObserver.observe(svg);
+
+    return () => {
+      resizeObserver.disconnect();
+      clearTimeout(resizeTimeoutId);
+    };
+  }, [checkAndConstrainPosition, disableDrag, element.kind.name]);
+
+  return (
+    <g
+      ref={gRef}
+      data-canvas-box-id={element.boxId}
+      data-canvas-kind={element.kind.name}
+      data-canvas-render-mode={renderMode}
+      data-canvas-element-id={
+        typeof element.id === "number" ? element.id : undefined
+      }
+    />
+  );
 }

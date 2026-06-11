@@ -1,8 +1,21 @@
 import MemoryViz from "memory-viz";
-import { BoxTypeName } from "../../shared/types";
+import { BoxTypeName, VisualStyle } from "../../shared/types";
 import { getBoxConfig, DEFAULT_PALETTE_STYLE } from "../../shared/boxConfig";
+import { createPythonTutorBoxRenderer } from "../../canvas/utils/pythonTutorRenderer";
+import { createPythonTutorPalettePreview } from "../../canvas/utils/pythonTutorReferences";
 
-export function createBoxRenderer(boxType: BoxTypeName): SVGSVGElement {
+export function createBoxRenderer(
+  boxType: BoxTypeName,
+  visualStyle: VisualStyle = "memoryviz"
+): SVGSVGElement {
+  if (visualStyle === "pythonTutor") {
+    const preview = createPythonTutorPalettePreview(boxType);
+    return createPythonTutorBoxRenderer(preview.element, {
+      elementsById: preview.elementsById,
+      renderMode: preview.renderMode,
+    });
+  }
+
   const { MemoryModel } = MemoryViz;
   const config = getBoxConfig(boxType);
 

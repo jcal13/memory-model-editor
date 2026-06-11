@@ -66,6 +66,15 @@
   --fade-box-fill: #f8fafc;
   --fade-box-line-color: #e2e8f0;
   --hide-box-fill: #ffffff;
+
+  /* Python Tutor styling */
+  --python-tutor-box-bg: #f1efc6;
+  --python-tutor-border: #7d7b63;
+  --python-tutor-header-text: #666666;
+  --python-tutor-body-text: #111111;
+  --python-tutor-reference-text: #1f4f82;
+  --python-tutor-selected-frame-bg: #d8dee8;
+  --python-tutor-frame-line: #a8a8a8;
 }
 
 :root[data-theme="dark"] {
@@ -132,6 +141,15 @@
   --fade-box-fill: #2d2d2d;
   --fade-box-line-color: #3a3a3a;
   --hide-box-fill: #2d2d2d;
+
+  /* Python Tutor styling */
+  --python-tutor-box-bg: #f1efc6;
+  --python-tutor-border: #7d7b63;
+  --python-tutor-header-text: #666666;
+  --python-tutor-body-text: #111111;
+  --python-tutor-reference-text: #1f4f82;
+  --python-tutor-selected-frame-bg: #d8dee8;
+  --python-tutor-frame-line: #a8a8a8;
 }
 
 /* Apply theme to body */

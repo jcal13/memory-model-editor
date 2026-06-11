@@ -5,9 +5,15 @@ import React, {
   useRef,
   useCallback,
   useLayoutEffect,
+  useMemo,
 } from "react";
 import Draggable from "react-draggable";
-import { CanvasElement, BoxType, ID } from "../shared/types";
+import {
+  CanvasElement,
+  BoxType,
+  ID,
+  VisualStyle,
+} from "../shared/types";
 import CanvasBox from "./components/CanvasBox";
 import BoxEditor from "../editors/boxEditor/BoxEditor";
 import CallStack from "./components/CallStack";
@@ -24,6 +30,11 @@ import {
   reorderFunctionFramesWithLockedMain,
 } from "../memoryModelEditor/utils/questionFrames";
 import styles from "./Canvas.module.css";
+import {
+  createElementsByIdMap,
+} from "./utils/pythonTutorReferences";
+import { findOrphanedGeneratedPrimitiveIds } from "../editors/utils/pythonTutorInlinePrimitives";
+import PythonTutorReferenceArrows from "./components/PythonTutorReferenceArrows";
 
 const NEW_BOX_BOUNDARY_DIMENSIONS = {
   width: 200,
@@ -63,6 +74,10 @@ interface FloatingEditorProps {
   isLockedMainFrame?: boolean;
   reservedFunctionNames?: string[];
   isQuestionMode?: boolean;
+  visualStyle?: VisualStyle;
+  pythonTutorReferenceArrows?: boolean;
+  pythonTutorStandalonePrimitives?: boolean;
+  onElementsChange: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
 }
 
 function FloatingEditor({
@@ -88,6 +103,10 @@ function FloatingEditor({
   isLockedMainFrame: lockMainFrame = false,
   reservedFunctionNames,
   isQuestionMode = false,
+  visualStyle = "memoryviz",
+  pythonTutorReferenceArrows = false,
+  pythonTutorStandalonePrimitives = false,
+  onElementsChange,
 }: FloatingEditorProps) {
   const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -138,6 +157,9 @@ function FloatingEditor({
             isLockedMainFrame={lockMainFrame}
             reservedFunctionNames={reservedFunctionNames}
             isQuestionMode={isQuestionMode}
+            visualStyle={visualStyle}
+            pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}
+            onElementsChange={onElementsChange}
           />
         </div>
       </div>
@@ -162,7 +184,10 @@ interface CanvasProps {
   scale?: number;
   onScaleChange?: (scale: number) => void;
   editorScale?: number;
-  questionFunctionNames?: string[];
+  questionFunctionNames?: string[]; 
+  visualStyle?: VisualStyle;
+  pythonTutorReferenceArrows?: boolean;
+  pythonTutorStandalonePrimitives?: boolean;
   isQuestionMode?: boolean;
 }
 
@@ -182,6 +207,9 @@ function Canvas({
   scale: externalScale,
   editorScale = 1,
   questionFunctionNames,
+  visualStyle = "memoryviz",
+  pythonTutorReferenceArrows = false,
+  pythonTutorStandalonePrimitives = false,
   isQuestionMode = false,
 }: CanvasProps) {
   const [openEditors, setOpenEditors] = useState<CanvasElement[]>([]);
@@ -201,6 +229,8 @@ function Canvas({
 
   const { svgRef } = useCanvasRefs();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const useInlinePythonTutorPrimitives =
+    visualStyle === "pythonTutor" && !pythonTutorStandalonePrimitives;
 
   const constrainCanvasElementPosition = useCallback(
     (
@@ -394,6 +424,18 @@ function Canvas({
     (event: React.DragEvent<SVGSVGElement>) => {
       event.preventDefault();
       const boxType = event.dataTransfer.getData("application/box-type");
+      const primitiveBoxTypes = new Set([
+        "none",
+        "int",
+        "float",
+        "str",
+        "bool",
+        "primitive",
+      ]);
+
+      if (useInlinePythonTutorPrimitives && primitiveBoxTypes.has(boxType)) {
+        return;
+      }
 
       const newKind = createNewElement(boxType);
       if (!newKind) return;
@@ -438,7 +480,14 @@ function Canvas({
         return [...prev, newElement];
       });
     },
-    [ids, sandbox, svgRef, setElements, constrainCanvasElementPosition],
+    [
+      elements,
+      ids,
+      sandbox,
+      svgRef,
+      setElements,
+      useInlinePythonTutorPrimitives,
+    ]
   );
 
   const saveElement = useCallback(
@@ -487,10 +536,17 @@ function Canvas({
     [elements, isProtectedMainFrame, setElements, removeId]
   );
 
-  const openElementEditor = useCallback((element: CanvasElement) => {
-    setOpenEditors([element]);
-    setSelectedElement(element);
-  }, []);
+  const openElementEditor = useCallback(
+    (element: CanvasElement) => {
+      if (useInlinePythonTutorPrimitives && element.kind.name === "primitive") {
+        return;
+      }
+
+      setOpenEditors([element]);
+      setSelectedElement(element);
+    },
+    [useInlinePythonTutorPrimitives]
+  );
 
   const closeElementEditor = useCallback((boxId: number) => {
     setOpenEditors((prev) => prev.filter((el) => el.boxId !== boxId));
@@ -503,6 +559,19 @@ function Canvas({
       onEditorOpenerReady(openElementEditor);
     }
   }, [onEditorOpenerReady, openElementEditor]);
+
+  useEffect(() => {
+    if (!useInlinePythonTutorPrimitives) {
+      return;
+    }
+
+    setOpenEditors((prev) =>
+      prev.filter((element) => element.kind.name !== "primitive")
+    );
+    setSelectedElement((prev) =>
+      prev?.kind.name === "primitive" ? null : prev
+    );
+  }, [useInlinePythonTutorPrimitives]);
 
   // Close all open editors when Escape is pressed
   useEffect(() => {
@@ -517,6 +586,63 @@ function Canvas({
   }, [openEditors.length]);
 
   const functionFrames = elements.filter((el) => el.kind.name === "function");
+  const elementsById = useMemo(() => createElementsByIdMap(elements), [elements]);
+  const visibleObjects = useMemo(
+    () =>
+      elements.filter((el) => {
+        if (el.kind.name === "function") return false;
+        return !(
+          useInlinePythonTutorPrimitives && el.kind.name === "primitive"
+        );
+      }),
+    [elements, useInlinePythonTutorPrimitives]
+  );
+
+  useEffect(() => {
+    if (!useInlinePythonTutorPrimitives) {
+      return;
+    }
+
+    const orphanedGeneratedPrimitiveIds = findOrphanedGeneratedPrimitiveIds(elements);
+    if (orphanedGeneratedPrimitiveIds.length === 0) {
+      return;
+    }
+
+    orphanedGeneratedPrimitiveIds.forEach((id) => removeId(id));
+    setElements((prev) =>
+      prev.filter(
+        (element) =>
+          !(
+            element.kind.name === "primitive" &&
+            element.generatedInlinePrimitive &&
+            typeof element.id === "number" &&
+            orphanedGeneratedPrimitiveIds.includes(element.id)
+          )
+      )
+    );
+    setOpenEditors((prev) =>
+      prev.filter(
+        (element) =>
+          !(
+            element.kind.name === "primitive" &&
+            typeof element.id === "number" &&
+            orphanedGeneratedPrimitiveIds.includes(element.id)
+          )
+      )
+    );
+    setSelectedElement((prev) => {
+      if (
+        prev &&
+        prev.kind.name === "primitive" &&
+        typeof prev.id === "number" &&
+        orphanedGeneratedPrimitiveIds.includes(prev.id)
+      ) {
+        return null;
+      }
+
+      return prev;
+    });
+  }, [elements, removeId, setElements, useInlinePythonTutorPrimitives]);
 
   const handleCallStackReorder = useCallback(
     (fromIndex: number, toIndex: number) => {
@@ -567,22 +693,41 @@ function Canvas({
             onReorder={handleCallStackReorder}
             onWidthChange={setCallStackWidth}
             scale={scale}
+            visualStyle={visualStyle}
+            pythonTutorReferenceArrows={pythonTutorReferenceArrows}
+            pythonTutorStandalonePrimitives={
+              pythonTutorStandalonePrimitives
+            }
+            elementsById={elementsById}
           />
 
           <g>
-            {elements
-              .filter((el) => el.kind.name !== "function")
-              .map((el) => (
+            {visibleObjects.map((el) => (
                 <CanvasBox
                   key={el.boxId}
                   element={el}
-                  openInterface={() => openElementEditor(el)}
+                  openInterface={(target) => openElementEditor(target ?? el)}
                   updatePosition={createPositionUpdater(el.boxId)}
                   invalidated={el.invalidated}
                   callStackWidth={callStackWidth}
+                  visualStyle={visualStyle}
+                  pythonTutorReferenceArrows={pythonTutorReferenceArrows}
+                  pythonTutorStandalonePrimitives={
+                    pythonTutorStandalonePrimitives
+                  }
+                  elementsById={elementsById}
                 />
               ))}
           </g>
+
+          <PythonTutorReferenceArrows
+            svgRef={svgRef}
+            enabled={
+              visualStyle === "pythonTutor" && pythonTutorReferenceArrows
+            }
+            includePrimitiveTargets={pythonTutorStandalonePrimitives}
+            elements={elements}
+          />
         </svg>
       </div>
 
@@ -617,6 +762,10 @@ function Canvas({
               isQuestionMode ? [QUESTION_MAIN_FRAME_NAME] : undefined
             }
             isQuestionMode={isQuestionMode}
+            visualStyle={visualStyle}
+            pythonTutorReferenceArrows={pythonTutorReferenceArrows}
+            pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}
+            onElementsChange={setElements}
           />
         );
       })}
@@ -700,7 +849,10 @@ const areEqual = (prev: Readonly<CanvasProps>, next: Readonly<CanvasProps>) => {
     prev.scale === next.scale &&
     prev.editorScale === next.editorScale &&
     prev.questionFunctionNames === next.questionFunctionNames &&
-    prev.isQuestionMode === next.isQuestionMode
+    prev.visualStyle === next.visualStyle &&
+    prev.pythonTutorReferenceArrows === next.pythonTutorReferenceArrows &&
+    prev.pythonTutorStandalonePrimitives ===
+      next.pythonTutorStandalonePrimitives
   );
 };
 

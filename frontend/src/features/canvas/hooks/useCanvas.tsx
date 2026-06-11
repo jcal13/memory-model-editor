@@ -5,7 +5,11 @@
 
 import { useRef, useEffect, useCallback } from "react";
 import { createBoxRenderer } from "../utils/box.renderer";
-import { CanvasElement } from "../../shared/types";
+import {
+  CanvasElement,
+  RenderMode,
+  VisualStyle,
+} from "../../shared/types";
 import { DragState, BoxDimensions } from "../utils/box.types";
 import {
   getCallStackBounds,
@@ -127,19 +131,30 @@ export function useDraggableBox({
   invalidated = false,
   disableDrag = false,
   callStackWidth,
+  visualStyle = "memoryviz",
+  pythonTutorReferenceArrows = false,
+  pythonTutorStandalonePrimitives = false,
+  elementsById,
+  renderMode = "canvas",
 }: {
   gRef: React.RefObject<SVGGElement | null>;
   element: CanvasElement;
   dimensions: React.MutableRefObject<BoxDimensions>;
   dragState: React.MutableRefObject<DragState>;
-  openInterface: (element: CanvasElement) => void;
+  openInterface: (element: CanvasElement | null) => void;
   updatePosition: (x: number, y: number) => void;
   invalidated?: boolean;
   disableDrag?: boolean;
   callStackWidth?: number;
+  visualStyle?: VisualStyle;
+  pythonTutorReferenceArrows?: boolean;
+  pythonTutorStandalonePrimitives?: boolean;
+  elementsById?: Map<number, CanvasElement>;
+  renderMode?: RenderMode;
 }) {
   const livePosRef = useRef({ x: element.x, y: element.y });
   const movedRef = useRef(false);
+  const boxSvgRef = useRef<SVGSVGElement | null>(null);
   const CLICK_EPS = 3;
 
   const getSvgPoint = useCallback(
@@ -226,9 +241,71 @@ export function useDraggableBox({
     });
   }, [handleMouseMove, updatePosition, dragState]);
 
+  const findReferencedElement = useCallback(
+    (event: MouseEvent | React.MouseEvent) => {
+      if (visualStyle !== "pythonTutor" || !elementsById || !boxSvgRef.current) {
+        return null;
+      }
+
+      const boxSvg = boxSvgRef.current;
+      const ctm = boxSvg.getScreenCTM();
+      if (!ctm) return null;
+
+      const point = boxSvg.createSVGPoint();
+      point.x = event.clientX;
+      point.y = event.clientY;
+      const localPoint = point.matrixTransform(ctm.inverse());
+
+      const hitTargets = Array.from(
+        boxSvg.querySelectorAll<SVGRectElement>("[data-ref-target-id]")
+      );
+
+      for (const hitTarget of hitTargets) {
+        const x = parseFloat(hitTarget.getAttribute("x") || "0");
+        const y = parseFloat(hitTarget.getAttribute("y") || "0");
+        const width = parseFloat(hitTarget.getAttribute("width") || "0");
+        const height = parseFloat(hitTarget.getAttribute("height") || "0");
+
+        const isInside =
+          localPoint.x >= x &&
+          localPoint.x <= x + width &&
+          localPoint.y >= y &&
+          localPoint.y <= y + height;
+
+        if (!isInside) continue;
+
+        const targetId = parseInt(
+          hitTarget.getAttribute("data-ref-target-id") || "",
+          10
+        );
+        if (!Number.isInteger(targetId)) continue;
+
+        const target = elementsById.get(targetId);
+        if (
+          target &&
+          !(
+            visualStyle === "pythonTutor" &&
+            !pythonTutorStandalonePrimitives &&
+            target.kind.name === "primitive"
+          )
+        ) {
+          return target;
+        }
+      }
+
+      return null;
+    },
+    [elementsById, pythonTutorStandalonePrimitives, visualStyle]
+  );
+
   const handleMouseDown = useCallback(
     (event: MouseEvent | React.MouseEvent) => {
       event.stopPropagation();
+      if (findReferencedElement(event)) {
+        movedRef.current = false;
+        return;
+      }
+
       movedRef.current = false;
       dragState.current.isDragging = true;
 
@@ -248,6 +325,7 @@ export function useDraggableBox({
       getSvgPoint,
       handleMouseMove,
       handleMouseUp,
+      findReferencedElement,
       dragState,
     ]
   );
@@ -260,7 +338,14 @@ export function useDraggableBox({
     const container = gRef.current;
     if (!container) return;
 
-    const svgElement = createBoxRenderer(element);
+    const svgElement = createBoxRenderer(element, {
+      visualStyle,
+      pythonTutorReferenceArrows,
+      pythonTutorStandalonePrimitives,
+      elementsById,
+      renderMode,
+    });
+    boxSvgRef.current = svgElement;
     const padding = 12;
 
     container.innerHTML = "";
@@ -312,13 +397,24 @@ export function useDraggableBox({
     const handleClick = (ev: MouseEvent) => {
       ev.stopPropagation();
       if (movedRef.current) return;
-      openInterface(element);
+      const targetElement = findReferencedElement(ev);
+      openInterface(targetElement ?? element);
+    };
+
+    const handleOverlayMouseMove = (ev: MouseEvent) => {
+      const targetElement = findReferencedElement(ev);
+      overlay.style.cursor = targetElement
+        ? "pointer"
+        : disableDrag
+        ? "pointer"
+        : "grab";
     };
 
     if (!disableDrag) {
       overlay.addEventListener("mousedown", handleMouseDown as EventListener);
     }
     overlay.addEventListener("click", handleClick);
+    overlay.addEventListener("mousemove", handleOverlayMouseMove);
     svgElement.appendChild(overlay);
 
     return () => {
@@ -329,6 +425,8 @@ export function useDraggableBox({
         );
       }
       overlay.removeEventListener("click", handleClick);
+      overlay.removeEventListener("mousemove", handleOverlayMouseMove);
+      boxSvgRef.current = null;
     };
   }, [
     element,
@@ -338,5 +436,11 @@ export function useDraggableBox({
     gRef,
     dimensions,
     disableDrag,
+    visualStyle,
+    pythonTutorReferenceArrows,
+    pythonTutorStandalonePrimitives,
+    elementsById,
+    renderMode,
+    findReferencedElement,
   ]);
 }

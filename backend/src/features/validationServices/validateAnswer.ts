@@ -126,11 +126,13 @@ function ensureBijection(
   errors: FeedbackError[],
   contextFrameId?: number
 ): boolean {
-  const cleanPathForUser = (p: string) =>
-    formatPathForUser(p)
-      .replace(/: [^.]+\.?/g, ".")
-      .replace(/:\s*$/g, "");
-  const currentPath = cleanPathForUser(path);
+  const cleanPathForUser = (p: string, id?: number) => {
+    if (id !== undefined && varNameByInputId.has(id)) {
+      return varNameByInputId.get(id)!;
+    }
+    return formatPathForUser(p);
+  };
+  const currentPath = cleanPathForUser(path, inputID);
 
   // Case 1: one expected object maps to multiple drawn objects.
   if (answerToInputMap.has(answerID)) {
@@ -138,10 +140,10 @@ function ensureBijection(
 
     if (prev.target !== inputID) {
       if (!isVar) {
-        const previousPath = cleanPathForUser(prev.path);
+        const previousPath = cleanPathForUser(prev.path, prev.target);
         const answerBox = answerMap.get(answerID);
 
-        const message = ERROR_MESSAGES.reference_should_match(previousPath, currentPath);
+        const message = ERROR_MESSAGES.reference_should_point_to(previousPath, currentPath);
 
         errors.push(
           makeFeedbackError(ErrorType.REFERENCE_MISMATCH, message, {
@@ -162,7 +164,7 @@ function ensureBijection(
 
     if (prev.target !== answerID) {
       if (!isVar) {
-        const previousPath = cleanPathForUser(prev.path);
+        const previousPath = cleanPathForUser(prev.path, prev.target);
 
         errors.push(
           makeFeedbackError(
@@ -195,12 +197,54 @@ const isNoneType = (t: string) => t === "None" || t === "NoneType";
 // Values that represent None/null
 const isNoneValue = (v: unknown) => v === null || v === "None" || v === "null";
 
+// Maps input element ID → variable name for direct path resolution
+let varNameByInputId = new Map<number, string>();
+let answerFramesForPath: MemoryBox[] = [];
+
+function getBestAnswerPath(
+  answerID: number,
+  answerFrames: MemoryBox[],
+  answerMap: Map<number, MemoryBox>
+): string | undefined {
+  const queue: { id: number; path: string }[] = [];
+
+  for (const frame of answerFrames) {
+    const vars = frame.value as Record<string, number>;
+    for (const [varName, id] of Object.entries(vars)) {
+      queue.push({ id, path: varName });
+    }
+  }
+
+  const seen = new Set<number>();
+
+  while (queue.length > 0) {
+    const cur = queue.shift()!;
+    if (cur.id === answerID) return cur.path;
+    if (seen.has(cur.id)) continue;
+    seen.add(cur.id);
+
+    const box = answerMap.get(cur.id);
+    if (!box || !isObjectType(box.type)) continue;
+
+    const props = box.value as Record<string, number>;
+    for (const [prop, nextId] of Object.entries(props)) {
+      queue.push({ id: nextId, path: `${cur.path}.${prop}` });
+    }
+  }
+
+  return undefined;
+}
+
 // Converts technical path to a shorter, user-friendly description
 function formatPathForUser(path: string): string {
-  let s = path
-    .replace(/function\s+"[^"]*"\s*→\s*var\s+"([^"]+)"→/g, "$1: ")
-    .replace(/object\s+"([^"]+)"\.([^→]+)→/g, "$1.$2 → ");
-  return s.replace(/\s*→\s*$/, "").trim() || path;
+  const varMatch = path.match(/var\s+"([^"]+)"/);
+  if (!varMatch) return path.replace(/→$/, "").trim() || path;
+
+  const props = [...path.matchAll(/object\s+"[^"]+"\.([\w]+)/g)].map(
+    (m) => m[1]
+  );
+
+  return [varMatch[1], ...props].join(".");
 }
 
 // Check whether a reference mismatch has already been reported for this path
@@ -255,8 +299,11 @@ function checkTypeMismatch(
   // None and NoneType are the same
   if (isNoneType(answerBox.type) && isNoneType(inputBox.type)) return false;
   // For class instances: wrong type means ID is assigned incorrectly/incompletely, not a type error
-  const loc = formatPathForUser(path);
-  const cleanLoc = loc.replace(/: [^.]+\.?/g, ".");
+  const inputId = inputBox.id ?? undefined;
+  const loc = (inputId !== undefined && varNameByInputId.has(inputId))
+    ? varNameByInputId.get(inputId)!
+    : formatPathForUser(path);
+  const cleanLoc = loc;
   if (isClassInstanceType(answerBox.type)) {
     if (!hasReferenceMismatchAtPath(errors, path)) {
       errors.push(
@@ -727,6 +774,17 @@ function scanDuplicates(model: MemoryBox[], errors: FeedbackError[]): Set<number
   return dup;
 }
 
+function walkGraph(id: number, path: string, inputMap: Map<number, MemoryBox>) {
+  if (varNameByInputId.has(id)) return;
+  varNameByInputId.set(id, path);
+  const box = inputMap.get(id);
+  if (!box || !isObjectType(box.type)) return;
+  const props = box.value as Record<string, number>;
+  for (const prop of Object.keys(props)) {
+    walkGraph(props[prop], `${path}.${prop}`, inputMap);
+  }
+}
+
 // Compare frames from the answer and user model, checking for variable mismatches
 function compareFrames(
   answerFrames: MemoryBox[],
@@ -783,6 +841,23 @@ function compareFrames(
             }
           )
         );
+
+    // first pass: populate varNameByInputId for all variables before compareIds runs
+    for (const k of Object.keys(aVars)) {
+      if (!(k in uVars)) continue;
+      const uid = (uVars as Record<string, any>)[k];
+      if (uid === "_") continue;
+      varNameByInputId.set(uid, k);
+      const directBox = inputMap.get(uid);
+      if (directBox && isObjectType(directBox.type)) {
+        const props = directBox.value as Record<string, number>;
+        for (const prop of Object.keys(props)) {
+          if (!varNameByInputId.has(props[prop])) {
+            walkGraph(props[prop], `${k}.${prop}`, inputMap);
+          }
+        }
+      }
+    }
 
     // deep comparison for shared variables
     for (const k of Object.keys(aVars)) {
@@ -928,22 +1003,38 @@ function compareIds(
   const inputMemoryBox = inputMap.get(inputID);
   if (!answerMemoryBox || !inputMemoryBox) {
     // if either ID is not found in the respective map
-    const cleanPath = path.endsWith('→') ? path.slice(0, -1) : path;
-    const frameMatch = cleanPath.match(/function "([^"]+)"/);
-    const varMatch = cleanPath.match(/var "([^"]+)"/);
-    const frameName = frameMatch ? frameMatch[1] : cleanPath;
-    const varName = varMatch ? varMatch[1] : cleanPath;
-    const unmappedMessage = frameMatch && varMatch
-      ? ERROR_MESSAGES.unmapped_variable(varName, frameName)
-      : ERROR_MESSAGES.unmapped_id_fallback(cleanPath);
-    
+    const loc =
+    !inputMemoryBox
+      ? getBestAnswerPath(answerID, answerFramesForPath, answerMap) ?? formatPathForUser(path)
+      : formatPathForUser(path);
+
+  const isDirectVariablePath =
+    /^function\s+"[^"]+"\s*→\s*var\s+"[^"]+"\s*→?$/.test(path);
+
+  const frameMatch = path.match(/function "([^"]+)"/);
+  const varMatch = path.match(/var "([^"]+)"/);
+
+  const message =
+    isDirectVariablePath && frameMatch && varMatch
+      ? ERROR_MESSAGES.unmapped_variable(varMatch[1], frameMatch[1])
+      : ERROR_MESSAGES.object_incorrectly_connected(loc);
+
     errors.push(
-      makeFeedbackError(ErrorType.INVALID_REFERENCE, unmappedMessage, {
+      makeFeedbackError(ErrorType.INVALID_REFERENCE, message, {
         path,
         severity: 'error',
       })
     );
     return;
+  }
+
+  // update path map with the shortest known path for this inputID
+  const derivedPath = formatPathForUser(path);
+  if (derivedPath) {
+    const existing = varNameByInputId.get(inputID);
+    if (!existing || derivedPath.split('.').length < existing.split('.').length) {
+      varNameByInputId.set(inputID, derivedPath);
+    }
   }
 
   // ID mapping check
@@ -1141,6 +1232,7 @@ function runComparison(
   answerModel: MemoryBox[]
 ): { correct: boolean; errors: FeedbackError[] } {
   const errors: FeedbackError[] = [];
+  varNameByInputId = new Map<number, string>();
 
   // gather frames from both models
   const { answerFrames, inputFrames } = gatherFrames(
@@ -1149,6 +1241,8 @@ function runComparison(
     errors
   );
 
+  answerFramesForPath = answerFrames;
+  
   // check for function + function call stack errors
   const hasFunctionErrors = errors.some(
     (e) =>
@@ -1254,6 +1348,7 @@ async function fetchStepsModel(
   if (!Array.isArray(step.answer)) {
     throw new Error(`Step answer for line ${lineNumber} is not an array`);
   }
+
   return step.answer as MemoryBox[];
 }
 

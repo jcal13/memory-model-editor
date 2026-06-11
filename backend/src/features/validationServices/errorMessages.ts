@@ -10,9 +10,9 @@ export const ERROR_MESSAGES = {
 
   // ID / pointer errors
 
-  // Pattern: "head.next and second should point to the same object"
-  reference_should_match: (pathA: string, pathB: string) =>
-    `${pathA} and ${pathB} should point to the same object`,
+  // Pattern: "third should point to the same object as head.next.next"
+  reference_should_point_to: (pathA: string, pathB: string) =>
+    `${pathA} should point to the same object as ${pathB}`,
   
   // Pattern: "head.next and second should not point to the same object"
   reference_should_differ: (pathA: string, pathB: string) =>
@@ -42,9 +42,9 @@ export const ERROR_MESSAGES = {
   type_mismatch: (loc: string, expectedType: string, gotType: string) =>
     `At ${cleanLocation(loc)}: expected ${expectedType}, but got ${gotType}`,
 
-  // Pattern: "At a: object is incorrectly or incompletely connected"
+  // Pattern: "Object at a is incorrectly or incompletely connected"
   object_incorrectly_connected: (loc: string) =>
-    `At ${cleanLocation(loc)}: object is incorrectly or incompletely connected`,
+    `Object at ${cleanLocation(loc)} is incorrectly or incompletely connected`,
 
   // Pattern: "At a: expected 5, but got 3"
   value_mismatch: (loc: string, expected: string, got: string) =>

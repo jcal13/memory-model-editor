@@ -201,6 +201,137 @@ const isNoneValue = (v: unknown) => v === null || v === "None" || v === "null";
 let varNameByInputId = new Map<number, string>();
 let answerFramesForPath: MemoryBox[] = [];
 
+const FRAME_VAR_PATH_RE = /^function "([^"]+)" → var "([^"]+)"$/;
+type FrameVariableOrder = Map<string, Map<string, number>>;
+
+// Rebuild variable order from first assignment in the question source code
+function deriveFrameVariableOrderFromCode(code: string[]): FrameVariableOrder {
+  const orderByFrame: FrameVariableOrder = new Map();
+  let nextOrder = 0;
+
+  const ensureFrameOrder = (frameName: string): Map<string, number> => {
+    let frameOrder = orderByFrame.get(frameName);
+    if (!frameOrder) {
+      frameOrder = new Map<string, number>();
+      orderByFrame.set(frameName, frameOrder);
+    }
+    return frameOrder;
+  };
+
+  const recordFirstAssignment = (frameName: string, varName: string) => {
+    const frameOrder = ensureFrameOrder(frameName);
+    if (!frameOrder.has(varName)) {
+      frameOrder.set(varName, nextOrder++);
+    }
+  };
+
+  const scopeStack: Array<{
+    indent: number;
+    kind: "function" | "class";
+    name: string;
+  }> = [];
+
+  for (const rawLine of code) {
+    const line = rawLine.replace(/\t/g, "    ");
+    const trimmed = line.trim();
+
+    if (!trimmed || trimmed.startsWith("#")) continue;
+
+    const indent = (line.match(/^ */)?.[0].length ?? 0);
+
+    while (
+      scopeStack.length > 0 &&
+      indent <= scopeStack[scopeStack.length - 1].indent
+    ) {
+      scopeStack.pop();
+    }
+
+    const functionMatch = trimmed.match(/^def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(/);
+    if (functionMatch) {
+      scopeStack.push({
+        indent,
+        kind: "function",
+        name: functionMatch[1],
+      });
+      continue;
+    }
+
+    const classMatch = trimmed.match(/^class\s+([A-Za-z_][A-Za-z0-9_]*)\b/);
+    if (classMatch) {
+      scopeStack.push({
+        indent,
+        kind: "class",
+        name: classMatch[1],
+      });
+      continue;
+    }
+
+    const currentFunctionScope = [...scopeStack]
+      .reverse()
+      .find((scope) => scope.kind === "function");
+
+    const frameName = currentFunctionScope?.name ?? "__main__";
+
+    const assignmentMatch = trimmed.match(
+      /^([A-Za-z_][A-Za-z0-9_]*)\s*(?:=|\+=|-=|\*=|\/=|%=|\/\/=|\*\*=)/
+    );
+
+    if (assignmentMatch) {
+      recordFirstAssignment(frameName, assignmentMatch[1]);
+    }
+  }
+
+  return orderByFrame;
+}
+
+// Restore source code order for missing variables only
+function sortMissingFrameVariableErrorsBySourceOrder(
+  errors: FeedbackError[],
+  code?: string[]
+): FeedbackError[] {
+  if (!code || code.length === 0) return errors;
+
+  const frameVariableOrder = deriveFrameVariableOrderFromCode(code);
+
+  const sortableEntries = errors
+    .map((error, index) => {
+      if (error.type !== ErrorType.MISSING_ELEMENT || !error.path) return null;
+
+      const match = error.path.match(FRAME_VAR_PATH_RE);
+      if (!match) return null;
+
+      const [, frameName, varName] = match;
+      const frameOrder = frameVariableOrder.get(frameName);
+      const sourceOrder = frameOrder?.get(varName);
+
+      if (sourceOrder === undefined) return null;
+
+      return { index, error, sourceOrder };
+    })
+    .filter(
+      (
+        entry
+      ): entry is {
+        index: number;
+        error: FeedbackError;
+        sourceOrder: number;
+      } => entry !== null
+    );
+
+  if (sortableEntries.length < 2) return errors;
+
+  const reorderedErrors = [...sortableEntries]
+    .sort((a, b) => a.sourceOrder - b.sourceOrder || a.index - b.index)
+    .map((entry) => entry.error);
+
+  const nextErrors = [...errors];
+  sortableEntries.forEach((entry, idx) => {
+    nextErrors[entry.index] = reorderedErrors[idx];
+  });
+
+  return nextErrors;
+}
+
 function getBestAnswerPath(
   answerID: number,
   answerFrames: MemoryBox[],
@@ -1202,6 +1333,49 @@ async function fetchAnswerModel(
   return raw as MemoryBox[];
 }
 
+// Fetch the original question code so that validation can derive source variable order
+async function fetchQuestionCode(
+  questionType: "test" | "practice" | "prep" | "experiment",
+  questionId: number
+): Promise<string[] | null> {
+  let rows: { code: unknown }[] = [];
+  if (questionType === "practice") {
+    const result = await getPool().query<{ code: unknown }>(
+      "SELECT code FROM practice_questions WHERE id = $1",
+      [questionId]
+    );
+    rows = result.rows;
+    if (rows.length === 0) return null;
+  } else if (questionType === "prep") {
+    const result = await getPool().query<{ code: unknown }>(
+      "SELECT code FROM prep_questions WHERE id = $1",
+      [questionId]
+    );
+    rows = result.rows;
+    if (rows.length === 0) return null;
+  } else if (questionType === "experiment") {
+    const result = await getPool().query<{ code: unknown }>(
+      "SELECT code FROM experiment_questions WHERE id = $1",
+      [questionId]
+    );
+    rows = result.rows;
+    if (rows.length === 0) return null;
+  } else {
+    const result = await getPool().query<{ code: unknown }>(
+      "SELECT code FROM test_questions WHERE id = $1",
+      [questionId]
+    );
+    rows = result.rows;
+    if (rows.length === 0) return null;
+  }
+
+  const raw = rows[0].code;
+  if (!Array.isArray(raw)) {
+    throw new Error("Code in DB is not an array");
+  }
+  return raw as string[];
+}
+
 /* ---------- shared comparison logic ---------- */
 function checkDuplicateNoneObjects(
   inputMap: Map<number, MemoryBox>,
@@ -1229,7 +1403,8 @@ function checkDuplicateNoneObjects(
 
 function runComparison(
   userModel: MemoryBox[],
-  answerModel: MemoryBox[]
+  answerModel: MemoryBox[],
+  code?: string[]
 ): { correct: boolean; errors: FeedbackError[] } {
   const errors: FeedbackError[] = [];
   varNameByInputId = new Map<number, string>();
@@ -1286,7 +1461,9 @@ function runComparison(
 
   checkDuplicateNoneObjects(inputMap, errors);
 
-  return { correct: errors.length === 0, errors };
+  const orderedErrors = sortMissingFrameVariableErrorsBySourceOrder(errors, code);
+
+  return { correct: orderedErrors.length === 0, errors: orderedErrors };
 }
 
 /* ---------- main validation function ---------- */
@@ -1298,8 +1475,12 @@ export default async function validateAnswer(
   correct: boolean;
   errors: FeedbackError[];
 }> {
-  const answerModel = await fetchAnswerModel(questionType, questionId);
-  if (!answerModel) {
+  const [answerModel, code] = await Promise.all([
+    fetchAnswerModel(questionType, questionId),
+    fetchQuestionCode(questionType, questionId)
+  ]);
+
+  if (!answerModel || !code) {
     return {
       correct: false,
       errors: [{
@@ -1310,7 +1491,7 @@ export default async function validateAnswer(
     };
   }
 
-  return runComparison(userModel, answerModel);
+  return runComparison(userModel, answerModel, code);
 }
 
 /* ---------- line-specific validation ---------- */
@@ -1359,9 +1540,12 @@ export async function validateAnswerAtLine(
   lineNumber: number,
   iterationNumber?: number
 ): Promise<{ correct: boolean; errors: FeedbackError[] }> {
-  const stepModel = await fetchStepsModel(questionType, questionId, lineNumber, iterationNumber);
+  const [stepModel, code] = await Promise.all([
+    fetchStepsModel(questionType, questionId, lineNumber, iterationNumber),
+    fetchQuestionCode(questionType, questionId)
+  ]);
 
-  if (stepModel === null) {
+  if (stepModel === null || code === null) {
     return {
       correct: false,
       errors: [{
@@ -1383,5 +1567,5 @@ export async function validateAnswerAtLine(
     };
   }
 
-  return runComparison(userModel, stepModel);
+  return runComparison(userModel, stepModel, code);
 }

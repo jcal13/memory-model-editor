@@ -100,6 +100,17 @@
   color: #93c5fd;
 }
 
+.categoryIcon.stepbystep {
+  background: #dcfce7;
+  color: #16a34a;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+:root[data-theme="dark"] .categoryIcon.stepbystep {
+  background: #1c3a2d;
+  color: #4ade80;
+}
+
 .categoryLabel {
   display: flex;
   flex-direction: column;

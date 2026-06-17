@@ -416,6 +416,87 @@
   border-color: #2d4a6a;
 }
 
+/* ── Divider between selector groups ── */
+.selectorDivider {
+  height: 1px;
+  background: var(--border-primary);
+  margin: 0.25rem 0;
+}
+
+/* ── Step-by-step indicator ── */
+.stepIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.85rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  transition: background-color 200ms ease, border-color 200ms ease;
+}
+
+.stepDots {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.stepDot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background 200ms ease, box-shadow 200ms ease;
+}
+
+.stepDotDone {
+  background: #10b981;
+}
+
+.stepDotActive {
+  background: #3b82f6;
+  box-shadow: 0 0 0 2.5px rgba(59, 130, 246, 0.25);
+}
+
+.stepDotPending {
+  background: var(--border-secondary);
+}
+
+.stepText {
+  font-size: calc(0.82rem * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: color 200ms ease;
+}
+
+.stepConsistencyError {
+  margin-top: 0.65rem;
+  padding: 0.55rem 0.85rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #dc2626;
+  font-size: calc(0.82rem * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+:root[data-theme="dark"] .stepConsistencyError {
+  background: #3a1c1c;
+  border-color: #7f1d1d;
+  color: #f87171;
+}
+
+.stepHint {
+  margin: 0.4rem 0 0 0;
+  font-size: calc(0.75rem * var(--font-scale, 1));
+  color: var(--text-muted);
+  font-style: italic;
+  transition: color 200ms ease;
+}
+
 /* Auto-advance toolbar */
 .autoToolbar {
   display: flex;

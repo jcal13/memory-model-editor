@@ -1,4 +1,5 @@
 import Canvas from "../canvas/Canvas";
+import StructurePanel from "../canvas/components/StructurePanel";
 import Palette from "../palette/Palette";
 import ConfirmationModal from "./components/ConfirmationModal";
 import InformationTabs from "../informationTabs/InformationTabs";
@@ -347,6 +348,9 @@ export default function MemoryModelEditor({
     visualStyle: state.visualStyle,
     pythonTutorReferenceArrows: state.pythonTutorReferenceArrows,
     pythonTutorStandalonePrimitives: state.pythonTutorStandalonePrimitives,
+    showLinkedListView: state.showLinkedListView,
+    structurePanelCollapsed: state.structurePanelCollapsed,
+    structurePanelHeight: state.structurePanelHeight,
     questionView: state.questionView,
     isInfoPanelOpen: state.isInfoPanelOpen,
     canvasScale,
@@ -549,6 +553,8 @@ export default function MemoryModelEditor({
                 onPythonTutorStandalonePrimitivesChange={
                   state.setPythonTutorStandalonePrimitives
                 }
+                showLinkedListView={state.showLinkedListView}
+                onShowLinkedListViewChange={state.setShowLinkedListView}
                 fontScale={fontScale}
                 onFontScaleChange={adjustFontScale}
               />
@@ -596,6 +602,15 @@ export default function MemoryModelEditor({
               isQuestionMode={state.selectedQuestionIndex !== null}
             />
           </div>
+
+          <StructurePanel
+            enabled={state.showLinkedListView}
+            elements={state.elements}
+            collapsed={state.structurePanelCollapsed}
+            height={state.structurePanelHeight}
+            onCollapsedChange={state.setStructurePanelCollapsed}
+            onHeightChange={state.setStructurePanelHeight}
+          />
 
           {state.jsonOutput && (
             <pre className={styles.jsonPreview}>{state.jsonOutput}</pre>

@@ -675,7 +675,7 @@ function Canvas({
           className={styles.canvas}
           style={{
             width: "100%",
-            height: canvasHeight ?? undefined,
+            minHeight: canvasHeight ?? undefined,
             display: "block",
             padding: 0,
             border: 0,

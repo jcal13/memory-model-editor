@@ -30,6 +30,9 @@ const DEFAULT_UI_STATE = {
   visualStyle: "memoryviz" as VisualStyle,
   pythonTutorReferenceArrows: false,
   pythonTutorStandalonePrimitives: false,
+  showLinkedListView: false,
+  structurePanelCollapsed: false,
+  structurePanelHeight: 200,
 };
 
 export interface CanvasData {
@@ -73,6 +76,9 @@ export interface UIState {
   visualStyle?: VisualStyle;
   pythonTutorReferenceArrows?: boolean;
   pythonTutorStandalonePrimitives?: boolean;
+  showLinkedListView?: boolean;
+  structurePanelCollapsed?: boolean;
+  structurePanelHeight?: number;
   questionView?: QuestionView;
   isInfoPanelOpen?: boolean;
   canvasScale?: number;
@@ -138,6 +144,15 @@ export function loadInitialUIData(): UIState {
     const pythonTutorStandalonePrimitives =
       parsed?.pythonTutorStandalonePrimitives === true;
 
+    const showLinkedListView = parsed?.showLinkedListView === true;
+    const structurePanelCollapsed = parsed?.structurePanelCollapsed === true;
+    const structurePanelHeight =
+      typeof parsed?.structurePanelHeight === "number" &&
+      parsed.structurePanelHeight >= 140 &&
+      parsed.structurePanelHeight <= 800
+        ? parsed.structurePanelHeight
+        : undefined;
+
     const validViews = ["root", "loading", "test", "list", "question", "practice", "prep"];
     const questionView =
       typeof parsed?.questionView === "string" && validViews.includes(parsed.questionView) && parsed.questionView !== "loading"
@@ -170,6 +185,7 @@ export function loadInitialUIData(): UIState {
       visualStyle,
       pythonTutorReferenceArrows,
       pythonTutorStandalonePrimitives,
+      showLinkedListView,
       questionView,
       isInfoPanelOpen,
       canvasScale,

@@ -4,10 +4,11 @@
   justify-content: center;
   align-items: flex-start;
   padding: 12px 0px;
-  height: 100vh;
+  height: 100%;
   background-color: var(--bg-tertiary);
   box-sizing: border-box;
   transition: background-color 200ms ease;
+  position: relative;
 }
 
 /* Main SVG canvas */
@@ -16,10 +17,7 @@
   height: 100%;
   display: block;
   background: var(--canvas-bg);
-  border: 1px solid var(--border-primary);
-  border-radius: 10px;
-  box-shadow: var(--shadow-sm);
-  transition: background-color 200ms ease, border-color 200ms ease;
+  transition: background-color 200ms ease;
 }
 
 /* Override memory-viz box background fills for light mode */

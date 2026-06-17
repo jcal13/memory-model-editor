@@ -57,6 +57,15 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     useState<boolean>(initialUIData.pythonTutorReferenceArrows ?? false);
   const [pythonTutorStandalonePrimitives, setPythonTutorStandalonePrimitives] =
     useState<boolean>(initialUIData.pythonTutorStandalonePrimitives ?? false);
+  const [showLinkedListView, setShowLinkedListView] = useState<boolean>(
+    initialUIData.showLinkedListView ?? false
+  );
+  const [structurePanelCollapsed, setStructurePanelCollapsed] = useState<boolean>(
+    initialUIData.structurePanelCollapsed ?? false
+  );
+  const [structurePanelHeight, setStructurePanelHeight] = useState<number>(
+    initialUIData.structurePanelHeight ?? 180
+  );
   const [questionView, setQuestionView] = useState<QuestionView>(
     initialUIData.questionView ?? "root"
   );
@@ -114,6 +123,12 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     setPythonTutorReferenceArrows,
     pythonTutorStandalonePrimitives,
     setPythonTutorStandalonePrimitives,
+    showLinkedListView,
+    setShowLinkedListView,
+    structurePanelCollapsed,
+    setStructurePanelCollapsed,
+    structurePanelHeight,
+    setStructurePanelHeight,
     questionView,
     setQuestionView,
     tabScrollPositions,

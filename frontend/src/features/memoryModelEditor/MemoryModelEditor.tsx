@@ -34,6 +34,7 @@ const MIN_PALETTE_WIDTH = 200;
 const MAX_PALETTE_WIDTH = 400;
 const DEFAULT_PALETTE_WIDTH = 280;
 const SNAP_CLOSE_THRESHOLD = 100;
+const STRUCTURE_PANEL_RESIZE_HANDLE_HEIGHT = 8;
 
 interface MemoryModelEditorProps {
   sandbox?: boolean;
@@ -600,6 +601,13 @@ export default function MemoryModelEditor({
                   : undefined
               }
               isQuestionMode={state.selectedQuestionIndex !== null}
+              preserveCollapsedWorkspace={state.showLinkedListView}
+              workspaceHeightOffset={
+                state.showLinkedListView && !state.structurePanelCollapsed
+                  ? state.structurePanelHeight +
+                    STRUCTURE_PANEL_RESIZE_HANDLE_HEIGHT
+                  : 0
+              }
             />
           </div>
 

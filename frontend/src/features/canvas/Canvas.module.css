@@ -3,7 +3,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 12px 0px;
+  padding: 12px 0 0;
   height: 100%;
   background-color: var(--bg-tertiary);
   box-sizing: border-box;

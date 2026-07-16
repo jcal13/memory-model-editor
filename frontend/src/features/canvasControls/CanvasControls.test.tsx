@@ -25,6 +25,10 @@ function openSettingsTab() {
   fireEvent.click(screen.getByRole("button", { name: /settings/i }));
 }
 
+function openViewTab() {
+  fireEvent.click(screen.getByRole("button", { name: /^view$/i }));
+}
+
 describe("CanvasControls", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -91,5 +95,94 @@ describe("CanvasControls", () => {
     fireEvent.click(toggle);
 
     expect(handleReferenceArrowChange).toHaveBeenCalledWith(true);
+  });
+});
+
+describe("CanvasControls help icons", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("shows a help icon for the panel title explaining the tabs", () => {
+    renderControls();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Help: Canvas Controls" })
+    );
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByText(/Actions to undo/i)).toBeInTheDocument();
+  });
+
+  it("shows help icons for Clear and Download without triggering their actions", () => {
+    const handleClear = jest.fn();
+    renderControls({ onClear: handleClear, elements: [] });
+
+    fireEvent.click(screen.getByRole("button", { name: "Help: Clear" }));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(handleClear).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Help: Download" }));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("shows help icons for all three zoom controls in the View tab", () => {
+    renderControls({
+      onScaleChange: jest.fn(),
+      onEditorScaleChange: jest.fn(),
+      onFontScaleChange: jest.fn(),
+    });
+    openViewTab();
+
+    expect(
+      screen.getByRole("button", { name: "Help: Canvas Zoom" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Help: Editor Zoom" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Help: Question Zoom" })
+    ).toBeInTheDocument();
+  });
+
+  it("shows a help icon for the practice/test mode toggle without flipping it", () => {
+    const handleModeToggle = jest.fn();
+    renderControls({ onModeToggle: handleModeToggle, isSandboxMode: true });
+    openSettingsTab();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Help: Practice / Test Mode" })
+    );
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(handleModeToggle).not.toHaveBeenCalled();
+  });
+
+  it("shows a help icon for the Python Tutor Style toggle", () => {
+    renderControls();
+    openSettingsTab();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Help: Python Tutor Style" })
+    );
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(
+      screen.getByText(/look like PythonTutor's visualizer/i)
+    ).toBeInTheDocument();
+  });
+
+  it("shows help icons for Standalone Primitives and Reference Arrows in Python Tutor mode", () => {
+    renderControls({ visualStyle: "pythonTutor" });
+    openSettingsTab();
+
+    expect(
+      screen.getByRole("button", { name: "Help: Standalone Primitives" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Help: Reference Arrows" })
+    ).toBeInTheDocument();
   });
 });

@@ -103,6 +103,10 @@
 }
 
 .title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   text-align: center;
   font-size: 0.85rem;
   font-weight: 700;
@@ -148,6 +152,13 @@
   transition: color 200ms ease;
 }
 
+.labelGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
 .scaleValue {
   font-size: 0.9rem;
   font-weight: 600;
@@ -168,6 +179,22 @@
 
 .buttonWrapper:last-child {
   margin-bottom: 0;
+}
+
+.buttonWrapperRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.buttonWrapperRow:last-child {
+  margin-bottom: 0;
+}
+
+.buttonWrapperRow > *:first-child {
+  flex: 1;
+  min-width: 0;
 }
 
 .feedbackWrapper {

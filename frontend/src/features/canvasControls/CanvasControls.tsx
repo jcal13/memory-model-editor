@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import { CanvasElement, VisualStyle } from "../shared/types";
 import { ClearCanvasButton, DownloadButton, ZoomControls, UndoButton, RedoButton, FeedbackButton } from "../canvas/components/CanvasButtons";
 import { useTheme } from "../../contexts/ThemeContext";
+import HelpIcon from "../shared/components/HelpIcon";
 import styles from "./CanvasControls.module.css";
 
 interface CanvasControlsProps {
@@ -97,7 +98,10 @@ export default function CanvasControls({
       </nav>
 
       <div className={styles.tabBody} role="tabpanel">
-        <h3 className={styles.title}>Canvas Controls</h3>
+        <h3 className={styles.title}>
+          Canvas Controls
+          <HelpIcon title="Canvas Controls" text="Tools for your canvas: Actions to undo/clear/export, View to zoom, and Settings to change modes and visual style." />
+        </h3>
 
         {/* Actions Tab */}
         {activeTab === "actions" && (
@@ -110,13 +114,15 @@ export default function CanvasControls({
             )}
 
             {onClear && (
-              <div className={styles.buttonWrapper}>
+              <div className={styles.buttonWrapperRow}>
                 <ClearCanvasButton onClick={onClear} />
+                <HelpIcon title="Clear" text="Permanently removes every box from the canvas. This can't be undone by anything other than Undo, right after." />
               </div>
             )}
 
-            <div className={styles.buttonWrapper}>
+            <div className={styles.buttonWrapperRow}>
               <DownloadButton elements={elements} />
+              <HelpIcon title="Download" text="Export your diagram as a PNG image or the raw canvas data as JSON." />
             </div>
           </div>
         )}
@@ -127,7 +133,10 @@ export default function CanvasControls({
             {onScaleChange && (
               <>
                 <div className={styles.controlItem}>
-                  <label className={styles.controlLabel}>Canvas Zoom</label>
+                  <span className={styles.labelGroup}>
+                    <label className={styles.controlLabel}>Canvas Zoom</label>
+                    <HelpIcon title="Canvas Zoom" text="Zooms the whole diagram — the boxes and arrows on the canvas." />
+                  </span>
                   <span className={styles.scaleValue}>{Math.round(scale * 100)}%</span>
                 </div>
                 <div className={styles.buttonWrapper}>
@@ -139,7 +148,10 @@ export default function CanvasControls({
             {onEditorScaleChange && (
               <>
                 <div className={styles.controlItem}>
-                  <label className={styles.controlLabel}>Editor Zoom</label>
+                  <span className={styles.labelGroup}>
+                    <label className={styles.controlLabel}>Editor Zoom</label>
+                    <HelpIcon title="Editor Zoom" text="Zooms the popup editor that opens when you click a box to edit its value — separate from the canvas zoom." />
+                  </span>
                   <span className={styles.scaleValue}>{Math.round(editorScale * 100)}%</span>
                 </div>
                 <div className={styles.buttonWrapper}>
@@ -151,7 +163,10 @@ export default function CanvasControls({
             {onFontScaleChange && (
               <>
                 <div className={styles.controlItem}>
-                  <label className={styles.controlLabel}>Question Zoom</label>
+                  <span className={styles.labelGroup}>
+                    <label className={styles.controlLabel}>Question Zoom</label>
+                    <HelpIcon title="Question Zoom" text="Resizes the question text and code in the info panel — doesn't affect the canvas or editor." />
+                  </span>
                   <span className={styles.scaleValue}>{Math.round(fontScale * 100)}%</span>
                 </div>
                 <div className={styles.buttonWrapper}>
@@ -189,9 +204,12 @@ export default function CanvasControls({
             {/* Mode Toggle */}
             {onModeToggle && (
               <div className={styles.controlItem}>
-                <label className={styles.controlLabel}>
-                  {isSandboxMode ? "Practice" : "Test"}
-                </label>
+                <span className={styles.labelGroup}>
+                  <label className={styles.controlLabel}>
+                    {isSandboxMode ? "Practice" : "Test"}
+                  </label>
+                  <HelpIcon title="Practice / Test Mode" text="Practice mode only shows the boxes needed for the current question. Test mode gives you the full palette, simulating exam conditions. Switching modes clears the canvas." />
+                </span>
                 <button
                   type="button"
                   role="switch"
@@ -223,12 +241,15 @@ export default function CanvasControls({
 
             {onVisualStyleChange && (
               <div className={styles.controlItem}>
-                <label
-                  className={styles.controlLabel}
-                  htmlFor="python-tutor-style-toggle"
-                >
-                  Python Tutor Style
-                </label>
+                <span className={styles.labelGroup}>
+                  <label
+                    className={styles.controlLabel}
+                    htmlFor="python-tutor-style-toggle"
+                  >
+                    Python Tutor Style
+                  </label>
+                  <HelpIcon title="Python Tutor Style" text="Redraws the diagram to look like PythonTutor's visualizer instead of the default MemoryViz style." />
+                </span>
                 <button
                   id="python-tutor-style-toggle"
                   type="button"
@@ -255,12 +276,15 @@ export default function CanvasControls({
                 <div
                   className={`${styles.controlItem} ${styles.nestedControlItem}`}
                 >
-                  <label
-                    className={styles.controlLabel}
-                    htmlFor="python-tutor-standalone-primitives-toggle"
-                  >
-                    Standalone Primitives
-                  </label>
+                  <span className={styles.labelGroup}>
+                    <label
+                      className={styles.controlLabel}
+                      htmlFor="python-tutor-standalone-primitives-toggle"
+                    >
+                      Standalone Primitives
+                    </label>
+                    <HelpIcon title="Standalone Primitives" text="When on, primitive values (int, str, bool, etc.) are drawn as their own boxes with pointers. When off, they're shown inline inside their container, matching PythonTutor's default." />
+                  </span>
                   <button
                     id="python-tutor-standalone-primitives-toggle"
                     type="button"
@@ -287,12 +311,15 @@ export default function CanvasControls({
                 <div
                   className={`${styles.controlItem} ${styles.nestedControlItem}`}
                 >
-                  <label
-                    className={styles.controlLabel}
-                    htmlFor="python-tutor-reference-arrows-toggle"
-                  >
-                    Reference Arrows
-                  </label>
+                  <span className={styles.labelGroup}>
+                    <label
+                      className={styles.controlLabel}
+                      htmlFor="python-tutor-reference-arrows-toggle"
+                    >
+                      Reference Arrows
+                    </label>
+                    <HelpIcon title="Reference Arrows" text="Draws arrows from variables and containers to the objects they reference, instead of just showing the referenced ID." />
+                  </span>
                   <button
                     id="python-tutor-reference-arrows-toggle"
                     type="button"

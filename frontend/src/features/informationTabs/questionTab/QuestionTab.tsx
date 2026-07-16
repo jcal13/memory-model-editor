@@ -616,6 +616,7 @@ export default function QuestionTab({
               icon="✏️"
               categoryType="practice"
               onClick={() => loadQuestions("practice")}
+              helpText="Build the memory model yourself. The palette only shows the boxes needed for the question, and you get feedback to help you learn."
             />
             <QuestionSelector
               variant="category"
@@ -624,6 +625,7 @@ export default function QuestionTab({
               icon="📝"
               categoryType="test"
               onClick={() => loadQuestions("test")}
+              helpText="Simulates exam conditions with the full palette of boxes available, so you decide what to use."
             />
             <QuestionSelector
               variant="category"
@@ -632,6 +634,7 @@ export default function QuestionTab({
               icon="🎓"
               categoryType="prep"
               onClick={() => loadQuestions("prep")}
+              helpText="Questions aligned to the CSC148 course curriculum, useful for reviewing course-specific material."
             />
             <QuestionSelector
               variant="category"
@@ -640,6 +643,7 @@ export default function QuestionTab({
               icon="🧪"
               categoryType="experiment"
               onClick={() => loadQuestions("experiment")}
+              helpText="Open-ended sandbox questions with no fixed answer to check against — freely explore how code affects the memory model."
             />
           </div>
         )}

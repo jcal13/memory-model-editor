@@ -12,6 +12,7 @@ import {
 } from "../../shared/types";
 import { BoxDimensions } from "../utils/box.types";
 import CanvasBox from "./CanvasBox";
+import HelpIcon from "../../shared/components/HelpIcon";
 import styles from "./CallStack.module.css";
 import {
   DEFAULT_BOX_WIDTH,
@@ -388,6 +389,19 @@ const CallStack: React.FC<CallStackProps> = ({
       >
         {visualStyle === "pythonTutor" ? "Frames" : "Call Stack"}
       </text>
+
+      <foreignObject
+        x={x + columnWidth - 26}
+        y={yPosition + (HEADER_HEIGHT - 18) / 2}
+        width={18}
+        height={18}
+        style={{ overflow: "visible" }}
+      >
+        <HelpIcon
+          title={visualStyle === "pythonTutor" ? "Frames" : "Call Stack"}
+          text="Shows the currently active function calls, most recent on top. Each frame lists that function's local variables and their values. Reorder frames by dragging to change which one is on top."
+        />
+      </foreignObject>
 
       <clipPath id={clipPathId}>
         <rect

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import PaletteBox from "./components/PaletteBox";
 import CanvasControls from "../canvasControls/CanvasControls";
+import HelpIcon from "../shared/components/HelpIcon";
 import { useResizable } from "./hooks/useResizable";
 import styles from "./Palette.module.css";
 import {
@@ -9,6 +10,21 @@ import {
   CanvasElement,
   VisualStyle,
 } from "../shared/types";
+
+const BOX_DESCRIPTIONS: Record<BoxTypeName, string> = {
+  function: "A stack frame for a function call — shows its name and local variables.",
+  class: "An instance of a class — shows its id and its attributes.",
+  none: "Python's None value.",
+  int: "An integer value.",
+  float: "A floating-point (decimal) value.",
+  str: "A string value.",
+  bool: "A boolean value — True or False.",
+  list: "An ordered, mutable collection of values.",
+  tuple: "An ordered, immutable collection of values.",
+  set: "An unordered collection of unique values.",
+  dict: "A collection of key-value pairs.",
+  primitive: "A basic value type, such as an int, float, str, or bool.",
+};
 
 // Move constants here for better organization
 const ALL_TYPES: readonly BoxTypeName[] = [
@@ -213,7 +229,13 @@ export default function Palette({
             </nav>
 
             <div className={styles.tabBody} role="tabpanel">
-              <h3 className={styles.paletteTitle}>Palette</h3>
+              <h3 className={styles.paletteTitle}>
+                Palette
+                <HelpIcon
+                  title="Palette"
+                  text="Drag a box onto the canvas to add it to your memory model. Use the tabs on the left to filter by category, and click a box's own ? for what it represents."
+                />
+              </h3>
               <div
                 className={styles.paletteBoxes}
                 style={{
@@ -224,11 +246,18 @@ export default function Palette({
               >
                 {visibleBoxes.length > 0 ? (
                   visibleBoxes.map((boxType) => (
-                    <PaletteBox
-                      key={boxType}
-                      boxType={boxType}
-                      visualStyle={visualStyle}
-                    />
+                    <div key={boxType} className={styles.paletteBoxItem}>
+                      <PaletteBox
+                        boxType={boxType}
+                        visualStyle={visualStyle}
+                      />
+                      <span className={styles.paletteBoxHelpSlot}>
+                        <HelpIcon
+                          title={boxType}
+                          text={BOX_DESCRIPTIONS[boxType]}
+                        />
+                      </span>
+                    </div>
                   ))
                 ) : (
                   <p className={styles.emptyState}>

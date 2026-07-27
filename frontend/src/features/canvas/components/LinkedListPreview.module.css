@@ -33,6 +33,12 @@
   font-family: var(--font-mono, ui-monospace, monospace);
 }
 
+.brokenLabel {
+  fill: var(--text-tertiary);
+  font-size: 10px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
 .nodeRect {
   fill: var(--bg-primary);
   stroke: var(--text-primary);
@@ -58,6 +64,22 @@
 .linkLine {
   stroke: var(--text-primary);
   stroke-width: 1.5;
+}
+
+.brokenLine {
+  stroke: var(--text-primary);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+}
+
+.cycleLine {
+  stroke: var(--text-primary);
+  stroke-width: 1.75;
+}
+
+.selfLoopLine {
+  stroke: var(--text-primary);
+  stroke-width: 1.75;
 }
 
 .arrowHead {

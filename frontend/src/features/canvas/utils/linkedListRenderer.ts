@@ -49,6 +49,7 @@ export interface LinkedListGraphLayout {
   edges: {
     fromId: number;
     toId: number;
+    kind: "forward" | "backward" | "self";
   }[];
 }
 
@@ -178,7 +179,25 @@ export function buildLinkedListGraphLayout(
     connectorY: 0,
     nodes,
     byId,
-    edges: graph.edges,
+    edges: graph.edges.map((edge) => {
+      const from = byId[edge.fromId];
+      const to = byId[edge.toId];
+
+      if (!from || !to) {
+        return { ...edge, kind: "forward" as const };
+      }
+
+      if (edge.fromId === edge.toId) {
+        return { ...edge, kind: "self" as const };
+      }
+
+      const isBackward = to.y > from.y || to.x <= from.x;
+
+      return {
+        ...edge,
+        kind: isBackward ? "backward" : "forward",
+      };
+    }),
   };
 }
 
@@ -236,4 +255,51 @@ export function createEdgePath(
     : { x: end.x, y: end.y + endOff };
 
   return `M ${start.x} ${start.y} C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${end.x} ${end.y}`;
+}
+
+export function createReturnEdgePath(
+  from: LinkedListNodeLayout,
+  to: LinkedListNodeLayout
+): string {
+  const startX = from.dotX;
+  const startY = from.dotY;
+  const endX = to.x + to.width / 2;
+  const endY = to.y + to.height + 2;
+  const sameRow = Math.abs(from.y - to.y) < 1;
+  const horizontalGap = from.x - to.x;
+
+  if (sameRow && horizontalGap > 0) {
+    const radiusX = Math.max(24, horizontalGap * 0.55);
+    const radiusY =
+      horizontalGap <= NODE_WIDTH + NODE_GAP + 10 ? 22 : 34;
+
+    return [
+      `M ${startX} ${startY}`,
+      `A ${radiusX} ${radiusY} 0 0 1 ${endX} ${endY}`,
+    ].join(" ");
+  }
+
+  const routeY = Math.max(from.y + from.height, to.y + to.height) + 26;
+  const c1 = { x: startX + 18, y: routeY };
+  const c2 = { x: endX + 10, y: routeY };
+
+  return [
+    `M ${startX} ${startY}`,
+    `C ${c1.x} ${startY}, ${c1.x} ${routeY}, ${c2.x} ${routeY}`,
+    `S ${endX} ${routeY}, ${endX} ${endY}`,
+  ].join(" ");
+}
+
+export function createSelfLoopPath(node: LinkedListNodeLayout): string {
+  const startX = node.dotX;
+  const startY = node.dotY;
+  const radiusX = 24;
+  const radiusY = 28;
+  const endX = node.dotX + 2;
+  const endY = node.y + 4;
+
+  return [
+    `M ${startX} ${startY}`,
+    `A ${radiusX} ${radiusY} 0 1 1 ${endX} ${endY}`,
+  ].join(" ");
 }

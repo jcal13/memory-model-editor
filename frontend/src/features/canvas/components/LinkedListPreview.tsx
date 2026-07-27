@@ -5,6 +5,8 @@ import {
   buildLinkedListGraphLayout,
   getRectPerimeterPoint,
   createEdgePath,
+  createReturnEdgePath,
+  createSelfLoopPath,
 } from "../utils/linkedListRenderer";
 
 interface LinkedListPreviewProps {
@@ -65,19 +67,34 @@ export default function LinkedListPreview({ graph }: LinkedListPreviewProps) {
           const to = layout.byId[edge.toId];
           if (!from || !to) return null;
 
-          const start = { x: from.dotX, y: from.dotY };
-          const end = getRectPerimeterPoint(
-            { x: to.x, y: to.y, width: to.width, height: to.height },
-            start
-          );
-          const d = createEdgePath(start, end.point, end.side);
+          let d: string;
+          let className = styles.linkLine;
+
+          if (edge.kind === "self") {
+            d = createSelfLoopPath(from);
+            className = styles.selfLoopLine;
+          } else {
+            const start = { x: from.dotX, y: from.dotY };
+            const end = getRectPerimeterPoint(
+              { x: to.x, y: to.y, width: to.width, height: to.height },
+              start
+            );
+            d =
+              edge.kind === "backward"
+                ? createReturnEdgePath(from, to)
+                : createEdgePath(start, end.point, end.side);
+
+            if (edge.kind === "backward") {
+              className = styles.cycleLine;
+            }
+          }
 
           return (
             <path
               key={`${edge.fromId}-${edge.toId}`}
               d={d}
               fill="none"
-              className={styles.linkLine}
+              className={className}
               markerEnd={`url(#${markerId})`}
             />
           );
@@ -137,7 +154,7 @@ export default function LinkedListPreview({ graph }: LinkedListPreviewProps) {
               {node.value}
             </text>
 
-            {node.nextText === "•" ? (
+            {node.nextKind === "missing" || node.nextKind === "invalid" || node.nextText === "•" ? (
               <circle
                 cx={node.dotX}
                 cy={node.y + node.height / 2}

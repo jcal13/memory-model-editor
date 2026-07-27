@@ -87,6 +87,8 @@
 .canvasColumn {
   flex: 1;
   min-width: 0;
+  min-width: 780px;
+  min-height: 0;
   position: relative;
   display: flex;
   flex-direction: column;

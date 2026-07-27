@@ -28,7 +28,9 @@ import { spreadOverlappingElements } from "../canvas/utils/boundary.helpers";
 
 // Layout constants
 const MAX_INFO_PANEL_VIEWPORT_RATIO = 0.6667;
-const MAX_INFO_PANEL_CSS_WIDTH = `${MAX_INFO_PANEL_VIEWPORT_RATIO * 100}vw`;
+const MIN_INFO_PANEL_WIDTH = 260;
+const MIN_CANVAS_COLUMN_WIDTH = 780;
+const INFO_RESIZE_DIVIDER_WIDTH = 8;
 const MIN_PALETTE_WIDTH = 200;
 const MAX_PALETTE_WIDTH = 400;
 const DEFAULT_PALETTE_WIDTH = 280;
@@ -53,6 +55,9 @@ export default function MemoryModelEditor({
   const [isResizingPalette, setIsResizingPalette] = useState<boolean>(false);
   const [tempPaletteWidth, setTempPaletteWidth] = useState<number>(
     DEFAULT_PALETTE_WIDTH
+  );
+  const [maxInfoPanelWidth, setMaxInfoPanelWidth] = useState<number>(
+    window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO
   );
 
   const [currentQuestionData, setCurrentQuestionData] = useState<any>(null);
@@ -449,12 +454,16 @@ export default function MemoryModelEditor({
 
       const maxWidthBasedOnViewport =
         window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO;
+      const maxWidthPreservingCanvas = Math.max(
+        MIN_INFO_PANEL_WIDTH,
+        containerRect.width - MIN_CANVAS_COLUMN_WIDTH - INFO_RESIZE_DIVIDER_WIDTH
+      );
       const maxAllowedWidth = Math.min(
-        containerRect.width - 100,
+        maxWidthPreservingCanvas,
         maxWidthBasedOnViewport
       );
 
-      const clamped = Math.max(50, Math.min(newWidth, maxAllowedWidth));
+      const clamped = Math.max(0, Math.min(newWidth, maxAllowedWidth));
       infoPanelSetWidth(clamped);
     };
 
@@ -463,10 +472,26 @@ export default function MemoryModelEditor({
         const containerRect =
           mainContainerRefCurrent.current.getBoundingClientRect();
         const finalWidth = containerRect.right - event.clientX;
+        const maxWidthBasedOnViewport =
+          window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO;
+        const maxWidthPreservingCanvas = Math.max(
+          MIN_INFO_PANEL_WIDTH,
+          containerRect.width - MIN_CANVAS_COLUMN_WIDTH - INFO_RESIZE_DIVIDER_WIDTH
+        );
+        const maxAllowedWidth = Math.min(
+          maxWidthPreservingCanvas,
+          maxWidthBasedOnViewport
+        );
 
         if (finalWidth < SNAP_CLOSE_THRESHOLD) {
           infoPanelSetOpen(false);
           infoPanelSetWidth(500);
+        } else {
+          const settledWidth = Math.max(
+            MIN_INFO_PANEL_WIDTH,
+            Math.min(finalWidth, maxAllowedWidth)
+          );
+          infoPanelSetWidth(settledWidth);
         }
       }
 
@@ -485,6 +510,42 @@ export default function MemoryModelEditor({
       document.body.style.cursor = "";
     };
   }, [state.isResizingInfoPanel, infoPanelSetWidth, infoPanelSetResizing, infoPanelSetOpen, mainContainerRefCurrent]);
+
+  useEffect(() => {
+    const container = refs.mainContainerRef.current;
+    if (!container) return;
+
+    const updateMaxInfoPanelWidth = () => {
+      const containerWidth = container.getBoundingClientRect().width;
+      const maxWidthBasedOnViewport =
+        window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO;
+      const maxWidthPreservingCanvas = Math.max(
+        MIN_INFO_PANEL_WIDTH,
+        containerWidth - MIN_CANVAS_COLUMN_WIDTH - INFO_RESIZE_DIVIDER_WIDTH
+      );
+      const nextMax = Math.min(
+        maxWidthBasedOnViewport,
+        maxWidthPreservingCanvas
+      );
+
+      setMaxInfoPanelWidth(nextMax);
+      state.setInfoPanelWidth((prev) => Math.min(prev, nextMax));
+    };
+
+    updateMaxInfoPanelWidth();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateMaxInfoPanelWidth();
+    });
+
+    resizeObserver.observe(container);
+    window.addEventListener("resize", updateMaxInfoPanelWidth);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateMaxInfoPanelWidth);
+    };
+  }, [refs.mainContainerRef, state.setInfoPanelWidth]);
 
   return (
     <div className={styles.editorContainer}>
@@ -614,8 +675,14 @@ export default function MemoryModelEditor({
                 state.isResizingInfoPanel ? styles.noTransition : ""
               }`}
               style={{
-                width: `${state.infoPanelWidth}px`,
-                maxWidth: MAX_INFO_PANEL_CSS_WIDTH,
+                width: `${Math.min(state.infoPanelWidth, maxInfoPanelWidth)}px`,
+                minWidth: state.isResizingInfoPanel
+                  ? "0px"
+                  : `${Math.min(MIN_INFO_PANEL_WIDTH, maxInfoPanelWidth)}px`,
+                maxWidth: `${Math.min(
+                  maxInfoPanelWidth,
+                  window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO
+                )}px`,
               }}
             >
               <InformationTabs

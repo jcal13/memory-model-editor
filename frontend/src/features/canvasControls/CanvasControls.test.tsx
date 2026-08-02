@@ -185,4 +185,20 @@ describe("CanvasControls help icons", () => {
       screen.getByRole("button", { name: "Help: Reference Arrows" })
     ).toBeInTheDocument();
   });
+
+  it("shows a help icon for Dark Mode without flipping the toggle", () => {
+    renderControls();
+    openSettingsTab();
+
+    const darkModeSwitch = screen.getByRole("switch", { name: /dark mode/i });
+    expect(darkModeSwitch).toHaveAttribute("aria-checked", "false");
+
+    fireEvent.click(screen.getByRole("button", { name: "Help: Dark Mode" }));
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(
+      screen.getByText(/exported on a white background/i)
+    ).toBeInTheDocument();
+    expect(darkModeSwitch).toHaveAttribute("aria-checked", "false");
+  });
 });

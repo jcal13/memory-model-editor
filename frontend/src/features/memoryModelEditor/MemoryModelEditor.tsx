@@ -3,6 +3,7 @@ import Palette from "../palette/Palette";
 import ConfirmationModal from "./components/ConfirmationModal";
 import InformationTabs from "../informationTabs/InformationTabs";
 import PanelToggleButtons from "./components/PanelToggleButtons";
+import HelpIcon from "../shared/components/HelpIcon";
 import styles from "./MemoryModelEditor.module.css";
 import { useResponsivePanels } from "./hooks/useResponsivePanels";
 
@@ -595,6 +596,12 @@ export default function MemoryModelEditor({
               }
               isQuestionMode={state.selectedQuestionIndex !== null}
             />
+            <div className={styles.canvasHelp}>
+              <HelpIcon
+                title="Canvas"
+                text="This is your workspace for building the memory model. Drag boxes in from the Palette, click a box to edit its values, and set a reference by picking another box's id in the field editor."
+              />
+            </div>
           </div>
 
           {state.jsonOutput && (

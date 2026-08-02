@@ -224,9 +224,15 @@ export default function CanvasControls({
 
             {/* Dark Mode Toggle */}
             <div className={styles.controlItem}>
-              <label className={styles.controlLabel} htmlFor="dark-mode-toggle">
-                Dark Mode
-              </label>
+              <span className={styles.labelGroup}>
+                <label className={styles.controlLabel} htmlFor="dark-mode-toggle">
+                  Dark Mode
+                </label>
+                <HelpIcon
+                  title="Dark Mode"
+                  text="Switches the editor's colors to a dark theme. Downloaded PNG snapshots are always exported on a white background regardless of this setting."
+                />
+              </span>
               <button
                 id="dark-mode-toggle"
                 type="button"

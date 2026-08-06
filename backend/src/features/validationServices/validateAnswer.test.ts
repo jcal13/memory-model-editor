@@ -124,4 +124,63 @@ describe("validateAnswer reference mismatch wording", () => {
       })
     );
   });
+
+  it('uses "None object" wording when the expected shared target is None', async () => {
+    mockQuery.mockResolvedValue({
+      rows: [
+        {
+          answer: [
+            {
+              type: ".frame",
+              name: "__main__",
+              id: null,
+              order: 0,
+              value: { pair: 1 },
+            },
+            {
+              type: "object",
+              id: 1,
+              name: "Pair",
+              value: { left: 2, right: 2 },
+            },
+            { type: "NoneType", id: 2, value: null },
+          ],
+        },
+      ],
+    });
+
+    const result = await validateAnswer(
+      [
+        {
+          type: ".frame",
+          name: "__main__",
+          id: null,
+          order: 0,
+          value: { pair: 10 },
+        },
+        {
+          type: "object",
+          id: 10,
+          name: "Pair",
+          value: { left: 20, right: 21 },
+        },
+        { type: "NoneType", id: 20, value: null },
+        { type: "NoneType", id: 21, value: null },
+      ],
+      1,
+      "practice"
+    );
+
+    const mismatchErrors = result.errors.filter(
+      (error) => error.type === ErrorType.REFERENCE_MISMATCH
+    );
+
+    expect(result.correct).toBe(false);
+    expect(mismatchErrors).toEqual([
+      expect.objectContaining({
+        message:
+          "pair.right should point to the same None object as pair.left",
+      }),
+    ]);
+  });
 });

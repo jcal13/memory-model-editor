@@ -30,6 +30,8 @@ interface CanvasControlsProps {
   onPythonTutorStandalonePrimitivesChange?: (value: boolean) => void;
   fontScale?: number;
   onFontScaleChange?: (delta: number) => void;
+  showLinkedListView?: boolean;
+  onShowLinkedListViewChange?: (value: boolean) => void;
 }
 
 type ControlTab = "actions" | "view" | "settings";
@@ -77,6 +79,8 @@ export default function CanvasControls({
   onPythonTutorStandalonePrimitivesChange,
   fontScale = 1,
   onFontScaleChange,
+  showLinkedListView = false,
+  onShowLinkedListViewChange,
 }: CanvasControlsProps) {
   const { theme, toggleTheme } = useTheme();
   const isDarkMode = theme === 'dark';
@@ -311,6 +315,37 @@ export default function CanvasControls({
                   </button>
                 </div>
               )}
+
+            {onShowLinkedListViewChange && (
+              <>
+                <div className={styles.sectionHeading}>
+                  Structure Visualizations
+                </div>
+
+                <div className={styles.controlItem}>
+                  <label
+                    className={styles.controlLabel}
+                    htmlFor="linked-list-view-toggle"
+                  >
+                    Linked List View
+                  </label>
+                  <button
+                    id="linked-list-view-toggle"
+                    type="button"
+                    role="switch"
+                    aria-checked={showLinkedListView}
+                    onClick={() =>
+                      onShowLinkedListViewChange(!showLinkedListView)
+                    }
+                    className={`${styles.toggle} ${
+                      showLinkedListView ? styles.toggleActive : ""
+                    }`}
+                  >
+                    <span className={styles.toggleThumb} />
+                  </button>
+                </div>
+              </>
+            )}
 
             <div className={`${styles.buttonWrapper} ${styles.feedbackWrapper}`}>
               <FeedbackButton />

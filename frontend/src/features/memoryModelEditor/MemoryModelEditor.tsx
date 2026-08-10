@@ -1,4 +1,5 @@
 import Canvas from "../canvas/Canvas";
+import StructurePanel from "../canvas/components/StructurePanel";
 import Palette from "../palette/Palette";
 import ConfirmationModal from "./components/ConfirmationModal";
 import InformationTabs from "../informationTabs/InformationTabs";
@@ -33,6 +34,7 @@ const MIN_PALETTE_WIDTH = 200;
 const MAX_PALETTE_WIDTH = 400;
 const DEFAULT_PALETTE_WIDTH = 280;
 const SNAP_CLOSE_THRESHOLD = 100;
+const STRUCTURE_PANEL_RESIZE_HANDLE_HEIGHT = 8;
 
 interface MemoryModelEditorProps {
   sandbox?: boolean;
@@ -347,6 +349,9 @@ export default function MemoryModelEditor({
     visualStyle: state.visualStyle,
     pythonTutorReferenceArrows: state.pythonTutorReferenceArrows,
     pythonTutorStandalonePrimitives: state.pythonTutorStandalonePrimitives,
+    showLinkedListView: state.showLinkedListView,
+    structurePanelCollapsed: state.structurePanelCollapsed,
+    structurePanelHeight: state.structurePanelHeight,
     questionView: state.questionView,
     isInfoPanelOpen: state.isInfoPanelOpen,
     canvasScale,
@@ -549,6 +554,8 @@ export default function MemoryModelEditor({
                 onPythonTutorStandalonePrimitivesChange={
                   state.setPythonTutorStandalonePrimitives
                 }
+                showLinkedListView={state.showLinkedListView}
+                onShowLinkedListViewChange={state.setShowLinkedListView}
                 fontScale={fontScale}
                 onFontScaleChange={adjustFontScale}
               />
@@ -594,8 +601,24 @@ export default function MemoryModelEditor({
                   : undefined
               }
               isQuestionMode={state.selectedQuestionIndex !== null}
+              preserveCollapsedWorkspace={state.showLinkedListView}
+              workspaceHeightOffset={
+                state.showLinkedListView && !state.structurePanelCollapsed
+                  ? state.structurePanelHeight +
+                    STRUCTURE_PANEL_RESIZE_HANDLE_HEIGHT
+                  : 0
+              }
             />
           </div>
+
+          <StructurePanel
+            enabled={state.showLinkedListView}
+            elements={state.elements}
+            collapsed={state.structurePanelCollapsed}
+            height={state.structurePanelHeight}
+            onCollapsedChange={state.setStructurePanelCollapsed}
+            onHeightChange={state.setStructurePanelHeight}
+          />
 
           {state.jsonOutput && (
             <pre className={styles.jsonPreview}>{state.jsonOutput}</pre>

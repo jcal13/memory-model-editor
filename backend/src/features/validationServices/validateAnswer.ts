@@ -114,6 +114,16 @@ function extractPathElementIds(
 const idMap = (m: MemoryBox[]) =>
   new Map(m.filter((e) => e.id !== null).map((e) => [e.id as number, e]));
 
+function describeExpectedReference(answerID: number, answerMap: Map<number, MemoryBox>): string {
+  const answerBox = answerMap.get(answerID);
+  if (!answerBox) return "object";
+  if (isNoneType(answerBox.type) || isNoneValue(answerBox.value)) return "None object";
+  if (isClassInstanceType(answerBox.type)) {
+    return answerBox.name ? `${answerBox.name} object` : "object";
+  }
+  return `${formatTypeForUser(answerBox.type)} object`;
+}
+
 // Ensure a bijection between answer and input IDs
 function ensureBijection(
   answerID: number,
@@ -139,9 +149,12 @@ function ensureBijection(
     if (prev.target !== inputID) {
       if (!isVar) {
         const previousPath = cleanPathForUser(prev.path);
-        const answerBox = answerMap.get(answerID);
-
-        const message = ERROR_MESSAGES.reference_should_match(previousPath, currentPath);
+        const expectedLabel = describeExpectedReference(answerID, answerMap);
+        const message = ERROR_MESSAGES.reference_should_match_with_expected(
+          currentPath,
+          previousPath,
+          expectedLabel
+        );
 
         errors.push(
           makeFeedbackError(ErrorType.REFERENCE_MISMATCH, message, {

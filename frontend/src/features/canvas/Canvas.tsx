@@ -189,6 +189,8 @@ interface CanvasProps {
   pythonTutorReferenceArrows?: boolean;
   pythonTutorStandalonePrimitives?: boolean;
   isQuestionMode?: boolean;
+  preserveCollapsedWorkspace?: boolean;
+  workspaceHeightOffset?: number;
 }
 
 function Canvas({
@@ -211,6 +213,8 @@ function Canvas({
   pythonTutorReferenceArrows = false,
   pythonTutorStandalonePrimitives = false,
   isQuestionMode = false,
+  preserveCollapsedWorkspace = false,
+  workspaceHeightOffset = 0,
 }: CanvasProps) {
   const [openEditors, setOpenEditors] = useState<CanvasElement[]>([]);
   const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(
@@ -291,53 +295,74 @@ function Canvas({
     [svgRef]
   );
 
+  const functionFrames = elements.filter((el) => el.kind.name === "function");
+  const elementsById = useMemo(() => createElementsByIdMap(elements), [elements]);
+  const visibleObjects = useMemo(
+    () =>
+      elements.filter((el) => {
+        if (el.kind.name === "function") return false;
+        return !(
+          useInlinePythonTutorPrimitives && el.kind.name === "primitive"
+        );
+      }),
+    [elements, useInlinePythonTutorPrimitives]
+  );
+
   // Canvas sizing and viewBox management (pre-paint to avoid flicker)
   useLayoutEffect(() => {
-    const svg = svgRef.current;
-    if (!svg) return;
-    const rect = svg.getBoundingClientRect();
-    const height = Math.max(1, rect.height);
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    const rect = wrapper.getBoundingClientRect();
     const width = Math.max(1, rect.width);
-    setCanvasHeight(height);
-    baseDims.current = { width, height };
-    applyViewBox(width, height, scale);
-  }, [svgRef, scale, applyViewBox]);
+    const viewportHeight = Math.max(1, rect.height);
+    const renderedHeight = preserveCollapsedWorkspace
+      ? Math.max(viewportHeight + workspaceHeightOffset, viewportHeight)
+      : viewportHeight;
+    setCanvasHeight(viewportHeight);
+    baseDims.current = { width, height: renderedHeight };
+    applyViewBox(width, renderedHeight, scale);
+  }, [scale, applyViewBox, preserveCollapsedWorkspace, workspaceHeightOffset]);
 
-  // Handle canvas width changes while preserving height
+  // Handle canvas size changes so vertical split panels can safely resize
+  // the workspace without leaving the SVG on a stale height.
   useEffect(() => {
-    if (!canvasHeight) return;
-
-    const svg = svgRef.current;
-    if (!svg) return;
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
 
     let animationFrame = 0;
     let previousWidth = -1;
+    let previousHeight = -1;
 
-    const updateWidth = () => {
-      const width = Math.max(
-        1,
-        svg.clientWidth || svg.getBoundingClientRect().width
-      );
+    const updateSize = () => {
+      const rect = wrapper.getBoundingClientRect();
+      const width = Math.max(1, rect.width);
+      const viewportHeight = Math.max(1, rect.height);
+      const renderedHeight = preserveCollapsedWorkspace
+        ? Math.max(viewportHeight + workspaceHeightOffset, viewportHeight)
+        : viewportHeight;
 
-      if (width !== previousWidth) {
+      if (width !== previousWidth || renderedHeight !== previousHeight) {
         previousWidth = width;
-        baseDims.current = { width, height: canvasHeight };
-        applyViewBox(width, canvasHeight, scale);
+        previousHeight = renderedHeight;
+        setCanvasHeight(viewportHeight);
+        baseDims.current = { width, height: renderedHeight };
+        applyViewBox(width, renderedHeight, scale);
       }
     };
 
     const resizeObserver = new ResizeObserver(() => {
       cancelAnimationFrame(animationFrame);
-      animationFrame = requestAnimationFrame(updateWidth);
+      animationFrame = requestAnimationFrame(updateSize);
     });
 
-    resizeObserver.observe(svg);
+    resizeObserver.observe(wrapper);
+    updateSize();
 
     return () => {
       cancelAnimationFrame(animationFrame);
       resizeObserver.disconnect();
     };
-  }, [canvasHeight, svgRef, scale, applyViewBox]);
+  }, [scale, applyViewBox, preserveCollapsedWorkspace, workspaceHeightOffset]);
 
   // Re-apply viewBox when scale changes
   useEffect(() => {
@@ -585,19 +610,6 @@ function Canvas({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [openEditors.length]);
 
-  const functionFrames = elements.filter((el) => el.kind.name === "function");
-  const elementsById = useMemo(() => createElementsByIdMap(elements), [elements]);
-  const visibleObjects = useMemo(
-    () =>
-      elements.filter((el) => {
-        if (el.kind.name === "function") return false;
-        return !(
-          useInlinePythonTutorPrimitives && el.kind.name === "primitive"
-        );
-      }),
-    [elements, useInlinePythonTutorPrimitives]
-  );
-
   useEffect(() => {
     if (!useInlinePythonTutorPrimitives) {
       return;
@@ -665,7 +677,10 @@ function Canvas({
       <div
         ref={wrapperRef}
         className={styles.canvasWrapper}
-        style={{ overflowX: "hidden" }}
+        style={{
+          overflowX: "hidden",
+          overflowY: preserveCollapsedWorkspace ? "auto" : "hidden",
+        }}
       >
         <svg
           data-testid="canvas"
@@ -675,7 +690,13 @@ function Canvas({
           className={styles.canvas}
           style={{
             width: "100%",
-            height: canvasHeight ?? undefined,
+            height: preserveCollapsedWorkspace
+              ? `${Math.max(
+                  canvasHeight ?? 0,
+                  (canvasHeight ?? 0) + workspaceHeightOffset
+                )}px`
+              : "100%",
+            minHeight: canvasHeight ?? undefined,
             display: "block",
             padding: 0,
             border: 0,

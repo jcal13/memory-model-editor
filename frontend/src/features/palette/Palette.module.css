@@ -194,6 +194,10 @@
 ======================================= */
 
 .paletteTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   text-align: center;
   font-size: 0.85rem;
   font-weight: 700;
@@ -213,6 +217,18 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
+}
+
+.paletteBoxItem {
+  position: relative;
+  display: inline-block;
+}
+
+.paletteBoxHelpSlot {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  z-index: 1;
 }
 
 .emptyState {

@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import Palette from "./Palette";
 
 jest.mock("./components/PaletteBox", () => ({
@@ -52,5 +52,34 @@ describe("Palette Python Tutor primitive mode", () => {
 
     expect(screen.queryByText(/created inline/i)).toBeNull();
     expect(screen.getAllByTestId("palette-box")).toHaveLength(5);
+  });
+});
+
+describe("Palette help icons", () => {
+  beforeAll(() => {
+    (global as typeof globalThis).ResizeObserver =
+      ResizeObserverMock as unknown as typeof ResizeObserver;
+  });
+
+  it("shows a help icon for the palette title", () => {
+    render(
+      <Palette activeTab="primitives" setActive={jest.fn()} />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Help: Palette" }));
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Drag a box onto the canvas/i)
+    ).toBeInTheDocument();
+  });
+
+  it("shows a help icon for each box with its own explanation", () => {
+    render(<Palette activeTab="primitives" setActive={jest.fn()} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Help: int" }));
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByText("An integer value.")).toBeInTheDocument();
   });
 });

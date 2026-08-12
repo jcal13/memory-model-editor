@@ -108,6 +108,13 @@
   transition: background-color 200ms ease, border-color 200ms ease;
 }
 
+.canvasHelp {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+}
+
 .infoPanel {
   flex-shrink: 0;
   display: flex;

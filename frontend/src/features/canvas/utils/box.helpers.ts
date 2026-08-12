@@ -99,6 +99,28 @@ export function getSequenceHeight(
 }
 
 /**
+ * Calculates the height for class-like boxes whose body consists of named rows.
+ * This is used for frame and class boxes when we need a layout estimate before
+ * the SVG has been measured.
+ *
+ * @param rowCount - Number of visible rows in the box body
+ * @param emptyHeight - Height used when there are no rows
+ * @param rowHeight - Additional height contributed by each row
+ * @returns Estimated height in SVG units
+ */
+export function getNamedRowBoxHeight(
+  rowCount: number,
+  emptyHeight: number = 78,
+  rowHeight: number = 56
+): number {
+  if (rowCount <= 0) {
+    return emptyHeight;
+  }
+
+  return emptyHeight + rowCount * rowHeight;
+}
+
+/**
  * Transforms function parameter data into MemoryViz-compatible format.
  * Handles duplicate parameter names using zero-width spaces for uniqueness.
  *

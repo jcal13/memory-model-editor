@@ -13,6 +13,13 @@ export const ERROR_MESSAGES = {
   // Pattern: "head.next and second should point to the same object"
   reference_should_match: (pathA: string, pathB: string) =>
     `${pathA} and ${pathB} should point to the same object`,
+
+  // Pattern: "third.next should point to the same None object as head.next"
+  reference_should_match_with_expected: (
+    targetPath: string,
+    sourcePath: string,
+    expectedLabel: string
+  ) => `${targetPath} should point to the same ${expectedLabel} as ${sourcePath}`,
   
   // Pattern: "head.next and second should not point to the same object"
   reference_should_differ: (pathA: string, pathB: string) =>

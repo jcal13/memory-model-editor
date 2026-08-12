@@ -12,6 +12,7 @@ import {
 } from "../../shared/types";
 import { BoxDimensions } from "../utils/box.types";
 import CanvasBox from "./CanvasBox";
+import HelpIcon from "../../shared/components/HelpIcon";
 import styles from "./CallStack.module.css";
 import {
   DEFAULT_BOX_WIDTH,
@@ -37,6 +38,7 @@ interface CallStackProps {
   onSelect: (element: CanvasElement) => void;
   onReorder: (fromIndex: number, toIndex: number) => void;
   onWidthChange?: (width: number) => void;
+  onBoundsChange?: (bounds: { top: number; bottom: number }) => void;
   x?: number;
   y?: number;
   width?: number;
@@ -73,6 +75,7 @@ const CallStack: React.FC<CallStackProps> = ({
   onSelect,
   onReorder,
   onWidthChange,
+  onBoundsChange,
   x = 20,
   y = 73,
   width = 205,
@@ -83,7 +86,7 @@ const CallStack: React.FC<CallStackProps> = ({
   elementsById,
 }) => {
   const clipPathId = useId();
-
+  
   const [viewportHeight] = useState<number>(() => window.innerHeight);
 
   const yPosition = y;
@@ -210,6 +213,33 @@ const CallStack: React.FC<CallStackProps> = ({
     },
     [layout, scrollPosition]
   );
+
+  useEffect(() => {
+    const clipTop = yPosition + HEADER_HEIGHT;
+    const clipBottom =
+      yPosition + HEADER_HEIGHT + TOP_PADDING + visibleHeight + BOTTOM_PADDING;
+
+    const visibleFrameBottoms = layout
+      .map(({ yLocal, h }) => {
+        const frameTop = yLocal + scrollPosition + VERTICAL_OFFSET - h / 2;
+        const frameBottom = yLocal + scrollPosition + VERTICAL_OFFSET + h / 2;
+
+        if (frameBottom < clipTop || frameTop > clipBottom) {
+          return null;
+        }
+
+        return Math.min(frameBottom, clipBottom);
+      })
+      .filter((value): value is number => value !== null);
+
+    onBoundsChange?.({
+      top: yPosition,
+      bottom:
+        visibleFrameBottoms.length > 0
+          ? Math.max(...visibleFrameBottoms)
+          : yPosition,
+    });
+  }, [layout, onBoundsChange, scrollPosition, visibleHeight, yPosition]);
 
   const handlePointerDown = useCallback(
     (index: number) => (event: React.PointerEvent<SVGGElement>) => {
@@ -388,6 +418,19 @@ const CallStack: React.FC<CallStackProps> = ({
       >
         {visualStyle === "pythonTutor" ? "Frames" : "Call Stack"}
       </text>
+
+      <foreignObject
+        x={x + columnWidth - 26}
+        y={yPosition + (HEADER_HEIGHT - 18) / 2}
+        width={18}
+        height={18}
+        style={{ overflow: "visible" }}
+      >
+        <HelpIcon
+          title={visualStyle === "pythonTutor" ? "Frames" : "Call Stack"}
+          text="Shows the currently active function calls, most recent on top. Each frame lists that function's local variables and their values. Reorder frames by dragging to change which one is on top."
+        />
+      </foreignObject>
 
       <clipPath id={clipPathId}>
         <rect

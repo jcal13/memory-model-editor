@@ -61,11 +61,14 @@ export default function ErrorListDisplay({
     message: string,
     isSandboxMode: boolean
   ): string => {
-    if (!isSandboxMode) {
-      return message;
-    }
+    let processed = message.replace(
+      /\bAt ([A-Za-z_]\w*): [A-Za-z_]\w*\.([A-Za-z_]\w*):/g,
+      "At $1.$2:"
+    );
 
-    let processed = message;
+    if (!isSandboxMode) {
+      return processed;
+    }
 
     // Do not edit messages that have "unexpected" in it
     if (!message.toLowerCase().includes("unexpected")) {

@@ -94,6 +94,8 @@ interface PaletteProps {
   onPythonTutorReferenceArrowsChange?: (value: boolean) => void;
   pythonTutorStandalonePrimitives?: boolean;
   onPythonTutorStandalonePrimitivesChange?: (value: boolean) => void;
+  showLinkedListView?: boolean;
+  onShowLinkedListViewChange?: (value: boolean) => void;
   fontScale?: number;
   onFontScaleChange?: (delta: number) => void;
 }
@@ -161,6 +163,8 @@ export default function Palette({
   onPythonTutorReferenceArrowsChange,
   pythonTutorStandalonePrimitives = false,
   onPythonTutorStandalonePrimitivesChange,
+  showLinkedListView = false,
+  onShowLinkedListViewChange,
   fontScale,
   onFontScaleChange,
 }: PaletteProps) {
@@ -308,6 +312,8 @@ export default function Palette({
             onPythonTutorStandalonePrimitivesChange={
               onPythonTutorStandalonePrimitivesChange
             }
+            showLinkedListView={showLinkedListView}
+            onShowLinkedListViewChange={onShowLinkedListViewChange}
             fontScale={fontScale}
             onFontScaleChange={onFontScaleChange}
           />

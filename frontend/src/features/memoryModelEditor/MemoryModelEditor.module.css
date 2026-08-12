@@ -87,15 +87,25 @@
 .canvasColumn {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   position: relative;
   display: flex;
   flex-direction: column;
+  padding-bottom: 12px;
+  box-sizing: border-box;
 }
 
 .canvasArea {
   flex: 1;
   position: relative;
+  min-height: 0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
+  box-sizing: border-box;
+  transition: background-color 200ms ease, border-color 200ms ease;
 }
 
 .canvasHelp {

@@ -144,6 +144,17 @@
   padding-top: 8px;
 }
 
+.sectionHeading {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-secondary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
 .controlLabel {
   font-size: 0.9rem;
   font-weight: 500;

@@ -38,6 +38,7 @@ interface CallStackProps {
   onSelect: (element: CanvasElement) => void;
   onReorder: (fromIndex: number, toIndex: number) => void;
   onWidthChange?: (width: number) => void;
+  onBoundsChange?: (bounds: { top: number; bottom: number }) => void;
   x?: number;
   y?: number;
   width?: number;
@@ -74,6 +75,7 @@ const CallStack: React.FC<CallStackProps> = ({
   onSelect,
   onReorder,
   onWidthChange,
+  onBoundsChange,
   x = 20,
   y = 73,
   width = 205,
@@ -84,7 +86,7 @@ const CallStack: React.FC<CallStackProps> = ({
   elementsById,
 }) => {
   const clipPathId = useId();
-
+  
   const [viewportHeight] = useState<number>(() => window.innerHeight);
 
   const yPosition = y;
@@ -211,6 +213,33 @@ const CallStack: React.FC<CallStackProps> = ({
     },
     [layout, scrollPosition]
   );
+
+  useEffect(() => {
+    const clipTop = yPosition + HEADER_HEIGHT;
+    const clipBottom =
+      yPosition + HEADER_HEIGHT + TOP_PADDING + visibleHeight + BOTTOM_PADDING;
+
+    const visibleFrameBottoms = layout
+      .map(({ yLocal, h }) => {
+        const frameTop = yLocal + scrollPosition + VERTICAL_OFFSET - h / 2;
+        const frameBottom = yLocal + scrollPosition + VERTICAL_OFFSET + h / 2;
+
+        if (frameBottom < clipTop || frameTop > clipBottom) {
+          return null;
+        }
+
+        return Math.min(frameBottom, clipBottom);
+      })
+      .filter((value): value is number => value !== null);
+
+    onBoundsChange?.({
+      top: yPosition,
+      bottom:
+        visibleFrameBottoms.length > 0
+          ? Math.max(...visibleFrameBottoms)
+          : yPosition,
+    });
+  }, [layout, onBoundsChange, scrollPosition, visibleHeight, yPosition]);
 
   const handlePointerDown = useCallback(
     (index: number) => (event: React.PointerEvent<SVGGElement>) => {

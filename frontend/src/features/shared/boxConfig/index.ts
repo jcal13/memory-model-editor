@@ -13,6 +13,7 @@ import { ID } from "../types";
 import {
   extractValues,
   getSequenceHeight,
+  getNamedRowBoxHeight,
   processFunctionParams,
   processClassVariables,
   extractDictionary,
@@ -139,6 +140,7 @@ export const DEFAULT_PALETTE_STYLE: BoxStyle = {
 export {
   extractValues,
   getSequenceHeight,
+  getNamedRowBoxHeight,
   processFunctionParams,
   processClassVariables,
   extractDictionary,
@@ -184,7 +186,8 @@ export const BOX_TYPE_CONFIGS: Record<string, BoxTypeConfig> = {
         style
       );
     },
-    getHeight: () => 78,
+    getHeight: (kind: any) =>
+      getNamedRowBoxHeight(Array.isArray(kind?.params) ? kind.params.length : 0),
     getMinWidth: () => DEFAULT_DIMENSIONS.PRIMITIVE_WIDTH,
     paletteMinHeight: 81,
     paletteMinWidth: 153,
@@ -205,7 +208,10 @@ export const BOX_TYPE_CONFIGS: Record<string, BoxTypeConfig> = {
         style
       );
     },
-    getHeight: () => 78,
+    getHeight: (kind: any) =>
+      getNamedRowBoxHeight(
+        Array.isArray(kind?.classVariables) ? kind.classVariables.length : 0
+      ),
     getMinWidth: () => DEFAULT_DIMENSIONS.PRIMITIVE_WIDTH,
     paletteMinHeight: 81,
     paletteMinWidth: 153,

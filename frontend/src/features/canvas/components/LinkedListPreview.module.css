@@ -1,0 +1,105 @@
+.arrowFill {
+  fill: var(--text-primary);
+}
+
+.diagramScroller {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.diagram {
+  display: block;
+  width: auto;
+  min-width: 100%;
+  height: auto;
+  max-width: none;
+}
+
+.label {
+  fill: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.labelArrow {
+  stroke: var(--text-primary);
+  stroke-width: 1;
+}
+
+.nextLabel {
+  fill: var(--text-primary);
+  font-size: 11px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.brokenLabel {
+  fill: var(--text-tertiary);
+  font-size: 10px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.nodeRect {
+  fill: var(--bg-primary);
+  stroke: var(--text-primary);
+  stroke-width: 1.5;
+}
+
+.divider {
+  stroke: var(--text-primary);
+  stroke-width: 1.5;
+}
+
+.dot {
+  fill: var(--text-primary);
+}
+
+.nodeValue {
+  fill: var(--text-primary);
+  font-size: 15px;
+  font-weight: 500;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.linkLine {
+  stroke: var(--text-primary);
+  stroke-width: 1.5;
+}
+
+.brokenLine {
+  stroke: var(--text-primary);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+}
+
+.cycleLine {
+  stroke: var(--text-primary);
+  stroke-width: 1.75;
+}
+
+.selfLoopLine {
+  stroke: var(--text-primary);
+  stroke-width: 1.75;
+}
+
+.arrowHead {
+  fill: var(--text-primary);
+}
+
+.cyclePath {
+  fill: none;
+  stroke: var(--accent-blue);
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}
+
+.footerText {
+  fill: var(--text-tertiary);
+  font-size: 12px;
+  font-style: italic;
+}
+
+.list {
+  display: block;
+  width: 100%;
+}

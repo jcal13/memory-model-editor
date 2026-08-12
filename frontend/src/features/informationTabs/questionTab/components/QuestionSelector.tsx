@@ -9,7 +9,7 @@ interface QuestionSelectorProps {
   variant?: "category" | "pill";
   icon?: string;
   subtitle?: string;
-  categoryType?: "practice" | "test" | "prep" | "experiment";
+  categoryType?: "practice" | "test" | "prep" | "experiment" | "stepbystep";
 }
 
 export default function QuestionSelector({
@@ -50,6 +50,8 @@ export default function QuestionSelector({
                 ? styles.prep
                 : categoryType === "experiment"
                 ? styles.experiment
+                : categoryType === "stepbystep"
+                ? styles.stepbystep
                 : ""
             }`}
           >

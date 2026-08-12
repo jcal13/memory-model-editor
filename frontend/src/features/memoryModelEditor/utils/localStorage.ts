@@ -65,7 +65,8 @@ export type QuestionView =
   | "question"
   | "practice"
   | "prep"
-  | "experiment";
+  | "experiment"
+  | "stepbystep";
 
 export interface UIState {
   activeTab: Tab;

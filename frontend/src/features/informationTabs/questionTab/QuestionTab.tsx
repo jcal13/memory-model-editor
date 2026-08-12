@@ -23,7 +23,7 @@ import {
 import { normalizeQuestionCanvasData } from "../../memoryModelEditor/utils/questionFrames";
 import ConfirmationModal from "../../memoryModelEditor/components/ConfirmationModal";
 
-type View = "root" | "loading" | "test" | "list" | "question" | "practice" | "prep" | "experiment";
+type View = "root" | "loading" | "test" | "list" | "question" | "practice" | "prep" | "experiment" | "stepbystep";
 type QuestionType = "test" | "practice" | "prep" | "experiment";
 type QuestionStatus = "unattempted" | "attempted" | "completed";
 
@@ -37,6 +37,7 @@ const VALID_VIEWS: View[] = [
   "practice",
   "prep",
   "experiment",
+  "stepbystep",
 ];
 
 interface QuestionStatusMap {
@@ -129,6 +130,55 @@ export function getNextCheckableLine(sortedLines: number[], line: number | null)
   return idx >= 0 && idx + 1 < sortedLines.length ? sortedLines[idx + 1] : null;
 }
 
+export interface StepAssignments {
+  variableToId: Record<string, number>;  // "a" → 1
+  idToType: Record<number, string>;       // 1 → "int"
+}
+
+export function extractStepAssignments(elements: any[]): StepAssignments {
+  const variableToId: Record<string, number> = {};
+  const idToType: Record<number, string> = {};
+
+  for (const el of elements) {
+    if (el.kind?.name === "function") {
+      for (const p of (el.kind.params ?? [])) {
+        if (typeof p.targetId === "number") {
+          variableToId[p.name] = p.targetId;
+        }
+      }
+    } else if (el.kind?.name === "class") {
+      for (const p of (el.kind.classVariables ?? [])) {
+        if (typeof p.targetId === "number") {
+          variableToId[p.name] = p.targetId;
+        }
+      }
+    } else {
+      if (typeof el.id === "number") {
+        idToType[el.id] = el.kind?.type ?? "unknown";
+      }
+    }
+  }
+
+  return { variableToId, idToType };
+}
+
+export function checkStepConsistency(committed: StepAssignments, current: StepAssignments): string | null {
+  for (const [varName, committedId] of Object.entries(committed.variableToId)) {
+    const currentId = current.variableToId[varName];
+    if (currentId !== undefined && currentId !== committedId) {
+      return `Variable "${varName}" must point to id ${committedId} (assigned in a previous step). You cannot reassign it to id ${currentId}.`;
+    }
+  }
+  for (const [idStr, committedType] of Object.entries(committed.idToType)) {
+    const id = parseInt(idStr, 10);
+    const currentType = current.idToType[id];
+    if (currentType !== undefined && currentType !== committedType) {
+      return `Id ${id} was a ${committedType} in a previous step and cannot be changed to a ${currentType}.`;
+    }
+  }
+  return null;
+}
+
 export default function QuestionTab({
   questionIndex,
   setQuestionIndex,
@@ -146,9 +196,10 @@ export default function QuestionTab({
   isSandboxMode,
   fontScale = 1,
 }: QuestionTabProps) {
-  const [view, setView] = useState<View>(
-    () => (VALID_VIEWS.includes(questionViewProp as View) && questionViewProp !== "loading" ? (questionViewProp as View) : "root")
-  );
+  const [view, setView] = useState<View>(() => {
+    const v = questionViewProp as View;
+    return VALID_VIEWS.includes(v) && v !== "loading" && v !== "stepbystep" ? v : "root";
+  });
   const [questionCount, setQuestionCount] = useState<number>(0);
   const [questionData, setQuestionData] = useState<QuestionData | null>(null);
   const [questionStatus, setQuestionStatus] = useState<QuestionStatusMap>(() =>
@@ -172,6 +223,9 @@ export default function QuestionTab({
     [selectedTopic, topicMap, questionCount]
   );
   const [autoAdvance, setAutoAdvance] = useState(false);
+  const [stepByStepIndex, setStepByStepIndex] = useState<number>(0);
+  const [committedAssignments, setCommittedAssignments] = useState<StepAssignments | null>(null);
+  const [stepConsistencyError, setStepConsistencyError] = useState<string | null>(null);
 
   const checkableLines = useMemo(() => getCheckableLines(questionData), [questionData]);
 
@@ -519,6 +573,9 @@ export default function QuestionTab({
   ]);
 
   const getHeading = (): string => {
+    if (view === "stepbystep" && questionIndex !== null) {
+      return `Step-by-Step · Q${questionIndex}`;
+    }
     if (view === "question" && questionIndex !== null) {
       return `Question ${questionIndex}`;
     }
@@ -586,14 +643,113 @@ export default function QuestionTab({
     setShowResetModal(false);
   };
 
+  const loadStepByStepQuestion = async (): Promise<void> => {
+    onClearCanvas();
+    setStepByStepIndex(0);
+    setCommittedAssignments(null);
+    setStepConsistencyError(null);
+    setSubmissionResults(null);
+    setSelectedLine(null);
+    setSelectedIteration(undefined);
+    setView("loading");
+
+    try {
+      const data = await fetchQuestion<QuestionData>(1, "practice");
+      setQuestionType("practice");
+      setQuestionIndex(1);
+      setQuestionData(data);
+      if (onQuestionDataChange) onQuestionDataChange(data);
+      setView("stepbystep");
+
+      setTimeout(() => {
+        const resolvedCanvas = normalizeQuestionCanvasData(
+          resolveQuestionCanvasData("practice", 1, data.canvasConfig ?? null)
+        );
+        onRestoreCanvas(resolvedCanvas.elements, resolvedCanvas.ids, resolvedCanvas.classes);
+      }, 0);
+    } catch (error) {
+      console.error("Failed to load step-by-step question:", error);
+      setView("root");
+    }
+  };
+
+  const navigateStepByStepToRoot = (): void => {
+    deleteQuestionCanvasData("practice", 1);
+    setStepByStepIndex(0);
+    setCommittedAssignments(null);
+    setStepConsistencyError(null);
+    setQuestionIndex(null);
+    setQuestionData(null);
+    setSelectedLine(null);
+    setSelectedIteration(undefined);
+    setSubmissionResults(null);
+    if (onQuestionDataChange) onQuestionDataChange(null);
+    onRestoreCanvas([], [], []);
+    setView("root");
+  };
+
+  const handleStepCheck = async (): Promise<void> => {
+    if (!questionData?.steps || stepByStepIndex >= questionData.steps.length) return;
+
+    // Snapshot canvas before the async call to avoid stale closure issues
+    const snapshotElements = currentCanvasState.elements;
+    const currentAssignments = extractStepAssignments(snapshotElements);
+
+    // Enforce ID consistency with what was committed in earlier steps
+    if (committedAssignments) {
+      const consistencyError = checkStepConsistency(committedAssignments, currentAssignments);
+      if (consistencyError) {
+        setStepConsistencyError(consistencyError);
+        return;
+      }
+    }
+    setStepConsistencyError(null);
+
+    const currentStep = questionData.steps[stepByStepIndex];
+    const success = await handleSubmitAtLine(currentStep.lineNumber, currentStep.iterationNumber);
+    if (success) {
+      // Merge the new assignments into the committed state
+      setCommittedAssignments((prev) => ({
+        variableToId: { ...prev?.variableToId, ...currentAssignments.variableToId },
+        idToType: { ...prev?.idToType, ...currentAssignments.idToType },
+      }));
+      setStepByStepIndex((prev) => prev + 1);
+    }
+  };
+
+  const handleStepByStepReset = async (): Promise<void> => {
+    try {
+      const data = await fetchQuestion<QuestionData>(1, "practice");
+      setQuestionData(data);
+      if (onQuestionDataChange) onQuestionDataChange(data);
+      setStepByStepIndex(0);
+      setCommittedAssignments(null);
+      setStepConsistencyError(null);
+      setSubmissionResults(null);
+      deleteQuestionCanvasData("practice", 1);
+      const resolvedCanvas = normalizeQuestionCanvasData(
+        resolveQuestionCanvasData("practice", 1, data.canvasConfig ?? null)
+      );
+      onRestoreCanvas(resolvedCanvas.elements, resolvedCanvas.ids, resolvedCanvas.classes);
+    } catch (error) {
+      console.error("Failed to reset step-by-step question:", error);
+    }
+  };
+
   return (
     <>
       <div className={styles.wrapper}>
         <div className={styles.titleRow}>
-          {(view === "list" || view === "question") && (
+          {(view === "list" || view === "question" || view === "stepbystep") && (
             <button
               type="button"
-              onClick={view === "list" ? () => { setQuestionIndex(null); setView("root"); } : navigateToList}
+              onClick={
+                view === "list"
+                  ? () => { setQuestionIndex(null); setView("root"); }
+                  : view === "stepbystep"
+                  ? navigateStepByStepToRoot
+                  : navigateToList
+              }
               className={styles.backBtn}
             >
               ← Back
@@ -640,6 +796,15 @@ export default function QuestionTab({
               icon="🧪"
               categoryType="experiment"
               onClick={() => loadQuestions("experiment")}
+            />
+            <div className={styles.selectorDivider} />
+            <QuestionSelector
+              variant="category"
+              text="Step-by-Step Questions"
+              subtitle="Build the model one line at a time"
+              icon="📋"
+              categoryType="stepbystep"
+              onClick={loadStepByStepQuestion}
             />
           </div>
         )}
@@ -814,6 +979,98 @@ export default function QuestionTab({
                 </div>
               </div>
             </>
+          );
+        })()}
+        {view === "stepbystep" && questionData && (() => {
+          const steps = questionData.steps ?? [];
+          const allDone = stepByStepIndex >= steps.length;
+          const currentStep = !allDone ? steps[stepByStepIndex] : null;
+          const currentLine = currentStep?.lineNumber ?? null;
+
+          return (
+            <div className={styles.questionArea} style={{ '--font-scale': fontScale } as React.CSSProperties}>
+              <div className={styles.stepIndicator}>
+                <div className={styles.stepDots}>
+                  {steps.map((_, i) => (
+                    <span
+                      key={i}
+                      className={`${styles.stepDot} ${
+                        i < stepByStepIndex
+                          ? styles.stepDotDone
+                          : i === stepByStepIndex
+                          ? styles.stepDotActive
+                          : styles.stepDotPending
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className={styles.stepText}>
+                  {allDone
+                    ? "All steps complete!"
+                    : `Step ${stepByStepIndex + 1} of ${steps.length}`}
+                </span>
+              </div>
+
+              <details className={styles.topicsSection}>
+                <summary className={styles.topicsSummary}>Topics</summary>
+                <div className={styles.topicsContent}>
+                  {(questionData.topics ?? []).length > 0 ? (
+                    <div className={styles.topicChips}>
+                      {(questionData.topics ?? []).map((topic, index) => (
+                        <span key={`${topic}-${index}`} className={styles.topicChip}>
+                          {topic}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className={styles.topicsEmpty}>No topics listed yet.</p>
+                  )}
+                </div>
+              </details>
+
+              <div className={styles.questionText}>
+                {allDone
+                  ? "You correctly drew the memory model for each line, one step at a time."
+                  : `Draw the memory model after executing line ${currentLine}.`}
+              </div>
+
+              <CodeBlock
+                code={questionData.code.join("\n")}
+                language="python"
+                selectedLine={currentLine !== null ? currentLine : undefined}
+              />
+
+              {stepConsistencyError && (
+                <div className={styles.stepConsistencyError}>
+                  {stepConsistencyError}
+                </div>
+              )}
+
+              <p className={styles.stepHint}>
+                {allDone
+                  ? "The canvas reflects the final state of memory."
+                  : "Set up the memory model for the highlighted line, then click Check."}
+              </p>
+
+              <div className={styles.buttonRow}>
+                <button
+                  type="button"
+                  className={styles.resetButton}
+                  onClick={handleStepByStepReset}
+                >
+                  {allDone ? "Try Again" : "Reset"}
+                </button>
+                {!allDone && (
+                  <button
+                    type="button"
+                    className={styles.checkAtLineButton}
+                    onClick={handleStepCheck}
+                  >
+                    Check Line {currentLine}
+                  </button>
+                )}
+              </div>
+            </div>
           );
         })()}
       </div>

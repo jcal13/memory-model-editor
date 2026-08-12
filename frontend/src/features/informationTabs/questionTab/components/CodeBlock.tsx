@@ -31,13 +31,17 @@ export default function CodeBlock({
         >
           {tokens.map((line, index) => {
             const lineNumber = startLineNumber + index;
-            const lineProps = getLineProps({ line, key: index });
+            const {
+              key: _lineKey,
+              className: lineClassNameFromProps,
+              ...restLineProps
+            } = getLineProps({ line, key: index });
             const isCheckable = checkableLines?.has(lineNumber) ?? false;
             const isSelected = selectedLine === lineNumber;
 
             const lineClassName = [
               styles.line,
-              lineProps.className ?? "",
+              lineClassNameFromProps ?? "",
               isCheckable ? styles.checkableLine : "",
               isSelected ? styles.selectedLine : "",
             ]
@@ -54,11 +58,7 @@ export default function CodeBlock({
                     : undefined
                 }
                 title={isCheckable ? `Check answer at line ${lineNumber}` : undefined}
-                {...Object.fromEntries(
-                  Object.entries(lineProps).filter(
-                    ([key]) => key !== "className"
-                  )
-                )}
+                {...restLineProps}
               >
                 {showLineNumbers && (
                   <span
@@ -69,12 +69,14 @@ export default function CodeBlock({
                   </span>
                 )}
                 <span className={styles.code}>
-                  {line.map((token, tokenIndex) => (
-                    <span
-                      key={tokenIndex}
-                      {...getTokenProps({ token, key: tokenIndex })}
-                    />
-                  ))}
+                  {line.map((token, tokenIndex) => {
+                    const { key: _tokenKey, ...tokenProps } = getTokenProps({
+                      token,
+                      key: tokenIndex,
+                    });
+
+                    return <span key={tokenIndex} {...tokenProps} />;
+                  })}
                 </span>
               </div>
             );

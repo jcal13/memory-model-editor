@@ -100,11 +100,11 @@ const ButtonDisplays = ({
 
   return (
     <>
-      {!disableInvalidate && (
       <div className={styles.invalidateGroup}>
         <button
           onClick={handleInvalidate}
           className={styles.invalidateButton}
+          disabled={disableInvalidate}
         >
           {invalidated ? "Validate" : "Invalidate"}
         </button>
@@ -116,17 +116,15 @@ const ButtonDisplays = ({
           </span>
         </span>
       </div>
-      )}
-      {!disableRemove && (
-        <button
-          onMouseEnter={() => setHoverRemove(true)}
-          onMouseLeave={() => setHoverRemove(false)}
-          onClick={handleClick}
-          className={styles.removeButton}
-        >
-          Remove Box
-        </button>
-      )}
+      <button
+        onMouseEnter={() => setHoverRemove(true)}
+        onMouseLeave={() => setHoverRemove(false)}
+        onClick={handleClick}
+        className={styles.removeButton}
+        disabled={disableRemove}
+      >
+        Remove Box
+      </button>
     </>
   );
 };

@@ -410,7 +410,7 @@ describe("QuestionTab component", () => {
 
       await userEvent.click(screen.getByRole("button", { name: /back/i }));
 
-      await screen.findByRole("button", { name: /practice questions/i });
+      await screen.findByText(/^practice questions$/i);
       expect(screen.queryByText(/step \d+ of/i)).not.toBeInTheDocument();
     });
   });

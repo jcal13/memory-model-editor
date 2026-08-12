@@ -11,6 +11,7 @@ interface QuestionSelectorProps {
   variant?: "category" | "pill";
   icon?: string;
   subtitle?: string;
+  helpText?: string;
   categoryType?: "practice" | "test" | "prep" | "experiment" | "stepbystep";
 }
 

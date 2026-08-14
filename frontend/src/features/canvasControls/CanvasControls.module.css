@@ -82,6 +82,8 @@
   scrollbar-width: thin;
   scrollbar-color: var(--border-secondary) transparent;
   transition: background-color 200ms ease, border-color 200ms ease;
+  container-type: inline-size;
+  container-name: controlsPanel;
 }
 
 .tabBody::-webkit-scrollbar {
@@ -168,6 +170,22 @@
   align-items: center;
   gap: 6px;
   min-width: 0;
+}
+
+/* When the panel is narrow (resized down, or on small screens), a label +
+   help icon + toggle no longer fit on one line without crowding each other.
+   Stack the label/icon on their own line and right-align the toggle below
+   it instead of letting them squeeze together. */
+@container controlsPanel (max-width: 240px) {
+  .controlItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .controlItem > *:last-child {
+    align-self: flex-end;
+  }
 }
 
 .scaleValue {

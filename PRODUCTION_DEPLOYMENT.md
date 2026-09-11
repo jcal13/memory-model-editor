@@ -32,7 +32,7 @@ Check that your account has permission to run deployment commands:
 sudo -l
 ```
 
-If your account does not have sudo access, contact the project maintainer or system administrator before continuing.
+If your account does not have sudo access, contact Professor Calver or the teaching systems administrator before continuing.
 
 ## 2. Update the Production Repository
 
@@ -62,7 +62,7 @@ Check whether production is behind `origin/dev`:
 sudo -u lilymeng git -C /home/lilymeng/memory-model-editor status
 ```
 
-Optional: review the commits that will be deployed:
+_Optional: review the commits that will be deployed:_
 
 ```bash
 sudo -u lilymeng git -C /home/lilymeng/memory-model-editor log --oneline HEAD..origin/dev

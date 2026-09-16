@@ -108,3 +108,40 @@ describe("detectLinkedListGraph", () => {
     expect(graph.edges).toEqual([{ fromId: 1, toId: 2 }]);
   });
 });
+
+// Use the actual saved question to catch regressions in legacy attributes.
+const prepQuestions = require("../../../../../backend/src/database/prepQuestions.json");
+
+it("detects the preloaded linked list in CSC148 Prep Q1", () => {
+  const question = prepQuestions.find((question: { id: number }) => question.id === 1);
+  const graph = detectLinkedListGraph(question.canvasConfig.elements);
+  expect(graph.nodes).toEqual([
+    expect.objectContaining({ nodeId: 2, value: "165", labels: ["_first"], nextTargetId: 4 }),
+    expect.objectContaining({ nodeId: 4, value: "108", nextKind: "none" }),
+  ]);
+  expect(graph.edges).toEqual([{ fromId: 2, toId: 4 }]);
+});
+
+it("ignores malformed labels and handles missing attribute arrays", () => {
+  const elements = [
+    { id: "_", kind: { name: "function", params: [null, { targetId: 1 }, { name: 42, targetId: 1 }] } },
+    { id: 1, kind: { name: "class", classVariables: [null, { value: 2 }] } },
+    { id: 2, kind: { name: "class" } },
+  ] as unknown as CanvasElement[];
+  expect(detectLinkedListGraph(elements)).toEqual({ nodes: [], edges: [] });
+});
+
+it("returns an empty graph for ordinary non-linked-list elements", () => {
+  expect(detectLinkedListGraph([
+    primitiveElement(1, 1, "int", "7"),
+    classElement(2, 2, "Person", [{ name: "age", targetId: 1 }]),
+  ])).toEqual({ nodes: [], edges: [] });
+});
+
+it("preserves an explicitly missing modern pointer over a legacy value", () => {
+  const element = classElement(1, 1, "Node", [
+    { name: "next", targetId: null, value: 2 } as { name: string; targetId: null },
+  ]);
+  expect(detectLinkedListGraph([element, primitiveElement(2, 2, "NoneType", "None")]).nodes[0])
+    .toMatchObject({ nextKind: "missing", nextTargetId: null });
+});

@@ -30,9 +30,7 @@ import {
   reorderFunctionFramesWithLockedMain,
 } from "../memoryModelEditor/utils/questionFrames";
 import styles from "./Canvas.module.css";
-import {
-  createElementsByIdMap,
-} from "./utils/pythonTutorReferences";
+import { createElementsByIdMap } from "./utils/canvasReferences";
 import { findOrphanedGeneratedPrimitiveIds } from "../editors/utils/pythonTutorInlinePrimitives";
 import PythonTutorReferenceArrows from "./components/PythonTutorReferenceArrows";
 

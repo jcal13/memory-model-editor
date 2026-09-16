@@ -1,6 +1,5 @@
 import {
   LinkedListNextKind,
-  LinkedListStructure,
   LinkedListGraph,
 } from "./linkedListDetector";
 
@@ -12,7 +11,6 @@ const NODE_GAP = 35;
 const VALUE_RATIO = 0.6;
 const LABEL_LINE_HEIGHT = 16;
 const LABEL_TO_NODE_GAP = 14;
-const FOOTER_HEIGHT = 24;
 const ROW_GAP = 44;
 
 export interface LinkedListNodeLayout {
@@ -29,15 +27,6 @@ export interface LinkedListNodeLayout {
   nextText: string;
   labels: string[];
   nextKind: LinkedListNextKind;
-}
-
-export interface LinkedListStructureLayout {
-  width: number;
-  height: number;
-  connectorY: number;
-  cyclePath: string | null;
-  footerText: string | null;
-  nodes: LinkedListNodeLayout[];
 }
 
 export interface LinkedListGraphLayout {
@@ -67,42 +56,6 @@ function getNextCellText(nextKind: LinkedListNextKind): string {
     default:
       return "•";
   }
-}
-
-function createCyclePath(
-  nodes: LinkedListNodeLayout[],
-  targetNodeId: number
-): string | null {
-  const source = nodes[nodes.length - 1];
-  const target = nodes.find((node) => node.nodeId === targetNodeId);
-
-  if (!source || !target) {
-    return null;
-  }
-
-  const startX = source.x + source.width - 8;
-  const startY = source.y + source.height / 2;
-  const endX = target.x + target.width / 2;
-  const endY = target.y - 6;
-  const controlY = target.y - 40;
-
-  return `M ${startX} ${startY} C ${startX + 30} ${controlY}, ${endX + 20} ${controlY}, ${endX} ${endY}`;
-}
-
-function getFooterText(nextKind: LinkedListNextKind, hasCycle: boolean): string | null {
-  if (hasCycle) {
-    return "Cycle detected";
-  }
-
-  if (nextKind === "missing") {
-    return "Chain stopped at a missing reference";
-  }
-
-  if (nextKind === "invalid") {
-    return "Chain stopped at a non-node next reference";
-  }
-
-  return null;
 }
 
 export function buildLinkedListGraphLayout(

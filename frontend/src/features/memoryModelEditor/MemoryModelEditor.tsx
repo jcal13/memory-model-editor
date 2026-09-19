@@ -1,3 +1,7 @@
+import { normalizeQuestionCanvasData } from "./utils/questionFrames";
+import Tutorial from "../tutorial/Tutorial";
+import { isTutorial } from "../tutorial/tutorialStorage";
+import { workspaceStorage } from "../tutorial/tutorialStorage";
 import Canvas from "../canvas/Canvas";
 import StructurePanel from "../canvas/components/StructurePanel";
 import Palette from "../palette/Palette";
@@ -63,18 +67,18 @@ export default function MemoryModelEditor({
     window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO
   );
 
-  const [currentQuestionData, setCurrentQuestionData] = useState<any>(null);
+  const [currentQuestionData, setCurrentQuestionData] = useState<any>(isTutorial() ? { answer: [{ type: "int", value: 5 }] } : null);
   const _initialUI = loadInitialUIData();
   const [canvasScale, setCanvasScale] = useState<number>(_initialUI.canvasScale ?? 1);
   const [editorScale, setEditorScale] = useState<number>(_initialUI.editorScale ?? 1);
   const [fontScale, setFontScale] = useState<number>(() => {
-    const saved = localStorage.getItem("questionFontScale");
+    const saved = workspaceStorage.getItem("questionFontScale");
     return saved ? parseFloat(saved) : 1;
   });
   const adjustFontScale = (delta: number) => {
     setFontScale((prev) => {
       const next = Math.max(0.75, Math.min(1.5, Math.round((prev + delta) * 10) / 10));
-      localStorage.setItem("questionFontScale", String(next));
+      workspaceStorage.setItem("questionFontScale", String(next));
       return next;
     });
   };
@@ -126,10 +130,11 @@ export default function MemoryModelEditor({
   }, [state.elements, state.elementIds, state.elementClasses, recordState]);
 
   const clearCanvas = () => {
+    const emptyElements = isTutorial() ? normalizeQuestionCanvasData().elements : [];
     if (state.selectedQuestionIndex !== null && state.selectedQuestionType !== null) {
       deleteQuestionCanvasData(state.selectedQuestionType, state.selectedQuestionIndex);
     }
-    state.setElements([]);
+    state.setElements(emptyElements);
     state.setElementIds([]);
     state.setElementClasses([]);
     state.setSelectedQuestionIndex(null);
@@ -139,7 +144,7 @@ export default function MemoryModelEditor({
     state.setCanvasResetKey((prev) => prev + 1);
     clearCanvasStorage();
     const baselineState = {
-      elements: [],
+      elements: emptyElements,
       ids: [],
       classes: [],
     };
@@ -365,6 +370,7 @@ export default function MemoryModelEditor({
   });
 
   useResponsivePanels({
+    enabled: !isTutorial(),
     isPaletteOpen: state.isPaletteOpen,
     isInfoPanelOpen: state.isInfoPanelOpen,
     setIsPaletteOpen: state.setIsPaletteOpen,
@@ -554,13 +560,13 @@ export default function MemoryModelEditor({
   }, [refs.mainContainerRef, state.setInfoPanelWidth]);
 
   return (
-    <div className={styles.editorContainer}>
-      <PanelToggleButtons
+    <div className={`${styles.editorContainer} ${isTutorial() ? "tutorial-workspace" : ""}`}>
+      {!isTutorial() && <PanelToggleButtons
         isPaletteOpen={state.isPaletteOpen}
         isInfoPanelOpen={state.isInfoPanelOpen}
         onTogglePalette={() => state.setIsPaletteOpen((prev) => !prev)}
         onToggleInfoPanel={() => state.setIsInfoPanelOpen((prev) => !prev)}
-      />
+      />}
 
       {state.isPaletteOpen && (
         <>
@@ -576,7 +582,7 @@ export default function MemoryModelEditor({
             }}
           >
             <div
-              className={styles.paletteContent}
+              data-tour="palette" className={styles.paletteContent}
               style={{
                 width: `${paletteWidth}px`,
               }}
@@ -593,7 +599,7 @@ export default function MemoryModelEditor({
                 }
                 isPracticeMode={effectiveSandboxMode}
                 isSandboxMode={effectiveSandboxMode}
-                onModeToggle={state.selectedQuestionType === "experiment" ? undefined : () => state.setShowModeToggleModal(true)}
+                onModeToggle={isTutorial() || state.selectedQuestionType === "experiment" ? undefined : () => state.setShowModeToggleModal(true)}
                 onClear={() => state.setShowClearCanvasModal(true)}
                 onUndo={undo}
                 onRedo={redo}
@@ -631,9 +637,9 @@ export default function MemoryModelEditor({
         </>
       )}
 
-      <div ref={refs.mainContainerRef} className={styles.mainContainer}>
-        <div className={styles.canvasColumn}>
-          <div className={styles.canvasArea}>
+      <div data-tour="main-container" ref={refs.mainContainerRef} className={styles.mainContainer}>
+        <div data-tour="canvas-column" className={styles.canvasColumn}>
+          <div data-tour="canvas" className={styles.canvasArea}>
             <Canvas
               key={state.canvasResetKey}
               elements={state.elements}
@@ -662,7 +668,7 @@ export default function MemoryModelEditor({
                   ? getQuestionFunctionNames(currentQuestionData)
                   : undefined
               }
-              isQuestionMode={state.selectedQuestionIndex !== null}
+              isQuestionMode={isTutorial() || state.selectedQuestionIndex !== null}
               preserveCollapsedWorkspace={state.showLinkedListView}
               workspaceHeightOffset={
                 state.showLinkedListView && !state.structurePanelCollapsed
@@ -701,7 +707,7 @@ export default function MemoryModelEditor({
             />
 
             <div
-              className={`${styles.infoPanel} ${
+              data-tour="info-panel" className={`${styles.infoPanel} ${
                 state.isResizingInfoPanel ? styles.noTransition : ""
               }`}
               style={{
@@ -715,7 +721,14 @@ export default function MemoryModelEditor({
                 )}px`,
               }}
             >
-              <InformationTabs
+              {isTutorial() ? <Tutorial elements={state.elements} onOpenEditor={openEditor || (() => {})}
+                onAddInteger={() => {
+                  const id = Math.max(-1, ...state.elements.map(e => typeof e.id === "number" ? e.id : -1)) + 1;
+                  const boxId = Math.max(-1, ...state.elements.map(e => e.boxId)) + 1;
+                  state.setElements(prev => [...prev, { boxId, id, x: 260, y: 100 + (id % 4) * 130,
+                    kind: { name: "primitive", type: "int", value: "0" } }]);
+                  state.setElementIds(prev => [...prev, id]);
+                }} /> : <InformationTabs
                 submissionResults={state.submissionResults}
                 questionSelected={state.selectedQuestionIndex !== null}
                 questionIndex={state.selectedQuestionIndex}
@@ -739,7 +752,7 @@ export default function MemoryModelEditor({
                 tabScrollPositions={state.tabScrollPositions}
                 setTabScrollPositions={state.setTabScrollPositions}
                 fontScale={fontScale}
-              />
+              />}
             </div>
           </>
         )}

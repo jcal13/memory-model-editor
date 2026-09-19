@@ -213,3 +213,24 @@ if (result.correct) {
 ```
 
 3. **Feedback**: The `result.errors` array provides specific reasons for failure, which can be piped directly into the MarkUs feedback file.
+
+## Guided tutorial
+
+Choose **Start here: Learn Memory Lab** in Questions to open the tutorial in the
+same browser tab (`?tutorial=1`). It uses a fixed exercise (`a = 5`, `b = 4`,
+`c = 6`), the normal canvas/editor, and a Beamer+-inspired spotlight. Students
+must perform the requested action before Next unlocks. Hide/Show guidance,
+Back, Restart tutorial, and Exit tutorial are available. Escape hides guidance.
+
+The tutorial runs without the question database. Its small, dedicated checker
+validates this fixed exercise; normal exercise grading is unchanged. Canvas,
+UI, undo history and step progress use prefixed sessionStorage keys, separate
+from regular localStorage. Tutorial work survives reloads in the same tab;
+Restart clears only tutorial data. Exit restores the regular workspace.
+
+Implementation: `frontend/src/features/tutorial/`. Edit the step descriptions
+in `Tutorial.tsx`, the assignments/checker in `tutorialModel.ts`, and the overlay
+styles in `tutorial.css`. Spotlight targets use stable `data-tour` attributes.
+The overlay permits canvas/editor interaction and follows resize/scroll/layout
+changes. The tutorial is designed for desktop/laptop use; narrow screens can
+scroll the workspace horizontally.

@@ -1,3 +1,5 @@
+import { isTutorial } from "../../tutorial/tutorialStorage";
+import { normalizeQuestionCanvasData } from "../utils/questionFrames";
 import { useState } from "react";
 import {
   CanvasElement,
@@ -18,7 +20,7 @@ const DEFAULT_INFO_PANEL_WIDTH = 500;
 
 export function useMemoryModelEditorState(sandbox: boolean) {
   // Load initial data
-  const initialCanvasData = loadInitialCanvasData();
+  const initialCanvasData = isTutorial() ? normalizeQuestionCanvasData(loadInitialCanvasData()) : loadInitialCanvasData();
   const initialUIData = loadInitialUIData();
 
   // Canvas state
@@ -79,7 +81,7 @@ export function useMemoryModelEditorState(sandbox: boolean) {
   const [activePaletteTab, setActivePaletteTab] = useState<PaletteTab>("all");
   const [isPaletteOpen, setIsPaletteOpen] = useState(true);
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(
-    typeof initialUIData.isInfoPanelOpen === "boolean" ? initialUIData.isInfoPanelOpen : true
+    isTutorial() ? true : typeof initialUIData.isInfoPanelOpen === "boolean" ? initialUIData.isInfoPanelOpen : true
   );
   const [infoPanelWidth, setInfoPanelWidth] = useState<number>(
     DEFAULT_INFO_PANEL_WIDTH

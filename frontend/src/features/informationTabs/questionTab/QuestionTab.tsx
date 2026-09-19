@@ -1,3 +1,5 @@
+import { startTutorial } from "../../tutorial/tutorialStorage";
+import { workspaceStorage } from "../../tutorial/tutorialStorage";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import {
@@ -83,7 +85,7 @@ interface QuestionTabProps {
 
 function loadQuestionStatus(): QuestionStatusMap {
   try {
-    const rawData = localStorage.getItem(QUESTION_STATUS_KEY);
+    const rawData = workspaceStorage.getItem(QUESTION_STATUS_KEY);
     if (!rawData) return {};
     return JSON.parse(rawData) ?? {};
   } catch {
@@ -93,7 +95,7 @@ function loadQuestionStatus(): QuestionStatusMap {
 
 function persistQuestionStatus(statusMap: QuestionStatusMap): void {
   try {
-    localStorage.setItem(QUESTION_STATUS_KEY, JSON.stringify(statusMap));
+    workspaceStorage.setItem(QUESTION_STATUS_KEY, JSON.stringify(statusMap));
   } catch (error) {
     console.warn("Failed to persist question status:", error);
   }
@@ -765,6 +767,9 @@ export default function QuestionTab({
 
         {view === "root" && (
           <div className={styles.selectors}>
+            <QuestionSelector variant="category" text="Start here: Learn Memory Lab"
+              subtitle="Build your first model with guided instructions" icon="🧭"
+              onClick={startTutorial} />
             <QuestionSelector
               variant="category"
               text="Practice Questions"

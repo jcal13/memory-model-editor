@@ -1,3 +1,4 @@
+import { workspaceStorage } from "../../tutorial/tutorialStorage";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { CanvasElement } from "../../shared/types";
 
@@ -31,8 +32,8 @@ export function useUndoHistory(
   // Load initial history from localStorage
   const loadHistory = useCallback(() => {
     try {
-      const saved = localStorage.getItem(HISTORY_STORAGE_KEY);
-      const savedIndex = localStorage.getItem(HISTORY_INDEX_STORAGE_KEY);
+      const saved = workspaceStorage.getItem(HISTORY_STORAGE_KEY);
+      const savedIndex = workspaceStorage.getItem(HISTORY_INDEX_STORAGE_KEY);
       return {
         history: saved ? JSON.parse(saved) : [],
         index: savedIndex ? parseInt(savedIndex, 10) : -1,
@@ -52,8 +53,8 @@ export function useUndoHistory(
   // Save history to localStorage whenever it changes
   useEffect(() => {
     try {
-      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
-      localStorage.setItem(HISTORY_INDEX_STORAGE_KEY, historyIndex.toString());
+      workspaceStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
+      workspaceStorage.setItem(HISTORY_INDEX_STORAGE_KEY, historyIndex.toString());
     } catch (error) {
       console.error("Failed to save undo history:", error);
     }
@@ -162,8 +163,8 @@ export function useUndoHistory(
     setHistoryIndex(0);
   
     try {
-      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify([initialState]));
-      localStorage.setItem(HISTORY_INDEX_STORAGE_KEY, "0");
+      workspaceStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify([initialState]));
+      workspaceStorage.setItem(HISTORY_INDEX_STORAGE_KEY, "0");
     } catch (error) {
       console.error("Failed to clear undo history from localStorage:", error);
     }

@@ -1,3 +1,4 @@
+import { isTutorial, exitTutorial } from "../../tutorial/tutorialStorage";
 import { workspaceStorage } from "../../tutorial/tutorialStorage";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -745,7 +746,7 @@ export default function QuestionTab({
             <button
               type="button"
               onClick={
-                view === "list"
+                isTutorial() ? exitTutorial : view === "list"
                   ? () => { setQuestionIndex(null); setView("root"); }
                   : view === "stepbystep"
                   ? navigateStepByStepToRoot
@@ -753,7 +754,7 @@ export default function QuestionTab({
               }
               className={styles.backBtn}
             >
-              ← Back
+              {isTutorial() ? "← Exit demo" : "← Back"}
             </button>
           )}
           <div className={styles.titleStack}>

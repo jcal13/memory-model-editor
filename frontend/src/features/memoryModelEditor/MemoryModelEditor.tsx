@@ -1,6 +1,6 @@
 import { normalizeQuestionCanvasData } from "./utils/questionFrames";
 import Tutorial from "../tutorial/Tutorial";
-import { isTutorial } from "../tutorial/tutorialStorage";
+import { isDemoQuestion, isTutorial } from "../tutorial/tutorialStorage";
 import { workspaceStorage } from "../tutorial/tutorialStorage";
 import Canvas from "../canvas/Canvas";
 import StructurePanel from "../canvas/components/StructurePanel";
@@ -758,7 +758,7 @@ export default function MemoryModelEditor({
         )}
       </div>
 
-      <Tutorial elements={state.elements} correct={tutorialCheckedModel === tutorialModelKey} />
+      <Tutorial demoActive={isDemoQuestion(state.selectedQuestionIndex, state.selectedQuestionType, state.questionView)} elements={state.elements} correct={tutorialCheckedModel === tutorialModelKey} />
 
       {state.showClearCanvasModal && (
         <ConfirmationModal

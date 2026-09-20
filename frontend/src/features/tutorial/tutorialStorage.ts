@@ -7,6 +7,8 @@ export const workspaceStorage = {
   removeItem(key: string) { if (isTutorial()) sessionStorage.removeItem(prefix + key); else localStorage.removeItem(key); },
 };
 export function startTutorial() {
+  // Each explicit launch loads a clean demo; regular work remains untouched.
+  Object.keys(sessionStorage).filter(key => key.startsWith(prefix)).forEach(key => sessionStorage.removeItem(key));
   sessionStorage.setItem(prefix + "guidance", "shown");
   sessionStorage.setItem(prefix + "started", "false");
   const url = new URL(window.location.href);
@@ -22,3 +24,6 @@ export function restartTutorial() {
   Object.keys(sessionStorage).filter(key => key.startsWith(prefix)).forEach(key => sessionStorage.removeItem(key));
   window.location.reload();
 }
+
+export const isDemoQuestion = (index: number | null, type: string | null, view: string) =>
+  isTutorial() && index === 1 && type === "practice" && view === "question";

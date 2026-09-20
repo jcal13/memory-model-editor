@@ -3,16 +3,17 @@ import { createPortal } from "react-dom";
 import { CanvasElement } from "../shared/types";
 import { hasAssignment } from "./tutorialModel";
 import { exitTutorial, isTutorial, startTutorial, workspaceStorage } from "./tutorialStorage";
+import HelpContent from "./HelpContent";
 import "./tutorial.css";
 
 // Beamer+ pattern: declarative steps, measured targets, and a transparent spotlight.
 const steps = [
-  { title: "Build your first memory model", body: "This is Practice Question 1, with the same tools, Submit button, and feedback you’ll use in practice. Your tutorial work is saved separately. Follow the guide or hide it to explore.", target: "" },
+  { title: "Build your first memory model", body: "This demo uses Practice Question 1, with the same tools, Submit button, and feedback you’ll use in practice. Your tutorial work is saved separately. Follow the guide or hide it to explore.", target: "" },
   { title: "Add an integer object", body: "Drag the int box from the palette onto the middle canvas. An integer box represents an object in memory.", target: '[aria-label="Draggable int box"]' },
-  { title: "Create the value for a = 5", body: "Click an integer object and set its value to 5 in the editor. Changes save automatically. Object IDs can differ: the value belongs inside the object.", target: '[data-tour="canvas"]' },
-  { title: "Connect a to the object with value 5", body: "Click the __main__ frame in the call stack. Choose Add Variable, enter a, then click its ID selector and choose the object containing 5.", target: '[data-tour="call-stack"]' },
-  { title: "Build b = 4", body: "Drag another int onto the canvas and change its value to 4. In __main__, add variable b and select the ID of the object containing 4. Keep the object containing 5 for a.", target: '[data-tour="canvas"]' },
-  { title: "Build c = 6", body: "Add an integer object containing 6. Add c to __main__ and reference that object’s ID. Keep a pointing to 5 and b pointing to 4.", target: '[data-tour="canvas"]' },
+  { title: "Create the value for a = 5", body: "Click an integer object and set its value to 5 in the editor. Changes save automatically. Object IDs can differ: the value belongs inside the object.", target: "" },
+  { title: "Connect a to the object with value 5", body: "Click the __main__ frame in the call stack. Choose Add Variable, enter a, then click its ID selector and choose the object containing 5.", target: '[data-canvas-kind="function"]' },
+  { title: "Build b = 4", body: "Drag another int onto the canvas and change its value to 4. In __main__, add variable b and select the ID of the object containing 4. Keep the object containing 5 for a.", target: "" },
+  { title: "Build c = 6", body: "Add an integer object containing 6. Add c to __main__ and reference that object’s ID. Keep a pointing to 5 and b pointing to 4.", target: "" },
   { title: "Submit and read the feedback", body: "Click the normal Submit button on the right. Read the Feedback panel below it and repair anything it flags. You can also check individual code lines using their highlighted line numbers.", target: '[data-tour="submit"]' },
   { title: "You’ve built your first model", body: "You added objects, edited values, connected references, and checked your answer. Finish closes the guide and leaves you here to explore. Resume guide and Help remain in the bottom-right corner; Exit tutorial returns to your regular workspace.", target: "" },
 ];
@@ -27,13 +28,15 @@ export function nextAction(elements: CanvasElement[], correct: boolean) {
   return correct ? 7 : 6;
 }
 
-export default function Tutorial({ elements, correct }: { elements: CanvasElement[]; correct: boolean }) {
-  const active = isTutorial();
+export default function Tutorial({ elements, correct, demoActive = isTutorial() }: { elements: CanvasElement[]; correct: boolean; demoActive?: boolean }) {
+  const active = demoActive;
   const action = nextAction(elements, correct);
   const [step, setStep] = useState(() => active && workspaceStorage.getItem("started") === "true" ? action : 0);
   const [guidance, setGuidance] = useState(() => active && workspaceStorage.getItem("guidance") !== "hidden");
   const [help, setHelp] = useState(false);
   const [interacting, setInteracting] = useState(false);
+  const [draggingBox, setDraggingBox] = useState(false);
+  const afterDrop = useRef(false);
   const [rect, setRect] = useState<{left: number; top: number; width: number; height: number} | null>(null);
   const [position, setPosition] = useState({left: 24, top: 24});
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -64,8 +67,8 @@ export default function Tutorial({ elements, correct }: { elements: CanvasElemen
   }, [active, step]);
   useEffect(() => {
     let dragging = false;
-    const dragStart = () => { dragging = true; setInteracting(true); };
-    const dragEnd = () => { dragging = false; setInteracting(false); };
+    const dragStart = () => { dragging = true; setInteracting(true); setDraggingBox(true); clicked.current = null; };
+    const dragEnd = () => { dragging = false; setInteracting(false); setDraggingBox(false); clicked.current = null; afterDrop.current = true; };
     const down = (event: PointerEvent) => {
       if (event.target instanceof Element && !event.target.closest('.tutorial-card, .tutorial-dock, .tutorial-help')) setInteracting(true);
     };
@@ -110,13 +113,21 @@ export default function Tutorial({ elements, correct }: { elements: CanvasElemen
     const update = () => {
       const editor = document.querySelector('[data-tour="box-editor"]');
       setEditingId(editor ? Number(editor.getAttribute("data-box-id")) : null);
-      const target = clicked.current?.isConnected ? clicked.current : editor || (current.target ? document.querySelector(current.target) : null);
+      let target: Element | null = clicked.current?.isConnected ? clicked.current : editor || (current.target ? document.querySelector(current.target) : null);
+      if (afterDrop.current) {
+        const boxes = Array.from(document.querySelectorAll('[data-canvas-box-id][data-canvas-kind="primitive"]'));
+        target = boxes[boxes.length - 1] || null;
+        if (target) { clicked.current = target; afterDrop.current = false; }
+      }
+      // Empty canvas clicks clear emphasis; never dim an entire working region.
+      if (target?.getAttribute("data-tour") === "canvas") target = null;
       const r = target?.getBoundingClientRect();
       const box = r && r.width && r.height ? {left:r.left-6, top:r.top-6, width:r.width+12, height:r.height+12} : null;
       setRect(old => JSON.stringify(old) === JSON.stringify(box) ? old : box);
       const w = card.current?.offsetWidth || 320, h = card.current?.offsetHeight || 300;
       const vw = window.innerWidth, vh = window.innerHeight;
       let left = (vw-w)/2, top = (vh-h)/2;
+      if (!r && step > 0 && step < 7) { left = vw-w-20; top = vh-h-72; }
       if (r) {
         left = vw-r.right >= w+22 ? r.right+14 : r.left >= w+22 ? r.left-w-14 : vw-w-16;
         top = r.top+r.height/2-h/2;
@@ -129,7 +140,8 @@ export default function Tutorial({ elements, correct }: { elements: CanvasElemen
     const pointer = (event: PointerEvent) => {
       if (!(event.target instanceof Element) || event.target.closest('.tutorial-card, .tutorial-dock')) return;
       if (step > 0) setStep(action);
-      clicked.current = event.target.closest('[data-tour="box-editor"], [data-tour="reference-picker"], [data-tour="canvas"], [data-tour="palette"], [data-tour="info-panel"]');
+      afterDrop.current = false;
+      clicked.current = event.target.closest('[data-tour="reference-picker"], [data-tour="box-editor"], [data-canvas-box-id], [aria-label^="Draggable "], [data-tour="submit"], [data-tour="canvas"]');
       schedule();
     };
     const key = (event: KeyboardEvent) => { if (event.key === "Escape") showGuide(false); };
@@ -141,16 +153,16 @@ export default function Tutorial({ elements, correct }: { elements: CanvasElemen
     window.addEventListener("resize",schedule); window.addEventListener("scroll",schedule,true);
     schedule();
     return () => { cancelAnimationFrame(raf); observer.disconnect(); resize.disconnect(); document.removeEventListener("pointerdown",pointer,true); document.removeEventListener("keydown",key); window.removeEventListener("resize",schedule); window.removeEventListener("scroll",schedule,true); };
-  }, [active,current.target,guidance,help,step,action,showGuide]);
+  }, [active,current.target,guidance,help,step,action,showGuide,draggingBox]);
 
   return createPortal(<>
     <div className="tutorial-dock">
-      {active && <><button onClick={() => { if (!guidance) setStep(action); showGuide(!guidance); }}>{guidance ? "Hide guide" : "Resume guide"}</button><button onClick={exitTutorial}>Exit tutorial</button></>}
+      {isTutorial() && <>{active && <button onClick={() => { if (!guidance) setStep(action); showGuide(!guidance); }}>{guidance ? "Hide guide" : "Resume guide"}</button>}<button onClick={exitTutorial}>Exit tutorial</button></>}
       <button className="tutorial-help-button" aria-label="Help and guide" title="Help and guide" onClick={() => setHelp(true)}>?</button>
     </div>
     {active && guidance && !help && <div className="tutorial-layer">
-      {rect ? <div className="tutorial-spotlight" style={rect}/> : <div className="tutorial-dim"/>}
-      <div ref={card} className="tutorial-card" style={{...position, pointerEvents: interacting ? "none" : "auto"}} role="dialog" aria-label={current.title}>
+      {!draggingBox && (rect ? <div className="tutorial-spotlight" style={rect}/> : (step === 0 || step === 7) ? <div className="tutorial-dim"/> : null)}
+      <div ref={card} className="tutorial-card" style={{...position, pointerEvents: interacting ? "none" : "auto", opacity: draggingBox ? 0 : 1}} role="dialog" aria-label={current.title}>
         <div className="tutorial-heading"><span>{step+1} of {steps.length}</span><button onClick={() => showGuide(false)}>Hide</button></div>
         <h2>{current.title}</h2><p>{instruction}</p>
         {context && step > 0 && step < 7 && <p className="tutorial-note" role="status">{context}</p>}
@@ -160,13 +172,7 @@ export default function Tutorial({ elements, correct }: { elements: CanvasElemen
     {help && <div className="tutorial-help-backdrop" onClick={event => { if(event.target===event.currentTarget) setHelp(false); }}>
       <div className="tutorial-help" ref={helpCard} role="dialog" aria-modal="true" aria-labelledby="memory-help-title" tabIndex={-1}>
         <div className="tutorial-heading"><h1 id="memory-help-title">Help &amp; guide</h1><button aria-label="Close help" onClick={()=>setHelp(false)}>×</button></div>
-        <button className="tutorial-launch" onClick={()=> { if(active) { setStep(0); showGuide(true); setHelp(false); } else startTutorial(); }}><strong>New to Memory Lab? Take the guided tour →</strong><span>Build your first memory model using Practice Question 1.</span></button>
-        <h2>Choose a question</h2><p>Open Practice Questions and select a question. Read the Python code on the right, then draw the memory model after it runs. The tutorial uses the same question interface in a separate workspace.</p>
-        <h2>Add and edit objects</h2><p>Drag a memory box from the palette on the left onto the middle canvas. Click a box to edit its value. For example, a = 5 needs an int object containing 5 and a variable in the main frame that refers to it.</p>
-        <h2>Connect variables to objects</h2><p>Click the __main__ frame in the call stack. Choose Add Variable, enter the variable name, and use its ID selector to reference an object. Match the object’s ID, not its value. Two variables can refer to the same object when the code requires it.</p>
-        <h2>Check your model</h2><p>Use Submit and read the Feedback panel below the question. Fix mistakes and submit again. Highlighted code line numbers let you check the model at that point; auto-advance moves to the next checkpoint after a correct answer.</p>
-        <h2>Adjust your workspace</h2><p>Drag the divider between the canvas and question panel to resize it. Canvas Controls includes Undo, Redo, Clear, and Download. Reset in the question panel restores that question’s starting model.</p>
-        <h2>Use the guided tour</h2><p>The spotlight follows the area you click while you drag and edit normally. Hide guide pauses the overlay; Resume guide brings it back at the next unfinished action. Finish leaves the exercise open. Exit tutorial returns to your regular workspace.</p>
+        <HelpContent onStart={startTutorial} />
         <button onClick={()=>setHelp(false)}>Done</button>
       </div>
     </div>}

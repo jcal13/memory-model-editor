@@ -218,12 +218,15 @@ if (result.correct) {
 
 Use the bottom-right **?** button to open **Help & guide**, including written
 instructions and **New to Memory Lab? Take the guided tour**. The tour opens in
-the same tab (`?tutorial=1`) with the real Practice Question 1 panel, code-line
+the same tab (`?tutorial=1`) as a fresh, isolated demo with the real Practice Question 1 panel, code-line
 checks, Reset/Submit controls, and feedback. It requires the normal question API.
 The right panel uses the regular draggable divider.
 
-The Beamer+-inspired spotlight allows normal dragging and editing and follows
-the region clicked. Instructions advance from actual objects and references,
+The demo is restricted to Practice Question 1; its Back control exits the demo
+instead of opening other questions. The Beamer+-inspired spotlight highlights
+individual boxes and editors, with lighter dimming. During native palette dragging,
+the overlay disappears, then highlights the dropped object. Empty canvas clicks
+clear emphasis. Instructions advance from actual objects and references,
 not fixed object IDs. Hide/Resume guide is always available at bottom-right;
 Resume finds the next unfinished action. Finish hides the guide and keeps the
 exercise open. Exit tutorial restores the regular workspace.
@@ -231,6 +234,6 @@ exercise open. Exit tutorial restores the regular workspace.
 Canvas, UI, undo history, question progress, and guide visibility use prefixed
 sessionStorage keys in tutorial mode, separate from regular localStorage.
 Implementation lives in `frontend/src/features/tutorial/`; step definitions and
-Help content are in `Tutorial.tsx`, reference checks in `tutorialModel.ts`, and
+Help content are in `Tutorial.tsx` and `HelpContent.tsx`, reference checks in `tutorialModel.ts`, and
 spotlight styles in `tutorial.css`. Normal grading remains in the existing
 question and submission components. `data-tour` attributes anchor the overlay.

@@ -14,7 +14,7 @@ test('help is available outside the Questions list with documentation and a tour
  window.history.replaceState({},'', '/'); render(<Tutorial elements={[]} correct={false}/>);
  fireEvent.click(screen.getByRole('button',{name:'Help and guide'}));
  expect(screen.getByRole('dialog',{name:'Help & guide'})).toBeInTheDocument();
- expect(screen.getByText('Connect variables to objects')).toBeInTheDocument();
+ expect(screen.getByText('3. Connect variables to objects')).toBeInTheDocument();
  expect(screen.getByRole('button',{name:/New to Memory Lab/})).toBeInTheDocument();
 });
 test('hide and resume preserve the exercise and find the next unfinished action',()=>{
@@ -49,4 +49,21 @@ test('completed actions advance instructions automatically',()=>{
  fireEvent.click(screen.getByRole('button',{name:'Next'}));
  rerender(<Tutorial elements={m} correct={false}/>);
  expect(screen.getByRole('dialog',{name:'Connect a to the object with value 5'})).toBeInTheDocument();
+});
+
+test('guidance and resume controls are unavailable on other questions',()=>{
+ render(<Tutorial elements={model()} correct={false} demoActive={false}/>);
+ expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+ expect(screen.queryByRole('button',{name:/Resume guide|Hide guide/})).not.toBeInTheDocument();
+ expect(screen.getByRole('button',{name:'Help and guide'})).toBeInTheDocument();
+});
+test('native drag removes all dimming until the drop completes',()=>{
+ render(<Tutorial elements={[]} correct={false}/>);
+ expect(document.querySelector('.tutorial-dim')).toBeInTheDocument();
+ fireEvent.dragStart(document.body);
+ fireEvent.pointerCancel(document.body);
+ expect(document.querySelector('.tutorial-dim')).not.toBeInTheDocument();
+ expect(document.querySelector('.tutorial-spotlight')).not.toBeInTheDocument();
+ fireEvent.dragEnd(document.body);
+ expect(document.querySelector('.tutorial-dim')).toBeInTheDocument();
 });

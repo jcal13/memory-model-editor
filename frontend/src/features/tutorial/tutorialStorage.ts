@@ -7,6 +7,8 @@ export const workspaceStorage = {
   removeItem(key: string) { if (isTutorial()) sessionStorage.removeItem(prefix + key); else localStorage.removeItem(key); },
 };
 export function startTutorial() {
+  sessionStorage.setItem(prefix + "guidance", "shown");
+  sessionStorage.setItem(prefix + "started", "false");
   const url = new URL(window.location.href);
   url.searchParams.set("tutorial", "1");
   window.location.assign(url.toString());

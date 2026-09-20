@@ -111,7 +111,7 @@ const BoxEditorModule = ({
     invalidated,
   );
   return (
-    <div data-tour="box-editor" ref={moduleRef} className={styles.boxEditorModule}>
+    <div data-tour="box-editor" data-box-id={metadata.boxId} ref={moduleRef} className={styles.boxEditorModule}>
       {/* Top section: header with id, type, name + close button */}
       <Header
         element={metadata}

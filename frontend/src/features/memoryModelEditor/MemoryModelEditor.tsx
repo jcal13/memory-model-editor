@@ -67,7 +67,9 @@ export default function MemoryModelEditor({
     window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO
   );
 
-  const [currentQuestionData, setCurrentQuestionData] = useState<any>(isTutorial() ? { answer: [{ type: "int", value: 5 }] } : null);
+  const [tutorialCheckedModel, setTutorialCheckedModel] = useState<string | null>(null);
+  const tutorialModelKey = JSON.stringify(state.elements.map(({id, kind, invalidated}) => ({id, kind, invalidated})));
+  const [currentQuestionData, setCurrentQuestionData] = useState<any>(null);
   const _initialUI = loadInitialUIData();
   const [canvasScale, setCanvasScale] = useState<number>(_initialUI.canvasScale ?? 1);
   const [editorScale, setEditorScale] = useState<number>(_initialUI.editorScale ?? 1);
@@ -370,7 +372,7 @@ export default function MemoryModelEditor({
   });
 
   useResponsivePanels({
-    enabled: !isTutorial(),
+    enabled: true,
     isPaletteOpen: state.isPaletteOpen,
     isInfoPanelOpen: state.isInfoPanelOpen,
     setIsPaletteOpen: state.setIsPaletteOpen,
@@ -561,12 +563,12 @@ export default function MemoryModelEditor({
 
   return (
     <div className={`${styles.editorContainer} ${isTutorial() ? "tutorial-workspace" : ""}`}>
-      {!isTutorial() && <PanelToggleButtons
+      <PanelToggleButtons
         isPaletteOpen={state.isPaletteOpen}
         isInfoPanelOpen={state.isInfoPanelOpen}
         onTogglePalette={() => state.setIsPaletteOpen((prev) => !prev)}
         onToggleInfoPanel={() => state.setIsInfoPanelOpen((prev) => !prev)}
-      />}
+      />
 
       {state.isPaletteOpen && (
         <>
@@ -721,14 +723,7 @@ export default function MemoryModelEditor({
                 )}px`,
               }}
             >
-              {isTutorial() ? <Tutorial elements={state.elements} onOpenEditor={openEditor || (() => {})}
-                onAddInteger={() => {
-                  const id = Math.max(-1, ...state.elements.map(e => typeof e.id === "number" ? e.id : -1)) + 1;
-                  const boxId = Math.max(-1, ...state.elements.map(e => e.boxId)) + 1;
-                  state.setElements(prev => [...prev, { boxId, id, x: 260, y: 100 + (id % 4) * 130,
-                    kind: { name: "primitive", type: "int", value: "0" } }]);
-                  state.setElementIds(prev => [...prev, id]);
-                }} /> : <InformationTabs
+              <InformationTabs
                 submissionResults={state.submissionResults}
                 questionSelected={state.selectedQuestionIndex !== null}
                 questionIndex={state.selectedQuestionIndex}
@@ -737,7 +732,12 @@ export default function MemoryModelEditor({
                 setQuestionType={state.setSelectedQuestionType}
                 questionView={state.questionView}
                 setQuestionView={state.setQuestionView}
-                onSubmit={handleCanvasSubmit}
+                onSubmit={isTutorial() ? async () => {
+                  const checkedKey = tutorialModelKey;
+                  const correct = await handleCanvasSubmit();
+                  setTutorialCheckedModel(correct ? checkedKey : null);
+                  return correct;
+                } : handleCanvasSubmit}
                 onSubmitAtLine={handleCanvasSubmitAtLine}
                 setSubmissionResults={state.setSubmissionResults}
                 onClearCanvas={clearCanvas}
@@ -752,11 +752,13 @@ export default function MemoryModelEditor({
                 tabScrollPositions={state.tabScrollPositions}
                 setTabScrollPositions={state.setTabScrollPositions}
                 fontScale={fontScale}
-              />}
+              />
             </div>
           </>
         )}
       </div>
+
+      <Tutorial elements={state.elements} correct={tutorialCheckedModel === tutorialModelKey} />
 
       {state.showClearCanvasModal && (
         <ConfirmationModal

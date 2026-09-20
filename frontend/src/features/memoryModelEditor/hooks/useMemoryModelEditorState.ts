@@ -22,6 +22,12 @@ export function useMemoryModelEditorState(sandbox: boolean) {
   // Load initial data
   const initialCanvasData = isTutorial() ? normalizeQuestionCanvasData(loadInitialCanvasData()) : loadInitialCanvasData();
   const initialUIData = loadInitialUIData();
+  if (isTutorial()) {
+    initialUIData.questionIndex = 1;
+    initialUIData.questionType = "practice";
+    initialUIData.questionView = "question";
+    initialUIData.sandboxMode = true;
+  }
 
   // Canvas state
   const [canvasResetKey, setCanvasResetKey] = useState(0);

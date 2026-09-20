@@ -216,21 +216,21 @@ if (result.correct) {
 
 ## Guided tutorial
 
-Choose **Start here: Learn Memory Lab** in Questions to open the tutorial in the
-same browser tab (`?tutorial=1`). It uses a fixed exercise (`a = 5`, `b = 4`,
-`c = 6`), the normal canvas/editor, and a Beamer+-inspired spotlight. Students
-must perform the requested action before Next unlocks. Hide/Show guidance,
-Back, Restart tutorial, and Exit tutorial are available. Escape hides guidance.
+Use the bottom-right **?** button to open **Help & guide**, including written
+instructions and **New to Memory Lab? Take the guided tour**. The tour opens in
+the same tab (`?tutorial=1`) with the real Practice Question 1 panel, code-line
+checks, Reset/Submit controls, and feedback. It requires the normal question API.
+The right panel uses the regular draggable divider.
 
-The tutorial runs without the question database. Its small, dedicated checker
-validates this fixed exercise; normal exercise grading is unchanged. Canvas,
-UI, undo history and step progress use prefixed sessionStorage keys, separate
-from regular localStorage. Tutorial work survives reloads in the same tab;
-Restart clears only tutorial data. Exit restores the regular workspace.
+The Beamer+-inspired spotlight allows normal dragging and editing and follows
+the region clicked. Instructions advance from actual objects and references,
+not fixed object IDs. Hide/Resume guide is always available at bottom-right;
+Resume finds the next unfinished action. Finish hides the guide and keeps the
+exercise open. Exit tutorial restores the regular workspace.
 
-Implementation: `frontend/src/features/tutorial/`. Edit the step descriptions
-in `Tutorial.tsx`, the assignments/checker in `tutorialModel.ts`, and the overlay
-styles in `tutorial.css`. Spotlight targets use stable `data-tour` attributes.
-The overlay permits canvas/editor interaction and follows resize/scroll/layout
-changes. The tutorial is designed for desktop/laptop use; narrow screens can
-scroll the workspace horizontally.
+Canvas, UI, undo history, question progress, and guide visibility use prefixed
+sessionStorage keys in tutorial mode, separate from regular localStorage.
+Implementation lives in `frontend/src/features/tutorial/`; step definitions and
+Help content are in `Tutorial.tsx`, reference checks in `tutorialModel.ts`, and
+spotlight styles in `tutorial.css`. Normal grading remains in the existing
+question and submission components. `data-tour` attributes anchor the overlay.

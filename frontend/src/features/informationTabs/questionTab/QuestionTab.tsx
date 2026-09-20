@@ -1,4 +1,3 @@
-import { startTutorial } from "../../tutorial/tutorialStorage";
 import { workspaceStorage } from "../../tutorial/tutorialStorage";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -767,9 +766,7 @@ export default function QuestionTab({
 
         {view === "root" && (
           <div className={styles.selectors}>
-            <QuestionSelector variant="category" text="Start here: Learn Memory Lab"
-              subtitle="Build your first model with guided instructions" icon="🧭"
-              onClick={startTutorial} />
+
             <QuestionSelector
               variant="category"
               text="Practice Questions"
@@ -980,6 +977,7 @@ export default function QuestionTab({
                     type="button"
                     className={styles.submitButton}
                     onClick={handleSubmit}
+                    data-tour="submit"
                     aria-label="Submit Canvas"
                     title="Submit Canvas"
                   >

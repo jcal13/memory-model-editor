@@ -24,7 +24,16 @@ import { normalizeQuestionCanvasData } from "../../memoryModelEditor/utils/quest
 import ConfirmationModal from "../../memoryModelEditor/components/ConfirmationModal";
 import type { StepHistoryState } from "../../memoryModelEditor/hooks/useStepUndoHistory";
 
-type View = "root" | "loading" | "test" | "list" | "question" | "practice" | "prep" | "experiment" | "stepbystep";
+type View =
+  | "root"
+  | "loading"
+  | "test"
+  | "list"
+  | "question"
+  | "practice"
+  | "prep"
+  | "experiment"
+  | "stepbystep";
 type QuestionType = "test" | "practice" | "prep" | "experiment";
 type QuestionStatus = "unattempted" | "attempted" | "completed";
 
@@ -50,7 +59,11 @@ export interface QuestionData {
   question: string;
   code: string[];
   answer: unknown;
-  steps?: Array<{ lineNumber: number; iterationNumber?: number; answer: unknown }> | null;
+  steps?: Array<{
+    lineNumber: number;
+    iterationNumber?: number;
+    answer: unknown;
+  }> | null;
   description?: string | null;
   topics?: string[] | null;
   canvasConfig?: CanvasData | null;
@@ -60,7 +73,9 @@ function formatSource(description: string): string {
   const parts = description.trim().split(/\s+/);
   if (parts.length < 2) return description;
   const [course, year, ...rest] = parts;
-  const label = rest.map((p, i) => (i === 0 ? p.charAt(0).toUpperCase() + p.slice(1) : p)).join(" ");
+  const label = rest
+    .map((p, i) => (i === 0 ? p.charAt(0).toUpperCase() + p.slice(1) : p))
+    .join(" ");
   return label ? `${course} · ${year} · ${label}` : `${course} · ${year}`;
 }
 
@@ -68,11 +83,16 @@ interface QuestionTabProps {
   questionIndex: number | null;
   setQuestionIndex: (index: number | null) => void;
   questionType: "test" | "practice" | "prep" | "experiment" | null;
-  setQuestionType: (type: "test" | "practice" | "prep" | "experiment" | null) => void;
+  setQuestionType: (
+    type: "test" | "practice" | "prep" | "experiment" | null,
+  ) => void;
   questionView: QuestionView;
   setQuestionView: (view: QuestionView) => void;
   onSubmit: () => Promise<boolean>;
-  onSubmitAtLine: (lineNumber: number, iterationNumber?: number) => Promise<boolean>;
+  onSubmitAtLine: (
+    lineNumber: number,
+    iterationNumber?: number,
+  ) => Promise<boolean>;
   setSubmissionResults: (results: SubmissionResult | null) => void;
   onClearCanvas: () => void;
   onRestoreCanvas: (elements: any[], ids: number[], classes: string[]) => void;
@@ -107,7 +127,9 @@ function getQuestionKey(type: QuestionType, index: number): string {
   return `${type}_${index}`;
 }
 
-export function getCheckableLines(questionData: QuestionData | null): Set<number> {
+export function getCheckableLines(
+  questionData: QuestionData | null,
+): Set<number> {
   return new Set(questionData?.steps?.map((s) => s.lineNumber) ?? []);
 }
 
@@ -115,7 +137,9 @@ export function sortCheckableLines(checkableLines: Set<number>): number[] {
   return Array.from(checkableLines).sort((a, b) => a - b);
 }
 
-export function buildLineIterations(questionData: QuestionData | null): Map<number, number[]> {
+export function buildLineIterations(
+  questionData: QuestionData | null,
+): Map<number, number[]> {
   const map = new Map<number, number[]>();
   for (const s of questionData?.steps ?? []) {
     if (s.iterationNumber !== undefined) {
@@ -128,15 +152,18 @@ export function buildLineIterations(questionData: QuestionData | null): Map<numb
   return map;
 }
 
-export function getNextCheckableLine(sortedLines: number[], line: number | null): number | null {
+export function getNextCheckableLine(
+  sortedLines: number[],
+  line: number | null,
+): number | null {
   if (line === null) return null;
   const idx = sortedLines.indexOf(line);
   return idx >= 0 && idx + 1 < sortedLines.length ? sortedLines[idx + 1] : null;
 }
 
 export interface StepAssignments {
-  variableToId: Record<string, number>;  // "a" → 1
-  idToType: Record<number, string>;       // 1 → "int"
+  variableToId: Record<string, number>; // "a" → 1
+  idToType: Record<number, string>; // 1 → "int"
 }
 
 export function extractStepAssignments(elements: any[]): StepAssignments {
@@ -145,13 +172,13 @@ export function extractStepAssignments(elements: any[]): StepAssignments {
 
   for (const el of elements) {
     if (el.kind?.name === "function") {
-      for (const p of (el.kind.params ?? [])) {
+      for (const p of el.kind.params ?? []) {
         if (typeof p.targetId === "number") {
           variableToId[p.name] = p.targetId;
         }
       }
     } else if (el.kind?.name === "class") {
-      for (const p of (el.kind.classVariables ?? [])) {
+      for (const p of el.kind.classVariables ?? []) {
         if (typeof p.targetId === "number") {
           variableToId[p.name] = p.targetId;
         }
@@ -166,7 +193,10 @@ export function extractStepAssignments(elements: any[]): StepAssignments {
   return { variableToId, idToType };
 }
 
-export function checkStepConsistency(committed: StepAssignments, current: StepAssignments): string | null {
+export function checkStepConsistency(
+  committed: StepAssignments,
+  current: StepAssignments,
+): string | null {
   for (const [varName, committedId] of Object.entries(committed.variableToId)) {
     const currentId = current.variableToId[varName];
     if (currentId !== undefined && currentId !== committedId) {
@@ -205,12 +235,14 @@ export default function QuestionTab({
 }: QuestionTabProps) {
   const [view, setView] = useState<View>(() => {
     const v = questionViewProp as View;
-    return VALID_VIEWS.includes(v) && v !== "loading" && v !== "stepbystep" ? v : "root";
+    return VALID_VIEWS.includes(v) && v !== "loading" && v !== "stepbystep"
+      ? v
+      : "root";
   });
   const [questionCount, setQuestionCount] = useState<number>(0);
   const [questionData, setQuestionData] = useState<QuestionData | null>(null);
   const [questionStatus, setQuestionStatus] = useState<QuestionStatusMap>(() =>
-    loadQuestionStatus()
+    loadQuestionStatus(),
   );
   const [showCanvasClearModal, setShowCanvasClearModal] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<{
@@ -219,7 +251,9 @@ export default function QuestionTab({
   } | null>(null);
   const [showResetModal, setShowResetModal] = useState(false);
   const [selectedLine, setSelectedLine] = useState<number | null>(null);
-  const [selectedIteration, setSelectedIteration] = useState<number | undefined>(undefined);
+  const [selectedIteration, setSelectedIteration] = useState<
+    number | undefined
+  >(undefined);
   const [topicMap, setTopicMap] = useState<Map<number, string[]>>(new Map());
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
 
@@ -227,16 +261,25 @@ export default function QuestionTab({
 
   const filteredQuestionIds = useMemo(
     () => filterQuestionIds(topicMap, questionCount, selectedTopic),
-    [selectedTopic, topicMap, questionCount]
+    [selectedTopic, topicMap, questionCount],
   );
   const [autoAdvance, setAutoAdvance] = useState(false);
   const [stepByStepIndex, setStepByStepIndex] = useState<number>(0);
-  const [committedAssignments, setCommittedAssignments] = useState<StepAssignments | null>(null);
-  const [stepConsistencyError, setStepConsistencyError] = useState<string | null>(null);
+  const [committedAssignments, setCommittedAssignments] =
+    useState<StepAssignments | null>(null);
+  const [stepConsistencyError, setStepConsistencyError] = useState<
+    string | null
+  >(null);
 
-  const checkableLines = useMemo(() => getCheckableLines(questionData), [questionData]);
+  const checkableLines = useMemo(
+    () => getCheckableLines(questionData),
+    [questionData],
+  );
 
-  const lineIterations = useMemo(() => buildLineIterations(questionData), [questionData]);
+  const lineIterations = useMemo(
+    () => buildLineIterations(questionData),
+    [questionData],
+  );
 
   const hydratedList = useRef<boolean>(false);
   const hydratedQuestion = useRef<boolean>(false);
@@ -309,7 +352,7 @@ export default function QuestionTab({
   const updateQuestionStatus = (
     type: QuestionType,
     index: number,
-    status: QuestionStatus
+    status: QuestionStatus,
   ) => {
     const key = getQuestionKey(type, index);
     setQuestionStatus((prev) => ({ ...prev, [key]: status }));
@@ -317,7 +360,7 @@ export default function QuestionTab({
 
   const getQuestionStatus = (
     type: QuestionType,
-    index: number
+    index: number,
   ): QuestionStatus => {
     const key = getQuestionKey(type, index);
     return questionStatus[key] || "unattempted";
@@ -325,18 +368,22 @@ export default function QuestionTab({
 
   const getNextStep = (
     lineNumber: number,
-    iterationNumber?: number
+    iterationNumber?: number,
   ): { lineNumber: number; iterationNumber?: number } | null => {
     const steps = questionData?.steps;
     if (!steps) return null;
     const idx = steps.findIndex(
-      (s) => s.lineNumber === lineNumber && s.iterationNumber === iterationNumber
+      (s) =>
+        s.lineNumber === lineNumber && s.iterationNumber === iterationNumber,
     );
     if (idx < 0 || idx + 1 >= steps.length) return null;
     return steps[idx + 1];
   };
 
-  const handleSubmitAtLine = async (lineNumber: number, iterationNumber?: number) => {
+  const handleSubmitAtLine = async (
+    lineNumber: number,
+    iterationNumber?: number,
+  ) => {
     if (!questionType || questionIndex === null) {
       return false;
     }
@@ -366,7 +413,7 @@ export default function QuestionTab({
         updateQuestionStatus(
           questionType,
           questionIndex,
-          success ? "completed" : "attempted"
+          success ? "completed" : "attempted",
         );
       } catch (error) {
         console.error("Error during submission:", error);
@@ -387,7 +434,9 @@ export default function QuestionTab({
         fetchQuestionTopics(questionType),
       ]);
       setQuestionCount(count);
-      setTopicMap(new Map(topicData.map(({ id, topics }) => [id, topics ?? []])));
+      setTopicMap(
+        new Map(topicData.map(({ id, topics }) => [id, topics ?? []])),
+      );
       setQuestionType(questionType);
       setQuestionIndex(null);
       setView("list");
@@ -414,7 +463,7 @@ export default function QuestionTab({
       saveQuestionCanvasData(
         prevQuestion.type,
         prevQuestion.index,
-        currentCanvasState
+        currentCanvasState,
       );
 
       setPendingNavigation({ type: questionType, index: id });
@@ -427,7 +476,7 @@ export default function QuestionTab({
 
   const proceedWithQuestionLoad = async (
     type: QuestionType,
-    id: number
+    id: number,
   ): Promise<void> => {
     hydratedQuestion.current = false;
     setQuestionData(null);
@@ -452,12 +501,12 @@ export default function QuestionTab({
 
       setTimeout(() => {
         const resolvedCanvas = normalizeQuestionCanvasData(
-          resolveQuestionCanvasData(type, id, data.canvasConfig ?? null)
+          resolveQuestionCanvasData(type, id, data.canvasConfig ?? null),
         );
         onRestoreCanvas(
           resolvedCanvas.elements,
           resolvedCanvas.ids,
-          resolvedCanvas.classes
+          resolvedCanvas.classes,
         );
       }, 0);
     } catch (error) {
@@ -504,7 +553,7 @@ export default function QuestionTab({
       } else {
         proceedWithQuestionLoad(
           pendingNavigation.type,
-          pendingNavigation.index
+          pendingNavigation.index,
         );
       }
       setPendingNavigation(null);
@@ -529,7 +578,9 @@ export default function QuestionTab({
       ])
         .then(([count, topicData]) => {
           setQuestionCount(count);
-          setTopicMap(new Map(topicData.map(({ id, topics }) => [id, topics ?? []])));
+          setTopicMap(
+            new Map(topicData.map(({ id, topics }) => [id, topics ?? []])),
+          );
         })
         .catch((error) => {
           console.error("Failed to hydrate list:", error);
@@ -552,7 +603,7 @@ export default function QuestionTab({
         try {
           const data = await fetchQuestion<QuestionData>(
             questionIndex,
-            questionType
+            questionType,
           );
           setQuestionData(data);
 
@@ -564,13 +615,13 @@ export default function QuestionTab({
             resolveQuestionCanvasData(
               questionType,
               questionIndex,
-              data.canvasConfig ?? null
-            )
+              data.canvasConfig ?? null,
+            ),
           );
           onRestoreCanvas(
             resolvedCanvas.elements,
             resolvedCanvas.ids,
-            resolvedCanvas.classes
+            resolvedCanvas.classes,
           );
         } catch (error) {
           console.error("Failed to hydrate question:", error);
@@ -622,7 +673,7 @@ export default function QuestionTab({
     try {
       const freshQuestionData = await fetchQuestion<QuestionData>(
         questionIndex,
-        questionType
+        questionType,
       );
 
       deleteQuestionCanvasData(questionType, questionIndex);
@@ -636,14 +687,14 @@ export default function QuestionTab({
         resolveQuestionCanvasData(
           questionType,
           questionIndex,
-          freshQuestionData.canvasConfig ?? null
-        )
+          freshQuestionData.canvasConfig ?? null,
+        ),
       );
 
       onRestoreCanvas(
         resolvedCanvas.elements,
         resolvedCanvas.ids,
-        resolvedCanvas.classes
+        resolvedCanvas.classes,
       );
       setSubmissionResults(null);
       updateQuestionStatus(questionType, questionIndex, "unattempted");
@@ -678,9 +729,13 @@ export default function QuestionTab({
 
       setTimeout(() => {
         const resolvedCanvas = normalizeQuestionCanvasData(
-          resolveQuestionCanvasData("practice", 1, data.canvasConfig ?? null)
+          resolveQuestionCanvasData("practice", 1, data.canvasConfig ?? null),
         );
-        onRestoreCanvas(resolvedCanvas.elements, resolvedCanvas.ids, resolvedCanvas.classes);
+        onRestoreCanvas(
+          resolvedCanvas.elements,
+          resolvedCanvas.ids,
+          resolvedCanvas.classes,
+        );
         onStepHistoryClear({
           ...resolvedCanvas,
           stepByStepIndex: 0,
@@ -716,7 +771,8 @@ export default function QuestionTab({
   };
 
   const handleStepCheck = async (): Promise<void> => {
-    if (!questionData?.steps || stepByStepIndex >= questionData.steps.length) return;
+    if (!questionData?.steps || stepByStepIndex >= questionData.steps.length)
+      return;
 
     // Snapshot canvas before the async call to avoid stale closure issues
     const snapshotElements = currentCanvasState.elements;
@@ -724,7 +780,10 @@ export default function QuestionTab({
 
     // Enforce ID consistency with what was committed in earlier steps
     if (committedAssignments) {
-      const consistencyError = checkStepConsistency(committedAssignments, currentAssignments);
+      const consistencyError = checkStepConsistency(
+        committedAssignments,
+        currentAssignments,
+      );
       if (consistencyError) {
         setStepConsistencyError(consistencyError);
         return;
@@ -733,12 +792,21 @@ export default function QuestionTab({
     setStepConsistencyError(null);
 
     const currentStep = questionData.steps[stepByStepIndex];
-    const success = await handleSubmitAtLine(currentStep.lineNumber, currentStep.iterationNumber);
+    const success = await handleSubmitAtLine(
+      currentStep.lineNumber,
+      currentStep.iterationNumber,
+    );
     if (success) {
       // Merge the new assignments into the committed state
       const nextCommittedAssignments = {
-        variableToId: { ...committedAssignments?.variableToId, ...currentAssignments.variableToId },
-        idToType: { ...committedAssignments?.idToType, ...currentAssignments.idToType },
+        variableToId: {
+          ...committedAssignments?.variableToId,
+          ...currentAssignments.variableToId,
+        },
+        idToType: {
+          ...committedAssignments?.idToType,
+          ...currentAssignments.idToType,
+        },
       };
       setCommittedAssignments(nextCommittedAssignments);
       setStepByStepIndex((prev) => prev + 1);
@@ -763,9 +831,13 @@ export default function QuestionTab({
       setSubmissionResults(null);
       deleteQuestionCanvasData("practice", 1);
       const resolvedCanvas = normalizeQuestionCanvasData(
-        resolveQuestionCanvasData("practice", 1, data.canvasConfig ?? null)
+        resolveQuestionCanvasData("practice", 1, data.canvasConfig ?? null),
       );
-      onRestoreCanvas(resolvedCanvas.elements, resolvedCanvas.ids, resolvedCanvas.classes);
+      onRestoreCanvas(
+        resolvedCanvas.elements,
+        resolvedCanvas.ids,
+        resolvedCanvas.classes,
+      );
       onStepHistoryClear({
         ...resolvedCanvas,
         stepByStepIndex: 0,
@@ -780,12 +852,17 @@ export default function QuestionTab({
     <>
       <div className={styles.wrapper}>
         <div className={styles.titleRow}>
-          {(view === "list" || view === "question" || view === "stepbystep") && (
+          {(view === "list" ||
+            view === "question" ||
+            view === "stepbystep") && (
             <button
               type="button"
               onClick={
                 view === "list"
-                  ? () => { setQuestionIndex(null); setView("root"); }
+                  ? () => {
+                      setQuestionIndex(null);
+                      setView("root");
+                    }
                   : view === "stepbystep"
                   ? navigateStepByStepToRoot
                   : navigateToList
@@ -797,9 +874,13 @@ export default function QuestionTab({
           )}
           <div className={styles.titleStack}>
             <h1 className={styles.title}>{getHeading()}</h1>
-            {view === "question" && questionType === "test" && questionData?.description && (
-              <p className={styles.sourceText}>{formatSource(questionData.description)}</p>
-            )}
+            {view === "question" &&
+              questionType === "test" &&
+              questionData?.description && (
+                <p className={styles.sourceText}>
+                  {formatSource(questionData.description)}
+                </p>
+              )}
           </div>
         </div>
 
@@ -861,7 +942,9 @@ export default function QuestionTab({
               <div className={styles.topicFilter}>
                 <button
                   type="button"
-                  className={`${styles.topicFilterChip} ${selectedTopic === null ? styles.topicFilterChipActive : ""}`}
+                  className={`${styles.topicFilterChip} ${
+                    selectedTopic === null ? styles.topicFilterChipActive : ""
+                  }`}
                   onClick={() => setSelectedTopic(null)}
                 >
                   All
@@ -870,8 +953,16 @@ export default function QuestionTab({
                   <button
                     key={topic}
                     type="button"
-                    className={`${styles.topicFilterChip} ${selectedTopic === topic ? styles.topicFilterChipActive : ""}`}
-                    onClick={() => setSelectedTopic((prev) => (prev === topic ? null : topic))}
+                    className={`${styles.topicFilterChip} ${
+                      selectedTopic === topic
+                        ? styles.topicFilterChipActive
+                        : ""
+                    }`}
+                    onClick={() =>
+                      setSelectedTopic((prev) =>
+                        prev === topic ? null : topic,
+                      )
+                    }
                   >
                     {topic}
                   </button>
@@ -899,16 +990,197 @@ export default function QuestionTab({
           </>
         )}
 
-        {view === "question" && questionData && (() => {
-          const selectedLineHasIterations =
-            selectedLine !== null && (lineIterations.get(selectedLine)?.length ?? 0) > 0;
-          const canCheckAtLine =
-            selectedLine !== null &&
-            checkableLines.has(selectedLine) &&
-            (!selectedLineHasIterations || selectedIteration !== undefined);
-          return (
-            <>
-              <div className={styles.questionArea} style={{ '--font-scale': fontScale } as React.CSSProperties}>
+        {view === "question" &&
+          questionData &&
+          (() => {
+            const selectedLineHasIterations =
+              selectedLine !== null &&
+              (lineIterations.get(selectedLine)?.length ?? 0) > 0;
+            const canCheckAtLine =
+              selectedLine !== null &&
+              checkableLines.has(selectedLine) &&
+              (!selectedLineHasIterations || selectedIteration !== undefined);
+            return (
+              <>
+                <div
+                  className={styles.questionArea}
+                  style={{ "--font-scale": fontScale } as React.CSSProperties}
+                >
+                  <details className={styles.topicsSection}>
+                    <summary className={styles.topicsSummary}>Topics</summary>
+                    <div className={styles.topicsContent}>
+                      {(questionData.topics ?? []).length > 0 ? (
+                        <div className={styles.topicChips}>
+                          {(questionData.topics ?? []).map((topic, index) => (
+                            <span
+                              key={`${topic}-${index}`}
+                              className={styles.topicChip}
+                            >
+                              {topic}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className={styles.topicsEmpty}>
+                          No topics listed yet.
+                        </p>
+                      )}
+                    </div>
+                  </details>
+
+                  <div className={styles.questionText}>
+                    <ReactMarkdown>{questionData.question}</ReactMarkdown>
+                  </div>
+
+                  <CodeBlock
+                    code={questionData.code.join("\n")}
+                    language="python"
+                    checkableLines={checkableLines}
+                    selectedLine={selectedLine}
+                    onLineClick={(n) => {
+                      setSelectedLine((prev) => (prev === n ? null : n));
+                      setSelectedIteration(undefined);
+                    }}
+                  />
+
+                  {checkableLines.size > 0 && (
+                    <p className={styles.lineHint}>
+                      Click a highlighted line number to check your answer at
+                      that point.
+                    </p>
+                  )}
+
+                  {checkableLines.size > 0 && (
+                    <div className={styles.autoToolbar}>
+                      <div
+                        className={`${styles.toggleTrack} ${
+                          autoAdvance ? styles.toggleOn : ""
+                        }`}
+                        onClick={() => setAutoAdvance((v) => !v)}
+                        role="switch"
+                        aria-checked={autoAdvance}
+                        aria-label="Auto advance to next checkable line"
+                        tabIndex={0}
+                        onKeyDown={(e) =>
+                          e.key === " " && setAutoAdvance((v) => !v)
+                        }
+                      >
+                        <div className={styles.toggleThumb} />
+                      </div>
+                      <span className={styles.toolbarText}>auto-advance</span>
+
+                      {selectedLine !== null &&
+                        (lineIterations.get(selectedLine)?.length ?? 0) > 0 && (
+                          <>
+                            <div className={styles.toolbarDivider} />
+                            <span className={styles.toolbarText}>iter:</span>
+                            {(lineIterations.get(selectedLine) ?? []).map(
+                              (iter) => (
+                                <button
+                                  key={iter}
+                                  type="button"
+                                  className={`${styles.iterationBtn} ${
+                                    selectedIteration === iter
+                                      ? styles.iterationBtnActive
+                                      : ""
+                                  }`}
+                                  onClick={() =>
+                                    setSelectedIteration((prev) =>
+                                      prev === iter ? undefined : iter,
+                                    )
+                                  }
+                                >
+                                  {iter}
+                                </button>
+                              ),
+                            )}
+                          </>
+                        )}
+
+                      {canCheckAtLine && (
+                        <>
+                          <div className={styles.toolbarDivider} />
+                          <button
+                            type="button"
+                            className={styles.checkAtLineButton}
+                            onClick={() =>
+                              handleSubmitAtLine(
+                                selectedLine!,
+                                selectedIteration,
+                              )
+                            }
+                            aria-label={`Check answer at line ${selectedLine}`}
+                            title={`Check answer at line ${selectedLine}`}
+                          >
+                            check line {selectedLine}
+                            {selectedIteration !== undefined
+                              ? ` · iter ${selectedIteration}`
+                              : ""}
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  <div className={styles.buttonRow}>
+                    <button
+                      type="button"
+                      className={styles.resetButton}
+                      onClick={handleResetQuestion}
+                      aria-label="Reset Question"
+                      title="Reset Question"
+                    >
+                      Reset
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.submitButton}
+                      onClick={handleSubmit}
+                      aria-label="Submit Canvas"
+                      title="Submit Canvas"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              </>
+            );
+          })()}
+        {view === "stepbystep" &&
+          questionData &&
+          (() => {
+            const steps = questionData.steps ?? [];
+            const allDone = stepByStepIndex >= steps.length;
+            const currentStep = !allDone ? steps[stepByStepIndex] : null;
+            const currentLine = currentStep?.lineNumber ?? null;
+
+            return (
+              <div
+                className={styles.questionArea}
+                style={{ "--font-scale": fontScale } as React.CSSProperties}
+              >
+                <div className={styles.stepIndicator}>
+                  <div className={styles.stepDots}>
+                    {steps.map((_, i) => (
+                      <span
+                        key={i}
+                        className={`${styles.stepDot} ${
+                          i < stepByStepIndex
+                            ? styles.stepDotDone
+                            : i === stepByStepIndex
+                            ? styles.stepDotActive
+                            : styles.stepDotPending
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className={styles.stepText}>
+                    {allDone
+                      ? "All steps complete!"
+                      : `Step ${stepByStepIndex + 1} of ${steps.length}`}
+                  </span>
+                </div>
+
                 <details className={styles.topicsSection}>
                   <summary className={styles.topicsSummary}>Topics</summary>
                   <div className={styles.topicsContent}>
@@ -932,191 +1204,50 @@ export default function QuestionTab({
                 </details>
 
                 <div className={styles.questionText}>
-                  <ReactMarkdown>{questionData.question}</ReactMarkdown>
+                  {allDone
+                    ? "You correctly drew the memory model for each line, one step at a time."
+                    : `Draw the memory model after executing line ${currentLine}.`}
                 </div>
 
                 <CodeBlock
                   code={questionData.code.join("\n")}
                   language="python"
-                  checkableLines={checkableLines}
-                  selectedLine={selectedLine}
-                  onLineClick={(n) => {
-                    setSelectedLine((prev) => (prev === n ? null : n));
-                    setSelectedIteration(undefined);
-                  }}
+                  selectedLine={currentLine !== null ? currentLine : undefined}
                 />
 
-                {checkableLines.size > 0 && (
-                  <p className={styles.lineHint}>
-                    Click a highlighted line number to check your answer at that point.
-                  </p>
-                )}
-
-                {checkableLines.size > 0 && (
-                  <div className={styles.autoToolbar}>
-                    <div
-                      className={`${styles.toggleTrack} ${autoAdvance ? styles.toggleOn : ""}`}
-                      onClick={() => setAutoAdvance(v => !v)}
-                      role="switch"
-                      aria-checked={autoAdvance}
-                      aria-label="Auto advance to next checkable line"
-                      tabIndex={0}
-                      onKeyDown={(e) => e.key === " " && setAutoAdvance(v => !v)}
-                    >
-                      <div className={styles.toggleThumb} />
-                    </div>
-                    <span className={styles.toolbarText}>auto-advance</span>
-
-                    {selectedLine !== null && (lineIterations.get(selectedLine)?.length ?? 0) > 0 && (
-                      <>
-                        <div className={styles.toolbarDivider} />
-                        <span className={styles.toolbarText}>iter:</span>
-                        {(lineIterations.get(selectedLine) ?? []).map((iter) => (
-                          <button
-                            key={iter}
-                            type="button"
-                            className={`${styles.iterationBtn} ${selectedIteration === iter ? styles.iterationBtnActive : ""}`}
-                            onClick={() => setSelectedIteration(prev => prev === iter ? undefined : iter)}
-                          >
-                            {iter}
-                          </button>
-                        ))}
-                      </>
-                    )}
-
-                    {canCheckAtLine && (
-                      <>
-                        <div className={styles.toolbarDivider} />
-                        <button
-                          type="button"
-                          className={styles.checkAtLineButton}
-                          onClick={() => handleSubmitAtLine(selectedLine!, selectedIteration)}
-                          aria-label={`Check answer at line ${selectedLine}`}
-                          title={`Check answer at line ${selectedLine}`}
-                        >
-                          check line {selectedLine}{selectedIteration !== undefined ? ` · iter ${selectedIteration}` : ""}
-                        </button>
-                      </>
-                    )}
+                {stepConsistencyError && (
+                  <div className={styles.stepConsistencyError}>
+                    {stepConsistencyError}
                   </div>
                 )}
+
+                <p className={styles.stepHint}>
+                  {allDone
+                    ? "The canvas reflects the final state of memory."
+                    : "Set up the memory model for the highlighted line, then click Check."}
+                </p>
 
                 <div className={styles.buttonRow}>
                   <button
                     type="button"
                     className={styles.resetButton}
-                    onClick={handleResetQuestion}
-                    aria-label="Reset Question"
-                    title="Reset Question"
+                    onClick={handleStepByStepReset}
                   >
-                    Reset
+                    {allDone ? "Try Again" : "Reset"}
                   </button>
-                  <button
-                    type="button"
-                    className={styles.submitButton}
-                    onClick={handleSubmit}
-                    aria-label="Submit Canvas"
-                    title="Submit Canvas"
-                  >
-                    Submit
-                  </button>
-                </div>
-              </div>
-            </>
-          );
-        })()}
-        {view === "stepbystep" && questionData && (() => {
-          const steps = questionData.steps ?? [];
-          const allDone = stepByStepIndex >= steps.length;
-          const currentStep = !allDone ? steps[stepByStepIndex] : null;
-          const currentLine = currentStep?.lineNumber ?? null;
-
-          return (
-            <div className={styles.questionArea} style={{ '--font-scale': fontScale } as React.CSSProperties}>
-              <div className={styles.stepIndicator}>
-                <div className={styles.stepDots}>
-                  {steps.map((_, i) => (
-                    <span
-                      key={i}
-                      className={`${styles.stepDot} ${
-                        i < stepByStepIndex
-                          ? styles.stepDotDone
-                          : i === stepByStepIndex
-                          ? styles.stepDotActive
-                          : styles.stepDotPending
-                      }`}
-                    />
-                  ))}
-                </div>
-                <span className={styles.stepText}>
-                  {allDone
-                    ? "All steps complete!"
-                    : `Step ${stepByStepIndex + 1} of ${steps.length}`}
-                </span>
-              </div>
-
-              <details className={styles.topicsSection}>
-                <summary className={styles.topicsSummary}>Topics</summary>
-                <div className={styles.topicsContent}>
-                  {(questionData.topics ?? []).length > 0 ? (
-                    <div className={styles.topicChips}>
-                      {(questionData.topics ?? []).map((topic, index) => (
-                        <span key={`${topic}-${index}`} className={styles.topicChip}>
-                          {topic}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className={styles.topicsEmpty}>No topics listed yet.</p>
+                  {!allDone && (
+                    <button
+                      type="button"
+                      className={styles.checkAtLineButton}
+                      onClick={handleStepCheck}
+                    >
+                      Check Line {currentLine}
+                    </button>
                   )}
                 </div>
-              </details>
-
-              <div className={styles.questionText}>
-                {allDone
-                  ? "You correctly drew the memory model for each line, one step at a time."
-                  : `Draw the memory model after executing line ${currentLine}.`}
               </div>
-
-              <CodeBlock
-                code={questionData.code.join("\n")}
-                language="python"
-                selectedLine={currentLine !== null ? currentLine : undefined}
-              />
-
-              {stepConsistencyError && (
-                <div className={styles.stepConsistencyError}>
-                  {stepConsistencyError}
-                </div>
-              )}
-
-              <p className={styles.stepHint}>
-                {allDone
-                  ? "The canvas reflects the final state of memory."
-                  : "Set up the memory model for the highlighted line, then click Check."}
-              </p>
-
-              <div className={styles.buttonRow}>
-                <button
-                  type="button"
-                  className={styles.resetButton}
-                  onClick={handleStepByStepReset}
-                >
-                  {allDone ? "Try Again" : "Reset"}
-                </button>
-                {!allDone && (
-                  <button
-                    type="button"
-                    className={styles.checkAtLineButton}
-                    onClick={handleStepCheck}
-                  >
-                    Check Line {currentLine}
-                  </button>
-                )}
-              </div>
-            </div>
-          );
-        })()}
+            );
+          })()}
       </div>
 
       {showCanvasClearModal && (

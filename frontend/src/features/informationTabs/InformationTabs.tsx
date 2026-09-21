@@ -13,11 +13,18 @@ interface InformationTabsProps {
   questionIndex: number | null;
   setQuestionIndex: (index: number | null) => void;
   questionType: "test" | "practice" | "prep" | "experiment" | null;
-  setQuestionType: (type: "test" | "practice" | "prep" | "experiment" | null) => void;
+  setQuestionType: (
+    type: "test" | "practice" | "prep" | "experiment" | null,
+  ) => void;
   questionView: import("../memoryModelEditor/utils/localStorage").QuestionView;
-  setQuestionView: (view: import("../memoryModelEditor/utils/localStorage").QuestionView) => void;
+  setQuestionView: (
+    view: import("../memoryModelEditor/utils/localStorage").QuestionView,
+  ) => void;
   onSubmit: () => Promise<boolean>;
-  onSubmitAtLine: (lineNumber: number, iterationNumber?: number) => Promise<boolean>;
+  onSubmitAtLine: (
+    lineNumber: number,
+    iterationNumber?: number,
+  ) => Promise<boolean>;
   setSubmissionResults: (results: SubmissionResult | null) => void;
   onClearCanvas: () => void;
   onRestoreCanvas: (elements: any[], ids: number[], classes: string[]) => void;
@@ -32,7 +39,9 @@ interface InformationTabsProps {
   isSandboxMode: boolean;
   onQuestionDataChange?: (data: any) => void;
   tabScrollPositions: Record<Tab, number>;
-  setTabScrollPositions: React.Dispatch<React.SetStateAction<Record<Tab, number>>>;
+  setTabScrollPositions: React.Dispatch<
+    React.SetStateAction<Record<Tab, number>>
+  >;
   fontScale?: number;
 }
 
@@ -102,7 +111,10 @@ export default function InformationTabs({
     return success;
   };
 
-  const handleSubmitAtLine = async (lineNumber: number, iterationNumber?: number) => {
+  const handleSubmitAtLine = async (
+    lineNumber: number,
+    iterationNumber?: number,
+  ) => {
     const ctx = { line: lineNumber, iteration: iterationNumber };
     lastSubmitLineRef.current = ctx;
     setLastSubmitLine(ctx);

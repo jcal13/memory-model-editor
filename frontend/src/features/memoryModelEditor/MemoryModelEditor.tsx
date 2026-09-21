@@ -12,7 +12,10 @@ import {
   useMemoryModelEditorState,
   clearCanvasStorage,
 } from "./hooks/useMemoryModelEditorState";
-import { loadInitialUIData, deleteQuestionCanvasData } from "./utils/localStorage";
+import {
+  loadInitialUIData,
+  deleteQuestionCanvasData,
+} from "./utils/localStorage";
 import { useMemoryModelEditorRefs } from "./hooks/useRef";
 import {
   useCanvasLocalStorage,
@@ -57,38 +60,46 @@ export default function MemoryModelEditor({
   >(null);
 
   const [paletteWidth, setPaletteWidth] = useState<number>(
-    DEFAULT_PALETTE_WIDTH
+    DEFAULT_PALETTE_WIDTH,
   );
   const [isResizingPalette, setIsResizingPalette] = useState<boolean>(false);
   const [tempPaletteWidth, setTempPaletteWidth] = useState<number>(
-    DEFAULT_PALETTE_WIDTH
+    DEFAULT_PALETTE_WIDTH,
   );
   const [maxInfoPanelWidth, setMaxInfoPanelWidth] = useState<number>(
-    window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO
+    window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO,
   );
 
   const [currentQuestionData, setCurrentQuestionData] = useState<any>(null);
   const _initialUI = loadInitialUIData();
-  const [canvasScale, setCanvasScale] = useState<number>(_initialUI.canvasScale ?? 1);
-  const [editorScale, setEditorScale] = useState<number>(_initialUI.editorScale ?? 1);
+  const [canvasScale, setCanvasScale] = useState<number>(
+    _initialUI.canvasScale ?? 1,
+  );
+  const [editorScale, setEditorScale] = useState<number>(
+    _initialUI.editorScale ?? 1,
+  );
   const [fontScale, setFontScale] = useState<number>(() => {
     const saved = localStorage.getItem("questionFontScale");
     return saved ? parseFloat(saved) : 1;
   });
   const adjustFontScale = (delta: number) => {
     setFontScale((prev) => {
-      const next = Math.max(0.75, Math.min(1.5, Math.round((prev + delta) * 10) / 10));
+      const next = Math.max(
+        0.75,
+        Math.min(1.5, Math.round((prev + delta) * 10) / 10),
+      );
       localStorage.setItem("questionFontScale", String(next));
       return next;
     });
   };
 
   // Initialize undo history
-  const { canUndo, canRedo, undo, redo, recordState, clearHistory } = useUndoHistory(
-    state.setElements,
-    state.setElementIds,
-    state.setElementClasses
-  );
+  const { canUndo, canRedo, undo, redo, recordState, clearHistory } =
+    useUndoHistory(
+      state.setElements,
+      state.setElementIds,
+      state.setElementClasses,
+    );
 
   const [stepHistoryRestoreState, setStepHistoryRestoreState] =
     useState<StepHistoryState | null>(null);
@@ -96,12 +107,15 @@ export default function MemoryModelEditor({
   const setElementIds = state.setElementIds;
   const setElementClasses = state.setElementClasses;
 
-  const restoreStepHistoryState = useCallback((historyState: StepHistoryState) => {
-    setElements(historyState.elements);
-    setElementIds(historyState.ids);
-    setElementClasses(historyState.classes);
-    setStepHistoryRestoreState(historyState);
-  }, [setElements, setElementIds, setElementClasses]);
+  const restoreStepHistoryState = useCallback(
+    (historyState: StepHistoryState) => {
+      setElements(historyState.elements);
+      setElementIds(historyState.ids);
+      setElementClasses(historyState.classes);
+      setStepHistoryRestoreState(historyState);
+    },
+    [setElements, setElementIds, setElementClasses],
+  );
 
   const stepHistory = useStepUndoHistory(restoreStepHistoryState);
   const isStepByStepActive = state.questionView === "stepbystep";
@@ -117,7 +131,7 @@ export default function MemoryModelEditor({
     (opener: (element: CanvasElement) => void) => {
       setOpenEditor(() => opener);
     },
-    []
+    [],
   );
 
   // Record state changes for undo functionality
@@ -132,11 +146,13 @@ export default function MemoryModelEditor({
     // Check if state has actually changed
     const stripTransient = (els: CanvasElement[]) =>
       els.map(({ color, ...rest }) => rest);
-    
+
     const hasChanged =
-      JSON.stringify(stripTransient(prevState.elements)) !== JSON.stringify(stripTransient(currentState.elements)) ||
+      JSON.stringify(stripTransient(prevState.elements)) !==
+        JSON.stringify(stripTransient(currentState.elements)) ||
       JSON.stringify(prevState.ids) !== JSON.stringify(currentState.ids) ||
-      JSON.stringify(prevState.classes) !== JSON.stringify(currentState.classes);
+      JSON.stringify(prevState.classes) !==
+        JSON.stringify(currentState.classes);
 
     if (hasChanged) {
       // Record the current state (after the change)
@@ -146,8 +162,14 @@ export default function MemoryModelEditor({
   }, [state.elements, state.elementIds, state.elementClasses, recordState]);
 
   const clearCanvas = () => {
-    if (state.selectedQuestionIndex !== null && state.selectedQuestionType !== null) {
-      deleteQuestionCanvasData(state.selectedQuestionType, state.selectedQuestionIndex);
+    if (
+      state.selectedQuestionIndex !== null &&
+      state.selectedQuestionType !== null
+    ) {
+      deleteQuestionCanvasData(
+        state.selectedQuestionType,
+        state.selectedQuestionIndex,
+      );
     }
     state.setElements([]);
     state.setElementIds([]);
@@ -163,7 +185,7 @@ export default function MemoryModelEditor({
       ids: [],
       classes: [],
     };
-    
+
     prevStateRef.current = baselineState;
     clearHistory(baselineState);
     stepHistory.clearHistory({
@@ -176,7 +198,7 @@ export default function MemoryModelEditor({
   const restoreCanvas = (
     elements: CanvasElement[],
     ids: number[],
-    classes: string[]
+    classes: string[],
   ) => {
     const restoredElements = spreadOverlappingElements(elements);
 
@@ -194,7 +216,8 @@ export default function MemoryModelEditor({
     clearHistory(baselineState);
   };
 
-  const effectiveSandboxMode = state.isSandboxMode || state.selectedQuestionType === "experiment";
+  const effectiveSandboxMode =
+    state.isSandboxMode || state.selectedQuestionType === "experiment";
 
   // When a question loads in practice mode, seed elementClasses with the class names
   // from the question's answer so the class selector shows them as pre-built options.
@@ -215,7 +238,7 @@ export default function MemoryModelEditor({
 
   const masterErrorList: MasterErrorList = useMemo(
     () => createMasterErrorList(state.elements),
-    [state.elements]
+    [state.elements],
   );
 
   const addElementId = (id: number): void => {
@@ -230,7 +253,7 @@ export default function MemoryModelEditor({
   const removeElementId = (id: number | "_"): void => {
     if (typeof id === "number") {
       state.setElementIds((prevIds) =>
-        prevIds.filter((existingId) => existingId !== id)
+        prevIds.filter((existingId) => existingId !== id),
       );
     }
   };
@@ -239,7 +262,7 @@ export default function MemoryModelEditor({
     state.setElementClasses((prevClasses) => {
       if (prevClasses.includes(className)) return prevClasses;
       const insertIndex = prevClasses.findIndex(
-        (existingClass) => existingClass.localeCompare(className) > 0
+        (existingClass) => existingClass.localeCompare(className) > 0,
       );
       return insertIndex === -1
         ? [...prevClasses, className]
@@ -253,31 +276,34 @@ export default function MemoryModelEditor({
 
   const removeElementClass = (className: string): void => {
     state.setElementClasses((prevClasses) =>
-      prevClasses.filter((existingClass) => existingClass !== className)
+      prevClasses.filter((existingClass) => existingClass !== className),
     );
   };
 
-  const getQuestionFunctionNames = useCallback((questionData: any): string[] => {
-    const seen = new Set<string>();
-    const collectFrameNames = (boxes: any[]) => {
-      for (const box of boxes) {
-        if (box.type === ".frame" && typeof box.name === "string") {
-          seen.add(box.name);
+  const getQuestionFunctionNames = useCallback(
+    (questionData: any): string[] => {
+      const seen = new Set<string>();
+      const collectFrameNames = (boxes: any[]) => {
+        for (const box of boxes) {
+          if (box.type === ".frame" && typeof box.name === "string") {
+            seen.add(box.name);
+          }
+        }
+      };
+      if (Array.isArray(questionData?.answer)) {
+        collectFrameNames(questionData.answer);
+      }
+      if (Array.isArray(questionData?.steps)) {
+        for (const step of questionData.steps) {
+          if (Array.isArray(step.answer)) {
+            collectFrameNames(step.answer);
+          }
         }
       }
-    };
-    if (Array.isArray(questionData?.answer)) {
-      collectFrameNames(questionData.answer);
-    }
-    if (Array.isArray(questionData?.steps)) {
-      for (const step of questionData.steps) {
-        if (Array.isArray(step.answer)) {
-          collectFrameNames(step.answer);
-        }
-      }
-    }
-    return Array.from(seen);
-  }, []);
+      return Array.from(seen);
+    },
+    [],
+  );
 
   const getQuestionClassNames = useCallback((questionData: any): string[] => {
     if (!questionData?.answer || !Array.isArray(questionData.answer)) {
@@ -299,63 +325,66 @@ export default function MemoryModelEditor({
     return names;
   }, []);
 
-  const getRequiredBoxTypeNames = useCallback((questionData: any): BoxTypeName[] => {
-    if (!questionData?.answer || !Array.isArray(questionData.answer)) {
-      return [];
-    }
-
-    const requiredTypes = new Set<BoxTypeName>();
-
-    const hasFrames = questionData.answer.some(
-      (box: any) => box.type === ".frame"
-    );
-    if (hasFrames) {
-      requiredTypes.add("function" as BoxTypeName);
-    }
-
-    questionData.answer.forEach((box: any) => {
-      const boxType = box.type;
-
-      switch (boxType) {
-        case ".frame":
-          break;
-        case "int":
-          requiredTypes.add("int" as BoxTypeName);
-          break;
-        case "float":
-          requiredTypes.add("float" as BoxTypeName);
-          break;
-        case "str":
-          requiredTypes.add("str" as BoxTypeName);
-          break;
-        case "bool":
-          requiredTypes.add("bool" as BoxTypeName);
-          break;
-        case "NoneType":
-        case "None":
-          requiredTypes.add("none" as BoxTypeName);
-          break;
-        case "list":
-          requiredTypes.add("list" as BoxTypeName);
-          break;
-        case "tuple":
-          requiredTypes.add("tuple" as BoxTypeName);
-          break;
-        case "set":
-          requiredTypes.add("set" as BoxTypeName);
-          break;
-        case "dict":
-          requiredTypes.add("dict" as BoxTypeName);
-          break;
-        case ".class":
-        case "object":
-          requiredTypes.add("class" as BoxTypeName);
-          break;
+  const getRequiredBoxTypeNames = useCallback(
+    (questionData: any): BoxTypeName[] => {
+      if (!questionData?.answer || !Array.isArray(questionData.answer)) {
+        return [];
       }
-    });
 
-    return Array.from(requiredTypes);
-  }, []);
+      const requiredTypes = new Set<BoxTypeName>();
+
+      const hasFrames = questionData.answer.some(
+        (box: any) => box.type === ".frame",
+      );
+      if (hasFrames) {
+        requiredTypes.add("function" as BoxTypeName);
+      }
+
+      questionData.answer.forEach((box: any) => {
+        const boxType = box.type;
+
+        switch (boxType) {
+          case ".frame":
+            break;
+          case "int":
+            requiredTypes.add("int" as BoxTypeName);
+            break;
+          case "float":
+            requiredTypes.add("float" as BoxTypeName);
+            break;
+          case "str":
+            requiredTypes.add("str" as BoxTypeName);
+            break;
+          case "bool":
+            requiredTypes.add("bool" as BoxTypeName);
+            break;
+          case "NoneType":
+          case "None":
+            requiredTypes.add("none" as BoxTypeName);
+            break;
+          case "list":
+            requiredTypes.add("list" as BoxTypeName);
+            break;
+          case "tuple":
+            requiredTypes.add("tuple" as BoxTypeName);
+            break;
+          case "set":
+            requiredTypes.add("set" as BoxTypeName);
+            break;
+          case "dict":
+            requiredTypes.add("dict" as BoxTypeName);
+            break;
+          case ".class":
+          case "object":
+            requiredTypes.add("class" as BoxTypeName);
+            break;
+        }
+      });
+
+      return Array.from(requiredTypes);
+    },
+    [],
+  );
 
   const { handleCanvasSubmit, handleCanvasSubmitAtLine } = useCanvasSubmission({
     selectedQuestionIndex: state.selectedQuestionIndex,
@@ -402,7 +431,7 @@ export default function MemoryModelEditor({
       ids: state.elementIds,
       classes: state.elementClasses,
     }),
-    [state.elements, state.elementIds, state.elementClasses]
+    [state.elements, state.elementIds, state.elementClasses],
   );
 
   useEffect(() => {
@@ -487,11 +516,13 @@ export default function MemoryModelEditor({
         window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO;
       const maxWidthPreservingCanvas = Math.max(
         MIN_INFO_PANEL_WIDTH,
-        containerRect.width - MIN_CANVAS_COLUMN_WIDTH - INFO_RESIZE_DIVIDER_WIDTH
+        containerRect.width -
+          MIN_CANVAS_COLUMN_WIDTH -
+          INFO_RESIZE_DIVIDER_WIDTH,
       );
       const maxAllowedWidth = Math.min(
         maxWidthPreservingCanvas,
-        maxWidthBasedOnViewport
+        maxWidthBasedOnViewport,
       );
 
       const clamped = Math.max(0, Math.min(newWidth, maxAllowedWidth));
@@ -507,11 +538,13 @@ export default function MemoryModelEditor({
           window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO;
         const maxWidthPreservingCanvas = Math.max(
           MIN_INFO_PANEL_WIDTH,
-          containerRect.width - MIN_CANVAS_COLUMN_WIDTH - INFO_RESIZE_DIVIDER_WIDTH
+          containerRect.width -
+            MIN_CANVAS_COLUMN_WIDTH -
+            INFO_RESIZE_DIVIDER_WIDTH,
         );
         const maxAllowedWidth = Math.min(
           maxWidthPreservingCanvas,
-          maxWidthBasedOnViewport
+          maxWidthBasedOnViewport,
         );
 
         if (finalWidth < SNAP_CLOSE_THRESHOLD) {
@@ -520,7 +553,7 @@ export default function MemoryModelEditor({
         } else {
           const settledWidth = Math.max(
             MIN_INFO_PANEL_WIDTH,
-            Math.min(finalWidth, maxAllowedWidth)
+            Math.min(finalWidth, maxAllowedWidth),
           );
           infoPanelSetWidth(settledWidth);
         }
@@ -540,7 +573,13 @@ export default function MemoryModelEditor({
       document.body.style.userSelect = "";
       document.body.style.cursor = "";
     };
-  }, [state.isResizingInfoPanel, infoPanelSetWidth, infoPanelSetResizing, infoPanelSetOpen, mainContainerRefCurrent]);
+  }, [
+    state.isResizingInfoPanel,
+    infoPanelSetWidth,
+    infoPanelSetResizing,
+    infoPanelSetOpen,
+    mainContainerRefCurrent,
+  ]);
 
   useEffect(() => {
     const container = refs.mainContainerRef.current;
@@ -552,11 +591,11 @@ export default function MemoryModelEditor({
         window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO;
       const maxWidthPreservingCanvas = Math.max(
         MIN_INFO_PANEL_WIDTH,
-        containerWidth - MIN_CANVAS_COLUMN_WIDTH - INFO_RESIZE_DIVIDER_WIDTH
+        containerWidth - MIN_CANVAS_COLUMN_WIDTH - INFO_RESIZE_DIVIDER_WIDTH,
       );
       const nextMax = Math.min(
         maxWidthBasedOnViewport,
-        maxWidthPreservingCanvas
+        maxWidthPreservingCanvas,
       );
 
       setMaxInfoPanelWidth(nextMax);
@@ -612,13 +651,21 @@ export default function MemoryModelEditor({
                 requiredBoxes={
                   effectiveSandboxMode && currentQuestionData
                     ? getRequiredBoxTypeNames(currentQuestionData).filter(
-                        (type) => !(state.selectedQuestionType === "experiment" && type === "function")
+                        (type) =>
+                          !(
+                            state.selectedQuestionType === "experiment" &&
+                            type === "function"
+                          ),
                       )
                     : undefined
                 }
                 isPracticeMode={effectiveSandboxMode}
                 isSandboxMode={effectiveSandboxMode}
-                onModeToggle={state.selectedQuestionType === "experiment" ? undefined : () => state.setShowModeToggleModal(true)}
+                onModeToggle={
+                  state.selectedQuestionType === "experiment"
+                    ? undefined
+                    : () => state.setShowModeToggleModal(true)
+                }
                 onClear={() => state.setShowClearCanvasModal(true)}
                 onUndo={isStepByStepActive ? stepHistory.undo : undo}
                 onRedo={isStepByStepActive ? stepHistory.redo : redo}
@@ -670,8 +717,12 @@ export default function MemoryModelEditor({
               addClasses={addElementClass}
               removeClasses={removeElementClass}
               sandbox={!effectiveSandboxMode}
-              canManageClasses={!effectiveSandboxMode || state.selectedQuestionIndex === null}
-              canManageFunctions={!effectiveSandboxMode || state.selectedQuestionIndex === null}
+              canManageClasses={
+                !effectiveSandboxMode || state.selectedQuestionIndex === null
+              }
+              canManageFunctions={
+                !effectiveSandboxMode || state.selectedQuestionIndex === null
+              }
               onClear={() => state.setShowClearCanvasModal(true)}
               onEditorOpenerReady={handleEditorOpenerReady}
               scale={canvasScale}
@@ -736,7 +787,7 @@ export default function MemoryModelEditor({
                   : `${Math.min(MIN_INFO_PANEL_WIDTH, maxInfoPanelWidth)}px`,
                 maxWidth: `${Math.min(
                   maxInfoPanelWidth,
-                  window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO
+                  window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO,
                 )}px`,
               }}
             >
@@ -801,7 +852,6 @@ export default function MemoryModelEditor({
           onCancel={() => state.setShowModeToggleModal(false)}
         />
       )}
-
     </div>
   );
 }

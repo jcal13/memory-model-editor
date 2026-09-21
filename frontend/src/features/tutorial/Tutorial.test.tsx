@@ -85,3 +85,39 @@ test('welcome resumes at step one and only one Hide control exists',()=>{
  fireEvent.click(screen.getByRole('button',{name:'Resume guide'}));
  expect(screen.getByRole('dialog',{name:'Build your first memory model'})).toBeInTheDocument();
 });
+
+test('normal mode never registers tutorial pointer or drag listeners', () => {
+ window.history.replaceState({}, '', '/');
+ const documentAdd = jest.spyOn(document, 'addEventListener');
+ const windowAdd = jest.spyOn(window, 'addEventListener');
+ try {
+  render(<Tutorial elements={[]} correct={false}/>);
+  const tutorialEvents = ['dragstart', 'dragend', 'drop', 'pointerdown', 'pointerup', 'pointercancel'];
+  expect(documentAdd.mock.calls.filter(([type]) => tutorialEvents.includes(type))).toHaveLength(0);
+  expect(windowAdd.mock.calls.filter(([type]) => type === 'blur')).toHaveLength(0);
+ } finally { documentAdd.mockRestore(); windowAdd.mockRestore(); }
+});
+
+test('deactivating the demo removes every tutorial interaction listener', () => {
+ const documentAdd = jest.spyOn(document, 'addEventListener');
+ const documentRemove = jest.spyOn(document, 'removeEventListener');
+ const windowAdd = jest.spyOn(window, 'addEventListener');
+ const windowRemove = jest.spyOn(window, 'removeEventListener');
+ try {
+  const {rerender} = render(<Tutorial elements={[]} correct={false} demoActive={true}/>);
+  const tutorialEvents = ['dragstart', 'dragend', 'drop', 'pointerdown', 'pointerup', 'pointercancel'];
+  const listeners = documentAdd.mock.calls.filter(([type]) => tutorialEvents.includes(type));
+  const blur = windowAdd.mock.calls.find(([type]) => type === 'blur');
+  expect(listeners).toHaveLength(6);
+  expect(blur).toBeDefined();
+  fireEvent.dragStart(document.body);
+  rerender(<Tutorial elements={[]} correct={false} demoActive={false}/>);
+  listeners.forEach(args => expect(documentRemove).toHaveBeenCalledWith(...args));
+  expect(windowRemove).toHaveBeenCalledWith(...blur!);
+  rerender(<Tutorial elements={[]} correct={false} demoActive={true}/>);
+  expect(document.querySelector('.tutorial-dim')).toBeInTheDocument();
+ } finally {
+  documentAdd.mockRestore(); documentRemove.mockRestore();
+  windowAdd.mockRestore(); windowRemove.mockRestore();
+ }
+});

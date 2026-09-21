@@ -21,7 +21,8 @@ const DEFAULT_INFO_PANEL_WIDTH = 500;
 export function useMemoryModelEditorState(sandbox: boolean) {
   // Load initial data
   const initialCanvasData = isTutorial() ? normalizeQuestionCanvasData(loadInitialCanvasData()) : loadInitialCanvasData();
-  const initialUIData = loadInitialUIData();
+  // Copy before applying demo overrides: the loader may return shared defaults.
+  const initialUIData = { ...loadInitialUIData() };
   if (isTutorial()) {
     initialUIData.questionIndex = 1;
     initialUIData.questionType = "practice";

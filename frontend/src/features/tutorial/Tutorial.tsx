@@ -64,6 +64,11 @@ export default function Tutorial({ elements, correct, demoActive = isTutorial() 
     if (active && step > 0) workspaceStorage.setItem("started", "true");
   }, [active, step]);
   useEffect(() => {
+    if (!active) {
+      setInteracting(false);
+      setDraggingBox(false);
+      return;
+    }
     let dragging = false;
     const dragStart = () => { dragging = true; setInteracting(true); setDraggingBox(true); };
     const dragEnd = () => { dragging = false; setInteracting(false); setDraggingBox(false); };
@@ -87,7 +92,7 @@ export default function Tutorial({ elements, correct, demoActive = isTutorial() 
       document.removeEventListener("pointercancel", up, true);
       window.removeEventListener("blur", up);
     };
-  }, []);
+  }, [active]);
   useEffect(() => {
     if (!help) return;
     const previous = document.activeElement as HTMLElement | null;

@@ -214,29 +214,20 @@ if (result.correct) {
 
 3. **Feedback**: The `result.errors` array provides specific reasons for failure, which can be piped directly into the MarkUs feedback file.
 
-## Guided tutorial
+## Guided Tutorial
 
-Use the bottom-right **?** button to open **Help & guide**, including written
-instructions and **New to Memory Lab? Take the guided tour**. The tour opens in
-the same tab (`?tutorial=1`) as a fresh, isolated demo with the real Practice Question 1 panel, code-line
-checks, Reset/Submit controls, and feedback. It requires the normal question API.
-The right panel uses the regular draggable divider. Help closes through Done;
-clicking outside or pressing Escape keeps the documentation open.
+MemoryLab includes a guided tutorial to help new users become familiar with the Practice Mode interface and basic memory model construction.
 
-The demo is restricted to Practice Question 1; its Back control exits the demo
-instead of opening other questions. The Beamer+-inspired spotlight highlights
-individual boxes and editors, with lighter dimming. During native palette dragging,
-the overlay disappears, then highlights the dropped object. Each lesson keeps
-its intended target despite unrelated clicks. Opening the relevant editor or
-reference picker automatically moves the spotlight there. Visible drawing bounds
-exclude invisible drag padding, and guide placement avoids boxes and open editors.
-Instructions advance from actual objects and references, not fixed object IDs.
-Hide/Resume guide is available only at bottom-right and preserves the exact step. Finish hides the guide and keeps the
-exercise open. Exit tutorial restores the regular workspace.
+To start the tutorial, click the **?** button in the bottom-right corner and open **Help & Guide**, then select **New to Memory Lab? Take the guided tour**.
 
-Canvas, UI, undo history, question progress, and guide visibility use prefixed
-sessionStorage keys in tutorial mode, separate from regular localStorage.
-Implementation lives in `frontend/src/features/tutorial/`; step definitions and
-Help content are in `Tutorial.tsx` and `HelpContent.tsx`, reference checks in `tutorialModel.ts`, and
-spotlight styles in `tutorial.css`. Normal grading remains in the existing
-question and submission components. `data-tour` attributes anchor the overlay.
+The tutorial uses **Practice Question 1** and walks users through the main interactions in MemoryLab, including:
+
+- Adding objects to the canvas
+- Creating and editing variables
+- Connecting references between objects
+- Using line-by-line checking
+- Submitting an answer and viewing feedback
+
+Relevant interface elements are highlighted as the user progresses through each step. The guide can also be hidden and resumed without losing progress.
+
+Tutorial mode runs separately from the regular workspace, so completing or modifying the tutorial does not affect the user's existing MemoryLab work.

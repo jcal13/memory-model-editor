@@ -220,15 +220,18 @@ Use the bottom-right **?** button to open **Help & guide**, including written
 instructions and **New to Memory Lab? Take the guided tour**. The tour opens in
 the same tab (`?tutorial=1`) as a fresh, isolated demo with the real Practice Question 1 panel, code-line
 checks, Reset/Submit controls, and feedback. It requires the normal question API.
-The right panel uses the regular draggable divider.
+The right panel uses the regular draggable divider. Help closes through Done;
+clicking outside or pressing Escape keeps the documentation open.
 
 The demo is restricted to Practice Question 1; its Back control exits the demo
 instead of opening other questions. The Beamer+-inspired spotlight highlights
 individual boxes and editors, with lighter dimming. During native palette dragging,
-the overlay disappears, then highlights the dropped object. Empty canvas clicks
-clear emphasis. Instructions advance from actual objects and references,
-not fixed object IDs. Hide/Resume guide is always available at bottom-right;
-Resume finds the next unfinished action. Finish hides the guide and keeps the
+the overlay disappears, then highlights the dropped object. Each lesson keeps
+its intended target despite unrelated clicks. Opening the relevant editor or
+reference picker automatically moves the spotlight there. Visible drawing bounds
+exclude invisible drag padding, and guide placement avoids boxes and open editors.
+Instructions advance from actual objects and references, not fixed object IDs.
+Hide/Resume guide is available only at bottom-right and preserves the exact step. Finish hides the guide and keeps the
 exercise open. Exit tutorial restores the regular workspace.
 
 Canvas, UI, undo history, question progress, and guide visibility use prefixed

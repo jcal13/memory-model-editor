@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { CanvasElement } from "../shared/types";
 import { hasAssignment } from "./tutorialModel";
 import { exitTutorial, isTutorial, startTutorial, workspaceStorage } from "./tutorialStorage";
+import { lessonTarget, targetBounds, placeCard } from "./tutorialTargets";
 import HelpContent from "./HelpContent";
 import "./tutorial.css";
 
@@ -36,13 +37,11 @@ export default function Tutorial({ elements, correct, demoActive = isTutorial() 
   const [help, setHelp] = useState(false);
   const [interacting, setInteracting] = useState(false);
   const [draggingBox, setDraggingBox] = useState(false);
-  const afterDrop = useRef(false);
   const [rect, setRect] = useState<{left: number; top: number; width: number; height: number} | null>(null);
   const [position, setPosition] = useState({left: 24, top: 24});
   const [editingId, setEditingId] = useState<number | null>(null);
   const card = useRef<HTMLDivElement>(null);
   const helpCard = useRef<HTMLDivElement>(null);
-  const clicked = useRef<Element | null>(null);
   const previousAction = useRef(action);
   const current = steps[step];
   const referenceValue = step === 4 ? 4 : step === 5 ? 6 : null;
@@ -55,20 +54,19 @@ export default function Tutorial({ elements, correct, demoActive = isTutorial() 
     ? `You are editing object ID ${editing.id}, currently containing ${editing.kind.value}. ${Number(editing.kind.value) === 4 ? "Keep this value for b." : Number(editing.kind.value) === 5 ? "Keep this value for a." : Number(editing.kind.value) === 6 ? "Keep this value for c." : "Set its value for the assignment you are building."}`
     : null;
   const showGuide = useCallback((visible: boolean) => { setGuidance(visible); if (active) workspaceStorage.setItem("guidance", visible ? "shown" : "hidden"); }, [active]);
-  // Advance when the actual model changes, including work done while guidance is hidden.
+  // Hidden guidance preserves its exact lesson, even if students explore meanwhile.
   // Back remains usable until another task is completed or undone.
   useEffect(() => {
-    if (action !== previousAction.current && step !== 0) setStep(action);
+    if (guidance && action !== previousAction.current && step !== 0) setStep(action);
     previousAction.current = action;
-  }, [action, step]);
+  }, [action, step, guidance]);
   useEffect(() => {
-    clicked.current = null;
     if (active && step > 0) workspaceStorage.setItem("started", "true");
   }, [active, step]);
   useEffect(() => {
     let dragging = false;
-    const dragStart = () => { dragging = true; setInteracting(true); setDraggingBox(true); clicked.current = null; };
-    const dragEnd = () => { dragging = false; setInteracting(false); setDraggingBox(false); clicked.current = null; afterDrop.current = true; };
+    const dragStart = () => { dragging = true; setInteracting(true); setDraggingBox(true); };
+    const dragEnd = () => { dragging = false; setInteracting(false); setDraggingBox(false); };
     const down = (event: PointerEvent) => {
       if (event.target instanceof Element && !event.target.closest('.tutorial-card, .tutorial-dock, .tutorial-help')) setInteracting(true);
     };
@@ -96,7 +94,7 @@ export default function Tutorial({ elements, correct, demoActive = isTutorial() 
     const panel = helpCard.current;
     panel?.focus();
     const key = (event: KeyboardEvent) => {
-      if (event.key === "Escape") { event.stopImmediatePropagation(); setHelp(false); }
+      if (event.key === "Escape") { event.preventDefault(); event.stopImmediatePropagation(); }
       if (event.key === "Tab" && panel) {
         const buttons = Array.from(panel.querySelectorAll<HTMLButtonElement>("button:not(:disabled)"));
         const first = buttons[0], last = buttons[buttons.length - 1];
@@ -111,67 +109,44 @@ export default function Tutorial({ elements, correct, demoActive = isTutorial() 
     if (!active || !guidance || help) return;
     let raf = 0;
     const update = () => {
-      const editor = document.querySelector('[data-tour="box-editor"]');
-      setEditingId(editor ? Number(editor.getAttribute("data-box-id")) : null);
-      let target: Element | null = clicked.current?.isConnected ? clicked.current : editor || (current.target ? document.querySelector(current.target) : null);
-      if (afterDrop.current) {
-        const boxes = Array.from(document.querySelectorAll('[data-canvas-box-id][data-canvas-kind="primitive"]'));
-        target = boxes[boxes.length - 1] || null;
-        if (target) { clicked.current = target; afterDrop.current = false; }
-      }
-      // Empty canvas clicks clear emphasis; never dim an entire working region.
-      if (target?.getAttribute("data-tour") === "canvas") target = null;
-      const r = target?.getBoundingClientRect();
-      const box = r && r.width && r.height ? {left:r.left-6, top:r.top-6, width:r.width+12, height:r.height+12} : null;
+      const target = lessonTarget(step, elements);
+      setEditingId(target?.getAttribute("data-tour") === "box-editor" ? Number(target.getAttribute("data-box-id")) : null);
+      const r = target ? targetBounds(target) : undefined;
+      const box = r && r.width && r.height ? {left:r.left-4, top:r.top-4, width:r.width+8, height:r.height+8} : null;
       setRect(old => JSON.stringify(old) === JSON.stringify(box) ? old : box);
       const w = card.current?.offsetWidth || 320, h = card.current?.offsetHeight || 300;
-      const vw = window.innerWidth, vh = window.innerHeight;
-      let left = (vw-w)/2, top = (vh-h)/2;
-      if (!r && step > 0 && step < 7) { left = vw-w-20; top = vh-h-72; }
-      if (r) {
-        left = vw-r.right >= w+22 ? r.right+14 : r.left >= w+22 ? r.left-w-14 : vw-w-16;
-        top = r.top+r.height/2-h/2;
-        if (target?.getAttribute("data-tour") === "canvas") { left=r.right-w-16; top=r.bottom-h-64; }
-      }
-      const pos = {left:Math.max(12,Math.min(left,vw-w-12)),top:Math.max(12,Math.min(top,vh-h-64))};
+      const obstacles = Array.from(document.querySelectorAll('[data-tour="box-editor"], [data-tour="reference-picker"], [data-canvas-box-id]')).map(targetBounds);
+      const pos = placeCard(r, w, h, window.innerWidth, window.innerHeight, obstacles);
       setPosition(old => old.left===pos.left && old.top===pos.top ? old : pos);
     };
     const schedule = () => { cancelAnimationFrame(raf); raf=requestAnimationFrame(update); };
-    const pointer = (event: PointerEvent) => {
-      if (!(event.target instanceof Element) || event.target.closest('.tutorial-card, .tutorial-dock')) return;
-      if (step > 0) setStep(action);
-      afterDrop.current = false;
-      clicked.current = event.target.closest('[data-tour="reference-picker"], [data-tour="box-editor"], [data-canvas-box-id], [aria-label^="Draggable "], [data-tour="submit"], [data-tour="canvas"]');
-      schedule();
-    };
     const key = (event: KeyboardEvent) => { if (event.key === "Escape") showGuide(false); };
     const observer = new MutationObserver(schedule);
     observer.observe(document.body,{childList:true,subtree:true,attributes:true});
     const resize = new ResizeObserver(schedule); resize.observe(document.body);
-    document.addEventListener("pointerdown",pointer,true);
     document.addEventListener("keydown",key);
     window.addEventListener("resize",schedule); window.addEventListener("scroll",schedule,true);
     schedule();
-    return () => { cancelAnimationFrame(raf); observer.disconnect(); resize.disconnect(); document.removeEventListener("pointerdown",pointer,true); document.removeEventListener("keydown",key); window.removeEventListener("resize",schedule); window.removeEventListener("scroll",schedule,true); };
-  }, [active,current.target,guidance,help,step,action,showGuide,draggingBox]);
+    return () => { cancelAnimationFrame(raf); observer.disconnect(); resize.disconnect(); document.removeEventListener("keydown",key); window.removeEventListener("resize",schedule); window.removeEventListener("scroll",schedule,true); };
+  }, [active,guidance,help,step,elements,showGuide,draggingBox]);
 
   return createPortal(<>
     <div className="tutorial-dock">
-      {isTutorial() && <>{active && <button onClick={() => { if (!guidance) setStep(action); showGuide(!guidance); }}>{guidance ? "Hide guide" : "Resume guide"}</button>}<button onClick={exitTutorial}>Exit tutorial</button></>}
+      {isTutorial() && <>{active && <button onClick={() => { showGuide(!guidance); }}>{guidance ? "Hide guide" : "Resume guide"}</button>}<button onClick={exitTutorial}>Exit tutorial</button></>}
       <button className="tutorial-help-button" aria-label="Help and guide" title="Help and guide" onClick={() => setHelp(true)}>?</button>
     </div>
     {active && guidance && !help && <div className="tutorial-layer">
       {!draggingBox && (rect ? <div className="tutorial-spotlight" style={rect}/> : (step === 0 || step === 7) ? <div className="tutorial-dim"/> : null)}
       <div ref={card} className="tutorial-card" style={{...position, pointerEvents: interacting ? "none" : "auto", opacity: draggingBox ? 0 : 1}} role="dialog" aria-label={current.title}>
-        <div className="tutorial-heading"><span>{step+1} of {steps.length}</span><button onClick={() => showGuide(false)}>Hide</button></div>
+        <div className="tutorial-heading"><span>Step {step+1} of {steps.length}</span></div>
         <h2>{current.title}</h2><p>{instruction}</p>
         {context && step > 0 && step < 7 && <p className="tutorial-note" role="status">{context}</p>}
         <div className="tutorial-actions"><button disabled={step===0} onClick={() => setStep(s=>s-1)}>Back</button><button className="tutorial-primary" disabled={step > 0 && step >= action && step < 7} onClick={() => { if (step===7) showGuide(false); else setStep(step===0 || step<action ? action : Math.min(step+1,7)); }}>{step===7 ? "Finish" : "Next"}</button></div>
       </div>
     </div>}
-    {help && <div className="tutorial-help-backdrop" onClick={event => { if(event.target===event.currentTarget) setHelp(false); }}>
+    {help && <div className="tutorial-help-backdrop">
       <div className="tutorial-help" ref={helpCard} role="dialog" aria-modal="true" aria-labelledby="memory-help-title" tabIndex={-1}>
-        <div className="tutorial-heading"><h1 id="memory-help-title">Help &amp; guide</h1><button aria-label="Close help" onClick={()=>setHelp(false)}>×</button></div>
+        <div className="tutorial-heading"><h1 id="memory-help-title">Help &amp; guide</h1></div>
         <HelpContent onStart={startTutorial} />
         <button onClick={()=>setHelp(false)}>Done</button>
       </div>

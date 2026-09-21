@@ -17,13 +17,13 @@ test('help is available outside the Questions list with documentation and a tour
  expect(screen.getByText('3. Connect variables to objects')).toBeInTheDocument();
  expect(screen.getByRole('button',{name:/New to Memory Lab/})).toBeInTheDocument();
 });
-test('hide and resume preserve the exercise and find the next unfinished action',()=>{
+test('hide and resume preserve the exact lesson even while the model changes',()=>{
  const m=model(); if(m[0].kind.name==='function') m[0].kind.params.pop();
  const {rerender}=render(<Tutorial elements={[]} correct={false}/>);
- fireEvent.click(screen.getByRole('button',{name:'Hide'}));
+ fireEvent.click(screen.getByRole('button',{name:'Hide guide'}));
  rerender(<Tutorial elements={m} correct={false}/>);
  fireEvent.click(screen.getByRole('button',{name:'Resume guide'}));
- expect(screen.getByRole('dialog',{name:'Build c = 6'})).toBeInTheDocument();
+ expect(screen.getByRole('dialog',{name:'Build your first memory model'})).toBeInTheDocument();
  expect(window.location.search).toBe('?tutorial=1');
 });
 test('finish keeps the tutorial exercise open and guide can be reopened',()=>{
@@ -66,4 +66,22 @@ test('native drag removes all dimming until the drop completes',()=>{
  expect(document.querySelector('.tutorial-spotlight')).not.toBeInTheDocument();
  fireEvent.dragEnd(document.body);
  expect(document.querySelector('.tutorial-dim')).toBeInTheDocument();
+});
+
+test('Help closes only with Done, not the backdrop or Escape',()=>{
+ render(<Tutorial elements={[]} correct={false}/>);
+ fireEvent.click(screen.getByRole('button',{name:'Help and guide'}));
+ fireEvent.click(document.querySelector('.tutorial-help-backdrop')!);
+ fireEvent.keyDown(document,{key:'Escape'});
+ expect(screen.getByRole('dialog',{name:'Help & guide'})).toBeInTheDocument();
+ expect(screen.queryByRole('button',{name:'Close help'})).not.toBeInTheDocument();
+ fireEvent.click(screen.getByRole('button',{name:'Done'}));
+ expect(screen.queryByRole('dialog',{name:'Help & guide'})).not.toBeInTheDocument();
+});
+test('welcome resumes at step one and only one Hide control exists',()=>{
+ render(<Tutorial elements={[]} correct={false}/>);
+ expect(screen.queryByRole('button',{name:'Hide'})).not.toBeInTheDocument();
+ fireEvent.click(screen.getByRole('button',{name:'Hide guide'}));
+ fireEvent.click(screen.getByRole('button',{name:'Resume guide'}));
+ expect(screen.getByRole('dialog',{name:'Build your first memory model'})).toBeInTheDocument();
 });

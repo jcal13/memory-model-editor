@@ -22,6 +22,7 @@ import {
 } from "../../memoryModelEditor/utils/localStorage";
 import { normalizeQuestionCanvasData } from "../../memoryModelEditor/utils/questionFrames";
 import ConfirmationModal from "../../memoryModelEditor/components/ConfirmationModal";
+import type { StepHistoryState } from "../../memoryModelEditor/hooks/useStepUndoHistory";
 
 type View = "root" | "loading" | "test" | "list" | "question" | "practice" | "prep" | "experiment" | "stepbystep";
 type QuestionType = "test" | "practice" | "prep" | "experiment";
@@ -76,6 +77,9 @@ interface QuestionTabProps {
   onClearCanvas: () => void;
   onRestoreCanvas: (elements: any[], ids: number[], classes: string[]) => void;
   currentCanvasState: { elements: any[]; ids: number[]; classes: string[] };
+  onStepHistoryRecord?: (state: StepHistoryState) => void;
+  onStepHistoryClear?: (state: StepHistoryState) => void;
+  stepHistoryRestoreState?: StepHistoryState | null;
   onQuestionDataChange?: (data: any) => void;
   isSandboxMode: boolean;
   fontScale?: number;
@@ -192,6 +196,9 @@ export default function QuestionTab({
   onClearCanvas,
   onRestoreCanvas,
   currentCanvasState,
+  onStepHistoryRecord = () => undefined,
+  onStepHistoryClear = () => undefined,
+  stepHistoryRestoreState = null,
   onQuestionDataChange,
   isSandboxMode,
   fontScale = 1,
@@ -238,6 +245,14 @@ export default function QuestionTab({
     index: number;
   } | null>(null);
   const prevSandboxModeRef = useRef<boolean>(isSandboxMode);
+
+  useEffect(() => {
+    if (!stepHistoryRestoreState) return;
+    setStepByStepIndex(stepHistoryRestoreState.stepByStepIndex);
+    setCommittedAssignments(stepHistoryRestoreState.committedAssignments);
+    setStepConsistencyError(null);
+    setSubmissionResults(null);
+  }, [stepHistoryRestoreState, setSubmissionResults]);
 
   useEffect(() => {
     if (view !== "loading") {
@@ -666,6 +681,11 @@ export default function QuestionTab({
           resolveQuestionCanvasData("practice", 1, data.canvasConfig ?? null)
         );
         onRestoreCanvas(resolvedCanvas.elements, resolvedCanvas.ids, resolvedCanvas.classes);
+        onStepHistoryClear({
+          ...resolvedCanvas,
+          stepByStepIndex: 0,
+          committedAssignments: null,
+        });
       }, 0);
     } catch (error) {
       console.error("Failed to load step-by-step question:", error);
@@ -685,6 +705,13 @@ export default function QuestionTab({
     setSubmissionResults(null);
     if (onQuestionDataChange) onQuestionDataChange(null);
     onRestoreCanvas([], [], []);
+    onStepHistoryClear({
+      elements: [],
+      ids: [],
+      classes: [],
+      stepByStepIndex: 0,
+      committedAssignments: null,
+    });
     setView("root");
   };
 
@@ -709,11 +736,19 @@ export default function QuestionTab({
     const success = await handleSubmitAtLine(currentStep.lineNumber, currentStep.iterationNumber);
     if (success) {
       // Merge the new assignments into the committed state
-      setCommittedAssignments((prev) => ({
-        variableToId: { ...prev?.variableToId, ...currentAssignments.variableToId },
-        idToType: { ...prev?.idToType, ...currentAssignments.idToType },
-      }));
+      const nextCommittedAssignments = {
+        variableToId: { ...committedAssignments?.variableToId, ...currentAssignments.variableToId },
+        idToType: { ...committedAssignments?.idToType, ...currentAssignments.idToType },
+      };
+      setCommittedAssignments(nextCommittedAssignments);
       setStepByStepIndex((prev) => prev + 1);
+      onStepHistoryRecord({
+        elements: snapshotElements,
+        ids: currentCanvasState.ids,
+        classes: currentCanvasState.classes,
+        stepByStepIndex: stepByStepIndex + 1,
+        committedAssignments: nextCommittedAssignments,
+      });
     }
   };
 
@@ -731,6 +766,11 @@ export default function QuestionTab({
         resolveQuestionCanvasData("practice", 1, data.canvasConfig ?? null)
       );
       onRestoreCanvas(resolvedCanvas.elements, resolvedCanvas.ids, resolvedCanvas.classes);
+      onStepHistoryClear({
+        ...resolvedCanvas,
+        stepByStepIndex: 0,
+        committedAssignments: null,
+      });
     } catch (error) {
       console.error("Failed to reset step-by-step question:", error);
     }

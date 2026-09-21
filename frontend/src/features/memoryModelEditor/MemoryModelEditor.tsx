@@ -20,6 +20,10 @@ import {
 } from "./hooks/useLocalStorage";
 import { useCanvasSubmission } from "./hooks/useCanvasSubmission";
 import { useUndoHistory } from "./hooks/useUndoHistory";
+import {
+  StepHistoryState,
+  useStepUndoHistory,
+} from "./hooks/useStepUndoHistory";
 import { useMemo, useEffect, useState, useCallback, useRef } from "react";
 import { CanvasElement, BoxTypeName } from "../shared/types";
 import {
@@ -86,6 +90,22 @@ export default function MemoryModelEditor({
     state.setElementClasses
   );
 
+  const [stepHistoryRestoreState, setStepHistoryRestoreState] =
+    useState<StepHistoryState | null>(null);
+  const setElements = state.setElements;
+  const setElementIds = state.setElementIds;
+  const setElementClasses = state.setElementClasses;
+
+  const restoreStepHistoryState = useCallback((historyState: StepHistoryState) => {
+    setElements(historyState.elements);
+    setElementIds(historyState.ids);
+    setElementClasses(historyState.classes);
+    setStepHistoryRestoreState(historyState);
+  }, [setElements, setElementIds, setElementClasses]);
+
+  const stepHistory = useStepUndoHistory(restoreStepHistoryState);
+  const isStepByStepActive = state.questionView === "stepbystep";
+
   // Track previous state for recording changes
   const prevStateRef = useRef({
     elements: state.elements,
@@ -146,6 +166,11 @@ export default function MemoryModelEditor({
     
     prevStateRef.current = baselineState;
     clearHistory(baselineState);
+    stepHistory.clearHistory({
+      ...baselineState,
+      stepByStepIndex: 0,
+      committedAssignments: null,
+    });
   };
 
   const restoreCanvas = (
@@ -595,10 +620,10 @@ export default function MemoryModelEditor({
                 isSandboxMode={effectiveSandboxMode}
                 onModeToggle={state.selectedQuestionType === "experiment" ? undefined : () => state.setShowModeToggleModal(true)}
                 onClear={() => state.setShowClearCanvasModal(true)}
-                onUndo={undo}
-                onRedo={redo}
-                canUndo={canUndo}
-                canRedo={canRedo}
+                onUndo={isStepByStepActive ? stepHistory.undo : undo}
+                onRedo={isStepByStepActive ? stepHistory.redo : redo}
+                canUndo={isStepByStepActive ? stepHistory.canUndo : canUndo}
+                canRedo={isStepByStepActive ? stepHistory.canRedo : canRedo}
                 elements={state.elements}
                 scale={canvasScale}
                 onScaleChange={setCanvasScale}
@@ -730,6 +755,9 @@ export default function MemoryModelEditor({
                 onClearCanvas={clearCanvas}
                 onRestoreCanvas={restoreCanvas}
                 currentCanvasState={currentCanvasState}
+                onStepHistoryRecord={stepHistory.recordState}
+                onStepHistoryClear={stepHistory.clearHistory}
+                stepHistoryRestoreState={stepHistoryRestoreState}
                 masterErrorList={masterErrorList}
                 elements={state.elements}
                 setElements={state.setElements}

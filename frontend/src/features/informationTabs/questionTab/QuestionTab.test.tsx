@@ -51,6 +51,16 @@ describe("QuestionTab component", () => {
     jest.clearAllMocks();
   });
 
+  it("provides Exit demo rather than navigation to other questions during the tour", async () => {
+    window.history.replaceState({}, "", "/?tutorial=1");
+    try {
+      render(<QuestionTab {...baseProps} />);
+      await screen.findByText(/draw the memory model/i);
+      expect(screen.getByRole("button", { name: "← Exit demo" })).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "← Back" })).not.toBeInTheDocument();
+    } finally { window.history.replaceState({}, "", "/"); }
+  });
+
   it("shows the auto advance checkbox and moves to the next line after a successful line check", async () => {
     const onSubmitAtLine = jest.fn().mockResolvedValue(true);
     const user = userEvent;

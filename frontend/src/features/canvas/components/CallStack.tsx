@@ -367,7 +367,7 @@ const CallStack: React.FC<CallStackProps> = ({
   const horizontalPadding = maxBoxWidth;
 
   return (
-    <g className={styles.callStackRoot} onWheel={handleWheel}>
+    <g data-tour="call-stack" className={styles.callStackRoot} onWheel={handleWheel}>
       {/* Outer container */}
       <rect
         className={styles.containerBackground}

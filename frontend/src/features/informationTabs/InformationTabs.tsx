@@ -146,7 +146,7 @@ export default function InformationTabs({
               aria-orientation="horizontal"
             />
             <div
-              className={styles.feedbackPanel}
+              data-tour="feedback" className={styles.feedbackPanel}
               style={{ height: `${100 - topHeight}%` }}
             >
               <FeedbackTab

@@ -1,3 +1,5 @@
+import { isTutorial, exitTutorial } from "../../tutorial/tutorialStorage";
+import { workspaceStorage } from "../../tutorial/tutorialStorage";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import {
@@ -83,7 +85,7 @@ interface QuestionTabProps {
 
 function loadQuestionStatus(): QuestionStatusMap {
   try {
-    const rawData = localStorage.getItem(QUESTION_STATUS_KEY);
+    const rawData = workspaceStorage.getItem(QUESTION_STATUS_KEY);
     if (!rawData) return {};
     return JSON.parse(rawData) ?? {};
   } catch {
@@ -93,7 +95,7 @@ function loadQuestionStatus(): QuestionStatusMap {
 
 function persistQuestionStatus(statusMap: QuestionStatusMap): void {
   try {
-    localStorage.setItem(QUESTION_STATUS_KEY, JSON.stringify(statusMap));
+    workspaceStorage.setItem(QUESTION_STATUS_KEY, JSON.stringify(statusMap));
   } catch (error) {
     console.warn("Failed to persist question status:", error);
   }
@@ -744,7 +746,7 @@ export default function QuestionTab({
             <button
               type="button"
               onClick={
-                view === "list"
+                isTutorial() ? exitTutorial : view === "list"
                   ? () => { setQuestionIndex(null); setView("root"); }
                   : view === "stepbystep"
                   ? navigateStepByStepToRoot
@@ -752,7 +754,7 @@ export default function QuestionTab({
               }
               className={styles.backBtn}
             >
-              ← Back
+              {isTutorial() ? "← Exit demo" : "← Back"}
             </button>
           )}
           <div className={styles.titleStack}>
@@ -765,6 +767,7 @@ export default function QuestionTab({
 
         {view === "root" && (
           <div className={styles.selectors}>
+
             <QuestionSelector
               variant="category"
               text="Practice Questions"
@@ -975,6 +978,7 @@ export default function QuestionTab({
                     type="button"
                     className={styles.submitButton}
                     onClick={handleSubmit}
+                    data-tour="submit"
                     aria-label="Submit Canvas"
                     title="Submit Canvas"
                   >

@@ -15,7 +15,7 @@ const steps = [
   { title: "Connect a to the object with value 5", body: "Click the __main__ frame in the call stack. Choose Add Variable, enter a, then click its ID selector and choose the object containing 5.", target: '[data-canvas-kind="function"]' },
   { title: "Build b = 4", body: "Drag another int onto the canvas and change its value to 4. In __main__, add variable b and select the ID of the object containing 4. Keep the object containing 5 for a.", target: "" },
   { title: "Build c = 6", body: "Add an integer object containing 6. Add c to __main__ and reference that object’s ID. Keep a pointing to 5 and b pointing to 4.", target: "" },
-  { title: "Submit and read the feedback", body: "Click the normal Submit button on the right. Read the Feedback panel below it and repair anything it flags. You can also check individual code lines using their highlighted line numbers.", target: '[data-tour="submit"]' },
+  { title: "Submit and read the feedback", body: "Click Submit to check your model. If you followed the previous steps, your model should pass. We’ll look at the result in the Feedback panel next.", target: '[data-tour="submit"]' },
   { title: "You’ve built your first model", body: "You added objects, edited values, connected references, and checked your answer. Finish closes the guide and leaves you here to explore. Resume guide and Help remain in the bottom-right corner; Exit tutorial returns to your regular workspace.", target: "" },
 ];
 
@@ -29,12 +29,12 @@ export function nextAction(elements: CanvasElement[], correct: boolean) {
   return correct ? 7 : 6;
 }
 
-export default function Tutorial({ elements, correct, demoActive = isTutorial() }: { elements: CanvasElement[]; correct: boolean; demoActive?: boolean }) {
+export default function Tutorial({ elements, correct, submissionFailed = false, demoActive = isTutorial() }: { elements: CanvasElement[]; correct: boolean; submissionFailed?: boolean; demoActive?: boolean }) {
   const active = demoActive;
   const action = nextAction(elements, correct);
-  const [step, setStep] = useState(() => active && workspaceStorage.getItem("started") === "true" ? action : 0);
+  const [step, setStep] = useState(() => active && workspaceStorage.getItem("started") === "true" ? Math.min(action, 6) : 0);
   const [guidance, setGuidance] = useState(() => active && workspaceStorage.getItem("guidance") !== "hidden");
-  const [help, setHelp] = useState(false);
+  const [help, setHelp] = useState(() => !isTutorial());
   const [interacting, setInteracting] = useState(false);
   const [draggingBox, setDraggingBox] = useState(false);
   const [rect, setRect] = useState<{left: number; top: number; width: number; height: number} | null>(null);
@@ -43,10 +43,20 @@ export default function Tutorial({ elements, correct, demoActive = isTutorial() 
   const card = useRef<HTMLDivElement>(null);
   const helpCard = useRef<HTMLDivElement>(null);
   const previousAction = useRef(action);
-  const current = steps[step];
+  const showingFeedback = step === 6 && (submissionFailed || correct);
+  const current = showingFeedback
+    ? { ...steps[step], title: correct ? "Congratulations! Your model passed!" : "Check your feedback" }
+    : steps[step];
   const referenceValue = step === 4 ? 4 : step === 5 ? 6 : null;
   const referenceObject = referenceValue === null ? undefined : elements.find(e => !e.invalidated && e.kind.name === "primitive" && e.kind.type === "int" && Number(e.kind.value) === referenceValue);
-  const instruction = referenceObject
+  const hasInteger = elements.some(e => !e.invalidated && e.kind.name === "primitive" && e.kind.type === "int");
+  const instruction = showingFeedback
+    ? correct
+      ? "The Feedback panel confirms your answer is correct. Click Next to finish the tutorial."
+      : "The Feedback panel shows issues to fix. Use it to adjust your model, then click Submit again. If you added anything while exploring, the feedback will help you check it. Next unlocks when your answer passes."
+    : step === 1 && hasInteger
+    ? "You already added an integer object to the canvas. This step is complete; you do not need to drag another box. Click Next to review setting its value."
+    : referenceObject
     ? `Your integer containing ${referenceValue} is ready (ID ${referenceObject.id}). Click __main__, add ${step === 4 ? "b" : "c"}, and select that object’s ID. You do not need another integer for this assignment.`
     : current.body;
   const editing = elements.find(e => e.boxId === editingId);
@@ -57,7 +67,7 @@ export default function Tutorial({ elements, correct, demoActive = isTutorial() 
   // Hidden guidance preserves its exact lesson, even if students explore meanwhile.
   // Back remains usable until another task is completed or undone.
   useEffect(() => {
-    if (guidance && action !== previousAction.current && step !== 0) setStep(action);
+    if (guidance && action !== previousAction.current && step !== 0) setStep(Math.min(action, 6));
     previousAction.current = action;
   }, [action, step, guidance]);
   useEffect(() => {
@@ -99,7 +109,7 @@ export default function Tutorial({ elements, correct, demoActive = isTutorial() 
     const panel = helpCard.current;
     panel?.focus();
     const key = (event: KeyboardEvent) => {
-      if (event.key === "Escape") { event.preventDefault(); event.stopImmediatePropagation(); }
+      if (event.key === "Escape") { event.preventDefault(); event.stopImmediatePropagation(); setHelp(false); }
       if (event.key === "Tab" && panel) {
         const buttons = Array.from(panel.querySelectorAll<HTMLButtonElement>("button:not(:disabled)"));
         const first = buttons[0], last = buttons[buttons.length - 1];
@@ -114,13 +124,13 @@ export default function Tutorial({ elements, correct, demoActive = isTutorial() 
     if (!active || !guidance || help) return;
     let raf = 0;
     const update = () => {
-      const target = lessonTarget(step, elements);
+      const target = showingFeedback ? document.querySelector('[data-tour="feedback"]') : lessonTarget(step, elements);
       setEditingId(target?.getAttribute("data-tour") === "box-editor" ? Number(target.getAttribute("data-box-id")) : null);
       const r = target ? targetBounds(target) : undefined;
       const box = r && r.width && r.height ? {left:r.left-4, top:r.top-4, width:r.width+8, height:r.height+8} : null;
       setRect(old => JSON.stringify(old) === JSON.stringify(box) ? old : box);
       const w = card.current?.offsetWidth || 320, h = card.current?.offsetHeight || 300;
-      const obstacles = Array.from(document.querySelectorAll('[data-tour="box-editor"], [data-tour="reference-picker"], [data-canvas-box-id]')).map(targetBounds);
+      const obstacles = Array.from(document.querySelectorAll('[data-tour="box-editor"], [data-tour="reference-picker"], [data-tour="feedback"], [data-canvas-box-id]')).map(targetBounds);
       const pos = placeCard(r, w, h, window.innerWidth, window.innerHeight, obstacles);
       setPosition(old => old.left===pos.left && old.top===pos.top ? old : pos);
     };
@@ -133,7 +143,7 @@ export default function Tutorial({ elements, correct, demoActive = isTutorial() 
     window.addEventListener("resize",schedule); window.addEventListener("scroll",schedule,true);
     schedule();
     return () => { cancelAnimationFrame(raf); observer.disconnect(); resize.disconnect(); document.removeEventListener("keydown",key); window.removeEventListener("resize",schedule); window.removeEventListener("scroll",schedule,true); };
-  }, [active,guidance,help,step,elements,showGuide,draggingBox]);
+  }, [active,guidance,help,step,elements,showGuide,draggingBox,showingFeedback]);
 
   return createPortal(<>
     <div className="tutorial-dock">
@@ -146,14 +156,16 @@ export default function Tutorial({ elements, correct, demoActive = isTutorial() 
         <div className="tutorial-heading"><span>Step {step+1} of {steps.length}</span></div>
         <h2>{current.title}</h2><p>{instruction}</p>
         {context && step > 0 && step < 7 && <p className="tutorial-note" role="status">{context}</p>}
-        <div className="tutorial-actions"><button disabled={step===0} onClick={() => setStep(s=>s-1)}>Back</button><button className="tutorial-primary" disabled={step > 0 && step >= action && step < 7} onClick={() => { if (step===7) showGuide(false); else setStep(step===0 || step<action ? action : Math.min(step+1,7)); }}>{step===7 ? "Finish" : "Next"}</button></div>
+        <div className="tutorial-actions"><button disabled={step===0} onClick={() => setStep(s=>s-1)}>Back</button><button className="tutorial-primary" disabled={step > 0 && step >= action && step < 7} onClick={() => { if (step===7) showGuide(false); else setStep(Math.min(step+1,7)); }}>{step===7 ? "Finish" : "Next"}</button></div>
       </div>
     </div>}
-    {help && <div className="tutorial-help-backdrop">
+    {help && <div className="tutorial-help-backdrop" onClick={event => { if (event.target === event.currentTarget) setHelp(false); }}>
+      <div className="tutorial-help-shell">
       <div className="tutorial-help" ref={helpCard} role="dialog" aria-modal="true" aria-labelledby="memory-help-title" tabIndex={-1}>
-        <div className="tutorial-heading"><h1 id="memory-help-title">Help &amp; guide</h1></div>
+        <div className="tutorial-heading"><h1 id="memory-help-title">Help &amp; guide</h1><button aria-label="Close help" onClick={() => setHelp(false)}>×</button></div>
         <HelpContent onStart={startTutorial} />
         <button onClick={()=>setHelp(false)}>Done</button>
+      </div>
       </div>
     </div>}
   </>, document.body);

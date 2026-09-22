@@ -734,11 +734,15 @@ export default function MemoryModelEditor({
                 setQuestionView={state.setQuestionView}
                 onSubmit={isTutorial() ? async () => {
                   const checkedKey = tutorialModelKey;
+                  setTutorialCheckedModel(null);
                   const correct = await handleCanvasSubmit();
-                  setTutorialCheckedModel(correct ? checkedKey : null);
+                  setTutorialCheckedModel(checkedKey);
                   return correct;
                 } : handleCanvasSubmit}
-                onSubmitAtLine={handleCanvasSubmitAtLine}
+                onSubmitAtLine={isTutorial() ? async (line, iteration) => {
+                  setTutorialCheckedModel(null);
+                  return handleCanvasSubmitAtLine(line, iteration);
+                } : handleCanvasSubmitAtLine}
                 setSubmissionResults={state.setSubmissionResults}
                 onClearCanvas={clearCanvas}
                 onRestoreCanvas={restoreCanvas}
@@ -758,7 +762,7 @@ export default function MemoryModelEditor({
         )}
       </div>
 
-      <Tutorial demoActive={isDemoQuestion(state.selectedQuestionIndex, state.selectedQuestionType, state.questionView)} elements={state.elements} correct={tutorialCheckedModel === tutorialModelKey} />
+      <Tutorial submissionFailed={tutorialCheckedModel === tutorialModelKey && state.submissionResults?.correct === false} demoActive={isDemoQuestion(state.selectedQuestionIndex, state.selectedQuestionType, state.questionView)} elements={state.elements} correct={tutorialCheckedModel === tutorialModelKey && state.submissionResults?.correct === true} />
 
       {state.showClearCanvasModal && (
         <ConfirmationModal

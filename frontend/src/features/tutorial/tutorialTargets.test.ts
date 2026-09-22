@@ -15,7 +15,7 @@ beforeEach(()=>{document.body.innerHTML='<button aria-label="Draggable int box">
 afterEach(()=>{document.body.innerHTML='';});
 test('step two stays on palette despite unrelated editor or picker opening',()=>{
  document.body.insertAdjacentHTML('beforeend','<div data-tour="box-editor" data-box-id="0"></div><div data-tour="reference-picker"></div>');
- expect(lessonTarget(1,elements)).toBe(document.querySelector('[aria-label]'));
+ expect(lessonTarget(1,elements.slice(0,1))).toBe(document.querySelector('[aria-label]'));
 });
 test('value lesson automatically hands off from its object to its own editor',()=>{
  expect(lessonTarget(2,elements)).toBe(document.querySelector('[data-canvas-box-id="1"]'));
@@ -43,4 +43,8 @@ test('visible bounds exclude invisible drag padding',()=>{
  wrapper.querySelector('path')!.getBoundingClientRect=()=>new DOMRect(10,20,100,60);
  wrapper.querySelector('rect')!.getBoundingClientRect=()=>new DOMRect(0,0,150,100);
  expect(targetBounds(wrapper).toJSON()).toEqual(new DOMRect(10,20,100,60).toJSON());
+});
+
+test('reviewing the drag step highlights the existing integer, not the palette', () => {
+ expect(lessonTarget(1,elements)).toBe(document.querySelector('[data-canvas-box-id="1"]'));
 });

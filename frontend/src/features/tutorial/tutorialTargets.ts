@@ -4,10 +4,13 @@ import { CanvasElement } from "../shared/types";
 export function lessonTarget(step: number, elements: CanvasElement[]): Element | null {
   const palette = () => document.querySelector('[aria-label="Draggable int box"]');
   if (step === 0 || step === 7) return null;
-  if (step === 1) return palette();
   if (step === 6) return document.querySelector('[data-tour="submit"]');
   const main = elements.find(e => e.kind.name === "function" && e.kind.functionName === "__main__");
   const integers = elements.filter(e => !e.invalidated && e.kind.name === "primitive" && e.kind.type === "int");
+  if (step === 1) {
+    const existing = integers[0];
+    return existing ? document.querySelector(`[data-canvas-box-id="${existing.boxId}"]`) : palette();
+  }
   const value = step === 4 ? 4 : step === 5 ? 6 : 5;
   const valued = integers.find(e => e.kind.name === "primitive" && Number(e.kind.value) === value);
   const usedIds = new Set(main?.kind.name === "function" ? main.kind.params.map(p => p.targetId) : []);

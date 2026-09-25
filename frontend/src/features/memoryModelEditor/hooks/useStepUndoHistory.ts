@@ -38,13 +38,11 @@ const cloneState = (state: StepHistoryState): StepHistoryState => ({
     : null,
 });
 
-const statesEqual = (
-  left: StepHistoryState,
-  right: StepHistoryState,
-): boolean => JSON.stringify(left) === JSON.stringify(right);
+const statesEqual = (left: StepHistoryState, right: StepHistoryState): boolean =>
+  JSON.stringify(left) === JSON.stringify(right);
 
 export function useStepUndoHistory(
-  restoreState: (state: StepHistoryState) => void,
+  restoreState: (state: StepHistoryState) => void
 ): StepUndoHistoryReturn {
   const [history, setHistory] = useState<StepHistoryState[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -71,7 +69,7 @@ export function useStepUndoHistory(
         return updatedHistory;
       });
     },
-    [historyIndex],
+    [historyIndex]
   );
 
   const undo = useCallback(() => {

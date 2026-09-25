@@ -298,6 +298,90 @@ describe("QuestionTab component", () => {
       expect(screen.getByRole("button", { name: /check line 2/i })).toBeInTheDocument();
     });
 
+    it("restores a completed line after later canvas work", async () => {
+      const onRestoreCanvas = jest.fn();
+      const onSubmitAtLine = jest.fn().mockResolvedValue(true);
+      const { rerender } = render(
+        <QuestionTab
+          {...sbsBaseProps}
+          onSubmitAtLine={onSubmitAtLine}
+          onRestoreCanvas={onRestoreCanvas}
+          currentCanvasState={step1Canvas}
+        />
+      );
+
+      await userEvent.click(screen.getByRole("button", { name: /step-by-step questions/i }));
+      await screen.findByText(/step 1 of 2/i);
+
+      await userEvent.click(screen.getByRole("button", { name: /check line 1/i }));
+      await screen.findByText(/step 2 of 2/i);
+
+      rerender(
+        <QuestionTab
+          {...sbsBaseProps}
+          onSubmitAtLine={onSubmitAtLine}
+          onRestoreCanvas={onRestoreCanvas}
+          currentCanvasState={step2CorrectCanvas}
+        />
+      );
+
+      await userEvent.click(screen.getByTitle("Return to line 1"));
+
+      expect(onRestoreCanvas).toHaveBeenLastCalledWith(
+        step1Canvas.elements,
+        step1Canvas.ids,
+        step1Canvas.classes,
+      );
+      expect(screen.getByText(/step 2 of 2/i)).toBeInTheDocument();
+    });
+
+    it("redos through completed line checkpoints", async () => {
+      const onRestoreCanvas = jest.fn();
+      const onSubmitAtLine = jest.fn().mockResolvedValue(true);
+      const { rerender } = render(
+        <QuestionTab
+          {...sbsBaseProps}
+          onSubmitAtLine={onSubmitAtLine}
+          onRestoreCanvas={onRestoreCanvas}
+          currentCanvasState={step1Canvas}
+        />
+      );
+
+      await userEvent.click(screen.getByRole("button", { name: /step-by-step questions/i }));
+      await screen.findByText(/step 1 of 2/i);
+      await userEvent.click(screen.getByRole("button", { name: /check line 1/i }));
+      await screen.findByText(/step 2 of 2/i);
+
+      rerender(
+        <QuestionTab
+          {...sbsBaseProps}
+          onSubmitAtLine={onSubmitAtLine}
+          onRestoreCanvas={onRestoreCanvas}
+          currentCanvasState={step2CorrectCanvas}
+        />
+      );
+      await userEvent.click(screen.getByRole("button", { name: /check line 2/i }));
+      await screen.findByText(/all steps complete!/i);
+
+      await userEvent.click(screen.getByTitle("Return to line 1"));
+      expect(screen.getByText(/step 2 of 2/i)).toBeInTheDocument();
+      expect(onRestoreCanvas).toHaveBeenLastCalledWith(
+        step1Canvas.elements,
+        step1Canvas.ids,
+        step1Canvas.classes,
+      );
+
+      await userEvent.click(screen.getByTitle("Return to line 2"));
+      await screen.findByText(/all steps complete!/i);
+      expect(onRestoreCanvas).toHaveBeenLastCalledWith(
+        step2CorrectCanvas.elements,
+        step2CorrectCanvas.ids,
+        step2CorrectCanvas.classes,
+      );
+
+      expect(screen.getByText(/all steps complete!/i)).toBeInTheDocument();
+    });
+
     it("stays on the same step when the check is incorrect", async () => {
       const onSubmitAtLine = jest.fn().mockResolvedValue(false);
       render(<QuestionTab {...sbsBaseProps} onSubmitAtLine={onSubmitAtLine} />);

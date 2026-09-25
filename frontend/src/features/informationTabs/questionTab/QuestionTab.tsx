@@ -135,6 +135,13 @@ export interface StepAssignments {
   idToType: Record<number, string>;       // 1 → "int"
 }
 
+interface StepCheckpoint {
+  elements: any[];
+  ids: number[];
+  classes: string[];
+  committedAssignments: StepAssignments | null;
+}
+
 export function extractStepAssignments(elements: any[]): StepAssignments {
   const variableToId: Record<string, number> = {};
   const idToType: Record<number, string> = {};
@@ -233,6 +240,7 @@ export default function QuestionTab({
 
   const hydratedList = useRef<boolean>(false);
   const hydratedQuestion = useRef<boolean>(false);
+  const stepCheckpointsRef = useRef<Map<number, StepCheckpoint>>(new Map());
   const previousQuestionRef = useRef<{
     type: "test" | "practice" | "prep" | "experiment";
     index: number;
@@ -645,6 +653,7 @@ export default function QuestionTab({
 
   const loadStepByStepQuestion = async (): Promise<void> => {
     onClearCanvas();
+    stepCheckpointsRef.current.clear();
     setStepByStepIndex(0);
     setCommittedAssignments(null);
     setStepConsistencyError(null);
@@ -665,6 +674,12 @@ export default function QuestionTab({
         const resolvedCanvas = normalizeQuestionCanvasData(
           resolveQuestionCanvasData("practice", 1, data.canvasConfig ?? null)
         );
+        stepCheckpointsRef.current.set(0, {
+          elements: JSON.parse(JSON.stringify(resolvedCanvas.elements)),
+          ids: [...resolvedCanvas.ids],
+          classes: [...resolvedCanvas.classes],
+          committedAssignments: null,
+        });
         onRestoreCanvas(resolvedCanvas.elements, resolvedCanvas.ids, resolvedCanvas.classes);
       }, 0);
     } catch (error) {
@@ -675,6 +690,7 @@ export default function QuestionTab({
 
   const navigateStepByStepToRoot = (): void => {
     deleteQuestionCanvasData("practice", 1);
+    stepCheckpointsRef.current.clear();
     setStepByStepIndex(0);
     setCommittedAssignments(null);
     setStepConsistencyError(null);
@@ -709,17 +725,41 @@ export default function QuestionTab({
     const success = await handleSubmitAtLine(currentStep.lineNumber, currentStep.iterationNumber);
     if (success) {
       // Merge the new assignments into the committed state
-      setCommittedAssignments((prev) => ({
-        variableToId: { ...prev?.variableToId, ...currentAssignments.variableToId },
-        idToType: { ...prev?.idToType, ...currentAssignments.idToType },
-      }));
+      const nextCommittedAssignments = {
+        variableToId: { ...committedAssignments?.variableToId, ...currentAssignments.variableToId },
+        idToType: { ...committedAssignments?.idToType, ...currentAssignments.idToType },
+      };
+      stepCheckpointsRef.current.set(stepByStepIndex + 1, {
+        elements: JSON.parse(JSON.stringify(snapshotElements)),
+        ids: [...currentCanvasState.ids],
+        classes: [...currentCanvasState.classes],
+        committedAssignments: nextCommittedAssignments,
+      });
+      setCommittedAssignments(nextCommittedAssignments);
       setStepByStepIndex((prev) => prev + 1);
     }
+  };
+
+  const restoreStepCheckpoint = (checkpointStepIndex: number): boolean => {
+    const checkpoint = stepCheckpointsRef.current.get(checkpointStepIndex);
+    if (!checkpoint) return false;
+
+    onRestoreCanvas(
+      checkpoint.elements,
+      checkpoint.ids,
+      checkpoint.classes,
+    );
+    setCommittedAssignments(checkpoint.committedAssignments);
+    setStepByStepIndex(checkpointStepIndex);
+    setStepConsistencyError(null);
+    setSubmissionResults(null);
+    return true;
   };
 
   const handleStepByStepReset = async (): Promise<void> => {
     try {
       const data = await fetchQuestion<QuestionData>(1, "practice");
+      stepCheckpointsRef.current.clear();
       setQuestionData(data);
       if (onQuestionDataChange) onQuestionDataChange(data);
       setStepByStepIndex(0);
@@ -730,6 +770,12 @@ export default function QuestionTab({
       const resolvedCanvas = normalizeQuestionCanvasData(
         resolveQuestionCanvasData("practice", 1, data.canvasConfig ?? null)
       );
+      stepCheckpointsRef.current.set(0, {
+        elements: JSON.parse(JSON.stringify(resolvedCanvas.elements)),
+        ids: [...resolvedCanvas.ids],
+        classes: [...resolvedCanvas.classes],
+        committedAssignments: null,
+      });
       onRestoreCanvas(resolvedCanvas.elements, resolvedCanvas.ids, resolvedCanvas.classes);
     } catch (error) {
       console.error("Failed to reset step-by-step question:", error);
@@ -990,6 +1036,10 @@ export default function QuestionTab({
           const allDone = stepByStepIndex >= steps.length;
           const currentStep = !allDone ? steps[stepByStepIndex] : null;
           const currentLine = currentStep?.lineNumber ?? null;
+          const highestCheckpointStep = Math.max(
+            ...Array.from(stepCheckpointsRef.current.keys()),
+            0,
+          );
 
           return (
             <div className={styles.questionArea} style={{ '--font-scale': fontScale } as React.CSSProperties}>
@@ -1041,7 +1091,21 @@ export default function QuestionTab({
               <CodeBlock
                 code={questionData.code.join("\n")}
                 language="python"
+                checkableLines={new Set(
+                  steps
+                    .slice(0, highestCheckpointStep)
+                    .map((step) => step.lineNumber),
+                )}
                 selectedLine={currentLine !== null ? currentLine : undefined}
+                onLineClick={(lineNumber) => {
+                  const lineStepIndex = steps
+                    .map((step) => step.lineNumber)
+                    .lastIndexOf(lineNumber);
+                  if (lineStepIndex < 0) return;
+
+                  restoreStepCheckpoint(lineStepIndex + 1);
+                }}
+                lineTitle={(lineNumber) => `Return to line ${lineNumber}`}
               />
 
               {stepConsistencyError && (

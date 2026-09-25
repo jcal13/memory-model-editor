@@ -61,14 +61,17 @@ export default function CodeBlock({
                 }
                 title={
                   isCheckable
-                    ? lineTitle?.(lineNumber) ?? `Check answer at line ${lineNumber}`
+                    ? lineTitle?.(lineNumber) ??
+                      `Check answer at line ${lineNumber}`
                     : undefined
                 }
                 {...restLineProps}
               >
                 {showLineNumbers && (
                   <span
-                    className={`${styles.gutter} ${isCheckable ? styles.checkableGutter : ""}`}
+                    className={`${styles.gutter} ${
+                      isCheckable ? styles.checkableGutter : ""
+                    }`}
                     aria-hidden="true"
                   >
                     {lineNumber}

@@ -5,7 +5,6 @@ import FeedbackTab from "./feedbackTab/FeedbackTab";
 import QuestionTab from "./questionTab/QuestionTab";
 import { useResizable } from "../palette/hooks/useResizable";
 import styles from "./InformationTabs.module.css";
-import type { StepHistoryState } from "../memoryModelEditor/hooks/useStepUndoHistory";
 
 interface InformationTabsProps {
   submissionResults: SubmissionResult | null;
@@ -22,9 +21,6 @@ interface InformationTabsProps {
   onClearCanvas: () => void;
   onRestoreCanvas: (elements: any[], ids: number[], classes: string[]) => void;
   currentCanvasState: { elements: any[]; ids: number[]; classes: string[] };
-  onStepHistoryRecord?: (state: StepHistoryState) => void;
-  onStepHistoryClear?: (state: StepHistoryState) => void;
-  stepHistoryRestoreState?: StepHistoryState | null;
   masterErrorList: MasterErrorList;
   elements: CanvasElement[];
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
@@ -51,9 +47,6 @@ export default function InformationTabs({
   onClearCanvas,
   onRestoreCanvas,
   currentCanvasState,
-  onStepHistoryRecord = () => undefined,
-  onStepHistoryClear = () => undefined,
-  stepHistoryRestoreState = null,
   masterErrorList,
   elements,
   setElements,
@@ -138,9 +131,6 @@ export default function InformationTabs({
             onClearCanvas={onClearCanvas}
             onRestoreCanvas={onRestoreCanvas}
             currentCanvasState={currentCanvasState}
-            onStepHistoryRecord={onStepHistoryRecord}
-            onStepHistoryClear={onStepHistoryClear}
-            stepHistoryRestoreState={stepHistoryRestoreState}
             onQuestionDataChange={onQuestionDataChange}
             isSandboxMode={isSandboxMode}
             fontScale={fontScale}

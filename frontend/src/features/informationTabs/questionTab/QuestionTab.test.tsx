@@ -310,54 +310,6 @@ describe("QuestionTab component", () => {
       expect(screen.getByText(/step 1 of 2/i)).toBeInTheDocument();
     });
 
-    it("records only successful step transitions", async () => {
-      const onStepHistoryRecord = jest.fn();
-      const onStepHistoryClear = jest.fn();
-      const onSubmitAtLine = jest.fn().mockResolvedValue(true);
-
-      render(
-        <QuestionTab
-          {...sbsBaseProps}
-          onSubmitAtLine={onSubmitAtLine}
-          onStepHistoryRecord={onStepHistoryRecord}
-          onStepHistoryClear={onStepHistoryClear}
-          currentCanvasState={step1Canvas}
-        />
-      );
-
-      await userEvent.click(screen.getByRole("button", { name: /step-by-step questions/i }));
-      await screen.findByText(/step 1 of 2/i);
-      await userEvent.click(screen.getByRole("button", { name: /check line 1/i }));
-
-      expect(onStepHistoryClear).toHaveBeenCalledWith(
-        expect.objectContaining({ stepByStepIndex: 0, committedAssignments: null })
-      );
-      await waitFor(() =>
-        expect(onStepHistoryRecord).toHaveBeenCalledWith(
-          expect.objectContaining({ stepByStepIndex: 1 })
-        )
-      );
-    });
-
-    it("does not record a failed step transition", async () => {
-      const onStepHistoryRecord = jest.fn();
-      const onSubmitAtLine = jest.fn().mockResolvedValue(false);
-
-      render(
-        <QuestionTab
-          {...sbsBaseProps}
-          onSubmitAtLine={onSubmitAtLine}
-          onStepHistoryRecord={onStepHistoryRecord}
-        />
-      );
-
-      await userEvent.click(screen.getByRole("button", { name: /step-by-step questions/i }));
-      await screen.findByText(/step 1 of 2/i);
-      await userEvent.click(screen.getByRole("button", { name: /check line 1/i }));
-
-      expect(onStepHistoryRecord).not.toHaveBeenCalled();
-    });
-
     it("shows a consistency error and skips the backend when variable→id mapping changes", async () => {
       const { onSubmitAtLine, rerender } = await enterStepByStep(step1Canvas);
 

@@ -45,10 +45,23 @@ export function placeCard(target: DOMRect | undefined, width: number, height: nu
   const clamp = (x: number, y: number) => ({left: Math.max(12, Math.min(x, vw-width-12)), top: Math.max(12, Math.min(y, vh-height-64))});
   if (!target) return clamp((vw-width)/2, (vh-height)/2);
   const r = target;
-  const candidates = [clamp(r.right+18,r.top),clamp(r.left-width-18,r.top),clamp(r.left,r.bottom+18),clamp(r.left,r.top-height-18),...obstacles.flatMap(o => [clamp(o.right+18,r.top), clamp(r.right+18,o.bottom+18), clamp(r.left,o.bottom+18)]),clamp(12,12),clamp(vw-width-12,12)];
+  const slide = (value: number, min: number, max: number) => Math.max(min, Math.min(value, max));
+  const ys = [r.top, r.bottom-height, (r.top+r.bottom-height)/2,
+    ...obstacles.flatMap(o => [o.top-height-18, o.bottom+18])]
+    .map(y => slide(y, r.top-height+Math.min(40,height,r.height), r.bottom-Math.min(40,height,r.height)));
+  const xs = [r.left, r.right-width, (r.left+r.right-width)/2,
+    ...obstacles.flatMap(o => [o.left-width-18, o.right+18])]
+    .map(x => slide(x, r.left-width+Math.min(40,width,r.width), r.right-Math.min(40,width,r.width)));
+  const candidates = [
+    ...ys.flatMap(y => [clamp(r.right+18,y), clamp(r.left-width-18,y)]),
+    ...xs.flatMap(x => [clamp(x,r.bottom+18), clamp(x,r.top-height-18)]),
+  ];
   const overlap = (p: {left:number;top:number}, o: DOMRect) => Math.max(0,Math.min(p.left+width,o.right+8)-Math.max(p.left,o.left-8))*Math.max(0,Math.min(p.top+height,o.bottom+8)-Math.max(p.top,o.top-8));
+  const score = (p: {left:number;top:number}) => obstacles.reduce((n,o)=>n+overlap(p,o),0)
+    + Math.hypot(p.left+width/2-(r.left+r.right)/2, p.top+height/2-(r.top+r.bottom)/2)*20;
   return candidates.reduce((best,p) => {
-    const score = (v: typeof p) => overlap(v,r)*100 + obstacles.reduce((n,o)=>n+overlap(v,o),0) + Math.hypot(v.left-r.right, v.top-r.top)*0.01;
+    const targetOverlap = overlap(p,r), bestOverlap = overlap(best,r);
+    if (targetOverlap !== bestOverlap) return targetOverlap < bestOverlap ? p : best;
     return score(p)<score(best) ? p : best;
   });
 }

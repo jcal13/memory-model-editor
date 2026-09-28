@@ -139,6 +139,7 @@ export default function Tutorial({ elements, correct, submissionFailed = false, 
     const observer = new MutationObserver(schedule);
     observer.observe(document.body,{childList:true,subtree:true,attributes:true});
     const resize = new ResizeObserver(schedule); resize.observe(document.body);
+    if (card.current) resize.observe(card.current);
     document.addEventListener("keydown",key);
     window.addEventListener("resize",schedule); window.addEventListener("scroll",schedule,true);
     schedule();

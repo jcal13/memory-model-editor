@@ -48,3 +48,22 @@ test('visible bounds exclude invisible drag padding',()=>{
 test('reviewing the drag step highlights the existing integer, not the palette', () => {
  expect(lessonTarget(1,elements)).toBe(document.querySelector('[data-canvas-box-id="1"]'));
 });
+
+ test('a crowded canvas keeps the guide beside its target instead of in a screen corner', () => {
+  const target = new DOMRect(700, 400, 150, 100);
+  const obstacles = [new DOMRect(860,390,200,180), new DOMRect(360,390,320,180),
+    new DOMRect(690,510,180,180), new DOMRect(690,130,180,250)];
+  const p = placeCard(target,320,250,1200,800,obstacles);
+  const dx = Math.max(target.left-p.left-320,p.left-target.right,0);
+  const dy = Math.max(target.top-p.top-250,p.top-target.bottom,0);
+  expect(Math.hypot(dx,dy)).toBeLessThanOrEqual(18);
+ });
+ test.each([[1024,768],[1280,720],[1920,1080]])('guide stays visible beside an edge target at %i by %i', (vw,vh) => {
+  const target = new DOMRect(vw-210,vh-200,180,100);
+  const p = placeCard(target,320,300,vw,vh,[]);
+  expect(p.left).toBeGreaterThanOrEqual(12);
+  expect(p.top).toBeGreaterThanOrEqual(12);
+  expect(p.left+320).toBeLessThanOrEqual(vw-12);
+  expect(p.top+300).toBeLessThanOrEqual(vh-64);
+  expect(p.left+320 <= target.left || p.top+300 <= target.top).toBe(true);
+ });

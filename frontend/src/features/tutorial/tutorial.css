@@ -11,7 +11,7 @@
 .tutorial-layer { position: fixed; inset: 0; z-index: 100000; pointer-events: none; }
 .tutorial-spotlight { position: fixed; border-radius: 10px; box-shadow: 0 0 0 2px #93c5fd, 0 0 0 9999px rgb(15 23 42 / .42); transition: left .2s, top .2s, width .2s, height .2s; }
 .tutorial-dim { position: absolute; inset: 0; background: rgb(15 23 42 / .42); }
-.tutorial-card { text-align: left; pointer-events: auto; position: fixed; width: 320px; max-width: calc(100vw - 24px); max-height: calc(100dvh - 24px); overflow: auto; box-sizing: border-box; background: white; color: #334155; border: 1px solid #cbd5e1; border-radius: 16px; padding: 20px; box-shadow: 0 16px 48px #0f172a33; }
+.tutorial-card { text-align: left; pointer-events: auto; position: fixed; width: 320px; max-width: calc(100vw - 24px); max-height: calc(100dvh - 76px); overflow: auto; box-sizing: border-box; background: white; color: #334155; border: 1px solid #cbd5e1; border-radius: 16px; padding: 20px; box-shadow: 0 16px 48px #0f172a33; }
 @media (prefers-reduced-motion: reduce) { .tutorial-spotlight { transition: none; } }
 
 
@@ -62,3 +62,5 @@
 .tutorial-help>button:last-child { display: block; margin: 12px auto 0; padding: 9px 30px; }
 .tutorial-spotlight { box-shadow: 0 0 0 2px #93b5e4, 0 0 0 9999px rgb(15 23 42 / .18); }
 @media (max-width: 540px) { .tutorial-help { padding: 20px; } .help-code { display: block; } .help-code span { display: block; margin-top: 6px; } .tutorial-help .tutorial-heading { top: -20px; } }
+.tutorial-help-shell { width: 740px; max-width: 100%; min-width: 0; border-radius: 16px; overflow: hidden; background: white; box-shadow: 0 16px 48px #0f172a33; }
+.tutorial-help-shell .tutorial-help { width: 100%; box-shadow: none; }

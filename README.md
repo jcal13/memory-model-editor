@@ -213,3 +213,21 @@ if (result.correct) {
 ```
 
 3. **Feedback**: The `result.errors` array provides specific reasons for failure, which can be piped directly into the MarkUs feedback file.
+
+## Guided Tutorial
+
+MemoryLab includes a guided tutorial to help new users become familiar with the Practice Mode interface and basic memory model construction.
+
+To start the tutorial, click the **?** button in the bottom-right corner and open **Help & Guide**, then select **New to Memory Lab? Take the guided tour**.
+
+The tutorial uses **Practice Question 1** and walks users through the main interactions in MemoryLab, including:
+
+- Adding objects to the canvas
+- Creating and editing variables
+- Connecting references between objects
+- Using line-by-line checking
+- Submitting an answer and viewing feedback
+
+Relevant interface elements are highlighted as the user progresses through each step. The guide can also be hidden and resumed without losing progress.
+
+Tutorial mode runs separately from the regular workspace, so completing or modifying the tutorial does not affect the user's existing MemoryLab work.

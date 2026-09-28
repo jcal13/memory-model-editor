@@ -57,7 +57,7 @@ const IdSelectorPanel: React.FC<Props> = ({
     setShowDup(false);
   };
   return (
-    <div
+    <div data-tour="reference-picker"
       className={`${boxStyles.boxEditorModule} ${panelStyles.panelShell} ${panelStyles.activeOutline}`}
     >
       <div className={`drag-handle ${panelStyles.header}`}>

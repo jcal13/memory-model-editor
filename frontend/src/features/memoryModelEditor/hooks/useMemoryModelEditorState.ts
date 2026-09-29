@@ -13,13 +13,25 @@ import {
 } from "../utils/localStorage";
 import type { QuestionView } from "../utils/localStorage";
 
+import { readQuestionLink } from "../../informationTabs/questionTab/utils/questionLinks";
+
 // Layout constants
 const DEFAULT_INFO_PANEL_WIDTH = 500;
 
 export function useMemoryModelEditorState(sandbox: boolean) {
   // Load initial data
-  const initialCanvasData = loadInitialCanvasData();
-  const initialUIData = loadInitialUIData();
+  const [linkedQuestion, setLinkedQuestion] = useState(() => readQuestionLink(window.location.search));
+  const initialCanvasData = linkedQuestion === null ? loadInitialCanvasData() : { elements: [], ids: [], classes: [] };
+  const initialUIData = { ...loadInitialUIData() };
+  if (linkedQuestion !== null) {
+    initialUIData.questionIndex = linkedQuestion.id;
+    initialUIData.questionType = linkedQuestion.type;
+    initialUIData.questionView = "question";
+    initialUIData.activeTab = "question";
+    initialUIData.isInfoPanelOpen = true;
+    initialUIData.sandboxMode = false;
+    initialUIData.submissionResults = null;
+  }
 
   // Canvas state
   const [canvasResetKey, setCanvasResetKey] = useState(0);
@@ -94,6 +106,8 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     useState<boolean>(false);
 
   return {
+    linkedQuestion,
+    setLinkedQuestion,
     // Canvas state
     canvasResetKey,
     setCanvasResetKey,

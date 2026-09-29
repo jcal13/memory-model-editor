@@ -305,10 +305,13 @@ export default function QuestionTab({
   // Reflect the visible question without reloading or resetting its canvas.
   useEffect(() => {
     if (view === "loading" || (view === "question" && !questionData)) return;
-    const question = view === "question" && questionType && questionIndex !== null
-      ? { type: questionType, id: questionIndex } : null;
+    const question =
+      view === "question" && questionType && questionIndex !== null
+        ? { type: questionType, id: questionIndex }
+        : null;
     const url = questionUrl(window.location.href, question);
-    if (url !== window.location.href) window.history.replaceState(window.history.state, "", url);
+    if (url !== window.location.href)
+      window.history.replaceState(window.history.state, "", url);
   }, [view, questionType, questionIndex, questionData]);
 
   useEffect(() => {
@@ -622,7 +625,7 @@ export default function QuestionTab({
 
           const resolvedCanvas = normalizeQuestionCanvasData(
             linkedQuestion?.id === questionIndex &&
-                linkedQuestion?.type === questionType
+              linkedQuestion?.type === questionType
               ? data.canvasConfig
               : resolveQuestionCanvasData(
                   questionType,
@@ -635,11 +638,20 @@ export default function QuestionTab({
             resolvedCanvas.ids,
             resolvedCanvas.classes,
           );
-          if (linkedQuestion?.id === questionIndex && linkedQuestion?.type === questionType) onQuestionLinkConsumed?.();
+          if (
+            linkedQuestion?.id === questionIndex &&
+            linkedQuestion?.type === questionType
+          )
+            onQuestionLinkConsumed?.();
         } catch (error) {
           console.error("Failed to hydrate question:", error);
-          if (linkedQuestion?.id === questionIndex && linkedQuestion?.type === questionType) {
-            setLinkError("This question could not be loaded. Choose a question below or try the link again.");
+          if (
+            linkedQuestion?.id === questionIndex &&
+            linkedQuestion?.type === questionType
+          ) {
+            setLinkError(
+              "This question could not be loaded. Choose a question below or try the link again.",
+            );
             setQuestionIndex(null);
             onQuestionLinkConsumed?.();
           }

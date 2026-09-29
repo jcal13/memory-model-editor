@@ -55,12 +55,7 @@ describe("QuestionTab component", () => {
     const onSubmitAtLine = jest.fn().mockResolvedValue(true);
     const user = userEvent;
 
-    render(
-      <QuestionTab
-        {...baseProps}
-        onSubmitAtLine={onSubmitAtLine}
-      />
-    );
+    render(<QuestionTab {...baseProps} onSubmitAtLine={onSubmitAtLine} />);
 
     await screen.findByText(/draw the memory model/i);
     await waitFor(() => expect(mockedFetchQuestion).toHaveBeenCalledTimes(1));
@@ -87,8 +82,8 @@ describe("QuestionTab component", () => {
       expect(
         screen.getByRole("button", {
           name: /check answer at line 2/i,
-        })
-      ).toBeInTheDocument()
+        }),
+      ).toBeInTheDocument(),
     );
   });
 
@@ -105,28 +100,29 @@ describe("QuestionTab component", () => {
     };
     mockedFetchQuestion.mockResolvedValueOnce(questionWithIteration);
 
-    render(
-      <QuestionTab
-        {...baseProps}
-        onSubmitAtLine={onSubmitAtLine}
-      />
-    );
+    render(<QuestionTab {...baseProps} onSubmitAtLine={onSubmitAtLine} />);
 
     await screen.findByText(/draw the memory model/i);
     await waitFor(() => expect(mockedFetchQuestion).toHaveBeenCalledTimes(1));
 
-    await user.click(screen.getByRole("switch", {
-      name: /auto advance to next checkable line/i,
-    }));
+    await user.click(
+      screen.getByRole("switch", {
+        name: /auto advance to next checkable line/i,
+      }),
+    );
 
     await user.click(screen.getByTitle("Check answer at line 1"));
-    await user.click(await screen.findByRole("button", { name: /check answer at line 1/i }));
+    await user.click(
+      await screen.findByRole("button", { name: /check answer at line 1/i }),
+    );
 
-    await waitFor(() => expect(onSubmitAtLine).toHaveBeenCalledWith(1, undefined));
+    await waitFor(() =>
+      expect(onSubmitAtLine).toHaveBeenCalledWith(1, undefined),
+    );
     expect(
       screen.getByRole("button", {
         name: /check answer at line 2/i,
-      })
+      }),
     ).toBeInTheDocument();
   });
 
@@ -150,7 +146,9 @@ describe("QuestionTab component", () => {
     await waitFor(() => expect(mockedFetchQuestion).toHaveBeenCalledTimes(1));
 
     await user.click(
-      screen.getByRole("switch", { name: /auto advance to next checkable line/i })
+      screen.getByRole("switch", {
+        name: /auto advance to next checkable line/i,
+      }),
     );
 
     // Select line 3 then pick iteration 1
@@ -158,12 +156,16 @@ describe("QuestionTab component", () => {
     await user.click(await screen.findByRole("button", { name: "1" }));
 
     // Submit the check at line 3, iter 1
-    await user.click(await screen.findByRole("button", { name: /check answer at line 3/i }));
+    await user.click(
+      await screen.findByRole("button", { name: /check answer at line 3/i }),
+    );
     expect(onSubmitAtLine).toHaveBeenCalledWith(3, 1);
 
     // Auto-advance should jump back to line 2 with iteration 2 already selected
     await waitFor(() => {
-      const btn = screen.getByRole("button", { name: /check answer at line 2/i });
+      const btn = screen.getByRole("button", {
+        name: /check answer at line 2/i,
+      });
       expect(btn).toBeInTheDocument();
       expect(btn).toHaveTextContent("iter 2");
     });
@@ -179,16 +181,22 @@ describe("QuestionTab component", () => {
     await waitFor(() => expect(mockedFetchQuestion).toHaveBeenCalledTimes(1));
 
     await user.click(
-      screen.getByRole("switch", { name: /auto advance to next checkable line/i })
+      screen.getByRole("switch", {
+        name: /auto advance to next checkable line/i,
+      }),
     );
 
     await user.click(screen.getByTitle("Check answer at line 1"));
-    await user.click(await screen.findByRole("button", { name: /check answer at line 1/i }));
+    await user.click(
+      await screen.findByRole("button", { name: /check answer at line 1/i }),
+    );
 
-    await waitFor(() => expect(onSubmitAtLine).toHaveBeenCalledWith(1, undefined));
+    await waitFor(() =>
+      expect(onSubmitAtLine).toHaveBeenCalledWith(1, undefined),
+    );
     // Line 1 should still be selected (no advance)
     expect(
-      screen.getByRole("button", { name: /check answer at line 1/i })
+      screen.getByRole("button", { name: /check answer at line 1/i }),
     ).toBeInTheDocument();
   });
 
@@ -213,57 +221,143 @@ describe("QuestionTab component", () => {
     const step1Canvas = {
       elements: [
         {
-          boxId: 0, id: "_", x: 0, y: 0,
-          kind: { name: "function", type: "function", value: null, functionName: "__main__", params: [{ name: "a", targetId: 1 }] },
+          boxId: 0,
+          id: "_",
+          x: 0,
+          y: 0,
+          kind: {
+            name: "function",
+            type: "function",
+            value: null,
+            functionName: "__main__",
+            params: [{ name: "a", targetId: 1 }],
+          },
         },
-        { boxId: 1, id: 1, x: 100, y: 0, kind: { name: "primitive", type: "int", value: "5" } },
+        {
+          boxId: 1,
+          id: 1,
+          x: 100,
+          y: 0,
+          kind: { name: "primitive", type: "int", value: "5" },
+        },
       ],
-      ids: [1], classes: [],
+      ids: [1],
+      classes: [],
     };
 
     // a now maps to id 2 instead of id 1 — violates consistency
     const step2WrongIdCanvas = {
       elements: [
         {
-          boxId: 0, id: "_", x: 0, y: 0,
-          kind: { name: "function", type: "function", value: null, functionName: "__main__", params: [{ name: "a", targetId: 2 }, { name: "b", targetId: 1 }] },
+          boxId: 0,
+          id: "_",
+          x: 0,
+          y: 0,
+          kind: {
+            name: "function",
+            type: "function",
+            value: null,
+            functionName: "__main__",
+            params: [
+              { name: "a", targetId: 2 },
+              { name: "b", targetId: 1 },
+            ],
+          },
         },
-        { boxId: 1, id: 1, x: 100, y: 0, kind: { name: "primitive", type: "int", value: "4" } },
-        { boxId: 2, id: 2, x: 200, y: 0, kind: { name: "primitive", type: "int", value: "5" } },
+        {
+          boxId: 1,
+          id: 1,
+          x: 100,
+          y: 0,
+          kind: { name: "primitive", type: "int", value: "4" },
+        },
+        {
+          boxId: 2,
+          id: 2,
+          x: 200,
+          y: 0,
+          kind: { name: "primitive", type: "int", value: "5" },
+        },
       ],
-      ids: [1, 2], classes: [],
+      ids: [1, 2],
+      classes: [],
     };
 
     // id 1 changed from int to str — violates consistency
     const step2WrongTypeCanvas = {
       elements: [
         {
-          boxId: 0, id: "_", x: 0, y: 0,
-          kind: { name: "function", type: "function", value: null, functionName: "__main__", params: [{ name: "a", targetId: 1 }] },
+          boxId: 0,
+          id: "_",
+          x: 0,
+          y: 0,
+          kind: {
+            name: "function",
+            type: "function",
+            value: null,
+            functionName: "__main__",
+            params: [{ name: "a", targetId: 1 }],
+          },
         },
-        { boxId: 1, id: 1, x: 100, y: 0, kind: { name: "primitive", type: "str", value: "hello" } },
+        {
+          boxId: 1,
+          id: 1,
+          x: 100,
+          y: 0,
+          kind: { name: "primitive", type: "str", value: "hello" },
+        },
       ],
-      ids: [1], classes: [],
+      ids: [1],
+      classes: [],
     };
 
     // Correct cumulative state for step 2: a→1 preserved, b→2 added
     const step2CorrectCanvas = {
       elements: [
         {
-          boxId: 0, id: "_", x: 0, y: 0,
-          kind: { name: "function", type: "function", value: null, functionName: "__main__", params: [{ name: "a", targetId: 1 }, { name: "b", targetId: 2 }] },
+          boxId: 0,
+          id: "_",
+          x: 0,
+          y: 0,
+          kind: {
+            name: "function",
+            type: "function",
+            value: null,
+            functionName: "__main__",
+            params: [
+              { name: "a", targetId: 1 },
+              { name: "b", targetId: 2 },
+            ],
+          },
         },
-        { boxId: 1, id: 1, x: 100, y: 0, kind: { name: "primitive", type: "int", value: "5" } },
-        { boxId: 2, id: 2, x: 200, y: 0, kind: { name: "primitive", type: "int", value: "4" } },
+        {
+          boxId: 1,
+          id: 1,
+          x: 100,
+          y: 0,
+          kind: { name: "primitive", type: "int", value: "5" },
+        },
+        {
+          boxId: 2,
+          id: 2,
+          x: 200,
+          y: 0,
+          kind: { name: "primitive", type: "int", value: "4" },
+        },
       ],
-      ids: [1, 2], classes: [],
+      ids: [1, 2],
+      classes: [],
     };
 
     // Props that start in root view (no question pre-loaded)
     const sbsBaseProps = {
       ...baseProps,
       questionView: "root" as const,
-      currentCanvasState: { elements: [] as any[], ids: [] as number[], classes: [] as string[] },
+      currentCanvasState: {
+        elements: [] as any[],
+        ids: [] as number[],
+        classes: [] as string[],
+      },
     };
 
     beforeEach(() => {
@@ -271,12 +365,20 @@ describe("QuestionTab component", () => {
     });
 
     /** Click "Step-by-Step Questions" and wait for the first step to appear. */
-    async function enterStepByStep(canvasState = sbsBaseProps.currentCanvasState) {
+    async function enterStepByStep(
+      canvasState = sbsBaseProps.currentCanvasState,
+    ) {
       const onSubmitAtLine = jest.fn().mockResolvedValue(true);
       const utils = render(
-        <QuestionTab {...sbsBaseProps} onSubmitAtLine={onSubmitAtLine} currentCanvasState={canvasState} />
+        <QuestionTab
+          {...sbsBaseProps}
+          onSubmitAtLine={onSubmitAtLine}
+          currentCanvasState={canvasState}
+        />,
       );
-      await userEvent.click(screen.getByRole("button", { name: /step-by-step questions/i }));
+      await userEvent.click(
+        screen.getByRole("button", { name: /step-by-step questions/i }),
+      );
       await screen.findByText(/step 1 of 2/i);
       return { ...utils, onSubmitAtLine };
     }
@@ -284,27 +386,133 @@ describe("QuestionTab component", () => {
     it("shows step indicator and Check button after entering step-by-step mode", async () => {
       await enterStepByStep();
       expect(screen.getByText(/step 1 of 2/i)).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /check line 1/i })).toBeInTheDocument();
-      expect(screen.getByText(/draw the memory model after executing line 1/i)).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /check line 1/i }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/draw the memory model after executing line 1/i),
+      ).toBeInTheDocument();
     });
 
     it("advances to the next step when the check is correct", async () => {
       const { onSubmitAtLine } = await enterStepByStep(step1Canvas);
 
-      await userEvent.click(screen.getByRole("button", { name: /check line 1/i }));
+      await userEvent.click(
+        screen.getByRole("button", { name: /check line 1/i }),
+      );
 
       expect(onSubmitAtLine).toHaveBeenCalledWith(1, undefined);
       await screen.findByText(/step 2 of 2/i);
-      expect(screen.getByRole("button", { name: /check line 2/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /check line 2/i }),
+      ).toBeInTheDocument();
+    });
+
+    it("restores a completed line after later canvas work", async () => {
+      const onRestoreCanvas = jest.fn();
+      const onSubmitAtLine = jest.fn().mockResolvedValue(true);
+      const { rerender } = render(
+        <QuestionTab
+          {...sbsBaseProps}
+          onSubmitAtLine={onSubmitAtLine}
+          onRestoreCanvas={onRestoreCanvas}
+          currentCanvasState={step1Canvas}
+        />,
+      );
+
+      await userEvent.click(
+        screen.getByRole("button", { name: /step-by-step questions/i }),
+      );
+      await screen.findByText(/step 1 of 2/i);
+
+      await userEvent.click(
+        screen.getByRole("button", { name: /check line 1/i }),
+      );
+      await screen.findByText(/step 2 of 2/i);
+
+      rerender(
+        <QuestionTab
+          {...sbsBaseProps}
+          onSubmitAtLine={onSubmitAtLine}
+          onRestoreCanvas={onRestoreCanvas}
+          currentCanvasState={step2CorrectCanvas}
+        />,
+      );
+
+      await userEvent.click(screen.getByTitle("Return to line 1"));
+
+      expect(onRestoreCanvas).toHaveBeenLastCalledWith(
+        step1Canvas.elements,
+        step1Canvas.ids,
+        step1Canvas.classes,
+      );
+      expect(screen.getByText(/step 2 of 2/i)).toBeInTheDocument();
+    });
+
+    it("redos through completed line checkpoints", async () => {
+      const onRestoreCanvas = jest.fn();
+      const onSubmitAtLine = jest.fn().mockResolvedValue(true);
+      const { rerender } = render(
+        <QuestionTab
+          {...sbsBaseProps}
+          onSubmitAtLine={onSubmitAtLine}
+          onRestoreCanvas={onRestoreCanvas}
+          currentCanvasState={step1Canvas}
+        />,
+      );
+
+      await userEvent.click(
+        screen.getByRole("button", { name: /step-by-step questions/i }),
+      );
+      await screen.findByText(/step 1 of 2/i);
+      await userEvent.click(
+        screen.getByRole("button", { name: /check line 1/i }),
+      );
+      await screen.findByText(/step 2 of 2/i);
+
+      rerender(
+        <QuestionTab
+          {...sbsBaseProps}
+          onSubmitAtLine={onSubmitAtLine}
+          onRestoreCanvas={onRestoreCanvas}
+          currentCanvasState={step2CorrectCanvas}
+        />,
+      );
+      await userEvent.click(
+        screen.getByRole("button", { name: /check line 2/i }),
+      );
+      await screen.findByText(/all steps complete!/i);
+
+      await userEvent.click(screen.getByTitle("Return to line 1"));
+      expect(screen.getByText(/step 2 of 2/i)).toBeInTheDocument();
+      expect(onRestoreCanvas).toHaveBeenLastCalledWith(
+        step1Canvas.elements,
+        step1Canvas.ids,
+        step1Canvas.classes,
+      );
+
+      await userEvent.click(screen.getByTitle("Return to line 2"));
+      await screen.findByText(/all steps complete!/i);
+      expect(onRestoreCanvas).toHaveBeenLastCalledWith(
+        step2CorrectCanvas.elements,
+        step2CorrectCanvas.ids,
+        step2CorrectCanvas.classes,
+      );
+
+      expect(screen.getByText(/all steps complete!/i)).toBeInTheDocument();
     });
 
     it("stays on the same step when the check is incorrect", async () => {
       const onSubmitAtLine = jest.fn().mockResolvedValue(false);
       render(<QuestionTab {...sbsBaseProps} onSubmitAtLine={onSubmitAtLine} />);
-      await userEvent.click(screen.getByRole("button", { name: /step-by-step questions/i }));
+      await userEvent.click(
+        screen.getByRole("button", { name: /step-by-step questions/i }),
+      );
       await screen.findByText(/step 1 of 2/i);
 
-      await userEvent.click(screen.getByRole("button", { name: /check line 1/i }));
+      await userEvent.click(
+        screen.getByRole("button", { name: /check line 1/i }),
+      );
 
       expect(onSubmitAtLine).toHaveBeenCalledWith(1, undefined);
       expect(screen.getByText(/step 1 of 2/i)).toBeInTheDocument();
@@ -314,15 +522,27 @@ describe("QuestionTab component", () => {
       const { onSubmitAtLine, rerender } = await enterStepByStep(step1Canvas);
 
       // Pass step 1 — commits a→1, id1=int
-      await userEvent.click(screen.getByRole("button", { name: /check line 1/i }));
+      await userEvent.click(
+        screen.getByRole("button", { name: /check line 1/i }),
+      );
       await screen.findByText(/step 2 of 2/i);
 
       // Switch to canvas where a now points to id 2
-      rerender(<QuestionTab {...sbsBaseProps} onSubmitAtLine={onSubmitAtLine} currentCanvasState={step2WrongIdCanvas} />);
+      rerender(
+        <QuestionTab
+          {...sbsBaseProps}
+          onSubmitAtLine={onSubmitAtLine}
+          currentCanvasState={step2WrongIdCanvas}
+        />,
+      );
 
-      await userEvent.click(screen.getByRole("button", { name: /check line 2/i }));
+      await userEvent.click(
+        screen.getByRole("button", { name: /check line 2/i }),
+      );
 
-      expect(screen.getByText(/variable "a" must point to id 1/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/variable "a" must point to id 1/i),
+      ).toBeInTheDocument();
       // Backend should NOT have been called for step 2
       expect(onSubmitAtLine).toHaveBeenCalledTimes(1);
     });
@@ -331,15 +551,27 @@ describe("QuestionTab component", () => {
       const { onSubmitAtLine, rerender } = await enterStepByStep(step1Canvas);
 
       // Pass step 1 — commits id1=int
-      await userEvent.click(screen.getByRole("button", { name: /check line 1/i }));
+      await userEvent.click(
+        screen.getByRole("button", { name: /check line 1/i }),
+      );
       await screen.findByText(/step 2 of 2/i);
 
       // Switch to canvas where id1 is now a str
-      rerender(<QuestionTab {...sbsBaseProps} onSubmitAtLine={onSubmitAtLine} currentCanvasState={step2WrongTypeCanvas} />);
+      rerender(
+        <QuestionTab
+          {...sbsBaseProps}
+          onSubmitAtLine={onSubmitAtLine}
+          currentCanvasState={step2WrongTypeCanvas}
+        />,
+      );
 
-      await userEvent.click(screen.getByRole("button", { name: /check line 2/i }));
+      await userEvent.click(
+        screen.getByRole("button", { name: /check line 2/i }),
+      );
 
-      expect(screen.getByText(/id 1.*int.*str|id 1 was a int/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/id 1.*int.*str|id 1 was a int/i),
+      ).toBeInTheDocument();
       expect(onSubmitAtLine).toHaveBeenCalledTimes(1);
     });
 
@@ -347,17 +579,37 @@ describe("QuestionTab component", () => {
       const { onSubmitAtLine, rerender } = await enterStepByStep(step1Canvas);
 
       // Pass step 1
-      await userEvent.click(screen.getByRole("button", { name: /check line 1/i }));
+      await userEvent.click(
+        screen.getByRole("button", { name: /check line 1/i }),
+      );
       await screen.findByText(/step 2 of 2/i);
 
       // Wrong canvas → error appears
-      rerender(<QuestionTab {...sbsBaseProps} onSubmitAtLine={onSubmitAtLine} currentCanvasState={step2WrongIdCanvas} />);
-      await userEvent.click(screen.getByRole("button", { name: /check line 2/i }));
-      expect(screen.getByText(/variable "a" must point to id 1/i)).toBeInTheDocument();
+      rerender(
+        <QuestionTab
+          {...sbsBaseProps}
+          onSubmitAtLine={onSubmitAtLine}
+          currentCanvasState={step2WrongIdCanvas}
+        />,
+      );
+      await userEvent.click(
+        screen.getByRole("button", { name: /check line 2/i }),
+      );
+      expect(
+        screen.getByText(/variable "a" must point to id 1/i),
+      ).toBeInTheDocument();
 
       // Correct canvas → error clears, backend called
-      rerender(<QuestionTab {...sbsBaseProps} onSubmitAtLine={onSubmitAtLine} currentCanvasState={step2CorrectCanvas} />);
-      await userEvent.click(screen.getByRole("button", { name: /check line 2/i }));
+      rerender(
+        <QuestionTab
+          {...sbsBaseProps}
+          onSubmitAtLine={onSubmitAtLine}
+          currentCanvasState={step2CorrectCanvas}
+        />,
+      );
+      await userEvent.click(
+        screen.getByRole("button", { name: /check line 2/i }),
+      );
 
       expect(screen.queryByText(/must point to id/i)).not.toBeInTheDocument();
       expect(onSubmitAtLine).toHaveBeenCalledTimes(2);
@@ -367,16 +619,30 @@ describe("QuestionTab component", () => {
       const { onSubmitAtLine, rerender } = await enterStepByStep(step1Canvas);
 
       // Step 1
-      await userEvent.click(screen.getByRole("button", { name: /check line 1/i }));
+      await userEvent.click(
+        screen.getByRole("button", { name: /check line 1/i }),
+      );
       await screen.findByText(/step 2 of 2/i);
 
       // Step 2
-      rerender(<QuestionTab {...sbsBaseProps} onSubmitAtLine={onSubmitAtLine} currentCanvasState={step2CorrectCanvas} />);
-      await userEvent.click(screen.getByRole("button", { name: /check line 2/i }));
+      rerender(
+        <QuestionTab
+          {...sbsBaseProps}
+          onSubmitAtLine={onSubmitAtLine}
+          currentCanvasState={step2CorrectCanvas}
+        />,
+      );
+      await userEvent.click(
+        screen.getByRole("button", { name: /check line 2/i }),
+      );
 
       await screen.findByText(/all steps complete!/i);
-      expect(screen.getByRole("button", { name: /try again/i })).toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: /check line/i })).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /try again/i }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /check line/i }),
+      ).not.toBeInTheDocument();
     });
 
     it("Reset restores canvas to initial state and returns to Step 1", async () => {
@@ -388,14 +654,18 @@ describe("QuestionTab component", () => {
           onSubmitAtLine={onSubmitAtLine}
           onRestoreCanvas={onRestoreCanvas}
           currentCanvasState={step1Canvas}
-        />
+        />,
       );
 
-      await userEvent.click(screen.getByRole("button", { name: /step-by-step questions/i }));
+      await userEvent.click(
+        screen.getByRole("button", { name: /step-by-step questions/i }),
+      );
       await screen.findByText(/step 1 of 2/i);
 
       // Advance to step 2
-      await userEvent.click(screen.getByRole("button", { name: /check line 1/i }));
+      await userEvent.click(
+        screen.getByRole("button", { name: /check line 1/i }),
+      );
       await screen.findByText(/step 2 of 2/i);
 
       // Reset

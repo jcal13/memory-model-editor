@@ -9,6 +9,7 @@ interface CodeBlockProps {
   checkableLines?: Set<number>;
   selectedLine?: number | null;
   onLineClick?: (lineNumber: number) => void;
+  lineTitle?: (lineNumber: number) => string;
 }
 
 export default function CodeBlock({
@@ -19,6 +20,7 @@ export default function CodeBlock({
   checkableLines,
   selectedLine,
   onLineClick,
+  lineTitle,
 }: CodeBlockProps) {
   return (
     <Highlight code={code} language={language as any} theme={undefined}>
@@ -57,12 +59,19 @@ export default function CodeBlock({
                     ? () => onLineClick(lineNumber)
                     : undefined
                 }
-                title={isCheckable ? `Check answer at line ${lineNumber}` : undefined}
+                title={
+                  isCheckable
+                    ? lineTitle?.(lineNumber) ??
+                      `Check answer at line ${lineNumber}`
+                    : undefined
+                }
                 {...restLineProps}
               >
                 {showLineNumbers && (
                   <span
-                    className={`${styles.gutter} ${isCheckable ? styles.checkableGutter : ""}`}
+                    className={`${styles.gutter} ${
+                      isCheckable ? styles.checkableGutter : ""
+                    }`}
                     aria-hidden="true"
                   >
                     {lineNumber}

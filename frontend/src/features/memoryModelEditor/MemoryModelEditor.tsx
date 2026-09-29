@@ -716,6 +716,8 @@ export default function MemoryModelEditor({
               }}
             >
               <InformationTabs
+                linkedQuestion={state.linkedQuestion}
+                onQuestionLinkConsumed={() => state.setLinkedQuestion(null)}
                 submissionResults={state.submissionResults}
                 questionSelected={state.selectedQuestionIndex !== null}
                 questionIndex={state.selectedQuestionIndex}

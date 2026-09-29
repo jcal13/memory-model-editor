@@ -22,6 +22,7 @@ import {
 } from "../../memoryModelEditor/utils/localStorage";
 import { normalizeQuestionCanvasData } from "../../memoryModelEditor/utils/questionFrames";
 import ConfirmationModal from "../../memoryModelEditor/components/ConfirmationModal";
+import { QuestionLink, questionUrl } from "./utils/questionLinks";
 
 type View =
   | "root"
@@ -79,6 +80,8 @@ function formatSource(description: string): string {
 }
 
 interface QuestionTabProps {
+  linkedQuestion?: QuestionLink | null;
+  onQuestionLinkConsumed?: () => void;
   questionIndex: number | null;
   setQuestionIndex: (index: number | null) => void;
   questionType: "test" | "practice" | "prep" | "experiment" | null;
@@ -217,6 +220,8 @@ export function checkStepConsistency(
 }
 
 export default function QuestionTab({
+  linkedQuestion,
+  onQuestionLinkConsumed,
   questionIndex,
   setQuestionIndex,
   questionType,
@@ -239,6 +244,7 @@ export default function QuestionTab({
       ? v
       : "root";
   });
+  const [linkError, setLinkError] = useState("");
   const [questionCount, setQuestionCount] = useState<number>(0);
   const [questionData, setQuestionData] = useState<QuestionData | null>(null);
   const [questionStatus, setQuestionStatus] = useState<QuestionStatusMap>(() =>
@@ -295,6 +301,15 @@ export default function QuestionTab({
       setQuestionView(view as QuestionView);
     }
   }, [view, setQuestionView]);
+
+  // Reflect the visible question without reloading or resetting its canvas.
+  useEffect(() => {
+    if (view === "loading" || (view === "question" && !questionData)) return;
+    const question = view === "question" && questionType && questionIndex !== null
+      ? { type: questionType, id: questionIndex } : null;
+    const url = questionUrl(window.location.href, question);
+    if (url !== window.location.href) window.history.replaceState(window.history.state, "", url);
+  }, [view, questionType, questionIndex, questionData]);
 
   useEffect(() => {
     persistQuestionStatus(questionStatus);
@@ -472,6 +487,7 @@ export default function QuestionTab({
     id: number,
   ): Promise<void> => {
     hydratedQuestion.current = false;
+    setLinkError("");
     setQuestionData(null);
     setSubmissionResults(null);
     setSelectedLine(null);
@@ -605,19 +621,28 @@ export default function QuestionTab({
           }
 
           const resolvedCanvas = normalizeQuestionCanvasData(
-            resolveQuestionCanvasData(
-              questionType,
-              questionIndex,
-              data.canvasConfig ?? null,
-            ),
+            linkedQuestion?.id === questionIndex &&
+                linkedQuestion?.type === questionType
+              ? data.canvasConfig
+              : resolveQuestionCanvasData(
+                  questionType,
+                  questionIndex,
+                  data.canvasConfig ?? null,
+                ),
           );
           onRestoreCanvas(
             resolvedCanvas.elements,
             resolvedCanvas.ids,
             resolvedCanvas.classes,
           );
+          if (linkedQuestion?.id === questionIndex && linkedQuestion?.type === questionType) onQuestionLinkConsumed?.();
         } catch (error) {
           console.error("Failed to hydrate question:", error);
+          if (linkedQuestion?.id === questionIndex && linkedQuestion?.type === questionType) {
+            setLinkError("This question could not be loaded. Choose a question below or try the link again.");
+            setQuestionIndex(null);
+            onQuestionLinkConsumed?.();
+          }
           setView("list");
         }
       })();
@@ -886,6 +911,7 @@ export default function QuestionTab({
           </div>
         </div>
 
+        {linkError && <p role="alert">{linkError}</p>}
         {view === "root" && (
           <div className={styles.selectors}>
             <QuestionSelector

@@ -1,3 +1,4 @@
+import type { QuestionLink } from "./questionTab/utils/questionLinks";
 import { useEffect, useRef, useState } from "react";
 import { SubmissionResult, Tab, CanvasElement } from "../shared/types";
 import { MasterErrorList } from "../memoryModelEditor/utils/masterErrorList";
@@ -7,6 +8,8 @@ import { useResizable } from "../palette/hooks/useResizable";
 import styles from "./InformationTabs.module.css";
 
 interface InformationTabsProps {
+  linkedQuestion?: QuestionLink | null;
+  onQuestionLinkConsumed?: () => void;
   submissionResults: SubmissionResult | null;
   questionSelected: boolean;
   questionIndex: number | null;
@@ -33,6 +36,8 @@ interface InformationTabsProps {
 }
 
 export default function InformationTabs({
+  linkedQuestion,
+  onQuestionLinkConsumed,
   submissionResults,
   questionSelected,
   questionIndex,
@@ -119,6 +124,8 @@ export default function InformationTabs({
           style={questionSelected ? { height: `${topHeight}%` } : undefined}
         >
           <QuestionTab
+            linkedQuestion={linkedQuestion}
+            onQuestionLinkConsumed={onQuestionLinkConsumed}
             questionIndex={questionIndex}
             setQuestionIndex={setQuestionIndex}
             questionType={questionType}

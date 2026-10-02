@@ -6,8 +6,14 @@ jest.mock("pg", () => ({
   })),
 }));
 
-import validateAnswer from "./validateAnswer";
+import validateAnswer, { validateAnswerAtLine } from "./validateAnswer";
 import { ErrorType } from "./errorStructuring";
+
+const prepQuestions = require("../../database/prepQuestions.json") as Array<{
+  id: number;
+  answer: unknown;
+  steps: Array<{ lineNumber: number; answer: unknown }>;
+}>;
 
 describe("validateAnswer reference mismatch wording", () => {
   beforeEach(() => {
@@ -182,5 +188,45 @@ describe("validateAnswer reference mismatch wording", () => {
           "pair.right should point to the same None object as pair.left",
       }),
     ]);
+  });
+});
+
+describe("CSC148 Prep class and method answers", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.DATABASE_URL = "postgres://example.test/memory-model-editor";
+  });
+
+  it.each([5, 6])("accepts question %i final and line answers", async (questionId) => {
+    const question = prepQuestions.find((item) => item.id === questionId);
+    if (!question) throw new Error(`Prep question ${questionId} is missing`);
+
+    mockQuery.mockImplementation(async (query: string) => {
+      if (query.includes("SELECT steps")) {
+        return { rows: [{ steps: question.steps }] };
+      }
+      return { rows: [{ answer: question.answer }] };
+    });
+
+    const toFrontendModel = (answer: unknown) =>
+      (answer as Array<Record<string, any>>).map((box) => ({
+        ...box,
+        type: box.type === ".class" ? "object" : box.type,
+      })) as Parameters<typeof validateAnswer>[0];
+    const finalResult = await validateAnswer(
+      toFrontendModel(question.answer),
+      questionId,
+      "prep"
+    );
+    const step = question.steps[0];
+    const lineResult = await validateAnswerAtLine(
+      toFrontendModel(step.answer),
+      questionId,
+      "prep",
+      step.lineNumber
+    );
+
+    expect(finalResult).toEqual({ correct: true, errors: [] });
+    expect(lineResult).toEqual({ correct: true, errors: [] });
   });
 });

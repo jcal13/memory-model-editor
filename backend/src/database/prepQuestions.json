@@ -1743,5 +1743,299 @@
       ]
     },
     "steps": []
+  },
+  {
+    "id": 5,
+    "question": "Draw the memory model at the marked line.",
+    "code": [
+      "class ScoreCard:",
+      "    def __init__(self, name, points):",
+      "        self.name = name",
+      "        self.points = points",
+      "",
+      "    def add_points(self, amount):",
+      "        self.points = self.points + amount",
+      "        # Draw the memory model here.",
+      "        return None",
+      "",
+      "card = ScoreCard(\"Mira\", 4)",
+      "card.add_points(3)"
+    ],
+    "answer": [
+      {
+        "id": null,
+        "name": "ScoreCard.add_points",
+        "type": ".frame",
+        "order": 2,
+        "value": {
+          "self": 1,
+          "amount": 4
+        }
+      },
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "card": 1
+        }
+      },
+      {
+        "id": 1,
+        "type": ".class",
+        "name": "ScoreCard",
+        "value": {
+          "name": 2,
+          "points": 3
+        }
+      },
+      {
+        "id": 2,
+        "type": "str",
+        "value": "Mira"
+      },
+      {
+        "id": 3,
+        "type": "int",
+        "value": 7
+      },
+      {
+        "id": 4,
+        "type": "int",
+        "value": 3
+      }
+    ],
+    "description": null,
+    "topics": [
+      "CSC148",
+      "Classes",
+      "Initialization",
+      "Methods",
+      "Mutation"
+    ],
+    "canvasConfig": {
+      "elements": [],
+      "ids": [],
+      "classes": []
+    },
+    "steps": [
+      {
+        "lineNumber": 8,
+        "answer": [
+          {
+            "id": null,
+            "name": "ScoreCard.add_points",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "amount": 4
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "card": 1
+            }
+          },
+          {
+            "id": 1,
+            "type": ".class",
+            "name": "ScoreCard",
+            "value": {
+              "name": 2,
+              "points": 3
+            }
+          },
+          {
+            "id": 2,
+            "type": "str",
+            "value": "Mira"
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 4,
+            "type": "int",
+            "value": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "question": "Draw the memory model at the marked line.",
+    "code": [
+      "class ScoreCard:",
+      "    def __init__(self, name, points):",
+      "        self.name = name",
+      "        self.points = points",
+      "",
+      "    def add_points(self, amount):",
+      "        self.points = self.points + amount",
+      "        # Draw the memory model here.",
+      "        return None",
+      "",
+      "first = ScoreCard(\"Mira\", 4)",
+      "second = ScoreCard(\"Noah\", 10)",
+      "first.add_points(3)"
+    ],
+    "answer": [
+      {
+        "id": null,
+        "name": "ScoreCard.add_points",
+        "type": ".frame",
+        "order": 2,
+        "value": {
+          "self": 1,
+          "amount": 7
+        }
+      },
+      {
+        "id": null,
+        "name": "__main__",
+        "type": ".frame",
+        "order": 1,
+        "value": {
+          "first": 1,
+          "second": 4
+        }
+      },
+      {
+        "id": 1,
+        "type": ".class",
+        "name": "ScoreCard",
+        "value": {
+          "name": 2,
+          "points": 3
+        }
+      },
+      {
+        "id": 2,
+        "type": "str",
+        "value": "Mira"
+      },
+      {
+        "id": 3,
+        "type": "int",
+        "value": 7
+      },
+      {
+        "id": 4,
+        "type": ".class",
+        "name": "ScoreCard",
+        "value": {
+          "name": 5,
+          "points": 6
+        }
+      },
+      {
+        "id": 5,
+        "type": "str",
+        "value": "Noah"
+      },
+      {
+        "id": 6,
+        "type": "int",
+        "value": 10
+      },
+      {
+        "id": 7,
+        "type": "int",
+        "value": 3
+      }
+    ],
+    "description": null,
+    "topics": [
+      "CSC148",
+      "Classes",
+      "Initialization",
+      "Methods",
+      "Mutation",
+      "Object Identity"
+    ],
+    "canvasConfig": {
+      "elements": [],
+      "ids": [],
+      "classes": []
+    },
+    "steps": [
+      {
+        "lineNumber": 8,
+        "answer": [
+          {
+            "id": null,
+            "name": "ScoreCard.add_points",
+            "type": ".frame",
+            "order": 2,
+            "value": {
+              "self": 1,
+              "amount": 7
+            }
+          },
+          {
+            "id": null,
+            "name": "__main__",
+            "type": ".frame",
+            "order": 1,
+            "value": {
+              "first": 1,
+              "second": 4
+            }
+          },
+          {
+            "id": 1,
+            "type": ".class",
+            "name": "ScoreCard",
+            "value": {
+              "name": 2,
+              "points": 3
+            }
+          },
+          {
+            "id": 2,
+            "type": "str",
+            "value": "Mira"
+          },
+          {
+            "id": 3,
+            "type": "int",
+            "value": 7
+          },
+          {
+            "id": 4,
+            "type": ".class",
+            "name": "ScoreCard",
+            "value": {
+              "name": 5,
+              "points": 6
+            }
+          },
+          {
+            "id": 5,
+            "type": "str",
+            "value": "Noah"
+          },
+          {
+            "id": 6,
+            "type": "int",
+            "value": 10
+          },
+          {
+            "id": 7,
+            "type": "int",
+            "value": 3
+          }
+        ]
+      }
+    ]
   }
 ]

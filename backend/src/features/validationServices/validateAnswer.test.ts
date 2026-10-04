@@ -11,8 +11,13 @@ import { ErrorType } from "./errorStructuring";
 
 const prepQuestions = require("../../database/prepQuestions.json") as Array<{
   id: number;
-  answer: unknown;
-  steps: Array<{ lineNumber: number; answer: unknown }>;
+  answer: Array<Record<string, any>>;
+  code: string[];
+  steps: Array<{
+    lineNumber: number;
+    iterationNumber?: number;
+    answer: Array<Record<string, any>>;
+  }>;
 }>;
 
 describe("validateAnswer reference mismatch wording", () => {
@@ -197,9 +202,41 @@ describe("CSC148 Prep class and method answers", () => {
     process.env.DATABASE_URL = "postgres://example.test/memory-model-editor";
   });
 
-  it.each([5, 6])("accepts question %i final and line answers", async (questionId) => {
+  it.each([5, 6])(
+    "accepts question %i final and every line answer",
+    async (questionId) => {
     const question = prepQuestions.find((item) => item.id === questionId);
     if (!question) throw new Error(`Prep question ${questionId} is missing`);
+
+    const expectedLines = questionId === 5 ? [3, 4, 7] : [4, 5, 8];
+    expect(question.steps.map((step) => step.lineNumber)).toEqual(expectedLines);
+    const finalScoreCard = question.answer.find(
+      (box) => box.type === ".class" && box.name === "ScoreCard"
+    );
+    expect(finalScoreCard).toBeDefined();
+    const finalPoints = question.answer.find(
+      (box) => box.id === finalScoreCard?.value.points
+    );
+    expect(finalPoints?.value).toBe(questionId === 5 ? 4 : 7);
+
+    if (questionId === 5) {
+      const firstInitializationStep = question.steps[0];
+      const partialObject = firstInitializationStep.answer.find(
+        (box) => box.type === ".class"
+      );
+      expect(partialObject?.value).toEqual({ name: 2 });
+    } else {
+      const calculationStep = question.steps[0];
+      const methodFrame = calculationStep.answer.find(
+        (box) => box.name === "ScoreCard.add_points"
+      );
+      expect(methodFrame?.value).toEqual({
+        self: 1,
+        amount: 4,
+        new_points: 5,
+      });
+      expect(calculationStep.answer.find((box) => box.id === 5)?.value).toBe(7);
+    }
 
     mockQuery.mockImplementation(async (query: string) => {
       if (query.includes("SELECT steps")) {
@@ -218,15 +255,18 @@ describe("CSC148 Prep class and method answers", () => {
       questionId,
       "prep"
     );
-    const step = question.steps[0];
-    const lineResult = await validateAnswerAtLine(
-      toFrontendModel(step.answer),
-      questionId,
-      "prep",
-      step.lineNumber
-    );
-
     expect(finalResult).toEqual({ correct: true, errors: [] });
-    expect(lineResult).toEqual({ correct: true, errors: [] });
-  });
+      for (const step of question.steps) {
+        const lineResult = await validateAnswerAtLine(
+          toFrontendModel(step.answer),
+          questionId,
+          "prep",
+          step.lineNumber,
+          step.iterationNumber
+        );
+
+        expect(lineResult).toEqual({ correct: true, errors: [] });
+      }
+    }
+  );
 });

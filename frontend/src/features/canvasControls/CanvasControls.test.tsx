@@ -147,17 +147,28 @@ describe("CanvasControls help icons", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows a help icon for the practice/test mode toggle without flipping it", () => {
+  it("shows a help icon for the Guided Palette/Full Palette toggle without flipping it", () => {
     const handleModeToggle = jest.fn();
     renderControls({ onModeToggle: handleModeToggle, isSandboxMode: true });
     openSettingsTab();
 
     fireEvent.click(
-      screen.getByRole("button", { name: "Help: Practice / Test Mode" })
+      screen.getByRole("button", { name: "Help: Guided Palette / Full Palette" })
     );
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(handleModeToggle).not.toHaveBeenCalled();
+    expect(screen.getByText(/Guided Palette only shows the boxes needed/)).toHaveTextContent('Switching modes clears the canvas.');
+    expect(screen.queryByText('Practice / Test Mode')).not.toBeInTheDocument();
+  });
+
+  it.each([true, false])("labels palette assistance independently of question category (%s)", guided => {
+    const toggle = jest.fn();
+    renderControls({onModeToggle: toggle, isSandboxMode: guided});
+    openSettingsTab();
+    expect(screen.getByText(guided ? "Guided Palette" : "Full Palette")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("switch", {name: "Guided Palette / Full Palette"}));
+    expect(toggle).toHaveBeenCalledTimes(1);
   });
 
   it("shows a help icon for the Python Tutor Style toggle", () => {

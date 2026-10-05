@@ -15,9 +15,9 @@ MemoryLab is a drag-and-drop web application designed for computer science educa
 ## Key Features
 
 - **Interactive Canvas**: A Scratch-style interface for building memory diagrams using frames, objects, and values.
-- **Practice vs. Test Modes**:
-  - **Practice Mode**: A guided environment with structured assistance to assist with model construction.
-  - **Test Mode**: A free-form environment with no constraints for independent self-assessment.
+- **Guided Palette vs. Full Palette**:
+  - **Guided Palette**: Shows the boxes needed for the current question.
+  - **Full Palette**: Shows all available boxes for more challenging, exam-style practice. Switching palette modes resets the current question’s canvas while keeping its category and URL.
 - **Direct Question Links**: Share specific Practice, Test, CSC148 Prep, and Experiment questions by copying their automatically updated URLs from the address bar.
 - **Question Bank**: Includes built-in exercises drawn from previous first-year computer science courses and tests at the University of Toronto.
 - **Automatic Grading**: Provides detailed, traceable feedback by treating memory models as graph-isomorphism problems. Also allows for line-by-line checking with auto-advancement features available.
@@ -36,7 +36,9 @@ Each Practice, Test, CSC148 Prep, and Experiment question has a direct URL. Open
 
 Replace the example host with your MemoryLab address and the number with the question ID. For local development, an example is `http://localhost:3000/?practice=1`.
 
-Opening or refreshing a direct link loads the selected question with its normal starting canvas, including its main frame, rather than restoring a saved answer. Returning to the question list removes the question parameter from the address bar. Normal question navigation continues to use the existing saved-work behavior.
+Opening or refreshing a direct link always starts in Guided Palette mode, regardless of the saved palette preference, and loads the selected question with its normal starting canvas, including its main frame, rather than restoring a saved answer. Returning to the question list removes the question parameter from the address bar. Normal question navigation continues to use the existing saved-work behaviour.
+
+Palette modes are independent of question categories: Test Questions can use Guided Palette mode, and Practice Questions can use Full Palette. Normal navigation without a direct question URL retains the saved palette preference.
 
 Step-by-Step Questions do not currently support direct links.
 

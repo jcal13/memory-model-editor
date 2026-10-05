@@ -79,8 +79,8 @@ const BoxEditorModule = ({
   const [invalidated, setInvalidated] = useInvalidatedState(metadata);
 
   // Function name list for the selector panel.
-  // In practice mode (non-sandbox), pre-populate with the question's function names.
-  // In sandbox mode, seed with __main__ as a default.
+  // In Guided Palette mode (non-sandbox), pre-populate with the question's function names.
+  // In Full Palette mode, seed with __main__ as a default.
   const [functionNames, setFunctionNames] = useState<string[]>(() => {
     if (!sandbox && questionFunctionNames && questionFunctionNames.length > 0) {
       return questionFunctionNames;

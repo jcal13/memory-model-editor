@@ -50,7 +50,13 @@ export function useCanvasSubmission({
     setResultsRef.current = setSubmissionResults;
   }, [setSubmissionResults]);
 
+  // Invalidate pending responses after reset, edits, navigation, or unmount.
+  const requestVersion = useRef(0);
+  useEffect(() => () => { requestVersion.current += 1; },
+    [elements, selectedQuestionIndex, selectedQuestionType]);
+
   const handleCanvasSubmit = useCallback(async (): Promise<boolean> => {
+    const version = requestVersion.current;
     const index = idxRef.current;
     const qtype = typeRef.current;
     const els = elsRef.current;
@@ -73,6 +79,8 @@ export function useCanvasSubmission({
 
     try {
       const result = await submitCanvas(validElements, index, qtype);
+
+      if (version !== requestVersion.current) return false;
 
       if (result !== undefined && result !== null) {
         console.log('[useCanvasSubmission] Submission result:', result);
@@ -100,6 +108,7 @@ export function useCanvasSubmission({
         return false;
       }
     } catch (error) {
+      if (version !== requestVersion.current) return false;
       console.error("Canvas submission failed:", error);
       setResultsRef.current(null);
       return false;
@@ -107,6 +116,7 @@ export function useCanvasSubmission({
   }, []);
 
   const handleCanvasSubmitAtLine = useCallback(async (lineNumber: number, iterationNumber?: number): Promise<boolean> => {
+    const version = requestVersion.current;
     const index = idxRef.current;
     const qtype = typeRef.current;
     const els = elsRef.current;
@@ -129,6 +139,8 @@ export function useCanvasSubmission({
     try {
       const result = await submitCanvasAtLine(validElements, index, qtype, lineNumber, iterationNumber);
 
+      if (version !== requestVersion.current) return false;
+
       if (result !== undefined && result !== null) {
         console.log('[useCanvasSubmission] submitAtLine result:', result);
 
@@ -149,6 +161,7 @@ export function useCanvasSubmission({
         return false;
       }
     } catch (error) {
+      if (version !== requestVersion.current) return false;
       console.error("Canvas submitAtLine failed:", error);
       setResultsRef.current(null);
       return false;

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import QuestionTab, { QuestionData } from "./QuestionTab";
 import * as fetchService from "./utils/FetchQuestionService";
@@ -286,6 +286,28 @@ describe("QuestionTab component", () => {
       expect(screen.getByText(/step 1 of 2/i)).toBeInTheDocument();
       expect(screen.getByRole("button", { name: /check line 1/i })).toBeInTheDocument();
       expect(screen.getByText(/draw the memory model after executing line 1/i)).toBeInTheDocument();
+    });
+
+    it("mode switching resets step progress and committed IDs", async () => {
+      const {onSubmitAtLine, rerender} = await enterStepByStep(step1Canvas);
+      await userEvent.click(screen.getByRole('button', {name: /check line 1/i}));
+      await screen.findByText(/step 2 of 2/i);
+      rerender(<QuestionTab {...sbsBaseProps} isSandboxMode={true} onSubmitAtLine={onSubmitAtLine} currentCanvasState={step2WrongIdCanvas} />);
+      expect(screen.getByText(/step 1 of 2/i)).toBeInTheDocument();
+      await userEvent.click(screen.getByRole('button', {name: /check line 1/i}));
+      expect(onSubmitAtLine).toHaveBeenCalledTimes(2);
+      await screen.findByText(/step 2 of 2/i);
+    });
+
+    it("a pending check cannot advance after switching modes", async () => {
+      const {onSubmitAtLine, rerender} = await enterStepByStep(step1Canvas);
+      let resolve!: (value: boolean) => void;
+      onSubmitAtLine.mockImplementationOnce(() => new Promise<boolean>(r => {resolve = r;}));
+      await userEvent.click(screen.getByRole('button', {name: /check line 1/i}));
+      rerender(<QuestionTab {...sbsBaseProps} isSandboxMode={true} onSubmitAtLine={onSubmitAtLine} />);
+      await act(async () => {resolve(true);});
+      expect(screen.getByText(/step 1 of 2/i)).toBeInTheDocument();
+      expect(screen.queryByText(/step 2 of 2/i)).not.toBeInTheDocument();
     });
 
     it("advances to the next step when the check is correct", async () => {

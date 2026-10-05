@@ -52,3 +52,35 @@ test('a missing linked question shows an explanation and returns to the list', a
  expect(consumed).toHaveBeenCalledTimes(1);
  spy.mockRestore();
 });
+
+test.each([true, false])('mode switch from %s keeps the question and URL without re-fetching', async mode => {
+ localStorage.setItem('questionStatus', JSON.stringify({practice_2:'completed', test_1:'completed'}));
+ const p=props();
+ const {rerender}=render(<QuestionTab {...p} isSandboxMode={mode}/>);
+ await screen.findByText('Draw this model');
+ await waitFor(()=>expect(window.location.search).toBe('?practice=2'));
+ const restores=p.onRestoreCanvas.mock.calls.length;
+ rerender(<QuestionTab {...p} isSandboxMode={!mode}/>);
+ expect(screen.getByText('Draw this model')).toBeInTheDocument();
+ expect(window.location.search).toBe('?practice=2');
+ expect(p.setQuestionIndex).not.toHaveBeenCalled();
+ expect(p.setQuestionType).not.toHaveBeenCalled();
+ expect(p.onClearCanvas).not.toHaveBeenCalled();
+ expect(p.onRestoreCanvas).toHaveBeenCalledTimes(restores);
+ expect(fetchQuestion).toHaveBeenCalledTimes(1);
+ expect(JSON.parse(localStorage.getItem('questionStatus')!)).toEqual({practice_2:'unattempted', test_1:'completed'});
+});
+
+test('late submission does not mark a reset question completed or attempted', async () => {
+ const p = props();
+ let resolve!: (value: boolean) => void;
+ p.onSubmit.mockImplementation(() => new Promise<boolean>(r => {resolve = r;}));
+ const {rerender} = render(<QuestionTab {...p} isSandboxMode={true}/>);
+ await screen.findByText('Draw this model');
+ await act(async () => {userEvent.click(screen.getByRole('button', {name: 'Submit Canvas'}));});
+ expect(p.onSubmit).toHaveBeenCalledTimes(1);
+ rerender(<QuestionTab {...p} isSandboxMode={false}/>);
+ await act(async () => {resolve(true);});
+ expect(JSON.parse(localStorage.getItem('questionStatus')!).practice_2).toBe('unattempted');
+ expect(window.location.search).toBe('?practice=2');
+});

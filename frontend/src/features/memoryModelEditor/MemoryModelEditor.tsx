@@ -1,3 +1,4 @@
+import { normalizeQuestionCanvasData } from "./utils/questionFrames";
 import Canvas from "../canvas/Canvas";
 import StructurePanel from "../canvas/components/StructurePanel";
 import Palette from "../palette/Palette";
@@ -169,9 +170,9 @@ export default function MemoryModelEditor({
     clearHistory(baselineState);
   };
 
-  const effectiveSandboxMode = state.isSandboxMode || state.selectedQuestionType === "experiment";
+  const effectiveSandboxMode = state.isSandboxMode;
 
-  // When a question loads in practice mode, seed elementClasses with the class names
+  // When a question loads in Guided Palette mode, seed elementClasses with the class names
   // from the question's answer so the class selector shows them as pre-built options.
   useEffect(() => {
     if (!effectiveSandboxMode || !currentQuestionData) return;
@@ -593,7 +594,7 @@ export default function MemoryModelEditor({
                 }
                 isPracticeMode={effectiveSandboxMode}
                 isSandboxMode={effectiveSandboxMode}
-                onModeToggle={state.selectedQuestionType === "experiment" ? undefined : () => state.setShowModeToggleModal(true)}
+                onModeToggle={() => state.setShowModeToggleModal(true)}
                 onClear={() => state.setShowClearCanvasModal(true)}
                 onUndo={undo}
                 onRedo={redo}
@@ -764,11 +765,19 @@ export default function MemoryModelEditor({
       {state.showModeToggleModal && (
         <ConfirmationModal
           title="Switch Mode?"
-          message="Switching modes will clear the canvas. Your current work will be saved and restored if you return to this question."
+          message="Switch modes? This clears your canvas and resets the current question. You will stay on the same question."
           confirmLabel="Confirm"
           cancelLabel="Cancel"
           onConfirm={() => {
-            clearCanvas();
+            if (state.selectedQuestionIndex !== null && state.selectedQuestionType !== null) {
+              deleteQuestionCanvasData(state.selectedQuestionType, state.selectedQuestionIndex);
+              const initial = normalizeQuestionCanvasData(currentQuestionData?.canvasConfig);
+              restoreCanvas(initial.elements, initial.ids, initial.classes);
+              state.setSubmissionResults(null);
+              state.setCanvasResetKey(prev => prev + 1);
+            } else {
+              clearCanvas();
+            }
             state.setIsSandboxMode((prev) => !prev);
             state.setShowModeToggleModal(false);
           }}

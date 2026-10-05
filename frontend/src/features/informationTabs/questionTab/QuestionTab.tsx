@@ -244,7 +244,6 @@ export default function QuestionTab({
     type: "test" | "practice" | "prep" | "experiment";
     index: number;
   } | null>(null);
-  const prevSandboxModeRef = useRef<boolean>(isSandboxMode);
 
   useEffect(() => {
     if (view !== "loading") {
@@ -286,26 +285,11 @@ export default function QuestionTab({
   }, []);
 
   useEffect(() => {
-    if (view !== "question" && onQuestionDataChange) {
+    if (view !== "question" && view !== "stepbystep" && onQuestionDataChange) {
       onQuestionDataChange(null);
     }
   }, [view, onQuestionDataChange]);
 
-  useEffect(() => {
-    if (prevSandboxModeRef.current === isSandboxMode) return;
-    prevSandboxModeRef.current = isSandboxMode;
-
-    setView("root");
-    setQuestionData(null);
-    setQuestionIndex(null);
-    setQuestionType(null);
-    setQuestionView("root");
-    setTopicMap(new Map());
-    setSelectedTopic(null);
-    hydratedList.current = false;
-    hydratedQuestion.current = false;
-    previousQuestionRef.current = null;
-  }, [isSandboxMode, setQuestionIndex, setQuestionType, setQuestionView]);
 
   const updateQuestionStatus = (
     type: QuestionType,
@@ -315,6 +299,26 @@ export default function QuestionTab({
     const key = getQuestionKey(type, index);
     setQuestionStatus((prev) => ({ ...prev, [key]: status }));
   };
+
+  // Pending checks must not advance progress or restore status after a reset.
+  const submissionVersion = useRef(0);
+  useEffect(() => () => { submissionVersion.current += 1; },
+    [isSandboxMode, questionType, questionIndex, view]);
+
+  const previousPaletteMode = useRef(isSandboxMode);
+  useEffect(() => {
+    if (previousPaletteMode.current !== isSandboxMode) {
+      setStepByStepIndex(0);
+      setCommittedAssignments(null);
+      setStepConsistencyError(null);
+      setSelectedLine(null);
+      setSelectedIteration(undefined);
+      if (questionType && questionIndex !== null) {
+        updateQuestionStatus(questionType, questionIndex, "unattempted");
+      }
+    }
+    previousPaletteMode.current = isSandboxMode;
+  }, [isSandboxMode, questionType, questionIndex]);
 
   const getQuestionStatus = (
     type: QuestionType,
@@ -338,12 +342,14 @@ export default function QuestionTab({
   };
 
   const handleSubmitAtLine = async (lineNumber: number, iterationNumber?: number) => {
+    const version = submissionVersion.current;
     if (!questionType || questionIndex === null) {
       return false;
     }
 
     try {
       const success = await onSubmitAtLine(lineNumber, iterationNumber);
+      if (version !== submissionVersion.current) return false;
 
       if (success && autoAdvance) {
         const nextStep = getNextStep(lineNumber, iterationNumber);
@@ -361,15 +367,18 @@ export default function QuestionTab({
   };
 
   const handleSubmit = async () => {
+    const version = submissionVersion.current;
     if (questionType && questionIndex !== null) {
       try {
         const success = await onSubmit();
+        if (version !== submissionVersion.current) return;
         updateQuestionStatus(
           questionType,
           questionIndex,
           success ? "completed" : "attempted"
         );
       } catch (error) {
+        if (version !== submissionVersion.current) return;
         console.error("Error during submission:", error);
         updateQuestionStatus(questionType, questionIndex, "attempted");
       }
@@ -620,6 +629,7 @@ export default function QuestionTab({
   };
 
   const handleResetConfirm = async () => {
+    submissionVersion.current += 1;
     if (!questionType || questionIndex === null) {
       setShowResetModal(false);
       return;
@@ -710,6 +720,7 @@ export default function QuestionTab({
   };
 
   const handleStepCheck = async (): Promise<void> => {
+    const version = submissionVersion.current;
     if (!questionData?.steps || stepByStepIndex >= questionData.steps.length) return;
 
     // Snapshot canvas before the async call to avoid stale closure issues
@@ -728,7 +739,7 @@ export default function QuestionTab({
 
     const currentStep = questionData.steps[stepByStepIndex];
     const success = await handleSubmitAtLine(currentStep.lineNumber, currentStep.iterationNumber);
-    if (success) {
+    if (success && version === submissionVersion.current) {
       // Merge the new assignments into the committed state
       setCommittedAssignments((prev) => ({
         variableToId: { ...prev?.variableToId, ...currentAssignments.variableToId },
@@ -739,6 +750,7 @@ export default function QuestionTab({
   };
 
   const handleStepByStepReset = async (): Promise<void> => {
+    submissionVersion.current += 1;
     try {
       const data = await fetchQuestion<QuestionData>(1, "practice");
       setQuestionData(data);
@@ -794,7 +806,7 @@ export default function QuestionTab({
               icon="✏️"
               categoryType="practice"
               onClick={() => loadQuestions("practice")}
-              helpText="Build the memory model yourself. The palette only shows the boxes needed for the question, and you get feedback to help you learn."
+              helpText="Build the memory model yourself and use feedback to learn. Choose Guided Palette or Full Palette in Settings."
             />
             <QuestionSelector
               variant="category"
@@ -803,7 +815,7 @@ export default function QuestionTab({
               icon="📝"
               categoryType="test"
               onClick={() => loadQuestions("test")}
-              helpText="Simulates exam conditions with the full palette of boxes available, so you decide what to use."
+              helpText="Test your knowledge with this question bank. Choose Guided Palette or Full Palette in Settings."
             />
             <QuestionSelector
               variant="category"

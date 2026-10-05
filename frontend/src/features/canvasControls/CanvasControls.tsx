@@ -210,13 +210,14 @@ export default function CanvasControls({
               <div className={styles.controlItem}>
                 <span className={styles.labelGroup}>
                   <label className={styles.controlLabel}>
-                    {isSandboxMode ? "Practice" : "Test"}
+                    {isSandboxMode ? "Guided Palette" : "Full Palette"}
                   </label>
-                  <HelpIcon title="Practice / Test Mode" text="Practice mode only shows the boxes needed for the current question. Test mode gives you the full palette, simulating exam conditions. Switching modes clears the canvas." />
+                  <HelpIcon title="Guided Palette / Full Palette" text="Guided Palette only shows the boxes needed for the current question. Full Palette shows all available boxes for more challenging, exam-style practice. Switching modes clears the canvas." />
                 </span>
                 <button
                   type="button"
                   role="switch"
+                  aria-label="Guided Palette / Full Palette"
                   aria-checked={isSandboxMode}
                   onClick={onModeToggle}
                   className={`${styles.toggle} ${isSandboxMode ? styles.toggleActive : ""}`}
@@ -234,7 +235,7 @@ export default function CanvasControls({
                 </label>
                 <HelpIcon
                   title="Dark Mode"
-                  text="Switches the editor's colors to a dark theme. Downloaded PNG snapshots are always exported on a white background regardless of this setting."
+                  text="Switches the editor's colours to a dark theme. Downloaded PNG snapshots are always exported on a white background regardless of this setting."
                 />
               </span>
               <button

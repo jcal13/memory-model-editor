@@ -29,7 +29,7 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     initialUIData.questionView = "question";
     initialUIData.activeTab = "question";
     initialUIData.isInfoPanelOpen = true;
-    initialUIData.sandboxMode = false;
+    initialUIData.sandboxMode = true;
     initialUIData.submissionResults = null;
   }
 

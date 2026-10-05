@@ -146,11 +146,12 @@ export default function CanvasControls({
             {onModeToggle && (
               <div className={styles.controlItem}>
                 <label className={styles.controlLabel}>
-                  {isSandboxMode ? "Practice" : "Test"}
+                  {isSandboxMode ? "Guided Palette" : "Full Palette"}
                 </label>
                 <button
                   type="button"
                   role="switch"
+                  aria-label="Guided Palette / Full Palette"
                   aria-checked={isSandboxMode}
                   onClick={onModeToggle}
                   className={`${styles.toggle} ${isSandboxMode ? styles.toggleActive : ""}`}

@@ -752,7 +752,9 @@ function Canvas({
         </svg>
       </div>
 
-      {openEditors.map((element) => {
+      {openEditors.map((openedElement) => {
+        const element = elements.find(item => item.boxId === openedElement.boxId);
+        if (!element) return null;
         const Editor = EDITOR_MAP[element.kind.name];
         return (
           <FloatingEditor

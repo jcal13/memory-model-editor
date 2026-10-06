@@ -9,10 +9,11 @@ jest.mock("pg", () => ({
 import validateAnswer, { validateAnswerAtLine } from "./validateAnswer";
 import { ErrorType } from "./errorStructuring";
 
-const prepQuestions = require("../../database/prepQuestions.json") as Array<{
+const practiceQuestions = require("../../database/practiceQuestions.json") as Array<{
   id: number;
   answer: Array<Record<string, any>>;
   code: string[];
+  topics: string[];
   steps: Array<{
     lineNumber: number;
     iterationNumber?: number;
@@ -69,7 +70,7 @@ describe("validateAnswer reference mismatch wording", () => {
         { type: "int", id: 21, value: 7 },
       ],
       1,
-      "practice"
+      "practice",
     );
 
     expect(result.correct).toBe(false);
@@ -77,7 +78,7 @@ describe("validateAnswer reference mismatch wording", () => {
       expect.objectContaining({
         type: ErrorType.REFERENCE_MISMATCH,
         message: "pair.right should point to the same int object as pair.left",
-      })
+      }),
     );
   });
 
@@ -124,7 +125,7 @@ describe("validateAnswer reference mismatch wording", () => {
         { type: "int", id: 20, value: 7 },
       ],
       1,
-      "practice"
+      "practice",
     );
 
     expect(result.correct).toBe(false);
@@ -132,7 +133,7 @@ describe("validateAnswer reference mismatch wording", () => {
       expect.objectContaining({
         type: ErrorType.REFERENCE_MISMATCH,
         message: "pair.left and pair.right should not point to the same object",
-      })
+      }),
     );
   });
 
@@ -179,99 +180,105 @@ describe("validateAnswer reference mismatch wording", () => {
         { type: "NoneType", id: 21, value: null },
       ],
       1,
-      "practice"
+      "practice",
     );
 
     const mismatchErrors = result.errors.filter(
-      (error) => error.type === ErrorType.REFERENCE_MISMATCH
+      (error) => error.type === ErrorType.REFERENCE_MISMATCH,
     );
 
     expect(result.correct).toBe(false);
     expect(mismatchErrors).toEqual([
       expect.objectContaining({
-        message:
-          "pair.right should point to the same None object as pair.left",
+        message: "pair.right should point to the same None object as pair.left",
       }),
     ]);
   });
 });
 
-describe("CSC148 Prep class and method answers", () => {
+describe("CSC148 Practice class and method answers", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     process.env.DATABASE_URL = "postgres://example.test/memory-model-editor";
   });
 
-  it.each([5, 6])(
+  it.each([17, 18])(
     "accepts question %i final and every line answer",
     async (questionId) => {
-    const question = prepQuestions.find((item) => item.id === questionId);
-    if (!question) throw new Error(`Prep question ${questionId} is missing`);
-
-    const expectedLines = questionId === 5 ? [3, 4, 6] : [4, 5, 8];
-    expect(question.steps.map((step) => step.lineNumber)).toEqual(expectedLines);
-    const finalScoreCard = question.answer.find(
-      (box) => box.type === ".class" && box.name === "ScoreCard"
-    );
-    expect(finalScoreCard).toBeDefined();
-    const finalPoints = question.answer.find(
-      (box) => box.id === finalScoreCard?.value.points
-    );
-    expect(finalPoints?.value).toBe(questionId === 5 ? 4 : 7);
-
-    if (questionId === 5) {
-      expect(question.code[1]).toContain("-> None:");
-      expect(question.code).not.toContain("        return None");
-      const firstInitializationStep = question.steps[0];
-      const partialObject = firstInitializationStep.answer.find(
-        (box) => box.type === ".class"
+      const question = practiceQuestions.find((item) => item.id === questionId);
+      if (!question) throw new Error(`Practice question ${questionId} is missing`);
+      expect(question.topics).toEqual(
+        questionId === 17 ? ["Creation", "Methods"] : ["Methods", "Mutation"],
       );
-      expect(partialObject?.value).toEqual({ name: 2 });
-    } else {
-      expect(question.code[2]).toContain("-> None:");
-      expect(question.code[6]).toBe('card = ScoreCard("Mira", 4)');
-      expect(question.code).not.toContain("        return None");
-      const calculationStep = question.steps[0];
-      const methodFrame = calculationStep.answer.find(
-        (box) => box.name === "ScoreCard.add_points"
-      );
-      expect(methodFrame?.value).toEqual({
-        self: 1,
-        amount: 4,
-        new_points: 5,
-      });
-      expect(calculationStep.answer.find((box) => box.id === 5)?.value).toBe(7);
-    }
 
-    mockQuery.mockImplementation(async (query: string) => {
-      if (query.includes("SELECT steps")) {
-        return { rows: [{ steps: question.steps }] };
+      const expectedLines = questionId === 17 ? [3, 4, 6] : [4, 5, 8];
+      expect(question.steps.map((step) => step.lineNumber)).toEqual(
+        expectedLines,
+      );
+      const finalScoreCard = question.answer.find(
+        (box) => box.type === ".class" && box.name === "ScoreCard",
+      );
+      expect(finalScoreCard).toBeDefined();
+      const finalPoints = question.answer.find(
+        (box) => box.id === finalScoreCard?.value.points,
+      );
+      expect(finalPoints?.value).toBe(questionId === 17 ? 4 : 7);
+
+      if (questionId === 17) {
+        expect(question.code[1]).toContain("-> None:");
+        expect(question.code).not.toContain("        return None");
+        const firstInitializationStep = question.steps[0];
+        const partialObject = firstInitializationStep.answer.find(
+          (box) => box.type === ".class",
+        );
+        expect(partialObject?.value).toEqual({ name: 2 });
+      } else {
+        expect(question.code[2]).toContain("-> None:");
+        expect(question.code[6]).toBe('card = ScoreCard("Mira", 4)');
+        expect(question.code).not.toContain("        return None");
+        const calculationStep = question.steps[0];
+        const methodFrame = calculationStep.answer.find(
+          (box) => box.name === "ScoreCard.add_points",
+        );
+        expect(methodFrame?.value).toEqual({
+          self: 1,
+          amount: 4,
+          new_points: 5,
+        });
+        expect(calculationStep.answer.find((box) => box.id === 5)?.value).toBe(
+          7,
+        );
       }
-      return { rows: [{ answer: question.answer }] };
-    });
 
-    const toFrontendModel = (answer: unknown) =>
-      (answer as Array<Record<string, any>>).map((box) => ({
-        ...box,
-        type: box.type === ".class" ? "object" : box.type,
-      })) as Parameters<typeof validateAnswer>[0];
-    const finalResult = await validateAnswer(
-      toFrontendModel(question.answer),
-      questionId,
-      "prep"
-    );
-    expect(finalResult).toEqual({ correct: true, errors: [] });
+      mockQuery.mockImplementation(async (query: string) => {
+        if (query.includes("SELECT steps")) {
+          return { rows: [{ steps: question.steps }] };
+        }
+        return { rows: [{ answer: question.answer }] };
+      });
+
+      const toFrontendModel = (answer: unknown) =>
+        (answer as Array<Record<string, any>>).map((box) => ({
+          ...box,
+          type: box.type === ".class" ? "object" : box.type,
+        })) as Parameters<typeof validateAnswer>[0];
+      const finalResult = await validateAnswer(
+        toFrontendModel(question.answer),
+        questionId,
+        "practice",
+      );
+      expect(finalResult).toEqual({ correct: true, errors: [] });
       for (const step of question.steps) {
         const lineResult = await validateAnswerAtLine(
           toFrontendModel(step.answer),
           questionId,
-          "prep",
+          "practice",
           step.lineNumber,
-          step.iterationNumber
+          step.iterationNumber,
         );
 
         expect(lineResult).toEqual({ correct: true, errors: [] });
       }
-    }
+    },
   );
 });

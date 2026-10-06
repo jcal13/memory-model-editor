@@ -208,7 +208,7 @@ describe("CSC148 Prep class and method answers", () => {
     const question = prepQuestions.find((item) => item.id === questionId);
     if (!question) throw new Error(`Prep question ${questionId} is missing`);
 
-    const expectedLines = questionId === 5 ? [3, 4, 7] : [4, 5, 8];
+    const expectedLines = questionId === 5 ? [3, 4, 6] : [4, 5, 8];
     expect(question.steps.map((step) => step.lineNumber)).toEqual(expectedLines);
     const finalScoreCard = question.answer.find(
       (box) => box.type === ".class" && box.name === "ScoreCard"
@@ -220,12 +220,17 @@ describe("CSC148 Prep class and method answers", () => {
     expect(finalPoints?.value).toBe(questionId === 5 ? 4 : 7);
 
     if (questionId === 5) {
+      expect(question.code[1]).toContain("-> None:");
+      expect(question.code).not.toContain("        return None");
       const firstInitializationStep = question.steps[0];
       const partialObject = firstInitializationStep.answer.find(
         (box) => box.type === ".class"
       );
       expect(partialObject?.value).toEqual({ name: 2 });
     } else {
+      expect(question.code[2]).toContain("-> None:");
+      expect(question.code[6]).toBe('card = ScoreCard("Mira", 4)');
+      expect(question.code).not.toContain("        return None");
       const calculationStep = question.steps[0];
       const methodFrame = calculationStep.answer.find(
         (box) => box.name === "ScoreCard.add_points"

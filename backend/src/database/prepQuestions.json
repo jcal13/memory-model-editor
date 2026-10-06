@@ -1749,10 +1749,9 @@
     "question": "Draw the memory model after the object is created. Use the line checks to trace `__init__`.",
     "code": [
       "class ScoreCard:",
-      "    def __init__(self, name, points):",
+      "    def __init__(self, name, points) -> None:",
       "        self.name = name",
       "        self.points = points",
-      "        return None",
       "",
       "card = ScoreCard(\"Mira\", 4)"
     ],
@@ -1884,7 +1883,7 @@
         ]
       },
       {
-        "lineNumber": 7,
+        "lineNumber": 6,
         "answer": [
           {
             "id": null,
@@ -1920,15 +1919,15 @@
   },
   {
     "id": 6,
-    "question": "A `ScoreCard` named `card` is provided in the initial memory model. Trace `add_points` at each line, then draw the memory model after the call returns.",
+    "question": "The initial memory model shows `card` after `card = ScoreCard(\"Mira\", 4)` executes. Trace `add_points` at each line, then draw the memory model after the call returns.",
     "code": [
       "class ScoreCard:",
       "    # The __init__ method is the same as in Q5.",
-      "    def add_points(self, amount):",
+      "    def add_points(self, amount) -> None:",
       "        new_points = self.points + amount",
       "        self.points = new_points",
-      "        return None",
       "",
+      "card = ScoreCard(\"Mira\", 4)",
       "card.add_points(3)"
     ],
     "answer": [

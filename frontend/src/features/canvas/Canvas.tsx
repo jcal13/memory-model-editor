@@ -476,10 +476,12 @@ function Canvas({
       if (!ctm) return;
       const coords = point.matrixTransform(ctm.inverse());
 
+      const newId =
+        sandbox || newKind.name === "function" ? "_" : getNextElementId(ids);
+      if (typeof newId === "number") addId(newId);
+
       setElements((prev) => {
         const newBoxId = getNextBoxId(prev);
-        const newId =
-          sandbox || newKind.name === "function" ? "_" : getNextElementId(ids);
 
         const baseElement: CanvasElement = {
           boxId: newBoxId,
@@ -511,6 +513,7 @@ function Canvas({
       sandbox,
       svgRef,
       setElements,
+      addId,
       useInlinePythonTutorPrimitives,
     ]
   );

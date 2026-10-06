@@ -1,6 +1,7 @@
-import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import React, { useEffect, useState } from "react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import Canvas from "./Canvas";
+import { useUndoHistory } from "../memoryModelEditor/hooks/useUndoHistory";
 import { CanvasElement } from "../shared/types";
 
 jest.mock("./components/CanvasBox", () => ({
@@ -229,5 +230,48 @@ describe("Canvas arrow overlay order", () => {
     });
 
     expect(setElements).toHaveBeenCalledTimes(1);
+  });
+});
+
+
+describe("Canvas drop history", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    global.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver;
+  });
+
+  it.each([false, true])("undoes a dropped box in one action (sandbox=%s)", async (sandbox) => {
+    function Harness() {
+      const [elements, setElements] = useState<CanvasElement[]>([]);
+      const [ids, setIds] = useState<number[]>([]);
+      const [classes, setClasses] = useState<string[]>([]);
+      const { recordState, undo, redo, canUndo, canRedo } = useUndoHistory(setElements, setIds, setClasses);
+      useEffect(() => { recordState({ elements, ids, classes }); }, [elements, ids, classes, recordState]);
+      return <>
+        <button onClick={undo} disabled={!canUndo}>Undo drop</button>
+        <button onClick={redo} disabled={!canRedo}>Redo drop</button>
+        <output data-testid="ids">{JSON.stringify(ids)}</output>
+        <Canvas elements={elements} setElements={setElements} ids={ids}
+          addId={id => setIds(previous => [...previous, id])}
+          removeId={id => setIds(previous => previous.filter(value => value !== id))}
+          onClear={() => {}} sandbox={sandbox} />
+      </>;
+    }
+    render(<Harness />);
+    const svg = screen.getByTestId("canvas") as unknown as SVGSVGElement;
+    Object.defineProperty(svg, "viewBox", { value: { baseVal: { width: 800, height: 600, x: 0, y: 0 } } });
+    svg.createSVGPoint = () => ({ x: 0, y: 0, matrixTransform: () => ({ x: 200, y: 100 }) }) as SVGPoint;
+    svg.getScreenCTM = () => ({ inverse: () => ({}) }) as SVGMatrix;
+    fireEvent.drop(svg, { dataTransfer: { getData: () => "int" }, clientX: 200, clientY: 100 });
+    expect(screen.getAllByTestId(/^canvas-box-/)).toHaveLength(1);
+    expect(screen.getByTestId("ids")).toHaveTextContent(sandbox ? "[]" : "[1]");
+    fireEvent.click(screen.getByText("Undo drop"));
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
+    expect(screen.queryAllByTestId(/^canvas-box-/)).toHaveLength(0);
+    expect(screen.getByTestId("ids")).toHaveTextContent("[]");
+    fireEvent.click(screen.getByText("Redo drop"));
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
+    expect(screen.getAllByTestId(/^canvas-box-/)).toHaveLength(1);
+    expect(screen.getByTestId("ids")).toHaveTextContent(sandbox ? "[]" : "[1]");
   });
 });

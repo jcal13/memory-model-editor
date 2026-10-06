@@ -1,3 +1,4 @@
+import { workspaceStorage } from "../../tutorial/tutorialStorage";
 // Storage utility functions - pure functions for localStorage operations
 
 import {
@@ -96,7 +97,7 @@ function normalizeVisualStyle(rawStyle: unknown): VisualStyle {
  */
 export function loadInitialCanvasData(): CanvasData {
   try {
-    const rawData = localStorage.getItem(CANVAS_STORAGE_KEY);
+    const rawData = workspaceStorage.getItem(CANVAS_STORAGE_KEY);
     if (!rawData) return DEFAULT_CANVAS_DATA;
 
     const parsed = JSON.parse(rawData);
@@ -113,7 +114,7 @@ export function loadInitialCanvasData(): CanvasData {
  */
 export function loadInitialUIData(): UIState {
   try {
-    const rawData = localStorage.getItem(UI_STORAGE_KEY);
+    const rawData = workspaceStorage.getItem(UI_STORAGE_KEY);
     if (!rawData) return DEFAULT_UI_STATE;
 
     const parsed = JSON.parse(rawData);
@@ -221,7 +222,7 @@ function validateSubmissionResults(rawResults: any): SubmissionResult | null {
  */
 export function saveCanvasData(data: CanvasData): void {
   try {
-    localStorage.setItem(CANVAS_STORAGE_KEY, JSON.stringify(data));
+    workspaceStorage.setItem(CANVAS_STORAGE_KEY, JSON.stringify(data));
   } catch (error) {
     console.warn("Failed to save canvas data to localStorage:", error);
   }
@@ -233,7 +234,7 @@ export function saveCanvasData(data: CanvasData): void {
  */
 export function saveUIState(state: UIState): void {
   try {
-    localStorage.setItem(UI_STORAGE_KEY, JSON.stringify(state));
+    workspaceStorage.setItem(UI_STORAGE_KEY, JSON.stringify(state));
   } catch (error) {
     console.warn("Failed to save UI state to localStorage:", error);
   }
@@ -244,7 +245,7 @@ export function saveUIState(state: UIState): void {
  */
 export function clearCanvasStorage(): void {
   try {
-    localStorage.removeItem(CANVAS_STORAGE_KEY);
+    workspaceStorage.removeItem(CANVAS_STORAGE_KEY);
   } catch (error) {
     console.warn("Failed to clear canvas storage:", error);
   }
@@ -270,7 +271,7 @@ export function saveQuestionCanvasData(
 ): void {
   try {
     const key = getQuestionCanvasKey(type, index);
-    localStorage.setItem(key, JSON.stringify(data));
+    workspaceStorage.setItem(key, JSON.stringify(data));
   } catch (error) {
     console.warn("Failed to save question canvas data:", error);
   }
@@ -285,7 +286,7 @@ export function loadQuestionCanvasData(
 ): CanvasData | null {
   try {
     const key = getQuestionCanvasKey(type, index);
-    const rawData = localStorage.getItem(key);
+    const rawData = workspaceStorage.getItem(key);
     if (!rawData) return null;
 
     const parsed = JSON.parse(rawData);
@@ -316,7 +317,7 @@ export function resolveQuestionCanvasData(
  */
 export function getDoNotRemindCanvasClear(): boolean {
   try {
-    const value = localStorage.getItem(DO_NOT_REMIND_KEY);
+    const value = workspaceStorage.getItem(DO_NOT_REMIND_KEY);
     return value === "true";
   } catch (error) {
     return false;
@@ -328,7 +329,7 @@ export function getDoNotRemindCanvasClear(): boolean {
  */
 export function setDoNotRemindCanvasClear(value: boolean): void {
   try {
-    localStorage.setItem(DO_NOT_REMIND_KEY, value.toString());
+    workspaceStorage.setItem(DO_NOT_REMIND_KEY, value.toString());
   } catch (error) {
     console.warn("Failed to save do not remind preference:", error);
   }
@@ -343,7 +344,7 @@ export function deleteQuestionCanvasData(
 ): void {
   try {
     const key = getQuestionCanvasKey(type, index);
-    localStorage.removeItem(key);
+    workspaceStorage.removeItem(key);
   } catch (error) {
     console.warn("Failed to delete question canvas data:", error);
   }

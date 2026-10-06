@@ -1,3 +1,5 @@
+import { isTutorial } from "../../tutorial/tutorialStorage";
+import { normalizeQuestionCanvasData } from "../utils/questionFrames";
 import { useState } from "react";
 import {
   CanvasElement,
@@ -19,11 +21,29 @@ import { readQuestionLink } from "../../informationTabs/questionTab/utils/questi
 const DEFAULT_INFO_PANEL_WIDTH = 500;
 
 export function useMemoryModelEditorState(sandbox: boolean) {
-  // Load initial data
-  const [linkedQuestion, setLinkedQuestion] = useState(() => readQuestionLink(window.location.search));
-  const initialCanvasData = linkedQuestion === null ? loadInitialCanvasData() : { elements: [], ids: [], classes: [] };
+    // Load initial data
+  const tutorial = isTutorial();
+  const [linkedQuestion, setLinkedQuestion] = useState(() =>
+    tutorial ? null : readQuestionLink(window.location.search)
+  );
+
+  const initialCanvasData = tutorial
+    ? normalizeQuestionCanvasData(loadInitialCanvasData())
+    : linkedQuestion === null
+      ? loadInitialCanvasData()
+      : { elements: [], ids: [], classes: [] };
+
+  // Copy before applying overrides to avoid changing shared defaults.
   const initialUIData = { ...loadInitialUIData() };
-  if (linkedQuestion !== null) {
+
+  if (tutorial) {
+    initialUIData.questionIndex = 1;
+    initialUIData.questionType = "practice";
+    initialUIData.questionView = "question";
+    initialUIData.activeTab = "question";
+    initialUIData.isInfoPanelOpen = true;
+    initialUIData.sandboxMode = true;
+  } else if (linkedQuestion !== null) {
     initialUIData.questionIndex = linkedQuestion.id;
     initialUIData.questionType = linkedQuestion.type;
     initialUIData.questionView = "question";
@@ -91,7 +111,7 @@ export function useMemoryModelEditorState(sandbox: boolean) {
   const [activePaletteTab, setActivePaletteTab] = useState<PaletteTab>("all");
   const [isPaletteOpen, setIsPaletteOpen] = useState(true);
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(
-    typeof initialUIData.isInfoPanelOpen === "boolean" ? initialUIData.isInfoPanelOpen : true
+    isTutorial() ? true : typeof initialUIData.isInfoPanelOpen === "boolean" ? initialUIData.isInfoPanelOpen : true
   );
   const [infoPanelWidth, setInfoPanelWidth] = useState<number>(
     DEFAULT_INFO_PANEL_WIDTH

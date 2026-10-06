@@ -5,6 +5,7 @@ MemoryLab is a drag-and-drop web application designed for computer science educa
 ## Table of Contents
 
 - [Key Features](#key-features)
+- [Sharing Question Links](#sharing-question-links)
 - [Developer Setup (Local)](#developer-setup-local)
 - [Production Deployment](#production-deployment)
 - [Adding Questions to the Database](#adding-questions-to-the-database)
@@ -17,9 +18,27 @@ MemoryLab is a drag-and-drop web application designed for computer science educa
 - **Practice vs. Test Modes**:
   - **Practice Mode**: A guided environment with structured assistance to assist with model construction.
   - **Test Mode**: A free-form environment with no constraints for independent self-assessment.
+- **Direct Question Links**: Share specific Practice, Test, CSC148 Prep, and Experiment questions by copying their automatically updated URLs from the address bar.
 - **Question Bank**: Includes built-in exercises drawn from previous first-year computer science courses and tests at the University of Toronto.
 - **Automatic Grading**: Provides detailed, traceable feedback by treating memory models as graph-isomorphism problems. Also allows for line-by-line checking with auto-advancement features available.
 - **Multi-Format Export**: Save models as **JSON** (for re-importing or uploading to MarkUs), **SVG**, or **PNG**.
+
+## Sharing Question Links
+
+Each Practice, Test, CSC148 Prep, and Experiment question has a direct URL. Opening a question automatically updates the browser address bar, so you can copy the address and share it with students or include it in course instructions. No separate copy button is needed.
+
+| Question category | Example URL |
+| --- | --- |
+| Practice | `https://your-memorylab-host/?practice=1` |
+| Test | `https://your-memorylab-host/?test=1` |
+| CSC148 Prep | `https://your-memorylab-host/?prep=1` |
+| Experiment | `https://your-memorylab-host/?experiment=1` |
+
+Replace the example host with your MemoryLab address and the number with the question ID. For local development, an example is `http://localhost:3000/?practice=1`.
+
+Opening or refreshing a direct link loads the selected question with its normal starting canvas, including its main frame, rather than restoring a saved answer. Returning to the question list removes the question parameter from the address bar. Normal question navigation continues to use the existing saved-work behavior.
+
+Step-by-Step Questions do not currently support direct links.
 
 ## Developer Setup (Local)
 

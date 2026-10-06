@@ -15,19 +15,42 @@ import {
 } from "../utils/localStorage";
 import type { QuestionView } from "../utils/localStorage";
 
+import { readQuestionLink } from "../../informationTabs/questionTab/utils/questionLinks";
+
 // Layout constants
 const DEFAULT_INFO_PANEL_WIDTH = 500;
 
 export function useMemoryModelEditorState(sandbox: boolean) {
-  // Load initial data
-  const initialCanvasData = isTutorial() ? normalizeQuestionCanvasData(loadInitialCanvasData()) : loadInitialCanvasData();
-  // Copy before applying demo overrides: the loader may return shared defaults.
+    // Load initial data
+  const tutorial = isTutorial();
+  const [linkedQuestion, setLinkedQuestion] = useState(() =>
+    tutorial ? null : readQuestionLink(window.location.search)
+  );
+
+  const initialCanvasData = tutorial
+    ? normalizeQuestionCanvasData(loadInitialCanvasData())
+    : linkedQuestion === null
+      ? loadInitialCanvasData()
+      : { elements: [], ids: [], classes: [] };
+
+  // Copy before applying overrides to avoid changing shared defaults.
   const initialUIData = { ...loadInitialUIData() };
-  if (isTutorial()) {
+
+  if (tutorial) {
     initialUIData.questionIndex = 1;
     initialUIData.questionType = "practice";
     initialUIData.questionView = "question";
+    initialUIData.activeTab = "question";
+    initialUIData.isInfoPanelOpen = true;
     initialUIData.sandboxMode = true;
+  } else if (linkedQuestion !== null) {
+    initialUIData.questionIndex = linkedQuestion.id;
+    initialUIData.questionType = linkedQuestion.type;
+    initialUIData.questionView = "question";
+    initialUIData.activeTab = "question";
+    initialUIData.isInfoPanelOpen = true;
+    initialUIData.sandboxMode = false;
+    initialUIData.submissionResults = null;
   }
 
   // Canvas state
@@ -103,6 +126,8 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     useState<boolean>(false);
 
   return {
+    linkedQuestion,
+    setLinkedQuestion,
     // Canvas state
     canvasResetKey,
     setCanvasResetKey,

@@ -27,7 +27,7 @@ import {
  * - onSave: function to call with the updated box data
  * - onRemove: function to call to remove the box from the canvas
  */
-const BoxEditorModule = ({
+const BoxEditorFields = ({
   metadata,
   onSave,
   onRemove,
@@ -194,6 +194,23 @@ const BoxEditorModule = ({
       </div>
     </div>
   );
+};
+
+const editorSignature = (id: BoxEditorType["metadata"]["id"], kind: BoxEditorType["metadata"]["kind"], invalidated?: boolean) =>
+  JSON.stringify([id, kind, !!invalidated]);
+
+const BoxEditorModule = (props: BoxEditorType) => {
+  const { metadata, onSave } = props;
+  const signature = editorSignature(metadata.id, metadata.kind, metadata.invalidated);
+  const [sync, setSync] = useState({ signature, revision: 0 });
+  if (sync.signature !== signature) {
+    setSync({ signature, revision: sync.revision + 1 });
+  }
+  return <BoxEditorFields {...props} key={sync.revision} onSave={(id, kind, invalidated) => {
+    const savedSignature = editorSignature(id, kind, invalidated);
+    setSync(previous => previous.signature === savedSignature ? previous : {...previous, signature: savedSignature});
+    onSave(id, kind, invalidated);
+  }} />;
 };
 
 export default BoxEditorModule;

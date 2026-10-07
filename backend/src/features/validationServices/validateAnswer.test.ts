@@ -282,3 +282,113 @@ describe("CSC148 Practice class and method answers", () => {
     },
   );
 });
+
+
+describe("missing attribute reference feedback", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.DATABASE_URL = "postgres://example.test/memory-model-editor";
+  });
+
+  it.each([null, 999])("identifies both Question 17 attributes with invalid target %s", async (target) => {
+    const answer = practiceQuestions.find((q) => q.id === 17)!.answer;
+    mockQuery.mockResolvedValue({ rows: [{ answer }] });
+    const result = await validateAnswer([
+      { type: ".frame", name: "__main__", id: null, order: 1, value: { card: 1 } },
+      { type: "object", name: "ScoreCard", id: 1, value: { name: target, points: target } },
+    ], 17, "practice");
+
+    expect(result.correct).toBe(false);
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'Attribute "card.name" on the ScoreCard object is missing a valid reference',
+      'Attribute "card.points" on the ScoreCard object is missing a valid reference',
+    ]);
+    expect(result.errors.every((error) => error.type === ErrorType.INVALID_REFERENCE)).toBe(true);
+  });
+
+  it("preserves the root variable message when card itself has no target", async () => {
+    const answer = practiceQuestions.find((q) => q.id === 17)!.answer;
+    mockQuery.mockResolvedValue({ rows: [{ answer }] });
+    const result = await validateAnswer([
+      { type: ".frame", name: "__main__", id: null, order: 1, value: { card: null } },
+    ], 17, "practice");
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'Variable "card" in __main__ is missing a valid reference',
+    ]);
+  });
+});
+
+
+describe("attribute reference feedback across object models", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.DATABASE_URL = "postgres://example.test/memory-model-editor";
+  });
+
+  it.each([
+    { target: null, valid: false },
+    { target: 999, valid: false },
+    { target: 30, valid: true },
+  ])("reports only the broken Book attribute (target=$target)", async ({ target, valid }) => {
+    mockQuery.mockResolvedValue({ rows: [{ answer: [
+      { type: ".frame", name: "__main__", id: null, order: 1, value: { book: 1 } },
+      { type: ".class", name: "Book", id: 1, value: { title: 2, pages: 3 } },
+      { type: "str", id: 2, value: "Dune" },
+      { type: "int", id: 3, value: 412 },
+    ] }] });
+
+    const result = await validateAnswer([
+      { type: ".frame", name: "__main__", id: null, order: 1, value: { book: 10 } },
+      { type: "object", name: "Book", id: 10, value: { title: 20, pages: target } },
+      { type: "str", id: 20, value: "Dune" },
+      ...(valid ? [{ type: "int", id: 30, value: 412 }] : []),
+    ], 1, "practice");
+
+    expect(result.correct).toBe(valid);
+    expect(result.errors).toEqual(valid ? [] : [expect.objectContaining({
+      type: ErrorType.INVALID_REFERENCE,
+      message: 'Attribute "book.pages" on the Book object is missing a valid reference',
+    })]);
+  });
+
+  it.each([null, 999])("names the nested attribute and its immediate owner (target=%s)", async (target) => {
+    mockQuery.mockResolvedValue({ rows: [{ answer: [
+      { type: ".frame", name: "build_team", id: null, order: 1, value: { team: 1 } },
+      { type: ".class", name: "Team", id: 1, value: { leader: 2 } },
+      { type: ".class", name: "Person", id: 2, value: { name: 3 } },
+      { type: "str", id: 3, value: "Ada" },
+    ] }] });
+
+    const result = await validateAnswer([
+      { type: ".frame", name: "build_team", id: null, order: 1, value: { team: 10 } },
+      { type: "object", name: "Team", id: 10, value: { leader: 20 } },
+      { type: "object", name: "Person", id: 20, value: { name: target } },
+    ], 1, "practice");
+
+    expect(result.correct).toBe(false);
+    expect(result.errors).toEqual([expect.objectContaining({
+      type: ErrorType.INVALID_REFERENCE,
+      message: 'Attribute "team.leader.name" on the Person object is missing a valid reference',
+    })]);
+  });
+
+  it("reports an unconnected intermediate object without blaming its child attribute", async () => {
+    mockQuery.mockResolvedValue({ rows: [{ answer: [
+      { type: ".frame", name: "__main__", id: null, order: 1, value: { team: 1 } },
+      { type: ".class", name: "Team", id: 1, value: { leader: 2 } },
+      { type: ".class", name: "Person", id: 2, value: { name: 3 } },
+      { type: "str", id: 3, value: "Ada" },
+    ] }] });
+
+    const result = await validateAnswer([
+      { type: ".frame", name: "__main__", id: null, order: 1, value: { team: 10 } },
+      { type: "object", name: "Team", id: 10, value: { leader: null } },
+    ], 1, "practice");
+
+    expect(result.correct).toBe(false);
+    expect(result.errors).toEqual([expect.objectContaining({
+      type: ErrorType.INVALID_REFERENCE,
+      message: 'Attribute "team.leader" on the Team object is missing a valid reference',
+    })]);
+  });
+});

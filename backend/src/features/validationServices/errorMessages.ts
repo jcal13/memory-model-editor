@@ -35,6 +35,9 @@ export const ERROR_MESSAGES = {
   unmapped_variable: (varName: string, frameName: string) =>
     `Variable "${varName}" in ${frameName} is missing a valid reference`,
 
+  unmapped_attribute: (attributePath: string, objectName: string) =>
+    `Attribute "${attributePath}" on the ${objectName} object is missing a valid reference`,
+
   // Pattern: "Unmapped ID: function "__main__" → var "b"" (fallback for non-variable paths)
   unmapped_id_fallback: (cleanPath: string) =>
     `Unmapped ID: ${cleanPath}`,

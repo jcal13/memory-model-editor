@@ -4,7 +4,9 @@ import { CanvasElement } from "../shared/types";
 import { hasAssignment } from "./tutorialModel";
 import { exitTutorial, isTutorial, startTutorial, workspaceStorage } from "./tutorialStorage";
 import { lessonTarget, targetBounds, placeCard } from "./tutorialTargets";
+import { assignmentRepair } from "./tutorialRepair";
 import HelpContent from "./HelpContent";
+import { questionTypes } from "../informationTabs/questionTab/utils/questionLinks";
 import "./tutorial.css";
 
 // Beamer+ pattern: declarative steps, measured targets, and a transparent spotlight.
@@ -34,7 +36,11 @@ export default function Tutorial({ elements, correct, submissionFailed = false, 
   const action = nextAction(elements, correct);
   const [step, setStep] = useState(() => active && workspaceStorage.getItem("started") === "true" ? Math.min(action, 6) : 0);
   const [guidance, setGuidance] = useState(() => active && workspaceStorage.getItem("guidance") !== "hidden");
-  const [help, setHelp] = useState(() => !isTutorial());
+  const [help, setHelp] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    // Let direct links show their question or loading error without a welcome overlay.
+    return !isTutorial() && !questionTypes.some(type => params.has(type));
+  });
   const [interacting, setInteracting] = useState(false);
   const [draggingBox, setDraggingBox] = useState(false);
   const [rect, setRect] = useState<{left: number; top: number; width: number; height: number} | null>(null);
@@ -47,8 +53,6 @@ export default function Tutorial({ elements, correct, submissionFailed = false, 
   const current = showingFeedback
     ? { ...steps[step], title: correct ? "Congratulations! Your model passed!" : "Check your feedback" }
     : steps[step];
-  const referenceValue = step === 4 ? 4 : step === 5 ? 6 : null;
-  const referenceObject = referenceValue === null ? undefined : elements.find(e => !e.invalidated && e.kind.name === "primitive" && e.kind.type === "int" && Number(e.kind.value) === referenceValue);
   const hasInteger = elements.some(e => !e.invalidated && e.kind.name === "primitive" && e.kind.type === "int");
   const instruction = showingFeedback
     ? correct
@@ -56,8 +60,8 @@ export default function Tutorial({ elements, correct, submissionFailed = false, 
       : "The Feedback panel shows issues to fix. Use it to adjust your model, then click Submit again. If you added anything while exploring, the feedback will help you check it. Next unlocks when your answer passes."
     : step === 1 && hasInteger
     ? "You already added an integer object to the canvas. This step is complete; you do not need to drag another box. Click Next to review setting its value."
-    : referenceObject
-    ? `Your integer containing ${referenceValue} is ready (ID ${referenceObject.id}). Click __main__, add ${step === 4 ? "b" : "c"}, and select that object’s ID. You do not need another integer for this assignment.`
+    : step >= 2 && step <= 5
+    ? assignmentRepair(step, elements).text
     : current.body;
   const editing = elements.find(e => e.boxId === editingId);
   const context = editing?.kind.name === "primitive"
@@ -163,7 +167,7 @@ export default function Tutorial({ elements, correct, submissionFailed = false, 
     {help && <div className="tutorial-help-backdrop" onClick={event => { if (event.target === event.currentTarget) setHelp(false); }}>
       <div className="tutorial-help-shell">
       <div className="tutorial-help" ref={helpCard} role="dialog" aria-modal="true" aria-labelledby="memory-help-title" tabIndex={-1}>
-        <div className="tutorial-heading"><h1 id="memory-help-title">Help &amp; guide</h1><button aria-label="Close help" onClick={() => setHelp(false)}>×</button></div>
+        <div className="tutorial-heading"><h1 id="memory-help-title">Help &amp; Guide</h1><button aria-label="Close help" onClick={() => setHelp(false)}>×</button></div>
         <HelpContent onStart={startTutorial} />
         <button onClick={()=>setHelp(false)}>Done</button>
       </div>

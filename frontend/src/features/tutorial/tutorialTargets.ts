@@ -1,3 +1,4 @@
+import { assignmentRepair } from "./tutorialRepair";
 import { CanvasElement } from "../shared/types";
 
 /** Targets belong to the lesson, never to the last arbitrary click. */
@@ -11,12 +12,9 @@ export function lessonTarget(step: number, elements: CanvasElement[]): Element |
     const existing = integers[0];
     return existing ? document.querySelector(`[data-canvas-box-id="${existing.boxId}"]`) : palette();
   }
-  const value = step === 4 ? 4 : step === 5 ? 6 : 5;
-  const valued = integers.find(e => e.kind.name === "primitive" && Number(e.kind.value) === value);
-  const usedIds = new Set(main?.kind.name === "function" ? main.kind.params.map(p => p.targetId) : []);
-  const object = valued || integers.find(e => !usedIds.has(e.id as number));
-  const wantsReference = step === 3 || ((step === 4 || step === 5) && !!valued);
-  const intended = wantsReference ? main : object;
+  const repair = assignmentRepair(step, elements);
+  const wantsReference = step === 3 || repair.reference;
+  const intended = step === 3 ? main : repair.target;
   if (!intended) return palette();
   const editor = document.querySelector(`[data-tour="box-editor"][data-box-id="${intended.boxId}"]`);
   if (editor) {

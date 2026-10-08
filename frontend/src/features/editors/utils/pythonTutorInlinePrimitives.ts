@@ -5,11 +5,8 @@ import {
   PrimitiveKind,
   PrimitiveType,
 } from "../../shared/types";
-import {
-  createElementsByIdMap,
-  getPythonTutorDisplayType,
-  isPrimitiveElement,
-} from "../../canvas/utils/pythonTutorReferences";
+import { getPythonTutorDisplayType } from "../../canvas/utils/pythonTutorReferences";
+import { createElementsByIdMap, isPrimitiveElement } from "../../canvas/utils/canvasReferences";
 
 export type InlineTargetValue = ID | string | null | undefined;
 

@@ -17,10 +17,7 @@ import {
   upsertInlinePrimitive,
   InlineTargetValue,
 } from "../utils/pythonTutorInlinePrimitives";
-import {
-  createElementsByIdMap,
-  isPrimitiveElement,
-} from "../../canvas/utils/pythonTutorReferences";
+import { createElementsByIdMap, isPrimitiveElement } from "../../canvas/utils/canvasReferences";
 
 interface InlineTargetEditorProps {
   ownerElement: CanvasElement;

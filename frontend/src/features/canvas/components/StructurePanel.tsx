@@ -1,6 +1,5 @@
 import React, { useMemo, useRef } from "react";
 import { CanvasElement } from "../../shared/types";
-import { createElementsByIdMap } from "../utils/pythonTutorReferences";
 import { detectLinkedListGraph } from "../utils/linkedListDetector";
 import LinkedListPreview from "./LinkedListPreview";
 import styles from "./StructurePanel.module.css";
@@ -14,8 +13,16 @@ interface StructurePanelProps {
   onHeightChange: (height: number) => void;
 }
 
-export default function StructurePanel({
-  enabled,
+function LinkedListContent({ elements }: { elements: CanvasElement[] }) {
+  const graph = useMemo(() => detectLinkedListGraph(elements), [elements]);
+  return graph.nodes.length === 0 ? (
+    <p role="status">No linked lists detected.</p>
+  ) : (
+    <LinkedListPreview graph={graph} />
+  );
+}
+
+function StructurePanelContent({
   elements,
   collapsed,
   height,
@@ -23,18 +30,6 @@ export default function StructurePanel({
   onHeightChange,
 }: StructurePanelProps) {
   const dragRef = useRef<{ y: number; h: number } | null>(null);
-
-  const elementsById = useMemo(() => createElementsByIdMap(elements), [elements]);
-
-  const graph = useMemo(() => {
-    if (!enabled) {
-      return { nodes: [], edges: [] };
-    }
-
-    return detectLinkedListGraph(elements, elementsById);
-  }, [enabled, elements, elementsById]);
-
-  if (!enabled || graph.nodes.length === 0) return null;
 
   const onHandleDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -80,6 +75,7 @@ export default function StructurePanel({
           <button
             type="button"
             className={styles.collapseBtn}
+            aria-label={collapsed ? "Expand visualization" : "Collapse visualization"}
             aria-expanded={!collapsed}
             onClick={() => onCollapsedChange(!collapsed)}
           >
@@ -89,10 +85,67 @@ export default function StructurePanel({
 
         {!collapsed && (
           <div className={styles.body}>
-            <LinkedListPreview graph={graph} />
+            <StructurePanelBoundary elements={elements}>
+              <LinkedListContent elements={elements} />
+            </StructurePanelBoundary>
           </div>
         )}
       </div>
     </>
   );
+}
+
+interface StructurePanelBoundaryProps {
+  elements: CanvasElement[];
+  children: React.ReactNode;
+}
+
+interface StructurePanelBoundaryState {
+  failed: boolean;
+  elements: CanvasElement[];
+}
+
+// Keep both detection and rendering inside the boundary so either can fail
+// without unmounting the surrounding editor.
+class StructurePanelBoundary extends React.Component<
+  StructurePanelBoundaryProps,
+  StructurePanelBoundaryState
+> {
+  state: StructurePanelBoundaryState = {
+    failed: false,
+    elements: this.props.elements,
+  };
+
+  static getDerivedStateFromError(): Partial<StructurePanelBoundaryState> {
+    return { failed: true };
+  }
+
+  static getDerivedStateFromProps(
+    props: StructurePanelBoundaryProps,
+    state: StructurePanelBoundaryState
+  ): Partial<StructurePanelBoundaryState> | null {
+    // Retry after an edit, undo/redo, or question change supplies a new canvas.
+    return props.elements !== state.elements
+      ? { elements: props.elements, failed: false }
+      : null;
+  }
+
+  render() {
+    if (this.state.failed) {
+      return (
+        <p role="status">
+          Visualization unavailable. You can keep editing your canvas.
+        </p>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+export default function StructurePanel(props: StructurePanelProps) {
+  // Unmounting the boundary also lets switching the visualizer off/on retry.
+  if (!props.enabled) return null;
+
+  return <StructurePanelContent {...props} />;
 }

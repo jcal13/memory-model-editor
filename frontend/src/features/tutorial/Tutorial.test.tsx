@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Tutorial, { nextAction } from './Tutorial';
+import { normalizeTutorialUrl, workspaceStorage } from './tutorialStorage';
 import { CanvasElement } from '../shared/types';
 const model = (): CanvasElement[] => [
  {boxId:0,id:'_',x:0,y:0,kind:{name:'function',type:'function',value:null,functionName:'__main__',params:[{name:'a',targetId:10},{name:'b',targetId:20},{name:'c',targetId:30}]}},
@@ -13,7 +14,7 @@ beforeEach(()=>{
 test('help is available outside the Questions list with documentation and a tour entry',()=>{
  window.history.replaceState({},'', '/'); render(<Tutorial elements={[]} correct={false}/>);
  fireEvent.click(screen.getByRole('button',{name:'Help and guide'}));
- expect(screen.getByRole('dialog',{name:'Help & guide'})).toBeInTheDocument();
+ expect(screen.getByRole('dialog',{name:'Help & Guide'})).toBeInTheDocument();
  expect(screen.getByText('3. Connect variables to objects')).toBeInTheDocument();
  expect(screen.getByRole('button',{name:/New to Memory Lab/})).toBeInTheDocument();
 });
@@ -72,16 +73,16 @@ test('Help keeps inside clicks open and supports outside, Escape, Close and Done
  render(<Tutorial elements={[]} correct={false}/>);
  const open = () => fireEvent.click(screen.getByRole('button',{name:'Help and guide'}));
  open();
- fireEvent.click(screen.getByRole('heading',{name:'Help & guide'}));
- expect(screen.getByRole('dialog',{name:'Help & guide'})).toBeInTheDocument();
+ fireEvent.click(screen.getByRole('heading',{name:'Help & Guide'}));
+ expect(screen.getByRole('dialog',{name:'Help & Guide'})).toBeInTheDocument();
  fireEvent.click(document.querySelector('.tutorial-help-backdrop')!);
- expect(screen.queryByRole('dialog',{name:'Help & guide'})).not.toBeInTheDocument();
+ expect(screen.queryByRole('dialog',{name:'Help & Guide'})).not.toBeInTheDocument();
  open(); fireEvent.keyDown(document,{key:'Escape'});
- expect(screen.queryByRole('dialog',{name:'Help & guide'})).not.toBeInTheDocument();
+ expect(screen.queryByRole('dialog',{name:'Help & Guide'})).not.toBeInTheDocument();
  open(); fireEvent.click(screen.getByRole('button',{name:'Close help'}));
- expect(screen.queryByRole('dialog',{name:'Help & guide'})).not.toBeInTheDocument();
+ expect(screen.queryByRole('dialog',{name:'Help & Guide'})).not.toBeInTheDocument();
  open(); fireEvent.click(screen.getByRole('button',{name:'Done'}));
- expect(screen.queryByRole('dialog',{name:'Help & guide'})).not.toBeInTheDocument();
+ expect(screen.queryByRole('dialog',{name:'Help & Guide'})).not.toBeInTheDocument();
 });
 test('welcome resumes at step one and only one Hide control exists',()=>{
  render(<Tutorial elements={[]} correct={false}/>);
@@ -130,16 +131,16 @@ test('deactivating the demo removes every tutorial interaction listener', () => 
 test('Help opens on every regular page load and can still be reopened', () => {
  window.history.replaceState({}, '', '/');
  const first = render(<Tutorial elements={[]} correct={false}/>);
- expect(screen.getByRole('dialog',{name:'Help & guide'})).toBeInTheDocument();
+ expect(screen.getByRole('dialog',{name:'Help & Guide'})).toBeInTheDocument();
  fireEvent.click(screen.getByRole('button',{name:'Close help'}));
  first.unmount();
  localStorage.setItem('memorylab-help-seen-v1', 'true');
  render(<Tutorial elements={[]} correct={false}/>);
- expect(screen.getByRole('dialog',{name:'Help & guide'})).toBeInTheDocument();
+ expect(screen.getByRole('dialog',{name:'Help & Guide'})).toBeInTheDocument();
  fireEvent.click(screen.getByRole('button',{name:'Close help'}));
  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
  fireEvent.click(screen.getByRole('button',{name:'Help and guide'}));
- expect(screen.getByRole('dialog',{name:'Help & guide'})).toBeInTheDocument();
+ expect(screen.getByRole('dialog',{name:'Help & Guide'})).toBeInTheDocument();
 });
 
 test('Back to the drag step acknowledges existing objects and Next reviews one step at a time', () => {
@@ -210,3 +211,43 @@ test('a model edited after submission returns to Submit rather than showing stal
  rerender(<Tutorial elements={model()} correct={false}/>);
  expect(screen.getByRole('dialog',{name:'Submit and read the feedback'})).toBeInTheDocument();
 });
+
+
+test.each([1, 2, 3])('after passing, repairing object %i uses the existing object and follows Undo/Redo', index => {
+ const original = model();
+ const {rerender} = render(<Tutorial elements={original} correct={true}/>);
+ for(let i=0;i<6;i++) fireEvent.click(screen.getByRole('button',{name:'Next'}));
+ const changed = model();
+ if(changed[index].kind.name === 'primitive') changed[index].kind.value = '3';
+ rerender(<Tutorial elements={changed} correct={false}/>);
+ expect(screen.getByText(new RegExp(`Change the value of the existing integer object.*ID ${index*10}`))).toBeInTheDocument();
+ expect(screen.queryByText(/Drag another int/)).not.toBeInTheDocument();
+ rerender(<Tutorial elements={original} correct={true}/>);
+ expect(screen.getByRole('dialog',{name:'Congratulations! Your model passed!'})).toBeInTheDocument();
+ rerender(<Tutorial elements={changed} correct={false}/>);
+ expect(screen.getByText(/Keep .* connected to this object/)).toBeInTheDocument();
+});
+
+
+test('an edited tutorial link opens Step 1 rather than Help or a resumed later step', () => {
+ window.history.replaceState({}, '', '/?tutorial=90&practice=bad');
+ workspaceStorage.setItem('started', 'true');
+ workspaceStorage.setItem('guidance', 'hidden');
+ normalizeTutorialUrl();
+ render(<Tutorial elements={model()} correct={false}/>);
+ expect(screen.getByRole('dialog',{name:'Build your first memory model'})).toBeInTheDocument();
+ expect(screen.queryByRole('dialog',{name:'Help & Guide'})).not.toBeInTheDocument();
+ expect(screen.getByText('Step 1 of 8')).toBeInTheDocument();
+});
+
+ test.each(['?practice=1', '?practice=999', '?practice=bad', '?test=2', '?prep=3', '?experiment=4', '?practice=', '?practice=1&test=2'])(
+ 'question link %s leaves help closed, including after refresh, but allows manual help', (search) => {
+  window.history.replaceState({}, '', '/' + search);
+  const first = render(<Tutorial elements={[]} correct={false}/>);
+  expect(screen.queryByRole('dialog', {name:'Help & Guide'})).not.toBeInTheDocument();
+  first.unmount();
+  render(<Tutorial elements={[]} correct={false}/>);
+  expect(screen.queryByRole('dialog', {name:'Help & Guide'})).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', {name:'Help and guide'}));
+  expect(screen.getByRole('dialog', {name:'Help & Guide'})).toBeInTheDocument();
+ });

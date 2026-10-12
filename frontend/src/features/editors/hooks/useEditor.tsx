@@ -174,6 +174,8 @@ export const useEditorAutoSave = (
     }
 
     prevRef.current = { id: ownId, payload, invalidated };
+    // Rehydrating an editor after Undo/Redo must not create a new edit.
+    if (ownId === element.id && isEqual(payload, element.kind) && !!invalidated === !!element.invalidated) return;
     onSave(ownId, payload, invalidated);
   }, [
     onSave,

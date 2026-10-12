@@ -1,3 +1,4 @@
+import DraftNameInput from "../DraftNameInput";
 import styles from "../../Editor.module.css";
 import type { Dispatch, SetStateAction } from "react";
 import {
@@ -63,12 +64,11 @@ const FunctionContent = ({
     setParams(functionParams.filter((_: any, idx: any) => idx !== i));
 
   // Update the name of a parameter at a given index
-  const changeName = (i: number, val: string) =>
-    setParams(
-      functionParams.map((p: any, idx: any) =>
-        idx === i ? { ...p, name: val } : p
-      )
-    );
+  const changeName = (i: number, val: string) => {
+    const next = functionParams.map((item: any, idx: number) => idx === i ? { ...item, name: val } : item);
+    setParams(next);
+    onCommitKind?.({ name: "function", type: "function", value: null, functionName, params: next });
+  };
 
   // Update the targetId of a parameter at a given index
   const setTargetId = (i: number, id: ID) =>
@@ -95,10 +95,10 @@ const FunctionContent = ({
             const fieldErrors = getErrorsForId(validationErrors, p.targetId);
             return (
               <div key={idx} className={styles.pairItem}>
-                <input
+                <DraftNameInput
                   placeholder="var"
                   value={p.name}
-                  onChange={(e) => changeName(idx, e.target.value)}
+                  onCommit={name => changeName(idx, name)}
                   className={styles.variableNameBox}
                 />
                 <div className={styles.idSelectButtonWrapper}>

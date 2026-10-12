@@ -4,6 +4,7 @@ const CLOSE_BOTH_PANELS_WIDTH = 1024;
 const CLOSE_PALETTE_WIDTH = 1280;
 
 interface UseResponsivePanelsParams {
+  enabled?: boolean;
   isPaletteOpen: boolean;
   isInfoPanelOpen: boolean;
   setIsPaletteOpen: (open: boolean) => void;
@@ -11,6 +12,7 @@ interface UseResponsivePanelsParams {
 }
 
 export function useResponsivePanels({
+  enabled = true,
   isPaletteOpen,
   isInfoPanelOpen,
   setIsPaletteOpen,
@@ -22,6 +24,7 @@ export function useResponsivePanels({
 
   useEffect(() => {
     const handleResize = () => {
+      if (!enabled) return;
       const width = window.innerWidth;
       const previousWidth = lastWidthRef.current;
       lastWidthRef.current = width;
@@ -66,7 +69,7 @@ export function useResponsivePanels({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [isPaletteOpen, isInfoPanelOpen, setIsPaletteOpen, setIsInfoPanelOpen]);
+  }, [enabled, isPaletteOpen, isInfoPanelOpen, setIsPaletteOpen, setIsInfoPanelOpen]);
 
   useEffect(() => {
     if (isPaletteOpen) {

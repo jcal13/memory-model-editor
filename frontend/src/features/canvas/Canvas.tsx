@@ -30,9 +30,7 @@ import {
   reorderFunctionFramesWithLockedMain,
 } from "../memoryModelEditor/utils/questionFrames";
 import styles from "./Canvas.module.css";
-import {
-  createElementsByIdMap,
-} from "./utils/pythonTutorReferences";
+import { createElementsByIdMap } from "./utils/canvasReferences";
 import { findOrphanedGeneratedPrimitiveIds } from "../editors/utils/pythonTutorInlinePrimitives";
 import PythonTutorReferenceArrows from "./components/PythonTutorReferenceArrows";
 
@@ -476,10 +474,12 @@ function Canvas({
       if (!ctm) return;
       const coords = point.matrixTransform(ctm.inverse());
 
+      const newId =
+        sandbox || newKind.name === "function" ? "_" : getNextElementId(ids);
+      if (typeof newId === "number") addId(newId);
+
       setElements((prev) => {
         const newBoxId = getNextBoxId(prev);
-        const newId =
-          sandbox || newKind.name === "function" ? "_" : getNextElementId(ids);
 
         const baseElement: CanvasElement = {
           boxId: newBoxId,
@@ -511,6 +511,7 @@ function Canvas({
       sandbox,
       svgRef,
       setElements,
+      addId,
       useInlinePythonTutorPrimitives,
     ]
   );
@@ -752,7 +753,9 @@ function Canvas({
         </svg>
       </div>
 
-      {openEditors.map((element) => {
+      {openEditors.map((openedElement) => {
+        const element = elements.find(item => item.boxId === openedElement.boxId);
+        if (!element) return null;
         const Editor = EDITOR_MAP[element.kind.name];
         return (
           <FloatingEditor

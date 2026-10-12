@@ -946,8 +946,16 @@ function compareIds(
     const varMatch = cleanPath.match(/var "([^"]+)"/);
     const frameName = frameMatch ? frameMatch[1] : cleanPath;
     const varName = varMatch ? varMatch[1] : cleanPath;
+    const attributeMatch = cleanPath.match(/object "([^"]+)"\.([^→]+)$/);
+    // Keep the route to the failing attribute instead of blaming its root variable.
+    const attributePath = varMatch
+      ? cleanPath.slice(cleanPath.indexOf(varMatch[0]) + varMatch[0].length)
+          .replace(/→object "[^"]+"\./g, ".")
+      : "";
     const unmappedMessage = frameMatch && varMatch
-      ? ERROR_MESSAGES.unmapped_variable(varName, frameName)
+      ? attributeMatch
+        ? ERROR_MESSAGES.unmapped_attribute(`${varName}${attributePath}`, attributeMatch[1])
+        : ERROR_MESSAGES.unmapped_variable(varName, frameName)
       : ERROR_MESSAGES.unmapped_id_fallback(cleanPath);
     
     errors.push(

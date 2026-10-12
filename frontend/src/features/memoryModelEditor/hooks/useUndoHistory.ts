@@ -1,3 +1,4 @@
+import { workspaceStorage } from "../../tutorial/tutorialStorage";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { CanvasElement } from "../../shared/types";
 
@@ -21,7 +22,8 @@ const HISTORY_STORAGE_KEY = "canvas_undo_history";
 const HISTORY_INDEX_STORAGE_KEY = "canvas_undo_history_index";
 
 const normalizeElements = (elements: CanvasElement[]) =>
-  elements.map(({ color, invalidated, ...rest }) => rest);
+  // Validation/feedback annotations are derived state, not user edits.
+  elements.map(({ color, invalidated, errors, ...rest }) => rest);
 
 export function useUndoHistory(
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>,
@@ -31,8 +33,8 @@ export function useUndoHistory(
   // Load initial history from localStorage
   const loadHistory = useCallback(() => {
     try {
-      const saved = localStorage.getItem(HISTORY_STORAGE_KEY);
-      const savedIndex = localStorage.getItem(HISTORY_INDEX_STORAGE_KEY);
+      const saved = workspaceStorage.getItem(HISTORY_STORAGE_KEY);
+      const savedIndex = workspaceStorage.getItem(HISTORY_INDEX_STORAGE_KEY);
       return {
         history: saved ? JSON.parse(saved) : [],
         index: savedIndex ? parseInt(savedIndex, 10) : -1,
@@ -52,8 +54,8 @@ export function useUndoHistory(
   // Save history to localStorage whenever it changes
   useEffect(() => {
     try {
-      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
-      localStorage.setItem(HISTORY_INDEX_STORAGE_KEY, historyIndex.toString());
+      workspaceStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
+      workspaceStorage.setItem(HISTORY_INDEX_STORAGE_KEY, historyIndex.toString());
     } catch (error) {
       console.error("Failed to save undo history:", error);
     }
@@ -80,7 +82,9 @@ export function useUndoHistory(
       const isDuplicate =
         lastState &&
         JSON.stringify(normalizeElements(lastState.elements)) ===
-          JSON.stringify(normalizeElements(clonedState.elements));
+          JSON.stringify(normalizeElements(clonedState.elements)) &&
+        JSON.stringify(lastState.ids) === JSON.stringify(clonedState.ids) &&
+        JSON.stringify(lastState.classes) === JSON.stringify(clonedState.classes);
     
       if (isDuplicate) {
         return prev;
@@ -162,8 +166,8 @@ export function useUndoHistory(
     setHistoryIndex(0);
   
     try {
-      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify([initialState]));
-      localStorage.setItem(HISTORY_INDEX_STORAGE_KEY, "0");
+      workspaceStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify([initialState]));
+      workspaceStorage.setItem(HISTORY_INDEX_STORAGE_KEY, "0");
     } catch (error) {
       console.error("Failed to clear undo history from localStorage:", error);
     }

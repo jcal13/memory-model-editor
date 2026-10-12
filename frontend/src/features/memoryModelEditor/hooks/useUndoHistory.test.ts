@@ -18,6 +18,17 @@ describe("useUndoHistory", () => {
       return { elements, ids, classes, ...undoHistory };
     });
 
+  it.each([0, 4])("undoes and redoes adding custom ID %s without changing boxes", id => {
+    const {result} = renderUndoHistory();
+    act(() => result.current.clearHistory({elements: [], ids: [], classes: []}));
+    act(() => result.current.recordState({elements: [], ids: [id], classes: []}));
+    expect(result.current.canUndo).toBe(true);
+    act(() => result.current.undo());
+    expect(result.current.ids).toEqual([]);
+    act(() => result.current.redo());
+    expect(result.current.ids).toEqual([id]);
+  });
+
   it("undoes newly added boxes one by one", () => {
     const { result } = renderUndoHistory();
 

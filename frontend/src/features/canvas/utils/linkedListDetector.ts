@@ -1,9 +1,5 @@
-import { CanvasElement, ClassKind } from "../../shared/types";
-import {
-  createElementsByIdMap,
-  formatPrimitiveValue,
-  isPrimitiveElement,
-} from "./pythonTutorReferences";
+import { CanvasElement, ClassKind, FunctionParams } from "../../shared/types";
+import { createElementsByIdMap, formatPrimitiveValue, isPrimitiveElement } from "./canvasReferences";
 
 const PREFERRED_ROOT_LABELS = ["head", "first", "_first"];
 const VALUE_ATTRIBUTE_NAMES = ["item", "value", "data", "val", "_value"];
@@ -14,27 +10,6 @@ export type LinkedListNextKind =
   | "missing"
   | "invalid"
   | "cycle";
-
-export interface LinkedListNodeSnapshot {
-  nodeId: number;
-  className: string;
-  value: string;
-  labels: string[];
-  nextTargetId: number | null;
-  nextKind: LinkedListNextKind;
-}
-
-export interface LinkedListStructure {
-  key: string;
-  rootNodeId: number;
-  className: string;
-  nodes: LinkedListNodeSnapshot[];
-  cycleTargetId: number | null;
-}
-
-export interface LinkedListDetectionResult {
-  structures: LinkedListStructure[];
-}
 
 export interface LinkedListGraphNode {
   nodeId: number;
@@ -71,10 +46,31 @@ function isClassElement(
   return element?.kind.name === "class";
 }
 
+// Saved questions may use the legacy { key, value } attribute format.
+// Normalize locally so detection also works for existing saved canvases.
+function normalizeReferences(references: unknown): FunctionParams[] {
+  if (!Array.isArray(references)) return [];
+
+  return references.flatMap((reference: unknown) => {
+    if (!reference || typeof reference !== "object") return [];
+    const field = reference as Record<string, unknown>;
+    const name = field.name ?? field.key;
+    const target = field.targetId !== undefined ? field.targetId : field.value;
+    if (typeof name !== "string" || !name.trim()) return [];
+
+    return [{
+      name,
+      targetId: typeof target === "number" && Number.isInteger(target)
+        ? target
+        : null,
+    }];
+  });
+}
+
 function hasNextAttribute(element: CanvasElement | undefined): boolean {
   return Boolean(
     isClassElement(element) &&
-      element.kind.classVariables.some((attribute) => attribute.name === "next")
+      normalizeReferences(element.kind.classVariables).some((attribute) => attribute.name === "next")
   );
 }
 
@@ -83,7 +79,7 @@ function addLabel(
   targetId: number | null,
   label: string
 ): void {
-  if (targetId === null || !label.trim()) {
+  if (targetId === null || typeof label !== "string" || !label.trim()) {
     return;
   }
 
@@ -97,14 +93,14 @@ function buildNodeLabelMap(elements: CanvasElement[]): Map<number, Set<string>> 
 
   elements.forEach((element) => {
     if (element.kind.name === "function") {
-      element.kind.params.forEach((param) => {
+      normalizeReferences(element.kind.params).forEach((param) => {
         addLabel(labelMap, param.targetId, param.name);
       });
       return;
     }
 
     if (element.kind.name === "class" && !hasNextAttribute(element)) {
-      element.kind.classVariables.forEach((attribute) => {
+      normalizeReferences(element.kind.classVariables).forEach((attribute) => {
         addLabel(labelMap, attribute.targetId, attribute.name);
       });
     }
@@ -141,7 +137,7 @@ function resolveNodeValue(
   element: CanvasElement & { kind: ClassKind },
   elementsById: Map<number, CanvasElement>
 ): string {
-  const attributes = element.kind.classVariables.filter(
+  const attributes = normalizeReferences(element.kind.classVariables).filter(
     (attribute) => attribute.name !== "next"
   );
 
@@ -166,7 +162,7 @@ function resolveNextPointer(
   element: CanvasElement & { kind: ClassKind },
   elementsById: Map<number, CanvasElement>
 ): Pick<CandidateNode, "nextTargetId" | "nextKind"> | null {
-  const nextAttribute = element.kind.classVariables.find(
+  const nextAttribute = normalizeReferences(element.kind.classVariables).find(
     (attribute) => attribute.name === "next"
   );
 
@@ -280,136 +276,6 @@ function compareStartNodes(
   }
 
   return leftId - rightId;
-}
-
-function traverseStructure(
-  startId: number,
-  candidateMap: Map<number, CandidateNode>
-): LinkedListStructure | null {
-  const start = candidateMap.get(startId);
-  if (!start) {
-    return null;
-  }
-
-  const visited = new Set<number>();
-  const nodes: LinkedListNodeSnapshot[] = [];
-  let currentId: number | null = startId;
-  let cycleTargetId: number | null = null;
-
-  while (currentId !== null) {
-    const current = candidateMap.get(currentId);
-    if (!current) {
-      break;
-    }
-
-    visited.add(currentId);
-
-    let nextKind: LinkedListNextKind = current.nextKind;
-    const nextTargetId = current.nextTargetId;
-
-    if (
-      current.nextKind === "node" &&
-      nextTargetId !== null &&
-      visited.has(nextTargetId)
-    ) {
-      nextKind = "cycle";
-      cycleTargetId = nextTargetId;
-    }
-
-    nodes.push({
-      nodeId: current.nodeId,
-      className: current.className,
-      value: current.value,
-      labels: current.labels,
-      nextTargetId,
-      nextKind,
-    });
-
-    if (nextKind !== "node" || nextTargetId === null) {
-      break;
-    }
-
-    currentId = nextTargetId;
-  }
-
-  if (nodes.length === 0) {
-    return null;
-  }
-
-  return {
-    key: `${start.className}-${startId}`,
-    rootNodeId: startId,
-    className: start.className,
-    nodes,
-    cycleTargetId,
-  };
-}
-
-export function detectLinkedLists(
-  elements: CanvasElement[],
-  elementsById: Map<number, CanvasElement> = createElementsByIdMap(elements)
-): LinkedListDetectionResult {
-  const labelMap = buildNodeLabelMap(elements);
-  const candidateMap = buildCandidateMap(elements, elementsById, labelMap);
-
-  if (candidateMap.size === 0) {
-    return { structures: [] };
-  }
-
-  const incomingNextCounts = new Map<number, number>();
-  candidateMap.forEach((candidate) => {
-    incomingNextCounts.set(candidate.nodeId, 0);
-  });
-
-  candidateMap.forEach((candidate) => {
-    if (candidate.nextKind !== "node" || candidate.nextTargetId === null) {
-      return;
-    }
-
-    if (candidateMap.has(candidate.nextTargetId)) {
-      incomingNextCounts.set(
-        candidate.nextTargetId,
-        (incomingNextCounts.get(candidate.nextTargetId) ?? 0) + 1
-      );
-    }
-  });
-
-  const orderedRoots = Array.from(candidateMap.keys())
-    .filter((nodeId) => (incomingNextCounts.get(nodeId) ?? 0) === 0)
-    .sort((left, right) => compareStartNodes(left, right, candidateMap));
-
-  const coveredNodeIds = new Set<number>();
-  const structures: LinkedListStructure[] = [];
-
-  for (const rootId of orderedRoots) {
-    if (coveredNodeIds.has(rootId)) {
-      continue;
-    }
-
-    const structure = traverseStructure(rootId, candidateMap);
-    if (!structure) {
-      continue;
-    }
-
-    structure.nodes.forEach((node) => coveredNodeIds.add(node.nodeId));
-    structures.push(structure);
-  }
-
-  const remainingStarts = Array.from(candidateMap.keys())
-    .filter((nodeId) => !coveredNodeIds.has(nodeId))
-    .sort((left, right) => compareStartNodes(left, right, candidateMap));
-
-  for (const startId of remainingStarts) {
-    const structure = traverseStructure(startId, candidateMap);
-    if (!structure) {
-      continue;
-    }
-
-    structure.nodes.forEach((node) => coveredNodeIds.add(node.nodeId));
-    structures.push(structure);
-  }
-
-  return { structures };
 }
 
 export function detectLinkedListGraph(

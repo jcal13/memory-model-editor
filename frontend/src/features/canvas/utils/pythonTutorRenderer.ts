@@ -9,13 +9,8 @@ import {
   SetKind,
   TupleKind,
 } from "../../shared/types";
-import {
-  formatPrimitiveValue,
-  getPythonTutorDisplayType,
-  getPythonTutorFrameTitle,
-  resolveInlineDisplay,
-  PythonTutorReferenceDisplay,
-} from "./pythonTutorReferences";
+import { getPythonTutorDisplayType, getPythonTutorFrameTitle, resolveInlineDisplay, PythonTutorReferenceDisplay } from "./pythonTutorReferences";
+import { formatPrimitiveValue } from "./canvasReferences";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const FONT_FAMILY = 'Consolas, "Courier New", monospace';

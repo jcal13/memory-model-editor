@@ -40,3 +40,7 @@ body.dragging * {
   -moz-user-select: none !important;
   -ms-user-select: none !important;
 }
+
+/* One desktop design, scaled uniformly to the available viewport. */
+:root { --ui-scale: 1; --workspace-height: calc(100vh / var(--ui-scale)); }
+body { zoom: var(--ui-scale); }

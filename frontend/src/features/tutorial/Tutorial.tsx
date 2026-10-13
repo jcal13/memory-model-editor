@@ -1,3 +1,4 @@
+import { uiScale } from "../shared/uiScale";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { CanvasElement } from "../shared/types";
@@ -126,12 +127,13 @@ export default function Tutorial({ elements, correct, submissionFailed = false, 
     const update = () => {
       const target = showingFeedback ? document.querySelector('[data-tour="feedback"]') : lessonTarget(step, elements);
       setEditingId(target?.getAttribute("data-tour") === "box-editor" ? Number(target.getAttribute("data-box-id")) : null);
-      const r = target ? targetBounds(target) : undefined;
+      const layoutBounds = (el: Element) => { const b = targetBounds(el), s = uiScale(); return new DOMRect(b.x/s, b.y/s, b.width/s, b.height/s); };
+      const r = target ? layoutBounds(target) : undefined;
       const box = r && r.width && r.height ? {left:r.left-4, top:r.top-4, width:r.width+8, height:r.height+8} : null;
       setRect(old => JSON.stringify(old) === JSON.stringify(box) ? old : box);
       const w = card.current?.offsetWidth || 320, h = card.current?.offsetHeight || 300;
-      const obstacles = Array.from(document.querySelectorAll('[data-tour="box-editor"], [data-tour="reference-picker"], [data-tour="feedback"], [data-canvas-box-id]')).map(targetBounds);
-      const pos = placeCard(r, w, h, window.innerWidth, window.innerHeight, obstacles);
+      const obstacles = Array.from(document.querySelectorAll('[data-tour="box-editor"], [data-tour="reference-picker"], [data-tour="feedback"], [data-canvas-box-id]')).map(layoutBounds);
+      const pos = placeCard(r, w, h, window.innerWidth / uiScale(), window.innerHeight / uiScale(), obstacles);
       setPosition(old => old.left===pos.left && old.top===pos.top ? old : pos);
     };
     const schedule = () => { cancelAnimationFrame(raf); raf=requestAnimationFrame(update); };

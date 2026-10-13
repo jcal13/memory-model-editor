@@ -3,6 +3,16 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { workspaceScale } from './features/shared/uiScale';
+
+// Apply before mounting so canvas measurements and popup geometry agree.
+const updateWorkspaceScale = () => {
+  document.documentElement.style.setProperty(
+    '--ui-scale', String(workspaceScale(window.innerWidth, window.innerHeight))
+  );
+};
+updateWorkspaceScale();
+window.addEventListener('resize', updateWorkspaceScale);
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

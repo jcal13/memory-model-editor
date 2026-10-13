@@ -3,9 +3,9 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 12px 0 0;
+  padding: 0;
   height: 100%;
-  background-color: var(--bg-tertiary);
+  background-color: var(--canvas-bg);
   box-sizing: border-box;
   transition: background-color 200ms ease;
   position: relative;

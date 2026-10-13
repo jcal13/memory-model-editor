@@ -1,6 +1,6 @@
 .App {
   text-align: center;
-  height: 100vh;
+  height: var(--workspace-height, 100vh);
   overflow: hidden;
 }
 
@@ -17,7 +17,7 @@
 
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
+  min-height: var(--workspace-height, 100vh);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -36,5 +36,68 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Keep the portrait notice readable independently of workspace scaling. */
+.narrow-window-notice {
+  display: none;
+}
+
+@media (max-width: 600px) and (orientation: portrait) {
+  .narrow-window-notice {
+    display: flex;
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(280px, calc(100vw - 24px));
+    box-sizing: border-box;
+    z-index: 100004;
+    zoom: calc(1 / var(--ui-scale, 1));
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    background: #fff1f2;
+    color: #9f3341;
+    box-shadow: 0 4px 16px #0f172a14;
+    text-align: left;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .narrow-window-warning {
+    flex: 0 0 18px;
+    height: 18px;
+    margin-top: 1px;
+  }
+
+  .narrow-window-notice p {
+    margin: 0;
+  }
+
+  .narrow-window-notice strong {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .narrow-window-notice button {
+    flex: 0 0 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .narrow-window-notice button:hover {
+    background: #ffe4e6;
   }
 }

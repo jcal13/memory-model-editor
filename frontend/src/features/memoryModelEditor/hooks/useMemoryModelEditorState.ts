@@ -18,7 +18,7 @@ import type { QuestionView } from "../utils/localStorage";
 import { readQuestionLink } from "../../informationTabs/questionTab/utils/questionLinks";
 
 // Layout constants
-const DEFAULT_INFO_PANEL_WIDTH = 500;
+const DEFAULT_INFO_PANEL_WIDTH = 380;
 
 export function useMemoryModelEditorState(sandbox: boolean) {
     // Load initial data

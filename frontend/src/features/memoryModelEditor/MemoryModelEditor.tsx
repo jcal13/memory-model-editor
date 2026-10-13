@@ -1,3 +1,5 @@
+import { uiScale } from "../shared/uiScale";
+import { maxInformationWidth } from "./utils/panelSizing";
 import { normalizeQuestionCanvasData } from "./utils/questionFrames";
 import Tutorial from "../tutorial/Tutorial";
 import { isDemoQuestion, isTutorial } from "../tutorial/tutorialStorage";
@@ -10,7 +12,6 @@ import InformationTabs from "../informationTabs/InformationTabs";
 import PanelToggleButtons from "./components/PanelToggleButtons";
 import HelpIcon from "../shared/components/HelpIcon";
 import styles from "./MemoryModelEditor.module.css";
-import { useResponsivePanels } from "./hooks/useResponsivePanels";
 
 import {
   useMemoryModelEditorState,
@@ -34,12 +35,10 @@ import { spreadOverlappingElements } from "../canvas/utils/boundary.helpers";
 
 // Layout constants
 const MAX_INFO_PANEL_VIEWPORT_RATIO = 0.6667;
-const MIN_INFO_PANEL_WIDTH = 260;
-const MIN_CANVAS_COLUMN_WIDTH = 780;
-const INFO_RESIZE_DIVIDER_WIDTH = 8;
-const MIN_PALETTE_WIDTH = 200;
+const MIN_INFO_PANEL_WIDTH = 320;
+const MIN_PALETTE_WIDTH = 260;
 const MAX_PALETTE_WIDTH = 400;
-const DEFAULT_PALETTE_WIDTH = 280;
+const DEFAULT_PALETTE_WIDTH = 260;
 const SNAP_CLOSE_THRESHOLD = 100;
 const STRUCTURE_PANEL_RESIZE_HANDLE_HEIGHT = 8;
 
@@ -64,7 +63,7 @@ export default function MemoryModelEditor({
     DEFAULT_PALETTE_WIDTH
   );
   const [maxInfoPanelWidth, setMaxInfoPanelWidth] = useState<number>(
-    window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO
+    window.innerWidth / uiScale() * MAX_INFO_PANEL_VIEWPORT_RATIO
   );
 
   const [tutorialCheckedModel, setTutorialCheckedModel] = useState<string | null>(null);
@@ -371,13 +370,7 @@ export default function MemoryModelEditor({
     editorScale,
   });
 
-  useResponsivePanels({
-    enabled: true,
-    isPaletteOpen: state.isPaletteOpen,
-    isInfoPanelOpen: state.isInfoPanelOpen,
-    setIsPaletteOpen: state.setIsPaletteOpen,
-    setIsInfoPanelOpen: state.setIsInfoPanelOpen,
-  });
+
 
   const currentCanvasState = useMemo(
     () => ({
@@ -396,7 +389,7 @@ export default function MemoryModelEditor({
     const UPDATE_INTERVAL = 50;
 
     const handleMouseMove = (e: MouseEvent) => {
-      const newWidth = Math.max(0, Math.min(MAX_PALETTE_WIDTH, e.clientX));
+      const newWidth = Math.max(0, Math.min(MAX_PALETTE_WIDTH, e.clientX / uiScale()));
 
       setTempPaletteWidth(newWidth);
 
@@ -464,18 +457,9 @@ export default function MemoryModelEditor({
 
       const containerRect =
         mainContainerRefCurrent.current.getBoundingClientRect();
-      const newWidth = containerRect.right - event.clientX;
+      const newWidth = (containerRect.right - event.clientX) / uiScale();
 
-      const maxWidthBasedOnViewport =
-        window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO;
-      const maxWidthPreservingCanvas = Math.max(
-        MIN_INFO_PANEL_WIDTH,
-        containerRect.width - MIN_CANVAS_COLUMN_WIDTH - INFO_RESIZE_DIVIDER_WIDTH
-      );
-      const maxAllowedWidth = Math.min(
-        maxWidthPreservingCanvas,
-        maxWidthBasedOnViewport
-      );
+      const maxAllowedWidth = maxInformationWidth(containerRect.width / uiScale(), window.innerWidth / uiScale());
 
       const clamped = Math.max(0, Math.min(newWidth, maxAllowedWidth));
       infoPanelSetWidth(clamped);
@@ -485,24 +469,15 @@ export default function MemoryModelEditor({
       if (mainContainerRefCurrent.current) {
         const containerRect =
           mainContainerRefCurrent.current.getBoundingClientRect();
-        const finalWidth = containerRect.right - event.clientX;
-        const maxWidthBasedOnViewport =
-          window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO;
-        const maxWidthPreservingCanvas = Math.max(
-          MIN_INFO_PANEL_WIDTH,
-          containerRect.width - MIN_CANVAS_COLUMN_WIDTH - INFO_RESIZE_DIVIDER_WIDTH
-        );
-        const maxAllowedWidth = Math.min(
-          maxWidthPreservingCanvas,
-          maxWidthBasedOnViewport
-        );
+        const finalWidth = (containerRect.right - event.clientX) / uiScale();
+        const maxAllowedWidth = maxInformationWidth(containerRect.width / uiScale(), window.innerWidth / uiScale());
 
         if (finalWidth < SNAP_CLOSE_THRESHOLD) {
           infoPanelSetOpen(false);
-          infoPanelSetWidth(500);
+          infoPanelSetWidth(380);
         } else {
           const settledWidth = Math.max(
-            MIN_INFO_PANEL_WIDTH,
+            Math.min(MIN_INFO_PANEL_WIDTH, maxAllowedWidth),
             Math.min(finalWidth, maxAllowedWidth)
           );
           infoPanelSetWidth(settledWidth);
@@ -530,20 +505,11 @@ export default function MemoryModelEditor({
     if (!container) return;
 
     const updateMaxInfoPanelWidth = () => {
-      const containerWidth = container.getBoundingClientRect().width;
-      const maxWidthBasedOnViewport =
-        window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO;
-      const maxWidthPreservingCanvas = Math.max(
-        MIN_INFO_PANEL_WIDTH,
-        containerWidth - MIN_CANVAS_COLUMN_WIDTH - INFO_RESIZE_DIVIDER_WIDTH
-      );
-      const nextMax = Math.min(
-        maxWidthBasedOnViewport,
-        maxWidthPreservingCanvas
-      );
+      const containerWidth = container.getBoundingClientRect().width / uiScale();
+      const nextMax = maxInformationWidth(containerWidth, window.innerWidth / uiScale());
 
       setMaxInfoPanelWidth(nextMax);
-      state.setInfoPanelWidth((prev) => Math.min(prev, nextMax));
+      // Keep the preferred width so it is restored when the window grows.
     };
 
     updateMaxInfoPanelWidth();
@@ -719,7 +685,7 @@ export default function MemoryModelEditor({
                   : `${Math.min(MIN_INFO_PANEL_WIDTH, maxInfoPanelWidth)}px`,
                 maxWidth: `${Math.min(
                   maxInfoPanelWidth,
-                  window.innerWidth * MAX_INFO_PANEL_VIEWPORT_RATIO
+                  window.innerWidth / uiScale() * MAX_INFO_PANEL_VIEWPORT_RATIO
                 )}px`,
               }}
             >

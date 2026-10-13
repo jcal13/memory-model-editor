@@ -5,7 +5,7 @@
 
 .editorContainer {
   display: flex;
-  height: 100vh;
+  height: var(--workspace-height, 100vh);
   width: 100%;
   overflow: hidden;
   align-items: stretch;
@@ -86,12 +86,12 @@
 
 .canvasColumn {
   flex: 1;
-  min-width: 780px;
+  min-width: 0;
   min-height: 0;
   position: relative;
   display: flex;
   flex-direction: column;
-  padding-bottom: 12px;
+  padding: 12px 0;
   box-sizing: border-box;
 }
 

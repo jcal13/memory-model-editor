@@ -36,7 +36,7 @@ Each Practice, Test, CSC148 Prep, and Experiment question has a direct URL. Open
 
 Replace the example host with your MemoryLab address and the number with the question ID. For local development, an example is `http://localhost:3000/?practice=1`.
 
-Opening or refreshing a direct link loads the selected question with its normal starting canvas, including its main frame, rather than restoring a saved answer. Returning to the question list removes the question parameter from the address bar. Normal question navigation continues to use the existing saved-work behavior.
+Opening or refreshing a direct link loads the selected question with its normal starting canvas, including its main frame, rather than restoring a saved answer. Returning to a question list uses its category URL: `?practice`, `?test`, `?prep`, or `?experiment`. These links open the full category directly; for example, `?practice` opens the Practice Questions list and `?practice=1` opens Practice Question 1. Returning to the category menu removes the category parameter. Normal question navigation continues to use the existing saved-work behavior.
 
 Step-by-Step Questions do not currently support direct links.
 

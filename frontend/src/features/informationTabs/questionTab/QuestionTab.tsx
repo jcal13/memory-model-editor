@@ -24,7 +24,7 @@ import {
 } from "../../memoryModelEditor/utils/localStorage";
 import { normalizeQuestionCanvasData } from "../../memoryModelEditor/utils/questionFrames";
 import ConfirmationModal from "../../memoryModelEditor/components/ConfirmationModal";
-import { QuestionLink, questionUrl } from "./utils/questionLinks";
+import { QuestionLink, questionUrl, categoryUrl, invalidQuestionLink } from "./utils/questionLinks";
 
 type View =
   | "root"
@@ -246,7 +246,7 @@ export default function QuestionTab({
       ? v
       : "root";
   });
-  const [linkError, setLinkError] = useState("");
+  const [linkError, setLinkError] = useState(() => !isTutorial() && invalidQuestionLink(window.location.search) ? "This question link is invalid. Choose a question or ask for a new link." : "");
   const [questionCount, setQuestionCount] = useState<number>(0);
   const [questionData, setQuestionData] = useState<QuestionData | null>(null);
   const [questionStatus, setQuestionStatus] = useState<QuestionStatusMap>(() =>
@@ -304,6 +304,12 @@ export default function QuestionTab({
     }
   }, [view, setQuestionView]);
 
+  const previousView = useRef(view);
+  useEffect(() => {
+    if (view === "root" && previousView.current !== "root") setLinkError("");
+    previousView.current = view;
+  }, [view]);
+
   // Reflect the visible question without reloading or resetting its canvas.
   useEffect(() => {
     if (view === "loading" || (view === "question" && !questionData)) return;
@@ -311,7 +317,9 @@ export default function QuestionTab({
       view === "question" && questionType && questionIndex !== null
         ? { type: questionType, id: questionIndex }
         : null;
-    const url = questionUrl(window.location.href, question);
+    const url = view === "list" && questionType
+      ? categoryUrl(window.location.href, questionType)
+      : questionUrl(window.location.href, question);
     if (url !== window.location.href)
       window.history.replaceState(window.history.state, "", url);
   }, [view, questionType, questionIndex, questionData]);
@@ -438,6 +446,7 @@ export default function QuestionTab({
   };
 
   const loadQuestions = async (questionType: QuestionType): Promise<void> => {
+    setLinkError("");
     onClearCanvas();
     setView("loading");
     setSelectedTopic(null);
@@ -922,7 +931,13 @@ export default function QuestionTab({
           </div>
         </div>
 
-        {linkError && <p role="alert">{linkError}</p>}
+        {linkError && (view === "list" || view === "root") && (
+          <div className={styles.linkError} role="alert">
+            <span className={styles.linkErrorIcon} aria-hidden="true">!</span>
+            <div><strong>Question unavailable</strong><p>{linkError}</p></div>
+            <button type="button" aria-label="Dismiss question link error" onClick={() => setLinkError("")}>×</button>
+          </div>
+        )}
         {view === "root" && (
           <div className={styles.selectors}>
 

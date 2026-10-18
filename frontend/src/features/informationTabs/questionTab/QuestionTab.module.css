@@ -553,3 +553,38 @@
   background: var(--border-primary);
   flex-shrink: 0;
 }
+
+
+.linkError {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border: 1px solid #fed7aa;
+  border-radius: 12px;
+  background: #fff7ed;
+  color: #9a3412;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.linkErrorIcon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ffedd5;
+  font-weight: 700;
+}
+.linkError p { margin: 4px 0 0; }
+.linkError button {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 0 4px;
+}
+.linkError button:focus-visible { outline: 2px solid currentColor; border-radius: 4px; }

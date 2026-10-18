@@ -69,6 +69,13 @@ export default function MemoryModelEditor({
 
   const [tutorialCheckedModel, setTutorialCheckedModel] = useState<string | null>(null);
   const tutorialModelKey = JSON.stringify(state.elements.map(({id, kind, invalidated}) => ({id, kind, invalidated})));
+  // A tutorial result only describes the model that was actually submitted.
+  useEffect(() => {
+    if (isTutorial() && tutorialCheckedModel !== null && tutorialCheckedModel !== tutorialModelKey) {
+      state.setSubmissionResults(null);
+      setTutorialCheckedModel(null);
+    }
+  }, [tutorialModelKey, tutorialCheckedModel, state.setSubmissionResults]);
   const [currentQuestionData, setCurrentQuestionData] = useState<any>(null);
   const _initialUI = loadInitialUIData();
   const [canvasScale, setCanvasScale] = useState<number>(_initialUI.canvasScale ?? 1);

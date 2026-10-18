@@ -51,6 +51,21 @@ describe("QuestionTab component", () => {
     jest.clearAllMocks();
   });
 
+  it("styles a failed question link and clears it when returning to the categories", async () => {
+    window.history.replaceState({}, "", "/?practice=999");
+    mockedFetchQuestion.mockRejectedValueOnce(new Error("Not found"));
+    (fetchService.fetchQuestionCount as jest.Mock).mockResolvedValue(2);
+    (fetchService.fetchQuestionTopics as jest.Mock).mockResolvedValue([]);
+    render(<QuestionTab {...baseProps} questionIndex={999} linkedQuestion={{type:"practice",id:999}} />);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Question unavailable");
+    await userEvent.click(screen.getByRole("button", {name:"← Back"}));
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    await userEvent.click(screen.getByText("Practice Questions"));
+    expect(await screen.findByText("Q1")).toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    window.history.replaceState({}, "", "/");
+  });
+
   it("provides Exit demo rather than navigation to other questions during the tour", async () => {
     window.history.replaceState({}, "", "/?tutorial=1");
     try {

@@ -22,3 +22,23 @@ export function questionUrl(href: string, question: QuestionLink | null): string
   if (question) url.searchParams.set(question.type, String(question.id));
   return url.toString();
 }
+
+/** An empty value (including a bare key) opens the category list. */
+export function readCategoryLink(search: string) {
+  const params = new URLSearchParams(search);
+  const types = questionTypes.filter(type => params.has(type));
+  return types.length === 1 && params.getAll(types[0]).length === 1 && params.get(types[0]) === ""
+    ? types[0] : null;
+}
+
+export function invalidQuestionLink(search: string) {
+  const params = new URLSearchParams(search);
+  return questionTypes.some(type => params.has(type)) && !readQuestionLink(search) && !readCategoryLink(search);
+}
+
+export function categoryUrl(href: string, type: typeof questionTypes[number]) {
+  const url = new URL(questionUrl(href, null));
+  const search = url.searchParams.toString();
+  url.search = search ? `${search}&${type}` : type;
+  return url.toString();
+}

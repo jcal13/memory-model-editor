@@ -67,3 +67,12 @@ test('reviewing the drag step highlights the existing integer, not the palette',
   expect(p.top+300).toBeLessThanOrEqual(vh-64);
   expect(p.left+320 <= target.left || p.top+300 <= target.top).toBe(true);
  });
+
+
+test('repair targets the referenced object even when its value has changed', () => {
+ const m = JSON.parse(JSON.stringify(elements));
+ m[0].kind.params = [{name:'b',targetId:7}];
+ expect(lessonTarget(4,m)).toBe(document.querySelector('[data-canvas-box-id="1"]'));
+ document.body.insertAdjacentHTML('beforeend','<div data-tour="box-editor" data-box-id="1"></div>');
+ expect(lessonTarget(4,m)).toBe(document.querySelector('[data-tour="box-editor"]'));
+});

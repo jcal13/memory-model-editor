@@ -1,4 +1,4 @@
-import { readQuestionLink, questionUrl, questionTypes } from './questionLinks';
+import { readQuestionLink, questionUrl, questionTypes, readCategoryLink, categoryUrl, invalidQuestionLink } from './questionLinks';
 test.each(questionTypes)('reads and writes %s question links', type => {
  expect(readQuestionLink(`?${type}=12`)).toEqual({type,id:12});
  expect(questionUrl('https://example.com/?practice=1', {type,id:12})).toBe(`https://example.com/?${type}=12`);
@@ -11,4 +11,16 @@ test('preserves the deployment path and unrelated URL fields', () => {
 });
 test('removes question parameters when leaving a question', () => {
  expect(questionUrl('https://example.com/?test=2&other=1',null)).toBe('https://example.com/?other=1');
+});
+
+test.each(questionTypes)('bare %s opens a category and round trips without an equals sign', type => {
+ expect(readCategoryLink(`?${type}`)).toBe(type);
+ expect(readCategoryLink(`?${type}=`)).toBe(type);
+ expect(categoryUrl('https://example.com/?practice=1', type)).toBe(`https://example.com/?${type}`);
+ expect(invalidQuestionLink(`?${type}`)).toBe(false);
+ expect(invalidQuestionLink(`?${type}=abc`)).toBe(true);
+});
+test.each(['?practice&test', '?practice&practice=1', '?practice=0'])('rejects ambiguous or invalid category URL %s', search => {
+ expect(readCategoryLink(search)).toBeNull();
+ expect(invalidQuestionLink(search)).toBe(true);
 });

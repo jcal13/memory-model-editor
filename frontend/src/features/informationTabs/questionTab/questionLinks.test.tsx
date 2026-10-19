@@ -35,12 +35,12 @@ test.each(questionTypes)('shows the current %s question in the address bar witho
  await waitFor(() => expect(window.location.search).toBe(`?${type}=2`));
  expect(screen.queryByRole('button',{name:'Copy question link'})).not.toBeInTheDocument();
 });
-test('removes the question URL when returning to the list', async () => {
+test('uses the category URL when returning to the list', async () => {
  render(<QuestionTab {...props()}/>);
  await screen.findByText('Draw this model');
  await waitFor(() => expect(window.location.search).toBe('?practice=2'));
  await act(async () => { userEvent.click(screen.getByRole('button',{name:'← Back'})); });
- await waitFor(() => expect(window.location.search).toBe(''));
+ await waitFor(() => expect(window.location.search).toBe('?practice'));
 });
 test('a missing linked question shows an explanation and returns to the list', async () => {
  (fetchQuestion as jest.Mock).mockRejectedValue(new Error('not found'));
@@ -51,4 +51,20 @@ test('a missing linked question shows an explanation and returns to the list', a
  expect(p.setQuestionIndex).toHaveBeenCalledWith(null);
  expect(consumed).toHaveBeenCalledTimes(1);
  spy.mockRestore();
+});
+
+test.each(questionTypes)('opens %s category without fetching an individual question', async type => {
+ window.history.replaceState(null, '', `/?${type}`);
+ render(<QuestionTab {...props()} questionType={type} questionIndex={null} questionView="list"/>);
+ await screen.findByRole('button', {name:/Q1/});
+ expect(fetchQuestion).not.toHaveBeenCalled();
+ expect(window.location.search).toBe(`?${type}`);
+ await act(async () => { userEvent.click(screen.getByRole('button',{name:'← Back'})); });
+ await waitFor(() => expect(window.location.search).toBe(''));
+});
+test('malformed question ID shows an error without fetching a question', async () => {
+ window.history.replaceState(null, '', '/?practice=abc');
+ render(<QuestionTab {...props()} questionIndex={null} questionView="list"/>);
+ expect(await screen.findByRole('alert')).toHaveTextContent('link is invalid');
+ expect(fetchQuestion).not.toHaveBeenCalled();
 });

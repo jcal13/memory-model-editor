@@ -27,6 +27,9 @@ function onResolutionChange() {
 updateWorkspaceScale();
 watchResolution();
 window.addEventListener('resize', updateWorkspaceScale);
+import { normalizeTutorialUrl } from './features/tutorial/tutorialStorage';
+
+normalizeTutorialUrl();
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

@@ -15,7 +15,7 @@ import {
 } from "../utils/localStorage";
 import type { QuestionView } from "../utils/localStorage";
 
-import { readQuestionLink } from "../../informationTabs/questionTab/utils/questionLinks";
+import { readQuestionLink, readCategoryLink, invalidQuestionLink, questionTypes } from "../../informationTabs/questionTab/utils/questionLinks";
 
 import { DEFAULT_INFO_PANEL_WIDTH } from "../utils/panelSizing";
 
@@ -26,9 +26,11 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     tutorial ? null : readQuestionLink(window.location.search)
   );
 
+  const [categoryLink] = useState(() => tutorial ? null : readCategoryLink(window.location.search));
+  const [invalidLink] = useState(() => tutorial ? false : invalidQuestionLink(window.location.search));
   const initialCanvasData = tutorial
     ? normalizeQuestionCanvasData(loadInitialCanvasData())
-    : linkedQuestion === null
+    : linkedQuestion === null && categoryLink === null && !invalidLink
       ? loadInitialCanvasData()
       : { elements: [], ids: [], classes: [] };
 
@@ -49,6 +51,16 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     initialUIData.activeTab = "question";
     initialUIData.isInfoPanelOpen = true;
     initialUIData.sandboxMode = false;
+    initialUIData.submissionResults = null;
+  }
+
+  if (!tutorial && (categoryLink || invalidLink)) {
+    const types = questionTypes.filter(type => new URLSearchParams(window.location.search).has(type));
+    initialUIData.questionIndex = null;
+    initialUIData.questionType = categoryLink ?? (types.length === 1 ? types[0] : null);
+    initialUIData.questionView = initialUIData.questionType ? "list" : "root";
+    initialUIData.activeTab = "question";
+    initialUIData.isInfoPanelOpen = true;
     initialUIData.submissionResults = null;
   }
 

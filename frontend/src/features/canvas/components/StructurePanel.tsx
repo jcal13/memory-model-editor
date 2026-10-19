@@ -23,6 +23,8 @@ function LinkedListContent({ elements }: { elements: CanvasElement[] }) {
   );
 }
 
+const STRUCTURE_MAX_HEIGHT_SHARE = 0.45;
+
 function StructurePanelContent({
   elements,
   collapsed,
@@ -43,7 +45,7 @@ function StructurePanelContent({
       const delta = (dragRef.current.y - ev.clientY) / uiScale();
       const next = Math.max(
         110,
-        Math.min(window.innerHeight / uiScale() * 0.45, dragRef.current.h + delta)
+        Math.min(window.innerHeight / uiScale() * STRUCTURE_MAX_HEIGHT_SHARE, dragRef.current.h + delta)
       );
 
       onHeightChange(next);

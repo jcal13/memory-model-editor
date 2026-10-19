@@ -1,5 +1,4 @@
 :root {
-  --resize-handle-width: 8px;
   --resize-handle-hover-width: 4px;
 }
 
@@ -91,7 +90,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 12px 0;
+  padding: var(--workspace-edge-space) 0;
   box-sizing: border-box;
 }
 

@@ -30,6 +30,9 @@ import {
 } from "../constants";
 import { isLockedMainFrame } from "../../memoryModelEditor/utils/questionFrames";
 
+// Leave equal breathing room above and below the stack.
+const STACK_EDGE_SPACE = 20;
+
 interface CallStackProps {
   frames: CanvasElement[];
   selected: CanvasElement | null;
@@ -76,7 +79,7 @@ const CallStack: React.FC<CallStackProps> = ({
   onWidthChange,
   onBoundsChange,
   x = 20,
-  y = 20,
+  y = STACK_EDGE_SPACE,
   width = 205,
   scale = 1,
   canvasHeight = window.innerHeight / uiScale(),
@@ -120,7 +123,7 @@ const CallStack: React.FC<CallStackProps> = ({
   }, [columnWidth, x, onWidthChange]);
 
   // Follow the measured canvas viewport, including resize and UI scaling.
-  const columnHeight = Math.max(0, canvasHeight / scale - yPosition - 20);
+  const columnHeight = Math.max(0, canvasHeight / scale - yPosition - STACK_EDGE_SPACE);
   const visibleHeight = Math.max(
     0,
     columnHeight - HEADER_HEIGHT - TOP_PADDING - BOTTOM_PADDING

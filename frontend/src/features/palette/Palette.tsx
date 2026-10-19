@@ -216,7 +216,7 @@ export default function Palette({
         {/* Palette Section - Resizable */}
         <div
           className={styles.paletteSection}
-          style={{ height: `calc(${topHeight}% - ${8 * topHeight / 100}px)` }}
+          style={{ height: `calc(${topHeight}% - var(--resize-handle-width) * ${topHeight / 100})` }}
           ref={paletteContainerRef}
         >
           <div className={styles.container}>
@@ -287,7 +287,7 @@ export default function Palette({
         {/* Canvas Controls Section - Resizable */}
         <div
           className={styles.controlsSection}
-          style={{ height: `calc(${100 - topHeight}% - ${8 * (100 - topHeight) / 100}px)` }}
+          style={{ height: `calc(${100 - topHeight}% - var(--resize-handle-width) * ${(100 - topHeight) / 100})` }}
         >
           <CanvasControls
             isSandboxMode={isSandboxMode}

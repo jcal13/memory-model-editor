@@ -39,65 +39,59 @@
   }
 }
 
-/* Keep the portrait notice readable independently of workspace scaling. */
+/* A compact recommendation for narrow portrait windows. */
+
 .narrow-window-notice {
-  display: none;
+  display: flex;
+  position: fixed;
+  top: var(--notice-offset);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(var(--notice-max-width), calc(100vw - var(--notice-close-size)));
+  box-sizing: border-box;
+  z-index: var(--notice-layer);
+  align-items: flex-start;
+  gap: var(--workspace-gap);
+  padding: var(--notice-offset) var(--workspace-edge-space);
+  border: var(--notice-border-width) solid var(--notice-border);
+  border-radius: var(--workspace-edge-space);
+  background: var(--notice-bg);
+  color: var(--notice-text);
+  box-shadow: var(--notice-shadow);
+  text-align: left;
+  font-size: var(--notice-font-size);
+  line-height: var(--notice-line-height);
 }
 
-@media (max-width: 600px) and (orientation: portrait) {
-  .narrow-window-notice {
-    display: flex;
-    position: fixed;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(280px, calc(100vw - 24px));
-    box-sizing: border-box;
-    z-index: 100004;
-    zoom: calc(1 / var(--ui-scale, 1));
-    align-items: flex-start;
-    gap: 8px;
-    padding: 10px 12px;
-    border: 1px solid #fecaca;
-    border-radius: 12px;
-    background: #fff1f2;
-    color: #9f3341;
-    box-shadow: 0 4px 16px #0f172a14;
-    text-align: left;
-    font-size: 12px;
-    line-height: 1.45;
-  }
+.narrow-window-warning {
+  flex: 0 0 var(--notice-icon-size);
+  height: var(--notice-icon-size);
+  margin-top: var(--notice-icon-offset);
+}
 
-  .narrow-window-warning {
-    flex: 0 0 18px;
-    height: 18px;
-    margin-top: 1px;
-  }
+.narrow-window-notice p {
+  margin: 0;
+}
 
-  .narrow-window-notice p {
-    margin: 0;
-  }
+.narrow-window-notice strong {
+  display: block;
+  margin-bottom: var(--notice-title-gap);
+  font-size: var(--notice-font-size);
+  font-weight: var(--notice-title-weight);
+}
 
-  .narrow-window-notice strong {
-    display: block;
-    margin-bottom: 3px;
-    font-size: 12px;
-    font-weight: 600;
-  }
+.narrow-window-notice button {
+  flex: 0 0 var(--notice-close-size);
+  height: var(--notice-close-size);
+  padding: 0;
+  border: 0;
+  border-radius: var(--workspace-side-space);
+  background: transparent;
+  color: inherit;
+  font-size: var(--notice-close-font-size);
+  cursor: pointer;
+}
 
-  .narrow-window-notice button {
-    flex: 0 0 24px;
-    height: 24px;
-    padding: 0;
-    border: 0;
-    border-radius: 6px;
-    background: transparent;
-    color: inherit;
-    font-size: 16px;
-    cursor: pointer;
-  }
-
-  .narrow-window-notice button:hover {
-    background: #ffe4e6;
-  }
+.narrow-window-notice button:hover {
+  background: var(--notice-hover);
 }

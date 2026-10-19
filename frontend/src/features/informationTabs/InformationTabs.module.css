@@ -76,7 +76,7 @@
   border-radius: 10px;
   height: var(--workspace-height, 100vh);
   box-shadow: var(--shadow-sm);
-  padding: 14px 16px;
+  padding: var(--information-panel-padding);
   overflow-y: auto;
   margin-top: 8px;
   transition: background-color 200ms ease, border-color 200ms ease;
@@ -87,7 +87,7 @@
   border: 1px solid var(--border-primary);
   border-radius: 10px;
   box-shadow: var(--shadow-sm);
-  padding: 14px 16px;
+  padding: var(--information-panel-padding);
   overflow-y: auto;
   flex: 1;
   min-height: 0;
@@ -100,7 +100,7 @@
   border: 1px solid var(--border-primary);
   border-radius: 10px;
   box-shadow: var(--shadow-sm);
-  padding: 14px 16px;
+  padding: var(--information-panel-padding);
   overflow-y: auto;
   flex-shrink: 0;
   min-height: 0;

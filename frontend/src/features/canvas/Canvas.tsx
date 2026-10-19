@@ -1,4 +1,4 @@
-import { uiScale } from "../shared/uiScale";
+import { uiScale, screenToCanvas } from "../shared/uiScale";
 import React, {
   memo,
   useState,
@@ -467,13 +467,8 @@ function Canvas({
       const svg = svgRef.current;
       if (!svg) return;
 
-      // Convert screen coordinates to SVG coordinates
-      const point = svg.createSVGPoint();
-      point.x = event.clientX;
-      point.y = event.clientY;
-      const ctm = svg.getScreenCTM();
-      if (!ctm) return;
-      const coords = point.matrixTransform(ctm.inverse());
+      const coords = screenToCanvas(svg, event.clientX, event.clientY);
+      if (!coords) return;
 
       const newId =
         sandbox || newKind.name === "function" ? "_" : getNextElementId(ids);

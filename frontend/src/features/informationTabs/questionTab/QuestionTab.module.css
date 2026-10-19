@@ -30,7 +30,7 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 8px 12px;
+  gap: var(--workspace-gap) var(--workspace-edge-space);
   margin-bottom: 18px;
   padding: 8px 0;
 }

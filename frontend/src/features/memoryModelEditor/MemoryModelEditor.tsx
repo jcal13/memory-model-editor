@@ -1,5 +1,5 @@
 import { uiScale } from "../shared/uiScale";
-import { maxInformationWidth } from "./utils/panelSizing";
+import { maxInformationWidth, DEFAULT_INFO_PANEL_WIDTH, MIN_INFO_PANEL_WIDTH, MIN_PALETTE_WIDTH, DEFAULT_PALETTE_WIDTH, MAX_INFO_PANEL_VIEWPORT_RATIO, RESIZE_HANDLE_SIZE } from "./utils/panelSizing";
 import { normalizeQuestionCanvasData } from "./utils/questionFrames";
 import Tutorial from "../tutorial/Tutorial";
 import { isDemoQuestion, isTutorial } from "../tutorial/tutorialStorage";
@@ -34,13 +34,8 @@ import {
 import { spreadOverlappingElements } from "../canvas/utils/boundary.helpers";
 
 // Layout constants
-const MAX_INFO_PANEL_VIEWPORT_RATIO = 0.6667;
-const MIN_INFO_PANEL_WIDTH = 320;
-const MIN_PALETTE_WIDTH = 260;
 const MAX_PALETTE_WIDTH = 400;
-const DEFAULT_PALETTE_WIDTH = 260;
 const SNAP_CLOSE_THRESHOLD = 100;
-const STRUCTURE_PANEL_RESIZE_HANDLE_HEIGHT = 8;
 
 interface MemoryModelEditorProps {
   sandbox?: boolean;
@@ -474,7 +469,7 @@ export default function MemoryModelEditor({
 
         if (finalWidth < SNAP_CLOSE_THRESHOLD) {
           infoPanelSetOpen(false);
-          infoPanelSetWidth(380);
+          infoPanelSetWidth(DEFAULT_INFO_PANEL_WIDTH);
         } else {
           const settledWidth = Math.max(
             Math.min(MIN_INFO_PANEL_WIDTH, maxAllowedWidth),
@@ -641,7 +636,7 @@ export default function MemoryModelEditor({
               workspaceHeightOffset={
                 state.showLinkedListView && !state.structurePanelCollapsed
                   ? state.structurePanelHeight +
-                    STRUCTURE_PANEL_RESIZE_HANDLE_HEIGHT
+                    RESIZE_HANDLE_SIZE
                   : 0
               }
             />

@@ -9,17 +9,18 @@ jest.mock("pg", () => ({
 import validateAnswer, { validateAnswerAtLine } from "./validateAnswer";
 import { ErrorType } from "./errorStructuring";
 
-const practiceQuestions = require("../../database/practiceQuestions.json") as Array<{
-  id: number;
-  answer: Array<Record<string, any>>;
-  code: string[];
-  topics: string[];
-  steps: Array<{
-    lineNumber: number;
-    iterationNumber?: number;
+const practiceQuestions =
+  require("../../database/practiceQuestions.json") as Array<{
+    id: number;
     answer: Array<Record<string, any>>;
+    code: string[];
+    topics: string[];
+    steps: Array<{
+      lineNumber: number;
+      iterationNumber?: number;
+      answer: Array<Record<string, any>>;
+    }>;
   }>;
-}>;
 
 describe("validateAnswer reference mismatch wording", () => {
   beforeEach(() => {
@@ -206,7 +207,8 @@ describe("CSC148 Practice class and method answers", () => {
     "accepts question %i final and every line answer",
     async (questionId) => {
       const question = practiceQuestions.find((item) => item.id === questionId);
-      if (!question) throw new Error(`Practice question ${questionId} is missing`);
+      if (!question)
+        throw new Error(`Practice question ${questionId} is missing`);
       expect(question.topics).toEqual(
         questionId === 17 ? ["Creation", "Methods"] : ["Methods", "Mutation"],
       );

@@ -10,6 +10,7 @@ import {
 import { deriveAllTopics, filterQuestionIds } from "./utils/topicFilter";
 import QuestionSelector from "./components/QuestionSelector";
 import CodeBlock from "./components/CodeBlock";
+import HelpIcon from "../../shared/components/HelpIcon";
 import styles from "./QuestionTab.module.css";
 import "prismjs/themes/prism-tomorrow.css";
 import { SubmissionResult } from "../../shared/types";
@@ -271,7 +272,6 @@ export default function QuestionTab({
     () => filterQuestionIds(topicMap, questionCount, selectedTopic),
     [selectedTopic, topicMap, questionCount],
   );
-  const [autoAdvance, setAutoAdvance] = useState(false);
   const [stepByStepIndex, setStepByStepIndex] = useState<number>(0);
   const [committedAssignments, setCommittedAssignments] =
     useState<StepAssignments | null>(null);
@@ -387,6 +387,9 @@ export default function QuestionTab({
     return questionStatus[key] || "unattempted";
   };
 
+  const getInitialStep = (stepData: QuestionData | null) =>
+    stepData?.steps?.[0] ?? null;
+
   const getNextStep = (
     lineNumber: number,
     iterationNumber?: number,
@@ -412,7 +415,7 @@ export default function QuestionTab({
     try {
       const success = await onSubmitAtLine(lineNumber, iterationNumber);
 
-      if (success && autoAdvance) {
+      if (success) {
         const nextStep = getNextStep(lineNumber, iterationNumber);
         if (nextStep !== null) {
           setSelectedLine(nextStep.lineNumber);
@@ -515,6 +518,10 @@ export default function QuestionTab({
       setQuestionType(type);
       setQuestionIndex(id);
       setQuestionData(data);
+
+      const firstStep = getInitialStep(data);
+      setSelectedLine(firstStep?.lineNumber ?? null);
+      setSelectedIteration(firstStep?.iterationNumber);
 
       if (onQuestionDataChange) {
         onQuestionDataChange(data);
@@ -630,6 +637,10 @@ export default function QuestionTab({
           );
           setQuestionData(data);
 
+          const firstStep = getInitialStep(data);
+          setSelectedLine(firstStep?.lineNumber ?? null);
+          setSelectedIteration(firstStep?.iterationNumber);
+
           if (onQuestionDataChange) {
             onQuestionDataChange(data);
           }
@@ -719,6 +730,10 @@ export default function QuestionTab({
 
       deleteQuestionCanvasData(questionType, questionIndex);
       setQuestionData(freshQuestionData);
+
+      const firstStep = getInitialStep(freshQuestionData);
+      setSelectedLine(firstStep?.lineNumber ?? null);
+      setSelectedIteration(firstStep?.iterationNumber);
 
       if (onQuestionDataChange) {
         onQuestionDataChange(freshQuestionData);
@@ -1107,27 +1122,9 @@ export default function QuestionTab({
 
                   {checkableLines.size > 0 && (
                     <div className={styles.autoToolbar}>
-                      <div
-                        className={`${styles.toggleTrack} ${
-                          autoAdvance ? styles.toggleOn : ""
-                        }`}
-                        onClick={() => setAutoAdvance((v) => !v)}
-                        role="switch"
-                        aria-checked={autoAdvance}
-                        aria-label="Auto advance to next checkable line"
-                        tabIndex={0}
-                        onKeyDown={(e) =>
-                          e.key === " " && setAutoAdvance((v) => !v)
-                        }
-                      >
-                        <div className={styles.toggleThumb} />
-                      </div>
-                      <span className={styles.toolbarText}>auto-advance</span>
-
                       {selectedLine !== null &&
                         (lineIterations.get(selectedLine)?.length ?? 0) > 0 && (
                           <>
-                            <div className={styles.toolbarDivider} />
                             <span className={styles.toolbarText}>iter:</span>
                             {(lineIterations.get(selectedLine) ?? []).map(
                               (iter) => (
@@ -1172,6 +1169,11 @@ export default function QuestionTab({
                               ? ` · iter ${selectedIteration}`
                               : ""}
                           </button>
+                          <HelpIcon
+                            title={`Check line ${selectedLine}`}
+                            text="This checks your answer at this line and, if correct, automatically advances to the next checkpoint."
+                            className={styles.helpIcon}
+                          />
                         </>
                       )}
                     </div>

@@ -497,7 +497,7 @@
   transition: color 200ms ease;
 }
 
-/* Auto-advance toolbar */
+/* Check-line toolbar */
 .autoToolbar {
   display: flex;
   align-items: center;
@@ -509,36 +509,6 @@
   width: fit-content;
   margin-top: 0.5rem;
   flex-wrap: wrap;
-}
-
-.toggleTrack {
-  width: 28px;
-  height: 15px;
-  border-radius: 99px;
-  background: var(--border-secondary);
-  position: relative;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 0.15s;
-}
-
-.toggleOn {
-  background: #0369a1;
-}
-
-.toggleThumb {
-  width: 11px;
-  height: 11px;
-  background: var(--bg-primary);
-  border-radius: 50%;
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  transition: left 0.15s;
-}
-
-.toggleOn .toggleThumb {
-  left: 15px;
 }
 
 .toolbarText {
@@ -554,6 +524,9 @@
   flex-shrink: 0;
 }
 
+.helpIcon {
+  margin-left: 0.25rem;
+}
 
 .linkError {
   display: flex;
@@ -568,6 +541,7 @@
   font-size: 14px;
   line-height: 1.5;
 }
+
 .linkErrorIcon {
   display: grid;
   place-items: center;
@@ -577,6 +551,7 @@
   background: #ffedd5;
   font-weight: 700;
 }
+
 .linkError p { margin: 4px 0 0; }
 .linkError button {
   margin-left: auto;

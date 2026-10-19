@@ -2,11 +2,7 @@
   {
     "id": 1,
     "question": "Draw the memory model after all the code has executed.",
-    "code": [
-      "a = 5",
-      "b = 4",
-      "c = 6"
-    ],
+    "code": ["a = 5", "b = 4", "c = 6"],
     "answer": [
       {
         "id": null,
@@ -37,12 +33,7 @@
       }
     ],
     "description": null,
-    "topics": [
-      "Variables",
-      "Assignment",
-      "Integers",
-      "Frames"
-    ],
+    "topics": ["Variables", "Assignment", "Integers", "Frames"],
     "canvasConfig": {
       "elements": [],
       "ids": [],
@@ -132,11 +123,7 @@
   {
     "id": 2,
     "question": "Draw the memory model after all the code has executed.",
-    "code": [
-      "a = 5",
-      "b = a + 3",
-      "c = [a, a, a]"
-    ],
+    "code": ["a = 5", "b = a + 3", "c = [a, a, a]"],
     "answer": [
       {
         "id": null,
@@ -163,20 +150,11 @@
       {
         "id": 3,
         "type": "list",
-        "value": [
-          1,
-          1,
-          1
-        ]
+        "value": [1, 1, 1]
       }
     ],
     "description": null,
-    "topics": [
-      "Arithmetic",
-      "Lists",
-      "Aliasing",
-      "Variables"
-    ],
+    "topics": ["Arithmetic", "Lists", "Aliasing", "Variables"],
     "steps": [
       {
         "lineNumber": 1,
@@ -252,11 +230,7 @@
           {
             "id": 3,
             "type": "list",
-            "value": [
-              1,
-              1,
-              1
-            ]
+            "value": [1, 1, 1]
           }
         ]
       }
@@ -265,10 +239,7 @@
   {
     "id": 3,
     "question": "Draw the memory model after all the code has executed.",
-    "code": [
-      "a = 5",
-      "b = [[[a]]]"
-    ],
+    "code": ["a = 5", "b = [[[a]]]"],
     "answer": [
       {
         "id": null,
@@ -289,31 +260,21 @@
       {
         "id": 2,
         "type": "list",
-        "value": [
-          1
-        ]
+        "value": [1]
       },
       {
         "id": 3,
         "type": "list",
-        "value": [
-          2
-        ]
+        "value": [2]
       },
       {
         "id": 4,
         "type": "list",
-        "value": [
-          3
-        ]
+        "value": [3]
       }
     ],
     "description": null,
-    "topics": [
-      "Lists",
-      "Nesting",
-      "Aliasing"
-    ],
+    "topics": ["Lists", "Nesting", "Aliasing"],
     "steps": [
       {
         "lineNumber": 1,
@@ -357,23 +318,17 @@
           {
             "id": 2,
             "type": "list",
-            "value": [
-              1
-            ]
+            "value": [1]
           },
           {
             "id": 3,
             "type": "list",
-            "value": [
-              2
-            ]
+            "value": [2]
           },
           {
             "id": 4,
             "type": "list",
-            "value": [
-              3
-            ]
+            "value": [3]
           }
         ]
       }
@@ -382,11 +337,7 @@
   {
     "id": 4,
     "question": "Draw the memory model after all the code has executed.",
-    "code": [
-      "x = [1, 2, 3]",
-      "y = x",
-      "y = y + [4]"
-    ],
+    "code": ["x = [1, 2, 3]", "y = x", "y = y + [4]"],
     "answer": [
       {
         "id": null,
@@ -422,30 +373,16 @@
       {
         "id": 5,
         "type": "list",
-        "value": [
-          1,
-          2,
-          3
-        ]
+        "value": [1, 2, 3]
       },
       {
         "id": 6,
         "type": "list",
-        "value": [
-          1,
-          2,
-          3,
-          4
-        ]
+        "value": [1, 2, 3, 4]
       }
     ],
     "description": null,
-    "topics": [
-      "Lists",
-      "Aliasing",
-      "Concatenation",
-      "Rebinding"
-    ],
+    "topics": ["Lists", "Aliasing", "Concatenation", "Rebinding"],
     "steps": [
       {
         "lineNumber": 1,
@@ -478,11 +415,7 @@
           {
             "id": 5,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3
-            ]
+            "value": [1, 2, 3]
           }
         ]
       },
@@ -518,11 +451,7 @@
           {
             "id": 5,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3
-            ]
+            "value": [1, 2, 3]
           }
         ]
       },
@@ -558,11 +487,7 @@
           {
             "id": 5,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3
-            ]
+            "value": [1, 2, 3]
           },
           {
             "id": 4,
@@ -572,12 +497,7 @@
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3,
-              4
-            ]
+            "value": [1, 2, 3, 4]
           }
         ]
       }
@@ -586,11 +506,7 @@
   {
     "id": 5,
     "question": "Draw the memory model after all the code has executed.",
-    "code": [
-      "x = {1, 2, 3}",
-      "y = x",
-      "set.add(y, 4)"
-    ],
+    "code": ["x = {1, 2, 3}", "y = x", "set.add(y, 4)"],
     "answer": [
       {
         "id": null,
@@ -626,20 +542,11 @@
       {
         "id": 5,
         "type": "set",
-        "value": [
-          1,
-          2,
-          3,
-          4
-        ]
+        "value": [1, 2, 3, 4]
       }
     ],
     "description": null,
-    "topics": [
-      "Sets",
-      "Aliasing",
-      "Mutation"
-    ],
+    "topics": ["Sets", "Aliasing", "Mutation"],
     "steps": [
       {
         "lineNumber": 1,
@@ -672,11 +579,7 @@
           {
             "id": 5,
             "type": "set",
-            "value": [
-              1,
-              2,
-              3
-            ]
+            "value": [1, 2, 3]
           }
         ]
       },
@@ -712,11 +615,7 @@
           {
             "id": 5,
             "type": "set",
-            "value": [
-              1,
-              2,
-              3
-            ]
+            "value": [1, 2, 3]
           }
         ]
       },
@@ -752,12 +651,7 @@
           {
             "id": 5,
             "type": "set",
-            "value": [
-              1,
-              2,
-              3,
-              4
-            ]
+            "value": [1, 2, 3, 4]
           },
           {
             "id": 4,
@@ -816,37 +710,21 @@
       {
         "id": 5,
         "type": "list",
-        "value": [
-          6,
-          7
-        ]
+        "value": [6, 7]
       },
       {
         "id": 6,
         "type": "list",
-        "value": [
-          1,
-          2,
-          8
-        ]
+        "value": [1, 2, 8]
       },
       {
         "id": 7,
         "type": "list",
-        "value": [
-          3,
-          4,
-          8
-        ]
+        "value": [3, 4, 8]
       }
     ],
     "description": null,
-    "topics": [
-      "Lists",
-      "Loops",
-      "Mutation",
-      "Nesting"
-    ],
+    "topics": ["Lists", "Loops", "Mutation", "Nesting"],
     "steps": [
       {
         "lineNumber": 1,
@@ -884,26 +762,17 @@
           {
             "id": 5,
             "type": "list",
-            "value": [
-              6,
-              7
-            ]
+            "value": [6, 7]
           },
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2
-            ]
+            "value": [1, 2]
           },
           {
             "id": 7,
             "type": "list",
-            "value": [
-              3,
-              4
-            ]
+            "value": [3, 4]
           }
         ]
       },
@@ -945,26 +814,17 @@
           {
             "id": 5,
             "type": "list",
-            "value": [
-              6,
-              7
-            ]
+            "value": [6, 7]
           },
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2
-            ]
+            "value": [1, 2]
           },
           {
             "id": 7,
             "type": "list",
-            "value": [
-              3,
-              4
-            ]
+            "value": [3, 4]
           }
         ]
       },
@@ -1011,27 +871,17 @@
           {
             "id": 5,
             "type": "list",
-            "value": [
-              6,
-              7
-            ]
+            "value": [6, 7]
           },
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2,
-              8
-            ]
+            "value": [1, 2, 8]
           },
           {
             "id": 7,
             "type": "list",
-            "value": [
-              3,
-              4
-            ]
+            "value": [3, 4]
           }
         ]
       },
@@ -1078,27 +928,17 @@
           {
             "id": 5,
             "type": "list",
-            "value": [
-              6,
-              7
-            ]
+            "value": [6, 7]
           },
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2,
-              8
-            ]
+            "value": [1, 2, 8]
           },
           {
             "id": 7,
             "type": "list",
-            "value": [
-              3,
-              4
-            ]
+            "value": [3, 4]
           }
         ]
       },
@@ -1145,28 +985,17 @@
           {
             "id": 5,
             "type": "list",
-            "value": [
-              6,
-              7
-            ]
+            "value": [6, 7]
           },
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2,
-              8
-            ]
+            "value": [1, 2, 8]
           },
           {
             "id": 7,
             "type": "list",
-            "value": [
-              3,
-              4,
-              8
-            ]
+            "value": [3, 4, 8]
           }
         ]
       },
@@ -1213,28 +1042,17 @@
           {
             "id": 5,
             "type": "list",
-            "value": [
-              6,
-              7
-            ]
+            "value": [6, 7]
           },
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2,
-              8
-            ]
+            "value": [1, 2, 8]
           },
           {
             "id": 7,
             "type": "list",
-            "value": [
-              3,
-              4,
-              8
-            ]
+            "value": [3, 4, 8]
           }
         ]
       }
@@ -1243,10 +1061,7 @@
   {
     "id": 7,
     "question": "Draw the memory model after all the code has executed.",
-    "code": [
-      "a = [1]",
-      "b = a"
-    ],
+    "code": ["a = [1]", "b = a"],
     "answer": [
       {
         "id": null,
@@ -1267,16 +1082,11 @@
       {
         "id": 2,
         "type": "list",
-        "value": [
-          1
-        ]
+        "value": [1]
       }
     ],
     "description": null,
-    "topics": [
-      "Lists",
-      "Aliasing"
-    ],
+    "topics": ["Lists", "Aliasing"],
     "steps": [
       {
         "lineNumber": 1,
@@ -1299,9 +1109,7 @@
           {
             "id": 2,
             "type": "list",
-            "value": [
-              1
-            ]
+            "value": [1]
           }
         ]
       },
@@ -1327,9 +1135,7 @@
           {
             "id": 2,
             "type": "list",
-            "value": [
-              1
-            ]
+            "value": [1]
           }
         ]
       }
@@ -1338,10 +1144,7 @@
   {
     "id": 8,
     "question": "Draw the memory model after all the code has executed.",
-    "code": [
-      "a = []",
-      "b = []"
-    ],
+    "code": ["a = []", "b = []"],
     "answer": [
       {
         "id": null,
@@ -1366,11 +1169,7 @@
       }
     ],
     "description": null,
-    "topics": [
-      "Lists",
-      "Object Identity",
-      "Creation"
-    ],
+    "topics": ["Lists", "Object Identity", "Creation"],
     "steps": [
       {
         "lineNumber": 1,
@@ -1423,11 +1222,7 @@
   {
     "id": 9,
     "question": "Draw the memory model after all the code has executed.",
-    "code": [
-      "n = 14",
-      "n2 = n",
-      "n = 15"
-    ],
+    "code": ["n = 14", "n2 = n", "n = 15"],
     "answer": [
       {
         "id": null,
@@ -1452,11 +1247,7 @@
       }
     ],
     "description": null,
-    "topics": [
-      "Integers",
-      "Aliasing",
-      "Rebinding"
-    ],
+    "topics": ["Integers", "Aliasing", "Rebinding"],
     "steps": [
       {
         "lineNumber": 1,
@@ -1530,11 +1321,7 @@
   {
     "id": 10,
     "question": "Draw the memory model after all the code has executed.",
-    "code": [
-      "s = \"hello\"",
-      "s2 = s",
-      "s = s[2:]"
-    ],
+    "code": ["s = \"hello\"", "s2 = s", "s = s[2:]"],
     "answer": [
       {
         "id": null,
@@ -1559,11 +1346,7 @@
       }
     ],
     "description": null,
-    "topics": [
-      "Strings",
-      "Slicing",
-      "Rebinding"
-    ],
+    "topics": ["Strings", "Slicing", "Rebinding"],
     "steps": [
       {
         "lineNumber": 1,
@@ -1637,11 +1420,7 @@
   {
     "id": 11,
     "question": "Draw the memory model after all the code has executed.",
-    "code": [
-      "one = [0, 1, 2, 3, 4]",
-      "two = one",
-      "one = one[1:3]"
-    ],
+    "code": ["one = [0, 1, 2, 3, 4]", "two = one", "one = one[1:3]"],
     "answer": [
       {
         "id": null,
@@ -1682,29 +1461,16 @@
       {
         "id": 6,
         "type": "list",
-        "value": [
-          1,
-          2,
-          3,
-          4,
-          5
-        ]
+        "value": [1, 2, 3, 4, 5]
       },
       {
         "id": 7,
         "type": "list",
-        "value": [
-          2,
-          3
-        ]
+        "value": [2, 3]
       }
     ],
     "description": null,
-    "topics": [
-      "Lists",
-      "Slicing",
-      "Aliasing"
-    ],
+    "topics": ["Lists", "Slicing", "Aliasing"],
     "steps": [
       {
         "lineNumber": 1,
@@ -1747,13 +1513,7 @@
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3,
-              4,
-              5
-            ]
+            "value": [1, 2, 3, 4, 5]
           }
         ]
       },
@@ -1799,13 +1559,7 @@
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3,
-              4,
-              5
-            ]
+            "value": [1, 2, 3, 4, 5]
           }
         ]
       },
@@ -1851,21 +1605,12 @@
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3,
-              4,
-              5
-            ]
+            "value": [1, 2, 3, 4, 5]
           },
           {
             "id": 7,
             "type": "list",
-            "value": [
-              2,
-              3
-            ]
+            "value": [2, 3]
           }
         ]
       }
@@ -1874,11 +1619,7 @@
   {
     "id": 12,
     "question": "Draw the memory model after all the code has executed.",
-    "code": [
-      "a = [1, 2, 3, 2, 9]",
-      "b = [1, 2, 3, 2, 9]",
-      "a.remove(2)"
-    ],
+    "code": ["a = [1, 2, 3, 2, 9]", "b = [1, 2, 3, 2, 9]", "a.remove(2)"],
     "answer": [
       {
         "id": null,
@@ -1914,31 +1655,16 @@
       {
         "id": 6,
         "type": "list",
-        "value": [
-          1,
-          3,
-          2,
-          4
-        ]
+        "value": [1, 3, 2, 4]
       },
       {
         "id": 7,
         "type": "list",
-        "value": [
-          1,
-          2,
-          3,
-          2,
-          4
-        ]
+        "value": [1, 2, 3, 2, 4]
       }
     ],
     "description": null,
-    "topics": [
-      "Lists",
-      "Mutation",
-      "Remove"
-    ],
+    "topics": ["Lists", "Mutation", "Remove"],
     "steps": [
       {
         "lineNumber": 1,
@@ -1976,13 +1702,7 @@
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3,
-              2,
-              4
-            ]
+            "value": [1, 2, 3, 2, 4]
           }
         ]
       },
@@ -2023,24 +1743,12 @@
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3,
-              2,
-              4
-            ]
+            "value": [1, 2, 3, 2, 4]
           },
           {
             "id": 7,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3,
-              2,
-              4
-            ]
+            "value": [1, 2, 3, 2, 4]
           }
         ]
       },
@@ -2081,23 +1789,12 @@
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              3,
-              2,
-              4
-            ]
+            "value": [1, 3, 2, 4]
           },
           {
             "id": 7,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3,
-              2,
-              4
-            ]
+            "value": [1, 2, 3, 2, 4]
           }
         ]
       }
@@ -2106,11 +1803,7 @@
   {
     "id": 13,
     "question": "Draw the memory model after all the code has executed.",
-    "code": [
-      "x = [1, 2, 3]",
-      "y = x",
-      "y[1] = 100"
-    ],
+    "code": ["x = [1, 2, 3]", "y = x", "y[1] = 100"],
     "answer": [
       {
         "id": null,
@@ -2146,20 +1839,11 @@
       {
         "id": 5,
         "type": "list",
-        "value": [
-          1,
-          4,
-          3
-        ]
+        "value": [1, 4, 3]
       }
     ],
     "description": null,
-    "topics": [
-      "Lists",
-      "Aliasing",
-      "Mutation",
-      "Index Assignment"
-    ],
+    "topics": ["Lists", "Aliasing", "Mutation", "Index Assignment"],
     "steps": [
       {
         "lineNumber": 1,
@@ -2192,11 +1876,7 @@
           {
             "id": 5,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3
-            ]
+            "value": [1, 2, 3]
           }
         ]
       },
@@ -2232,11 +1912,7 @@
           {
             "id": 5,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3
-            ]
+            "value": [1, 2, 3]
           }
         ]
       },
@@ -2272,11 +1948,7 @@
           {
             "id": 5,
             "type": "list",
-            "value": [
-              1,
-              4,
-              3
-            ]
+            "value": [1, 4, 3]
           },
           {
             "id": 4,
@@ -2290,11 +1962,7 @@
   {
     "id": 14,
     "question": "Draw the memory model after all the code has executed.",
-    "code": [
-      "lst = [3, 2, 7]",
-      "lst2 = lst",
-      "lst.append(99)"
-    ],
+    "code": ["lst = [3, 2, 7]", "lst2 = lst", "lst.append(99)"],
     "answer": [
       {
         "id": null,
@@ -2330,21 +1998,11 @@
       {
         "id": 5,
         "type": "list",
-        "value": [
-          1,
-          2,
-          3,
-          4
-        ]
+        "value": [1, 2, 3, 4]
       }
     ],
     "description": null,
-    "topics": [
-      "Lists",
-      "Aliasing",
-      "Mutation",
-      "Append"
-    ],
+    "topics": ["Lists", "Aliasing", "Mutation", "Append"],
     "steps": [
       {
         "lineNumber": 1,
@@ -2377,11 +2035,7 @@
           {
             "id": 5,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3
-            ]
+            "value": [1, 2, 3]
           }
         ]
       },
@@ -2417,11 +2071,7 @@
           {
             "id": 5,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3
-            ]
+            "value": [1, 2, 3]
           }
         ]
       },
@@ -2457,12 +2107,7 @@
           {
             "id": 5,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3,
-              4
-            ]
+            "value": [1, 2, 3, 4]
           },
           {
             "id": 4,
@@ -2534,29 +2179,16 @@
       {
         "id": 8,
         "type": "list",
-        "value": [
-          1,
-          4,
-          3
-        ]
+        "value": [1, 4, 3]
       },
       {
         "id": 9,
         "type": "list",
-        "value": [
-          8,
-          7,
-          5
-        ]
+        "value": [8, 7, 5]
       }
     ],
     "description": null,
-    "topics": [
-      "Lists",
-      "Aliasing",
-      "Mutation",
-      "Rebinding"
-    ],
+    "topics": ["Lists", "Aliasing", "Mutation", "Rebinding"],
     "steps": [
       {
         "lineNumber": 1,
@@ -2589,11 +2221,7 @@
           {
             "id": 8,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3
-            ]
+            "value": [1, 2, 3]
           }
         ]
       },
@@ -2634,11 +2262,7 @@
           {
             "id": 8,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3
-            ]
+            "value": [1, 2, 3]
           }
         ]
       },
@@ -2685,20 +2309,12 @@
           {
             "id": 8,
             "type": "list",
-            "value": [
-              1,
-              2,
-              3
-            ]
+            "value": [1, 2, 3]
           },
           {
             "id": 9,
             "type": "list",
-            "value": [
-              8,
-              7,
-              5
-            ]
+            "value": [8, 7, 5]
           }
         ]
       },
@@ -2750,20 +2366,12 @@
           {
             "id": 8,
             "type": "list",
-            "value": [
-              1,
-              4,
-              3
-            ]
+            "value": [1, 4, 3]
           },
           {
             "id": 9,
             "type": "list",
-            "value": [
-              8,
-              7,
-              5
-            ]
+            "value": [8, 7, 5]
           }
         ]
       },
@@ -2815,20 +2423,12 @@
           {
             "id": 8,
             "type": "list",
-            "value": [
-              1,
-              4,
-              3
-            ]
+            "value": [1, 4, 3]
           },
           {
             "id": 9,
             "type": "list",
-            "value": [
-              8,
-              7,
-              5
-            ]
+            "value": [8, 7, 5]
           },
           {
             "id": 6,
@@ -2842,11 +2442,7 @@
   {
     "id": 16,
     "question": "Draw the memory model after the loop has finished executing.",
-    "code": [
-      "L = [[1, 2], [3, 4]]",
-      "for item in L:",
-      "    item = 88"
-    ],
+    "code": ["L = [[1, 2], [3, 4]]", "for item in L:", "    item = 88"],
     "answer": [
       {
         "id": null,
@@ -2887,34 +2483,21 @@
       {
         "id": 6,
         "type": "list",
-        "value": [
-          1,
-          2
-        ]
+        "value": [1, 2]
       },
       {
         "id": 7,
         "type": "list",
-        "value": [
-          3,
-          4
-        ]
+        "value": [3, 4]
       },
       {
         "id": 8,
         "type": "list",
-        "value": [
-          6,
-          7
-        ]
+        "value": [6, 7]
       }
     ],
     "description": null,
-    "topics": [
-      "Loops",
-      "Rebinding",
-      "Lists"
-    ],
+    "topics": ["Loops", "Rebinding", "Lists"],
     "steps": [
       {
         "lineNumber": 1,
@@ -2952,26 +2535,17 @@
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2
-            ]
+            "value": [1, 2]
           },
           {
             "id": 7,
             "type": "list",
-            "value": [
-              3,
-              4
-            ]
+            "value": [3, 4]
           },
           {
             "id": 8,
             "type": "list",
-            "value": [
-              6,
-              7
-            ]
+            "value": [6, 7]
           }
         ]
       },
@@ -3013,26 +2587,17 @@
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2
-            ]
+            "value": [1, 2]
           },
           {
             "id": 7,
             "type": "list",
-            "value": [
-              3,
-              4
-            ]
+            "value": [3, 4]
           },
           {
             "id": 8,
             "type": "list",
-            "value": [
-              6,
-              7
-            ]
+            "value": [6, 7]
           }
         ]
       },
@@ -3079,26 +2644,17 @@
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2
-            ]
+            "value": [1, 2]
           },
           {
             "id": 7,
             "type": "list",
-            "value": [
-              3,
-              4
-            ]
+            "value": [3, 4]
           },
           {
             "id": 8,
             "type": "list",
-            "value": [
-              6,
-              7
-            ]
+            "value": [6, 7]
           }
         ]
       },
@@ -3145,26 +2701,17 @@
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2
-            ]
+            "value": [1, 2]
           },
           {
             "id": 7,
             "type": "list",
-            "value": [
-              3,
-              4
-            ]
+            "value": [3, 4]
           },
           {
             "id": 8,
             "type": "list",
-            "value": [
-              6,
-              7
-            ]
+            "value": [6, 7]
           }
         ]
       },
@@ -3211,26 +2758,17 @@
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2
-            ]
+            "value": [1, 2]
           },
           {
             "id": 7,
             "type": "list",
-            "value": [
-              3,
-              4
-            ]
+            "value": [3, 4]
           },
           {
             "id": 8,
             "type": "list",
-            "value": [
-              6,
-              7
-            ]
+            "value": [6, 7]
           }
         ]
       },
@@ -3277,26 +2815,17 @@
           {
             "id": 6,
             "type": "list",
-            "value": [
-              1,
-              2
-            ]
+            "value": [1, 2]
           },
           {
             "id": 7,
             "type": "list",
-            "value": [
-              3,
-              4
-            ]
+            "value": [3, 4]
           },
           {
             "id": 8,
             "type": "list",
-            "value": [
-              6,
-              7
-            ]
+            "value": [6, 7]
           }
         ]
       }
@@ -3344,10 +2873,7 @@
       }
     ],
     "description": null,
-    "topics": [
-      "Creation",
-      "Methods"
-    ],
+    "topics": ["Creation", "Methods"],
     "canvasConfig": {
       "elements": [],
       "ids": [],
@@ -3516,10 +3042,7 @@
       }
     ],
     "description": null,
-    "topics": [
-      "Methods",
-      "Mutation"
-    ],
+    "topics": ["Methods", "Mutation"],
     "canvasConfig": {
       "elements": [
         {
@@ -3586,14 +3109,8 @@
           }
         }
       ],
-      "ids": [
-        1,
-        2,
-        3
-      ],
-      "classes": [
-        "ScoreCard"
-      ]
+      "ids": [1, 2, 3],
+      "classes": ["ScoreCard"]
     },
     "steps": [
       {

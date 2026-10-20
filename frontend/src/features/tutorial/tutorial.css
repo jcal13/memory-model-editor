@@ -27,8 +27,8 @@
 .tutorial-launch span { display: block; font-size: 14px; margin-top: 6px; }
 
 /* A compact learning guide, using the same restrained palette as the editor. */
-.tutorial-help { width: var(--help-max-width); padding: var(--help-inner-padding) 32px; }
-.tutorial-help .tutorial-heading { position: sticky; top: -28px; background: white; padding: 16px 0; margin-top: -16px; z-index: 1; border-bottom: 1px solid #e8edf5; }
+.tutorial-help { width: var(--help-max-width); padding: var(--help-inner-padding) var(--help-inline-padding); }
+.tutorial-help .tutorial-heading { position: sticky; top: calc(-1 * var(--help-inner-padding)); background: white; padding: 16px 0; margin-top: -16px; z-index: 1; border-bottom: 1px solid #e8edf5; }
 .tutorial-help .help-intro { color: #64748b; margin: 12px 0 20px; font-size: 15px; }
 .tutorial-help .tutorial-launch { display: flex; align-items: center; gap: 14px; margin: 0; padding: 18px; border-radius: 12px; background: #eef4ff; border: 1px solid #c7d8fb; }
 .tutorial-help .tutorial-launch:hover { background: #e3edff; }
@@ -61,9 +61,19 @@
 .help-tools { border: 0; }
 .tutorial-help>button:last-child { display: block; margin: 12px auto 0; padding: 9px 30px; }
 .tutorial-spotlight { box-shadow: 0 0 0 2px #93b5e4, 0 0 0 9999px rgb(15 23 42 / .18); }
-.tutorial-help-shell { width: min(var(--help-max-width), calc(100dvw / var(--ui-scale, 1) - var(--help-viewport-gutter))); max-width: 100%; min-width: 0; border-radius: var(--help-radius); overflow: hidden; background: white; box-shadow: var(--help-shadow); }
+.tutorial-help-shell { width: min(clamp(var(--help-compact-width), calc(var(--help-viewport-width) / var(--ui-scale, 1)), var(--help-max-width)), calc(100dvw / var(--ui-scale, 1) - var(--help-viewport-gutter))); max-width: 100%; min-width: 0; border-radius: var(--help-radius); overflow: hidden; background: white; box-shadow: var(--help-shadow); }
 .tutorial-help-shell .tutorial-help { width: 100%; max-height: min(var(--help-max-height), calc(var(--help-viewport-height) / var(--ui-scale, 1))); box-shadow: none; }
 
 .tutorial-help .tutorial-heading button { flex-shrink: 0; }
 .tutorial-help .help-lesson { overflow-wrap: anywhere; }
 .help-code, .help-memory { flex-wrap: wrap; }
+
+/* Short windows need less whitespace, not smaller text. Divide viewport lengths
+   by root zoom so these bounds describe the space the user actually sees. */
+.tutorial-help-shell {
+  --help-compact-space: var(--workspace-edge-space);
+  --help-inner-padding: clamp(var(--help-compact-space), calc(3dvh / var(--ui-scale, 1)), var(--help-preferred-inner-padding));
+  --help-inline-padding: clamp(var(--help-compact-space), calc(3dvw / var(--ui-scale, 1)), var(--help-preferred-inline-padding));
+  --help-lesson-padding: clamp(var(--workspace-gap), calc(2dvh / var(--ui-scale, 1)), var(--help-preferred-lesson-padding));
+}
+.tutorial-help-shell .tutorial-launch { padding: var(--help-lesson-padding); }

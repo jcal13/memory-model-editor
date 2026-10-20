@@ -52,7 +52,9 @@ html { zoom: var(--ui-scale); }
   --workspace-side-space: 6px;
   --information-panel-padding: 14px 16px;
   --help-max-height: 765px;
-  --help-viewport-height: 90dvh;
+  --help-viewport-height: 70dvh;
+  --help-viewport-width: 65dvw;
+  --help-compact-width: 360px;
   --help-viewport-gutter: 40px;
 }
 
@@ -85,10 +87,14 @@ html { zoom: var(--ui-scale); }
   --help-max-width: 740px;
   --help-radius: 16px;
   --help-outer-padding: 20px;
-  --help-inner-padding: 28px;
+  --help-preferred-inner-padding: 28px;
+  --help-inner-padding: var(--help-preferred-inner-padding);
+  --help-preferred-inline-padding: 32px;
+  --help-inline-padding: var(--help-preferred-inline-padding);
   --help-lesson-icon-size: 36px;
   --help-lesson-gap: 14px;
-  --help-lesson-padding: 18px;
+  --help-preferred-lesson-padding: 18px;
+  --help-lesson-padding: var(--help-preferred-lesson-padding);
   --tutorial-dock-layer: 100002;
   --tutorial-help-layer: 100003;
   --help-backdrop-blur: 4px;

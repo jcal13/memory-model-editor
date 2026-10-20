@@ -10,7 +10,6 @@ function renderControls(
     <ThemeProvider>
       <CanvasControls
         visualStyle="memoryviz"
-        onVisualStyleChange={jest.fn()}
         pythonTutorReferenceArrows={false}
         onPythonTutorReferenceArrowsChange={jest.fn()}
         pythonTutorStandalonePrimitives={false}
@@ -45,7 +44,6 @@ describe("CanvasControls", () => {
       <ThemeProvider>
         <CanvasControls
           visualStyle="pythonTutor"
-          onVisualStyleChange={jest.fn()}
           pythonTutorReferenceArrows={false}
           onPythonTutorReferenceArrowsChange={jest.fn()}
           pythonTutorStandalonePrimitives={false}
@@ -160,18 +158,11 @@ describe("CanvasControls help icons", () => {
     expect(handleModeToggle).not.toHaveBeenCalled();
   });
 
-  it("shows a help icon for the Python Tutor Style toggle", () => {
-    renderControls();
+  it.each(["memoryviz", "pythonTutor"] as const)("does not offer the style toggle in %s mode", (visualStyle) => {
+    renderControls({ visualStyle });
     openSettingsTab();
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Help: Python Tutor Style" })
-    );
-
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-    expect(
-      screen.getByText(/look like PythonTutor's visualizer/i)
-    ).toBeInTheDocument();
+    expect(screen.queryByText("Python Tutor Style")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Help: Python Tutor Style" })).not.toBeInTheDocument();
   });
 
   it("shows help icons for Standalone Primitives and Reference Arrows in Python Tutor mode", () => {

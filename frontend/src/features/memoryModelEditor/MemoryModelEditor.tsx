@@ -620,7 +620,6 @@ export default function MemoryModelEditor({
                 editorScale={editorScale}
                 onEditorScaleChange={setEditorScale}
                 visualStyle={state.visualStyle}
-                onVisualStyleChange={state.setVisualStyle}
                 pythonTutorReferenceArrows={state.pythonTutorReferenceArrows}
                 onPythonTutorReferenceArrowsChange={
                   state.setPythonTutorReferenceArrows

@@ -1,3 +1,4 @@
+import { normalizeClassVariable } from "../../canvas/utils/canvasReferences";
 import { spreadOverlappingElements } from "../../canvas/utils/boundary.helpers";
 import {
   CanvasElement,
@@ -63,7 +64,7 @@ function collectReferencedIds(elements: CanvasElement[]): Set<number> {
         break;
       case "class":
         element.kind.classVariables.forEach((variable) =>
-          addReference(variable.targetId)
+          addReference(normalizeClassVariable(variable).targetId)
         );
         break;
       case "list":

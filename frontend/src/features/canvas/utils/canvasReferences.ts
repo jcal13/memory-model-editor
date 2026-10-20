@@ -1,4 +1,4 @@
-import { CanvasElement, PrimitiveKind } from "../../shared/types";
+import { CanvasElement, FunctionParams, PrimitiveKind } from "../../shared/types";
 
 export function isPrimitiveElement(
   element: CanvasElement | null | undefined
@@ -34,3 +34,13 @@ export function createElementsByIdMap(
   );
 }
 
+
+// Older saved diagrams and question data use key/value for class attributes.
+export function normalizeClassVariable(
+  variable: Partial<FunctionParams> & { key?: string; value?: number | null }
+): FunctionParams {
+  return {
+    name: variable.name ?? variable.key ?? "",
+    targetId: variable.targetId !== undefined ? variable.targetId : variable.value ?? null,
+  };
+}

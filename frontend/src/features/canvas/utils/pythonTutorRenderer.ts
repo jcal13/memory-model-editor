@@ -10,7 +10,7 @@ import {
   TupleKind,
 } from "../../shared/types";
 import { getPythonTutorDisplayType, getPythonTutorFrameTitle, resolveInlineDisplay, PythonTutorReferenceDisplay } from "./pythonTutorReferences";
-import { formatPrimitiveValue } from "./canvasReferences";
+import { formatPrimitiveValue, normalizeClassVariable } from "./canvasReferences";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const FONT_FAMILY = 'Consolas, "Courier New", monospace';
@@ -673,7 +673,7 @@ function renderClassBox(
   element: CanvasElement & { kind: ClassKind },
   context: RenderContext
 ): SVGSVGElement {
-  const rows = (element.kind.classVariables || []).map((variable) => ({
+  const rows = (element.kind.classVariables || []).map(normalizeClassVariable).map((variable) => ({
     left: variable.name,
     right: resolveDisplay(variable.targetId, context),
   }));

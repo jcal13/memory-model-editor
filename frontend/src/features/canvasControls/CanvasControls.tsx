@@ -24,7 +24,6 @@ interface CanvasControlsProps {
   editorScale?: number;
   onEditorScaleChange?: (scale: number) => void;
   visualStyle?: VisualStyle;
-  onVisualStyleChange?: (style: VisualStyle) => void;
   pythonTutorReferenceArrows?: boolean;
   onPythonTutorReferenceArrowsChange?: (value: boolean) => void;
   pythonTutorStandalonePrimitives?: boolean;
@@ -73,7 +72,6 @@ export default function CanvasControls({
   editorScale = 1,
   onEditorScaleChange,
   visualStyle = "memoryviz",
-  onVisualStyleChange,
   pythonTutorReferenceArrows = false,
   onPythonTutorReferenceArrowsChange,
   pythonTutorStandalonePrimitives = false,
@@ -104,7 +102,7 @@ export default function CanvasControls({
       <div className={styles.tabBody} role="tabpanel">
         <h3 className={styles.title}>
           Canvas Controls
-          <HelpIcon title="Canvas Controls" text="Tools for your canvas: Actions to undo/clear/export, View to zoom, and Settings to change modes and visual style." />
+          <HelpIcon title="Canvas Controls" text="Tools for your canvas: Actions to undo/clear/export, View to zoom, and Settings to change modes and appearance." />
         </h3>
 
         {/* Actions Tab */}
@@ -248,38 +246,6 @@ export default function CanvasControls({
                 <span className={styles.toggleThumb} />
               </button>
             </div>
-
-            {onVisualStyleChange && (
-              <div className={styles.controlItem}>
-                <span className={styles.labelGroup}>
-                  <label
-                    className={styles.controlLabel}
-                    htmlFor="python-tutor-style-toggle"
-                  >
-                    Python Tutor Style
-                  </label>
-                  <HelpIcon title="Python Tutor Style" text="Redraws the diagram to look like PythonTutor's visualizer instead of the default MemoryViz style." />
-                </span>
-                <button
-                  id="python-tutor-style-toggle"
-                  type="button"
-                  role="switch"
-                  aria-checked={visualStyle === "pythonTutor"}
-                  onClick={() =>
-                    onVisualStyleChange(
-                      visualStyle === "pythonTutor"
-                        ? "memoryviz"
-                        : "pythonTutor"
-                    )
-                  }
-                  className={`${styles.toggle} ${
-                    visualStyle === "pythonTutor" ? styles.toggleActive : ""
-                  }`}
-                >
-                  <span className={styles.toggleThumb} />
-                </button>
-              </div>
-            )}
 
             {visualStyle === "pythonTutor" &&
               onPythonTutorStandalonePrimitivesChange && (

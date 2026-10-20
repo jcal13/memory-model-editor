@@ -89,7 +89,6 @@ interface PaletteProps {
   editorScale?: number;
   onEditorScaleChange?: (scale: number) => void;
   visualStyle?: VisualStyle;
-  onVisualStyleChange?: (style: VisualStyle) => void;
   pythonTutorReferenceArrows?: boolean;
   onPythonTutorReferenceArrowsChange?: (value: boolean) => void;
   pythonTutorStandalonePrimitives?: boolean;
@@ -158,7 +157,6 @@ export default function Palette({
   editorScale,
   onEditorScaleChange,
   visualStyle = "memoryviz",
-  onVisualStyleChange,
   pythonTutorReferenceArrows = false,
   onPythonTutorReferenceArrowsChange,
   pythonTutorStandalonePrimitives = false,
@@ -303,7 +301,6 @@ export default function Palette({
             editorScale={editorScale}
             onEditorScaleChange={onEditorScaleChange}
             visualStyle={visualStyle}
-            onVisualStyleChange={onVisualStyleChange}
             pythonTutorReferenceArrows={pythonTutorReferenceArrows}
             onPythonTutorReferenceArrowsChange={
               onPythonTutorReferenceArrowsChange

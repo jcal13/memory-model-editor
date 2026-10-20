@@ -23,9 +23,16 @@ const DEFAULT_INFO_PANEL_WIDTH = 500;
 export function useMemoryModelEditorState(sandbox: boolean) {
     // Load initial data
   const tutorial = isTutorial();
-  const [linkedQuestion, setLinkedQuestion] = useState(() =>
-    tutorial ? null : readQuestionLink(window.location.search)
-  );
+  const [linkedQuestion, setLinkedQuestion] = useState(() => {
+    if (tutorial) return null;
+    const link = readQuestionLink(window.location.search);
+    const saved = loadInitialUIData();
+    // The address bar also contains the current question after normal navigation.
+    // Reopening that workspace should restore its diagram, not start it over.
+    const resumesQuestion = link !== null && saved.questionView === "question" &&
+      saved.questionIndex === link.id && saved.questionType === link.type;
+    return resumesQuestion ? null : link;
+  });
 
   const [categoryLink] = useState(() => tutorial ? null : readCategoryLink(window.location.search));
   const [invalidLink] = useState(() => tutorial ? false : invalidQuestionLink(window.location.search));

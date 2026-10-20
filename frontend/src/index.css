@@ -40,3 +40,63 @@ body.dragging * {
   -moz-user-select: none !important;
   -ms-user-select: none !important;
 }
+
+/* Native browser zoom is compensated only outside the supported visual range. */
+:root { --ui-scale: 1; --workspace-height: calc(100vh / var(--ui-scale)); }
+html { zoom: var(--ui-scale); }
+
+/* Shared spacing for the responsive workspace. */
+:root {
+  --workspace-gap: 8px;
+  --workspace-edge-space: 12px;
+  --workspace-side-space: 6px;
+  --information-panel-padding: 14px 16px;
+  --help-max-height: 765px;
+  --help-viewport-height: 70dvh;
+  --help-viewport-width: 65dvw;
+  --help-compact-width: 360px;
+  --help-viewport-gutter: 40px;
+}
+
+:root {
+  --notice-offset: 10px;
+  --notice-font-size: var(--workspace-edge-space);
+  --notice-border-width: 1px;
+  --notice-icon-offset: var(--notice-border-width);
+  --notice-max-width: 280px;
+  --notice-close-size: 24px;
+  --notice-icon-size: 18px;
+  --notice-title-gap: 3px;
+  --notice-close-font-size: 16px;
+  --notice-line-height: 1.45;
+  --notice-title-weight: 600;
+  --notice-layer: 100004;
+  --notice-border: #fecaca;
+  --notice-bg: #fff1f2;
+  --notice-text: #9f3341;
+  --notice-hover: #ffe4e6;
+  --notice-shadow: 0 4px 16px #0f172a14;
+}
+
+/* Tutorial bounds shrink to the viewport; these are preferred sizes only. */
+:root {
+  --tour-card-width: 320px;
+  --tour-card-height-reserve: 76px;
+  --tour-card-gutter: 24px;
+  --help-content-width: 650px;
+  --help-max-width: 740px;
+  --help-radius: 16px;
+  --help-outer-padding: 20px;
+  --help-preferred-inner-padding: 28px;
+  --help-inner-padding: var(--help-preferred-inner-padding);
+  --help-preferred-inline-padding: 32px;
+  --help-inline-padding: var(--help-preferred-inline-padding);
+  --help-lesson-icon-size: 36px;
+  --help-lesson-gap: 14px;
+  --help-preferred-lesson-padding: 18px;
+  --help-lesson-padding: var(--help-preferred-lesson-padding);
+  --tutorial-dock-layer: 100002;
+  --tutorial-help-layer: 100003;
+  --help-backdrop-blur: 4px;
+  --help-shadow: 0 16px 48px #0f172a33;
+}

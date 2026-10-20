@@ -1,3 +1,4 @@
+import { uiScale, screenToCanvas } from "../shared/uiScale";
 import React, {
   memo,
   useState,
@@ -115,7 +116,7 @@ function FloatingEditor({
       defaultPosition={defaultPosition}
       onMouseDown={onSelect}
       bounds={`.${styles.canvasWrapper}`}
-      scale={editorScale}
+      scale={editorScale * uiScale()}
       onStart={(e) => {
         e.stopPropagation();
         // Prevent text selection during drag
@@ -311,8 +312,8 @@ function Canvas({
     const wrapper = wrapperRef.current;
     if (!wrapper) return;
     const rect = wrapper.getBoundingClientRect();
-    const width = Math.max(1, rect.width);
-    const viewportHeight = Math.max(1, rect.height);
+    const width = Math.max(1, rect.width / uiScale());
+    const viewportHeight = Math.max(1, rect.height / uiScale());
     const renderedHeight = preserveCollapsedWorkspace
       ? Math.max(viewportHeight + workspaceHeightOffset, viewportHeight)
       : viewportHeight;
@@ -333,8 +334,8 @@ function Canvas({
 
     const updateSize = () => {
       const rect = wrapper.getBoundingClientRect();
-      const width = Math.max(1, rect.width);
-      const viewportHeight = Math.max(1, rect.height);
+      const width = Math.max(1, rect.width / uiScale());
+      const viewportHeight = Math.max(1, rect.height / uiScale());
       const renderedHeight = preserveCollapsedWorkspace
         ? Math.max(viewportHeight + workspaceHeightOffset, viewportHeight)
         : viewportHeight;
@@ -466,13 +467,8 @@ function Canvas({
       const svg = svgRef.current;
       if (!svg) return;
 
-      // Convert screen coordinates to SVG coordinates
-      const point = svg.createSVGPoint();
-      point.x = event.clientX;
-      point.y = event.clientY;
-      const ctm = svg.getScreenCTM();
-      if (!ctm) return;
-      const coords = point.matrixTransform(ctm.inverse());
+      const coords = screenToCanvas(svg, event.clientX, event.clientY);
+      if (!coords) return;
 
       const newId =
         sandbox || newKind.name === "function" ? "_" : getNextElementId(ids);
@@ -715,6 +711,7 @@ function Canvas({
             onReorder={handleCallStackReorder}
             onWidthChange={setCallStackWidth}
             scale={scale}
+            canvasHeight={canvasHeight ?? undefined}
             visualStyle={visualStyle}
             pythonTutorReferenceArrows={pythonTutorReferenceArrows}
             pythonTutorStandalonePrimitives={

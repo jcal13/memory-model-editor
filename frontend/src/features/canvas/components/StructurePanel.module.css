@@ -12,7 +12,7 @@
 }
 
 .resizeHandle {
-  height: var(--resize-handle-width, 8px);
+  height: var(--resize-handle-width);
   flex: 0 0 auto;
   cursor: ns-resize;
   user-select: none;
@@ -93,4 +93,8 @@
   min-height: 0;
   overflow: auto;
   padding: 12px;
+}
+.collapsedGap {
+  height: var(--resize-handle-width);
+  flex: 0 0 auto;
 }

@@ -29,6 +29,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--workspace-gap) var(--workspace-edge-space);
   margin-bottom: 18px;
   padding: 8px 0;
 }
@@ -116,8 +118,8 @@
 }
 
 .backBtn {
-  position: absolute;
-  left: 0;
+  position: static;
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;

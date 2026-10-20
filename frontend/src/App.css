@@ -1,6 +1,6 @@
 .App {
   text-align: center;
-  height: 100vh;
+  height: var(--workspace-height, 100vh);
   overflow: hidden;
 }
 
@@ -17,7 +17,7 @@
 
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
+  min-height: var(--workspace-height, 100vh);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -37,4 +37,61 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* A compact recommendation for narrow portrait windows. */
+
+.narrow-window-notice {
+  display: flex;
+  position: fixed;
+  top: var(--notice-offset);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(var(--notice-max-width), calc(100vw - var(--notice-close-size)));
+  box-sizing: border-box;
+  z-index: var(--notice-layer);
+  align-items: flex-start;
+  gap: var(--workspace-gap);
+  padding: var(--notice-offset) var(--workspace-edge-space);
+  border: var(--notice-border-width) solid var(--notice-border);
+  border-radius: var(--workspace-edge-space);
+  background: var(--notice-bg);
+  color: var(--notice-text);
+  box-shadow: var(--notice-shadow);
+  text-align: left;
+  font-size: var(--notice-font-size);
+  line-height: var(--notice-line-height);
+}
+
+.narrow-window-warning {
+  flex: 0 0 var(--notice-icon-size);
+  height: var(--notice-icon-size);
+  margin-top: var(--notice-icon-offset);
+}
+
+.narrow-window-notice p {
+  margin: 0;
+}
+
+.narrow-window-notice strong {
+  display: block;
+  margin-bottom: var(--notice-title-gap);
+  font-size: var(--notice-font-size);
+  font-weight: var(--notice-title-weight);
+}
+
+.narrow-window-notice button {
+  flex: 0 0 var(--notice-close-size);
+  height: var(--notice-close-size);
+  padding: 0;
+  border: 0;
+  border-radius: var(--workspace-side-space);
+  background: transparent;
+  color: inherit;
+  font-size: var(--notice-close-font-size);
+  cursor: pointer;
+}
+
+.narrow-window-notice button:hover {
+  background: var(--notice-hover);
 }

@@ -58,25 +58,7 @@ html { zoom: var(--ui-scale); }
   --help-viewport-gutter: 40px;
 }
 
-:root {
-  --notice-offset: 10px;
-  --notice-font-size: var(--workspace-edge-space);
-  --notice-border-width: 1px;
-  --notice-icon-offset: var(--notice-border-width);
-  --notice-max-width: 280px;
-  --notice-close-size: 24px;
-  --notice-icon-size: 18px;
-  --notice-title-gap: 3px;
-  --notice-close-font-size: 16px;
-  --notice-line-height: 1.45;
-  --notice-title-weight: 600;
-  --notice-layer: 100004;
-  --notice-border: #fecaca;
-  --notice-bg: #fff1f2;
-  --notice-text: #9f3341;
-  --notice-hover: #ffe4e6;
-  --notice-shadow: 0 4px 16px #0f172a14;
-}
+
 
 /* Tutorial bounds shrink to the viewport; these are preferred sizes only. */
 :root {

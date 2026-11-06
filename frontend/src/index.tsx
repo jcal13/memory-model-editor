@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { getBrowserZoom } from './features/shared/uiScale';
 import { RESIZE_HANDLE_SIZE } from './features/memoryModelEditor/utils/panelSizing';
+import { normalizeTutorialUrl } from './features/tutorial/tutorialStorage';
 
 // CSS and pointer calculations use the same divider size.
 document.documentElement.style.setProperty('--resize-handle-width', `${RESIZE_HANDLE_SIZE}px`);
@@ -27,7 +28,6 @@ function onResolutionChange() {
 updateWorkspaceScale();
 watchResolution();
 window.addEventListener('resize', updateWorkspaceScale);
-import { normalizeTutorialUrl } from './features/tutorial/tutorialStorage';
 
 normalizeTutorialUrl();
 

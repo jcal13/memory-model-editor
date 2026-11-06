@@ -1,0 +1,39 @@
+/* Native modal dialogs sit above tutorial portals and keep background controls inert. */
+.device-guidance {
+  --guidance-width: 28rem;
+  --guidance-gap: 1rem;
+  box-sizing: border-box;
+  width: min(var(--guidance-width), calc(100dvw / var(--ui-scale, 1) - 2 * var(--guidance-gap)));
+  max-width: none;
+  max-height: calc(100dvh / var(--ui-scale, 1) - 2 * var(--guidance-gap));
+  margin: auto;
+  padding: clamp(1rem, 4vw, 2rem);
+  overflow: auto;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--help-radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  text-align: left;
+  box-shadow: var(--help-shadow);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.device-guidance::backdrop { background: rgb(15 23 42 / 55%); }
+.device-guidance h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 1rem; }
+.device-guidance-note { color: var(--text-secondary); font-size: 0.875rem; }
+.device-guidance-actions { display: flex; flex-direction: column; gap: 0.75rem; }
+.device-guidance button, .device-guidance input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-primary);
+  border-radius: 0.5rem;
+  font: inherit;
+  color: inherit;
+  background: var(--bg-primary);
+}
+.device-guidance button { cursor: pointer; }
+.device-guidance .device-guidance-primary { background: #315dce; color: white; border-color: #315dce; }
+.device-guidance :focus-visible { outline: 3px solid #719aff; outline-offset: 3px; }
+.device-guidance [role="status"]:empty { display: none; }

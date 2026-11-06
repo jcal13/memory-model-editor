@@ -1,3 +1,4 @@
+import { uiScale } from "../../shared/uiScale";
 import React, {
   useCallback,
   useEffect,
@@ -26,11 +27,11 @@ import {
   SCROLLBAR_THUMB_MIN_HEIGHT,
   DRAG_THRESHOLD_PX,
   CALLSTACK_VERTICAL_OFFSET as VERTICAL_OFFSET,
-  DOWNLOAD_BUTTON_BOTTOM,
-  BUTTON_HEIGHT,
-  ADDITIONAL_HEIGHT_OFFSET,
 } from "../constants";
 import { isLockedMainFrame } from "../../memoryModelEditor/utils/questionFrames";
+
+// Leave equal breathing room above and below the stack.
+const STACK_EDGE_SPACE = 20;
 
 interface CallStackProps {
   frames: CanvasElement[];
@@ -43,6 +44,7 @@ interface CallStackProps {
   y?: number;
   width?: number;
   scale?: number;
+  canvasHeight?: number;
   visualStyle?: VisualStyle;
   pythonTutorReferenceArrows?: boolean;
   pythonTutorStandalonePrimitives?: boolean;
@@ -77,9 +79,10 @@ const CallStack: React.FC<CallStackProps> = ({
   onWidthChange,
   onBoundsChange,
   x = 20,
-  y = 73,
+  y = STACK_EDGE_SPACE,
   width = 205,
   scale = 1,
+  canvasHeight = window.innerHeight / uiScale(),
   visualStyle = "memoryviz",
   pythonTutorReferenceArrows = false,
   pythonTutorStandalonePrimitives = false,
@@ -87,7 +90,6 @@ const CallStack: React.FC<CallStackProps> = ({
 }) => {
   const clipPathId = useId();
   
-  const [viewportHeight] = useState<number>(() => window.innerHeight);
 
   const yPosition = y;
 
@@ -120,13 +122,10 @@ const CallStack: React.FC<CallStackProps> = ({
     onWidthChange?.(columnWidth + x);
   }, [columnWidth, x, onWidthChange]);
 
-  // Calculate height in pixels (not affected by scale)
-  // The call stack height stays constant regardless of zoom level
-  const bottomSpacing = DOWNLOAD_BUTTON_BOTTOM + BUTTON_HEIGHT + ADDITIONAL_HEIGHT_OFFSET;
-  const pixelColumnHeight = viewportHeight - (yPosition + bottomSpacing);
-  const columnHeight = pixelColumnHeight / scale;
+  // Follow the measured canvas viewport, including resize and UI scaling.
+  const columnHeight = Math.max(0, canvasHeight / scale - yPosition - STACK_EDGE_SPACE);
   const visibleHeight = Math.max(
-    100,
+    0,
     columnHeight - HEADER_HEIGHT - TOP_PADDING - BOTTOM_PADDING
   );
 
@@ -269,7 +268,7 @@ const CallStack: React.FC<CallStackProps> = ({
       if (!dragState.current) return;
 
       const drag = dragState.current;
-      const deltaY = event.clientY - drag.startY;
+      const deltaY = (event.clientY - drag.startY) / uiScale();
 
       if (!drag.active && Math.abs(deltaY) > DRAG_THRESHOLD_PX) {
         drag.active = true;
@@ -547,7 +546,7 @@ const CallStack: React.FC<CallStackProps> = ({
             onPointerMove={(event) => {
               if (!thumbDragState.current.isDragging) return;
 
-              const deltaY = event.clientY - thumbDragState.current.startY;
+              const deltaY = (event.clientY - thumbDragState.current.startY) / uiScale();
               const scrollRatio = maxScrollPosition / scrollbarThumbTravel;
               const newScrollPosition = Math.min(
                 maxScrollPosition,

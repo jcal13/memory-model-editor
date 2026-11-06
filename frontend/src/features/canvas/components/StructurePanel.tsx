@@ -1,3 +1,4 @@
+import { uiScale } from "../../shared/uiScale";
 import React, { useMemo, useRef } from "react";
 import { CanvasElement } from "../../shared/types";
 import { detectLinkedListGraph } from "../utils/linkedListDetector";
@@ -22,6 +23,8 @@ function LinkedListContent({ elements }: { elements: CanvasElement[] }) {
   );
 }
 
+const STRUCTURE_MAX_HEIGHT_SHARE = 0.45;
+
 function StructurePanelContent({
   elements,
   collapsed,
@@ -39,10 +42,10 @@ function StructurePanelContent({
     const onMove = (ev: MouseEvent) => {
       if (!dragRef.current) return;
 
-      const delta = dragRef.current.y - ev.clientY;
+      const delta = (dragRef.current.y - ev.clientY) / uiScale();
       const next = Math.max(
         110,
-        Math.min(window.innerHeight * 0.45, dragRef.current.h + delta)
+        Math.min(window.innerHeight / uiScale() * STRUCTURE_MAX_HEIGHT_SHARE, dragRef.current.h + delta)
       );
 
       onHeightChange(next);
@@ -61,9 +64,11 @@ function StructurePanelContent({
 
   return (
     <>
-      {!collapsed && (
-        <div className={styles.resizeHandle} onMouseDown={onHandleDown} />
-      )}
+      <div
+        className={collapsed ? styles.collapsedGap : styles.resizeHandle}
+        onMouseDown={collapsed ? undefined : onHandleDown}
+        aria-hidden="true"
+      />
 
       <div
         className={styles.dock}

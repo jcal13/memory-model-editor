@@ -57,3 +57,16 @@ describe("CallStack help icon", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 });
+
+it("keeps the stack within the canvas after resizing and zooming", () => {
+  const props = { frames: [], selected: null, onSelect: jest.fn(), onReorder: jest.fn() };
+  const { container, rerender } = render(
+    <svg><CallStack {...props} canvasHeight={900} /></svg>
+  );
+  const bounds = () => container.querySelector('[data-tour="call-stack"] > rect')!;
+  expect(Number(bounds().getAttribute("y")) + Number(bounds().getAttribute("height"))).toBe(880);
+  rerender(<svg><CallStack {...props} canvasHeight={500} scale={0.8} /></svg>);
+  expect(Number(bounds().getAttribute("y")) + Number(bounds().getAttribute("height"))).toBe(605);
+  rerender(<svg><CallStack {...props} canvasHeight={1000} /></svg>);
+  expect(Number(bounds().getAttribute("height"))).toBe(960);
+});

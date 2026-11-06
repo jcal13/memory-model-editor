@@ -102,6 +102,7 @@ describe("MemoryModelEditor info panel resizing", () => {
   });
 
   afterEach(() => {
+    document.documentElement.style.removeProperty("--ui-scale");
     rectSpy.mockRestore();
     if (innerWidthDescriptor) {
       Object.defineProperty(window, "innerWidth", innerWidthDescriptor);
@@ -120,7 +121,7 @@ describe("MemoryModelEditor info panel resizing", () => {
     fireEvent.mouseMove(document, { clientX: 898 });
     fireEvent.mouseUp(document, { clientX: 898 });
 
-    expect(infoPanel.style.width).toBe("260px");
+    expect(infoPanel.style.width).toBe("320px");
   });
 
   it("caps the information panel so the canvas keeps its minimum column width", () => {
@@ -136,8 +137,19 @@ describe("MemoryModelEditor info panel resizing", () => {
     fireEvent.mouseMove(document, { clientX: 0 });
     fireEvent.mouseUp(document, { clientX: 0 });
 
-    expect(infoPanel.style.width).toBe("412px");
-    expect(containerWidth - parseInt(infoPanel.style.width, 10) - 8).toBe(780);
+    expect(infoPanel.style.width).toBe("592px");
+    expect(containerWidth - parseInt(infoPanel.style.width, 10) - 8).toBe(600);
     expect(canvasColumn).toBeInTheDocument();
   });
+  it("converts pointer distances to layout widths when the UI is scaled", () => {
+    document.documentElement.style.setProperty("--ui-scale", "0.8");
+    containerWidth = 960;
+    const { container } = render(<MemoryModelEditor />);
+    const dividers = container.querySelectorAll(".resizeDivider");
+    fireEvent.mouseDown(dividers[dividers.length - 1]);
+    fireEvent.mouseMove(document, { clientX: 640 });
+    fireEvent.mouseUp(document, { clientX: 640 });
+    expect((container.querySelector(".infoPanel") as HTMLElement).style.width).toBe("400px");
+  });
+
 });

@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import { Pool } from "pg";
+import { studyQuestions, findStudyQuestion, withStudyQuestion } from "../../../database/studyQuestionDefinitions";
 
 const router = express.Router();
 
@@ -35,6 +36,28 @@ type QuestionRow = {
   topics: string[] | null; // text[]
   canvasConfig: unknown | null; // jsonb
 };
+
+router.post("/studyquestions", (_req: Request, res: Response) => {
+  res.json({ count: studyQuestions.length });
+});
+router.get("/studyquestions/topics", (_req: Request, res: Response) => {
+  res.json(studyQuestions.map(({ id }) => ({ id, topics: [] })));
+});
+router.get("/studyquestions/:id", async (req: Request, res: Response) => {
+  const study = findStudyQuestion(Number(req.params.id));
+  if (!study) { res.status(404).json({ error: "Study question not found" }); return; }
+  try {
+    const { rows } = await getPool().query<QuestionRow>(
+      'SELECT id, question, code, answer, topics, canvas_config AS "canvasConfig" FROM practice_questions WHERE id = $1',
+      [study.sourceQuestionId],
+    );
+    if (!rows.length) { res.status(404).json({ error: "Source question not found" }); return; }
+    res.json(withStudyQuestion(rows[0], study));
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch study question" });
+  }
+});
 
 router.post("/practicequestions", async (_req: Request, res: Response) => {
   try {

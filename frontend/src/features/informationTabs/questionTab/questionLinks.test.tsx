@@ -56,7 +56,7 @@ test('a missing linked question shows an explanation and returns to the list', a
 test.each(questionTypes)('opens %s category without fetching an individual question', async type => {
  window.history.replaceState(null, '', `/?${type}`);
  render(<QuestionTab {...props()} questionType={type} questionIndex={null} questionView="list"/>);
- await screen.findByRole('button', {name:/Q1/});
+ await screen.findByRole('button', {name: type === 'study' ? /Task 1/ : /Q1/});
  expect(fetchQuestion).not.toHaveBeenCalled();
  expect(window.location.search).toBe(`?${type}`);
  await act(async () => { userEvent.click(screen.getByRole('button',{name:'← Back'})); });

@@ -1,4 +1,4 @@
-export const questionTypes = ["practice", "test", "prep", "experiment"] as const;
+export const questionTypes = ["practice", "test", "prep", "experiment", "study"] as const;
 export interface QuestionLink {
   type: typeof questionTypes[number];
   id: number;

@@ -1,0 +1,344 @@
+[
+  {
+    "id": 1,
+    "sourceQuestionId": 7,
+    "title": "Task 1",
+    "question": "Draw the memory model after all the code has executed.",
+    "canvasConfig": {
+      "elements": [],
+      "ids": [],
+      "classes": []
+    }
+  },
+  {
+    "id": 2,
+    "sourceQuestionId": 1,
+    "title": "Task 2a",
+    "question": "The starting diagram contains one error. Submit it, read the feedback, and correct the diagram to match the code after all lines have executed.",
+    "canvasConfig": {
+      "elements": [
+        {
+          "boxId": 1,
+          "id": "_",
+          "x": 280,
+          "y": 80,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "functionName": "__main__",
+            "order": 1,
+            "params": [
+              {
+                "name": "a",
+                "targetId": 1
+              },
+              {
+                "name": "b",
+                "targetId": 2
+              },
+              {
+                "name": "c",
+                "targetId": 3
+              }
+            ],
+            "value": null
+          }
+        },
+        {
+          "boxId": 2,
+          "id": 1,
+          "x": 280,
+          "y": 80,
+          "kind": {
+            "name": "primitive",
+            "type": "int",
+            "value": "9"
+          }
+        },
+        {
+          "boxId": 3,
+          "id": 2,
+          "x": 460,
+          "y": 80,
+          "kind": {
+            "name": "primitive",
+            "type": "int",
+            "value": "4"
+          }
+        },
+        {
+          "boxId": 4,
+          "id": 3,
+          "x": 640,
+          "y": 80,
+          "kind": {
+            "name": "primitive",
+            "type": "int",
+            "value": "6"
+          }
+        }
+      ],
+      "ids": [
+        1,
+        2,
+        3
+      ],
+      "classes": []
+    }
+  },
+  {
+    "id": 3,
+    "sourceQuestionId": 8,
+    "title": "Task 2b",
+    "question": "The starting diagram contains one error. Submit it, read the feedback, and correct the diagram to match the code after all lines have executed.",
+    "canvasConfig": {
+      "elements": [
+        {
+          "boxId": 1,
+          "id": "_",
+          "x": 280,
+          "y": 80,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "functionName": "__main__",
+            "order": 1,
+            "params": [
+              {
+                "name": "a",
+                "targetId": 1
+              },
+              {
+                "name": "b",
+                "targetId": 1
+              }
+            ],
+            "value": null
+          }
+        },
+        {
+          "boxId": 2,
+          "id": 1,
+          "x": 280,
+          "y": 80,
+          "kind": {
+            "name": "list",
+            "type": "list",
+            "value": []
+          }
+        },
+        {
+          "boxId": 3,
+          "id": 2,
+          "x": 460,
+          "y": 80,
+          "kind": {
+            "name": "list",
+            "type": "list",
+            "value": []
+          }
+        }
+      ],
+      "ids": [
+        1,
+        2
+      ],
+      "classes": []
+    }
+  },
+  {
+    "id": 4,
+    "sourceQuestionId": 2,
+    "title": "Task 2c",
+    "question": "The starting diagram contains one error. Submit it, read the feedback, and correct the diagram to match the code after all lines have executed.",
+    "canvasConfig": {
+      "elements": [
+        {
+          "boxId": 1,
+          "id": "_",
+          "x": 280,
+          "y": 80,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "functionName": "__main__",
+            "order": 1,
+            "params": [
+              {
+                "name": "a",
+                "targetId": 1
+              },
+              {
+                "name": "b",
+                "targetId": 2
+              },
+              {
+                "name": "c",
+                "targetId": 3
+              }
+            ],
+            "value": null
+          }
+        },
+        {
+          "boxId": 2,
+          "id": 1,
+          "x": 280,
+          "y": 80,
+          "kind": {
+            "name": "primitive",
+            "type": "int",
+            "value": "5"
+          }
+        },
+        {
+          "boxId": 3,
+          "id": 2,
+          "x": 460,
+          "y": 80,
+          "kind": {
+            "name": "primitive",
+            "type": "int",
+            "value": "8"
+          }
+        },
+        {
+          "boxId": 4,
+          "id": 3,
+          "x": 640,
+          "y": 80,
+          "kind": {
+            "name": "list",
+            "type": "list",
+            "value": [
+              1,
+              1
+            ]
+          }
+        }
+      ],
+      "ids": [
+        1,
+        2,
+        3
+      ],
+      "classes": []
+    }
+  },
+  {
+    "id": 5,
+    "sourceQuestionId": 4,
+    "title": "Task 2d",
+    "question": "The starting diagram contains more than one error. Submit it, read the feedback, and correct the diagram to match the code after all lines have executed.",
+    "canvasConfig": {
+      "elements": [
+        {
+          "boxId": 1,
+          "id": "_",
+          "x": 280,
+          "y": 80,
+          "kind": {
+            "name": "function",
+            "type": "function",
+            "functionName": "__main__",
+            "order": 1,
+            "params": [
+              {
+                "name": "x",
+                "targetId": 5
+              },
+              {
+                "name": "y",
+                "targetId": 6
+              }
+            ],
+            "value": null
+          }
+        },
+        {
+          "boxId": 2,
+          "id": 1,
+          "x": 280,
+          "y": 80,
+          "kind": {
+            "name": "primitive",
+            "type": "int",
+            "value": "1"
+          }
+        },
+        {
+          "boxId": 3,
+          "id": 2,
+          "x": 460,
+          "y": 80,
+          "kind": {
+            "name": "primitive",
+            "type": "int",
+            "value": "2"
+          }
+        },
+        {
+          "boxId": 4,
+          "id": 3,
+          "x": 640,
+          "y": 80,
+          "kind": {
+            "name": "primitive",
+            "type": "int",
+            "value": "3"
+          }
+        },
+        {
+          "boxId": 5,
+          "id": 4,
+          "x": 280,
+          "y": 240,
+          "kind": {
+            "name": "primitive",
+            "type": "int",
+            "value": "9"
+          }
+        },
+        {
+          "boxId": 6,
+          "id": 5,
+          "x": 460,
+          "y": 240,
+          "kind": {
+            "name": "list",
+            "type": "list",
+            "value": [
+              1,
+              2
+            ]
+          }
+        },
+        {
+          "boxId": 7,
+          "id": 6,
+          "x": 640,
+          "y": 240,
+          "kind": {
+            "name": "list",
+            "type": "list",
+            "value": [
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        }
+      ],
+      "ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "classes": []
+    }
+  }
+]

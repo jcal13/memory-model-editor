@@ -45,3 +45,13 @@ test('regular question and visual preferences survive demo initialization', () =
   expect(result.current.isInfoPanelOpen).toBe(false);
   expect(localStorage.getItem('canvas_ui_state_v3')).toBe(saved);
 });
+
+ test.each([true, false])('study links preserve the selected editor mode (%s)', mode => {
+  saveUIState({activeTab:'question', questionIndex:null, questionType:null,
+    questionView:'root', submissionResults:null, sandboxMode:mode});
+  window.history.replaceState({}, '', '/?study=2');
+  const {result} = renderHook(() => useMemoryModelEditorState(!mode));
+  expect(result.current.selectedQuestionType).toBe('study');
+  expect(result.current.selectedQuestionIndex).toBe(2);
+  expect(result.current.isSandboxMode).toBe(mode);
+});

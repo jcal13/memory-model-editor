@@ -11,7 +11,8 @@ test.each(questionTypes)('a %s link overrides saved selection and a closed panel
   expect(result.current.selectedQuestionType).toBe(type);
   expect(result.current.questionView).toBe('question');
   expect(result.current.isInfoPanelOpen).toBe(true);
-  expect(result.current.isSandboxMode).toBe(false);
+  // Study links preserve the saved Practice mode; other question links select Test mode.
+  expect(result.current.isSandboxMode).toBe(type === 'study');
   expect(result.current.elements).toEqual([]);
   expect(loadInitialUIData().questionType).toBe('test');
 });

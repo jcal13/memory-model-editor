@@ -35,6 +35,9 @@ export const ERROR_MESSAGES = {
   unmapped_variable: (varName: string, frameName: string) =>
     `Variable "${varName}" in ${frameName} is missing a valid reference`,
 
+  unmapped_index: (path: string) =>
+    `The entry at ${path} is missing a valid reference. Connect it to the appropriate object.`,
+
   unmapped_attribute: (attributePath: string, objectName: string) =>
     `Attribute "${attributePath}" on the ${objectName} object is missing a valid reference`,
 

@@ -953,8 +953,12 @@ function compareIds(
       ? cleanPath.slice(cleanPath.indexOf(varMatch[0]) + varMatch[0].length)
           .replace(/→object "[^"]+"\./g, ".")
       : "";
+    const indexedPath = /\[\d+\]$/.test(cleanPath);
+    const referencePath = `${varName}${attributePath.replace(/→/g, "")}`;
     const unmappedMessage = frameMatch && varMatch
-      ? attributeMatch
+      ? indexedPath
+        ? ERROR_MESSAGES.unmapped_index(referencePath)
+        : attributeMatch
         ? ERROR_MESSAGES.unmapped_attribute(`${varName}${attributePath}`, attributeMatch[1])
         : ERROR_MESSAGES.unmapped_variable(varName, frameName)
       : ERROR_MESSAGES.unmapped_id_fallback(cleanPath);

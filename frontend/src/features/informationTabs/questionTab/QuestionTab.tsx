@@ -1107,7 +1107,7 @@ export default function QuestionTab({
                   </section>
                   <section className={styles.studyTask} aria-labelledby="study-task-5">
                     <h2 id="study-task-5">Task 5 · Explore the question bank</h2>
-                    <p>Find and open a question about Aliasing in the question bank.</p>
+                    <p>Explore Practice Questions and find and open a question about Aliasing.</p>
                   </section>
                 </div>
               ) : (

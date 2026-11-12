@@ -1,3 +1,4 @@
+import { findStudyQuestion } from "../../database/studyQuestionDefinitions";
 import { Pool } from "pg";
 import { FeedbackError, ErrorType } from "./errorStructuring";
 import { ERROR_MESSAGES } from "./errorMessages";
@@ -369,7 +370,7 @@ function checkArray(
       errors.push(
         makeFeedbackError(
           ErrorType.MISSING_ELEMENT,
-          ERROR_MESSAGES.missing_element_at_index(path, i, answerMemoryBox.value[i]),
+          ERROR_MESSAGES.missing_element_at_index(formatPathForUser(path), i, inputMemoryBox.type, expectedLen, actualLen),
           {
             elementId: inputMemoryBox.id ?? undefined, // The container that's missing elements
             path: `${path}[${i}]`,
@@ -383,7 +384,7 @@ function checkArray(
       errors.push(
         makeFeedbackError(
           ErrorType.UNEXPECTED_ELEMENT,
-          ERROR_MESSAGES.unexpected_element_at_index(path, j, inputMemoryBox.value[j]),
+          ERROR_MESSAGES.unexpected_element_at_index(formatPathForUser(path), j, inputMemoryBox.type, expectedLen, actualLen),
           {
             elementId: inputMemoryBox.id ?? undefined,
             path: `${path}[${j}]`,
@@ -952,8 +953,12 @@ function compareIds(
       ? cleanPath.slice(cleanPath.indexOf(varMatch[0]) + varMatch[0].length)
           .replace(/→object "[^"]+"\./g, ".")
       : "";
+    const indexedPath = /\[\d+\]$/.test(cleanPath);
+    const referencePath = `${varName}${attributePath.replace(/→/g, "")}`;
     const unmappedMessage = frameMatch && varMatch
-      ? attributeMatch
+      ? indexedPath
+        ? ERROR_MESSAGES.unmapped_index(referencePath)
+        : attributeMatch
         ? ERROR_MESSAGES.unmapped_attribute(`${varName}${attributePath}`, attributeMatch[1])
         : ERROR_MESSAGES.unmapped_variable(varName, frameName)
       : ERROR_MESSAGES.unmapped_id_fallback(cleanPath);
@@ -1091,9 +1096,15 @@ function checkCallStackOrder(
 }
 
 async function fetchAnswerModel(
-  questionType: "test" | "practice" | "prep" | "experiment",
+  questionType: "test" | "practice" | "prep" | "experiment" | "study",
   questionId: number
 ): Promise<MemoryBox[] | null> {
+  if (questionType === "study") {
+    const study = findStudyQuestion(questionId);
+    if (!study) return null;
+    questionId = study.sourceQuestionId;
+    questionType = "practice";
+  }
   let rows: { answer: unknown }[] = [];
   if (questionType === "practice") {
     const result = await getPool().query<{ answer: unknown }>(
@@ -1220,7 +1231,7 @@ function runComparison(
 export default async function validateAnswer(
   userModel: MemoryBox[],
   questionId: number,
-  questionType: "test" | "practice" | "prep" | "experiment"
+  questionType: "test" | "practice" | "prep" | "experiment" | "study"
 ): Promise<{
   correct: boolean;
   errors: FeedbackError[];
@@ -1244,11 +1255,12 @@ export default async function validateAnswer(
 type QuestionStep = { lineNumber: number; iterationNumber?: number; answer: unknown };
 
 async function fetchStepsModel(
-  questionType: "test" | "practice" | "prep" | "experiment",
+  questionType: "test" | "practice" | "prep" | "experiment" | "study",
   questionId: number,
   lineNumber: number,
   iterationNumber?: number
 ): Promise<MemoryBox[] | "no_steps" | null> {
+  if (questionType === "study") return findStudyQuestion(questionId) ? "no_steps" : null;
   const table =
     questionType === "practice"
       ? "practice_questions"
@@ -1281,7 +1293,7 @@ async function fetchStepsModel(
 export async function validateAnswerAtLine(
   userModel: MemoryBox[],
   questionId: number,
-  questionType: "test" | "practice" | "prep" | "experiment",
+  questionType: "test" | "practice" | "prep" | "experiment" | "study",
   lineNumber: number,
   iterationNumber?: number
 ): Promise<{ correct: boolean; errors: FeedbackError[] }> {

@@ -1,3 +1,4 @@
+import { studyTaskLabel } from "./utils/studyTasks";
 import { isTutorial, exitTutorial } from "../../tutorial/tutorialStorage";
 import { workspaceStorage } from "../../tutorial/tutorialStorage";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -37,7 +38,7 @@ type View =
   | "prep"
   | "experiment"
   | "stepbystep";
-type QuestionType = "test" | "practice" | "prep" | "experiment";
+type QuestionType = "test" | "practice" | "prep" | "experiment" | "study";
 type QuestionStatus = "unattempted" | "attempted" | "completed";
 
 const QUESTION_STATUS_KEY = "questionStatus";
@@ -59,6 +60,7 @@ interface QuestionStatusMap {
 
 export interface QuestionData {
   id: number;
+  title?: string;
   question: string;
   code: string[];
   answer: unknown;
@@ -87,9 +89,9 @@ interface QuestionTabProps {
   onQuestionLinkConsumed?: () => void;
   questionIndex: number | null;
   setQuestionIndex: (index: number | null) => void;
-  questionType: "test" | "practice" | "prep" | "experiment" | null;
+  questionType: "test" | "practice" | "prep" | "experiment" | "study" | null;
   setQuestionType: (
-    type: "test" | "practice" | "prep" | "experiment" | null,
+    type: "test" | "practice" | "prep" | "experiment" | "study" | null,
   ) => void;
   questionView: QuestionView;
   setQuestionView: (view: QuestionView) => void;
@@ -255,7 +257,7 @@ export default function QuestionTab({
   );
   const [showCanvasClearModal, setShowCanvasClearModal] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<{
-    type: "test" | "practice" | "prep" | "experiment";
+    type: "test" | "practice" | "prep" | "experiment" | "study";
     index: number;
   } | null>(null);
   const [showResetModal, setShowResetModal] = useState(false);
@@ -289,14 +291,21 @@ export default function QuestionTab({
     [questionData],
   );
 
+  // A newer navigation or mode change supersedes pending question requests.
+  const requestVersion = useRef(0);
   const hydratedList = useRef<boolean>(false);
   const hydratedQuestion = useRef<boolean>(false);
   const stepCheckpointsRef = useRef<Map<number, StepCheckpoint>>(new Map());
   const previousQuestionRef = useRef<{
-    type: "test" | "practice" | "prep" | "experiment";
+    type: "test" | "practice" | "prep" | "experiment" | "study";
     index: number;
   } | null>(null);
   const prevSandboxModeRef = useRef<boolean>(isSandboxMode);
+  useEffect(() => () => {
+    requestVersion.current++;
+    hydratedQuestion.current = false;
+    hydratedList.current = false;
+  }, []);
 
   useEffect(() => {
     if (view !== "loading") {
@@ -357,6 +366,7 @@ export default function QuestionTab({
   useEffect(() => {
     if (prevSandboxModeRef.current === isSandboxMode) return;
     prevSandboxModeRef.current = isSandboxMode;
+    requestVersion.current++;
 
     setView("root");
     setQuestionData(null);
@@ -449,6 +459,7 @@ export default function QuestionTab({
   };
 
   const loadQuestions = async (questionType: QuestionType): Promise<void> => {
+    const request = ++requestVersion.current;
     setLinkError("");
     onClearCanvas();
     setView("loading");
@@ -458,6 +469,7 @@ export default function QuestionTab({
         fetchQuestionCount(questionType),
         fetchQuestionTopics(questionType),
       ]);
+      if (request !== requestVersion.current) return;
       setQuestionCount(count);
       setTopicMap(
         new Map(topicData.map(({ id, topics }) => [id, topics ?? []])),
@@ -466,7 +478,9 @@ export default function QuestionTab({
       setQuestionIndex(null);
       setView("list");
     } catch (error) {
+      if (request !== requestVersion.current) return;
       console.error("Failed to load questions:", error);
+      setLinkError("This category could not be loaded. Please try again.");
       setView("root");
     }
   };
@@ -503,6 +517,7 @@ export default function QuestionTab({
     type: QuestionType,
     id: number,
   ): Promise<void> => {
+    const request = ++requestVersion.current;
     hydratedQuestion.current = false;
     setLinkError("");
     setQuestionData(null);
@@ -514,10 +529,12 @@ export default function QuestionTab({
 
     try {
       const data = await fetchQuestion<QuestionData>(id, type);
+      if (request !== requestVersion.current) return;
 
       setQuestionType(type);
       setQuestionIndex(id);
       setQuestionData(data);
+      if (type === "study") updateQuestionStatus(type, id, "unattempted");
 
       const firstStep = getInitialStep(data);
       setSelectedLine(firstStep?.lineNumber ?? null);
@@ -529,17 +546,16 @@ export default function QuestionTab({
 
       setView("question");
 
-      setTimeout(() => {
-        const resolvedCanvas = normalizeQuestionCanvasData(
-          resolveQuestionCanvasData(type, id, data.canvasConfig ?? null),
-        );
-        onRestoreCanvas(
-          resolvedCanvas.elements,
-          resolvedCanvas.ids,
-          resolvedCanvas.classes,
-        );
-      }, 0);
+      const resolvedCanvas = normalizeQuestionCanvasData(
+        resolveQuestionCanvasData(type, id, data.canvasConfig ?? null),
+      );
+      onRestoreCanvas(
+        resolvedCanvas.elements,
+        resolvedCanvas.ids,
+        resolvedCanvas.classes,
+      );
     } catch (error) {
+      if (request !== requestVersion.current) return;
       console.error("Failed to load question:", error);
       setView("list");
     }
@@ -560,6 +576,7 @@ export default function QuestionTab({
       saveQuestionCanvasData(questionType, questionIndex, currentCanvasState);
     }
 
+    requestVersion.current++;
     setQuestionIndex(null);
     setQuestionData(null);
     setSelectedLine(null);
@@ -573,6 +590,7 @@ export default function QuestionTab({
     setShowCanvasClearModal(false);
     if (pendingNavigation) {
       if (pendingNavigation.index === -1) {
+        requestVersion.current++;
         setQuestionIndex(null);
         setQuestionData(null);
         setSelectedLine(null);
@@ -602,17 +620,20 @@ export default function QuestionTab({
   useEffect(() => {
     if (view === "list" && questionType && !hydratedList.current) {
       hydratedList.current = true;
+      const request = requestVersion.current;
       Promise.all([
         fetchQuestionCount(questionType),
         fetchQuestionTopics(questionType),
       ])
         .then(([count, topicData]) => {
+          if (request !== requestVersion.current) return;
           setQuestionCount(count);
           setTopicMap(
             new Map(topicData.map(({ id, topics }) => [id, topics ?? []])),
           );
         })
         .catch((error) => {
+          if (request !== requestVersion.current) return;
           console.error("Failed to hydrate list:", error);
           setView("root");
         });
@@ -628,6 +649,7 @@ export default function QuestionTab({
       !hydratedQuestion.current
     ) {
       hydratedQuestion.current = true;
+      const request = ++requestVersion.current;
       setSubmissionResults(null);
       (async () => {
         try {
@@ -635,7 +657,9 @@ export default function QuestionTab({
             questionIndex,
             questionType,
           );
+          if (request !== requestVersion.current) return;
           setQuestionData(data);
+          if (questionType === "study") updateQuestionStatus(questionType, questionIndex, "unattempted");
 
           const firstStep = getInitialStep(data);
           setSelectedLine(firstStep?.lineNumber ?? null);
@@ -666,6 +690,7 @@ export default function QuestionTab({
           )
             onQuestionLinkConsumed?.();
         } catch (error) {
+          if (request !== requestVersion.current) return;
           console.error("Failed to hydrate question:", error);
           if (
             linkedQuestion?.id === questionIndex &&
@@ -695,7 +720,7 @@ export default function QuestionTab({
       return `Step-by-Step · Q${questionIndex}`;
     }
     if (view === "question" && questionIndex !== null) {
-      return `Question ${questionIndex}`;
+      return questionType === "study" ? studyTaskLabel(questionIndex) : `Question ${questionIndex}`;
     }
     if (view === "list" && questionType === "test") {
       return "Test Questions";
@@ -709,6 +734,7 @@ export default function QuestionTab({
     if (view === "list" && questionType === "experiment") {
       return "Experiment Questions";
     }
+    if (view === "list" && questionType === "study") return "Study Questions";
     return "Questions";
   };
 
@@ -722,12 +748,14 @@ export default function QuestionTab({
       return;
     }
 
+    const request = ++requestVersion.current;
     try {
       const freshQuestionData = await fetchQuestion<QuestionData>(
         questionIndex,
         questionType,
       );
 
+      if (request !== requestVersion.current) return;
       deleteQuestionCanvasData(questionType, questionIndex);
       setQuestionData(freshQuestionData);
 
@@ -812,6 +840,7 @@ export default function QuestionTab({
     setStepByStepIndex(0);
     setCommittedAssignments(null);
     setStepConsistencyError(null);
+    requestVersion.current++;
     setQuestionIndex(null);
     setQuestionData(null);
     setSelectedLine(null);
@@ -1001,6 +1030,15 @@ export default function QuestionTab({
               categoryType="stepbystep"
               onClick={loadStepByStepQuestion}
             />
+            <div className={styles.selectorDivider} />
+            <QuestionSelector
+              variant="category"
+              text="Study Questions"
+              subtitle="Tasks for the MemoryLab study"
+              icon="📋"
+              categoryType="study"
+              onClick={() => loadQuestions("study")}
+            />
           </div>
         )}
 
@@ -1040,22 +1078,48 @@ export default function QuestionTab({
               </div>
             )}
             <div className={styles.scroller}>
-              <div className={styles.questionGrid}>
-                {filteredQuestionIds.map((questionNum) => {
-                  const status = questionType
-                    ? getQuestionStatus(questionType, questionNum)
-                    : "unattempted";
-
-                  return (
-                    <QuestionSelector
-                      key={questionNum}
-                      text={`Q${questionNum}`}
-                      onClick={() => loadSingleQuestion(questionNum)}
-                      status={status}
-                    />
-                  );
-                })}
-              </div>
+              {questionType === "study" ? (
+                <div className={styles.studyTasks}>
+                  <p className={styles.studyIntro}>Work through the five tasks in order.</p>
+                  <section className={styles.studyTask} aria-labelledby="study-task-1">
+                    <h2 id="study-task-1">Task 1 · Build a diagram</h2>
+                    <p>Read the code and draw its memory model.</p>
+                    <QuestionSelector text="Task 1" onClick={() => loadSingleQuestion(1)} status={getQuestionStatus("study", 1)} />
+                  </section>
+                  <section className={styles.studyTask} aria-labelledby="study-task-2">
+                    <h2 id="study-task-2">Task 2 · Use the feedback</h2>
+                    <p>Open Tasks 2a–2d and use the feedback to fix each diagram.</p>
+                    <div className={styles.studyTaskDetails}>
+                      <p>Complete 2a–2d in order. Submit each starting diagram, read the feedback, and make corrections. Tasks 2a–2c each contain one error; Task 2d contains more than one.</p>
+                      <div className={styles.studyExerciseGrid}>
+                        {[2, 3, 4, 5].map(id => <QuestionSelector key={id} text={studyTaskLabel(id)} onClick={() => loadSingleQuestion(id)} status={getQuestionStatus("study", id)} />)}
+                      </div>
+                      <p className={styles.studyNote}>Resetting or reopening an exercise restores its starting diagram.</p>
+                    </div>
+                  </section>
+                  <section className={styles.studyTask} aria-labelledby="study-task-3">
+                    <h2 id="study-task-3">Task 3 · Compare the modes</h2>
+                    <p>Complete Practice Question 13 in Practice mode. Switch to Test mode yourself, then complete Practice Question 14 from the same question bank.</p>
+                  </section>
+                  <section className={styles.studyTask} aria-labelledby="study-task-4">
+                    <h2 id="study-task-4">Task 4 · Export your diagram</h2>
+                    <p>Before leaving Task 3, use Download to save your completed diagram as JSON and PNG.</p>
+                  </section>
+                  <section className={styles.studyTask} aria-labelledby="study-task-5">
+                    <h2 id="study-task-5">Task 5 · Explore the question bank</h2>
+                    <p>Explore Practice Questions and find and open a question about Aliasing.</p>
+                  </section>
+                </div>
+              ) : (
+                <div className={styles.questionGrid}>
+                  {filteredQuestionIds.map(questionNum => <QuestionSelector
+                    key={questionNum}
+                    text={`Q${questionNum}`}
+                    onClick={() => loadSingleQuestion(questionNum)}
+                    status={questionType ? getQuestionStatus(questionType, questionNum) : "unattempted"}
+                  />)}
+                </div>
+              )}
             </div>
           </>
         )}

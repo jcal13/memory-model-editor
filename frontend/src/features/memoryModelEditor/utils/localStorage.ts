@@ -25,7 +25,7 @@ const DEFAULT_CANVAS_DATA = {
 const DEFAULT_UI_STATE = {
   activeTab: "question" as Tab,
   questionIndex: null as number | null,
-  questionType: null as "test" | "practice" | "prep" | "experiment" | null,
+  questionType: null as "test" | "practice" | "prep" | "experiment" | "study" | null,
   submissionResults: null as SubmissionResult | null,
   sandboxMode: null as boolean | null,
   visualStyle: "memoryviz" as VisualStyle,
@@ -72,7 +72,7 @@ export type QuestionView =
 export interface UIState {
   activeTab: Tab;
   questionIndex: number | null;
-  questionType: "test" | "practice" | "prep" | "experiment" | null;
+  questionType: "test" | "practice" | "prep" | "experiment" | "study" | null;
   submissionResults: SubmissionResult | null;
   sandboxMode: boolean | null;
   visualStyle?: VisualStyle;
@@ -129,7 +129,7 @@ export function loadInitialUIData(): UIState {
       typeof parsed?.questionIndex === "number" ? parsed.questionIndex : null;
 
     const questionType =
-      parsed?.questionType === "test" || parsed?.questionType === "practice" || parsed?.questionType === "prep" || parsed?.questionType === "experiment"
+      parsed?.questionType === "test" || parsed?.questionType === "practice" || parsed?.questionType === "prep" || parsed?.questionType === "experiment" || parsed?.questionType === "study"
         ? parsed.questionType
         : null;
 
@@ -255,7 +255,7 @@ export function clearCanvasStorage(): void {
  * Gets the storage key for a specific question's canvas
  */
 function getQuestionCanvasKey(
-  type: "test" | "practice" | "prep" | "experiment",
+  type: "test" | "practice" | "prep" | "experiment" | "study",
   index: number
 ): string {
   return `${QUESTION_CANVAS_PREFIX}${type}_${index}`;
@@ -265,10 +265,11 @@ function getQuestionCanvasKey(
  * Saves canvas data for a specific question
  */
 export function saveQuestionCanvasData(
-  type: "test" | "practice" | "prep" | "experiment",
+  type: "test" | "practice" | "prep" | "experiment" | "study",
   index: number,
   data: CanvasData
 ): void {
+  if (type === "study") return; // Study attempts must never replace the authored starting diagram.
   try {
     const key = getQuestionCanvasKey(type, index);
     workspaceStorage.setItem(key, JSON.stringify(data));
@@ -281,9 +282,10 @@ export function saveQuestionCanvasData(
  * Loads canvas data for a specific question
  */
 export function loadQuestionCanvasData(
-  type: "test" | "practice" | "prep" | "experiment",
+  type: "test" | "practice" | "prep" | "experiment" | "study",
   index: number
 ): CanvasData | null {
+  if (type === "study") return null;
   try {
     const key = getQuestionCanvasKey(type, index);
     const rawData = workspaceStorage.getItem(key);
@@ -302,7 +304,7 @@ export function loadQuestionCanvasData(
  * LocalStorage takes precedence; fallback is used only if no saved state exists.
  */
 export function resolveQuestionCanvasData(
-  type: "test" | "practice" | "prep" | "experiment",
+  type: "test" | "practice" | "prep" | "experiment" | "study",
   index: number,
   fallback?: CanvasData | null
 ): CanvasData {
@@ -339,9 +341,10 @@ export function setDoNotRemindCanvasClear(value: boolean): void {
  * Deletes canvas data for a specific question
  */
 export function deleteQuestionCanvasData(
-  type: "test" | "practice" | "prep" | "experiment",
+  type: "test" | "practice" | "prep" | "experiment" | "study",
   index: number
 ): void {
+  if (type === "study") return; // Study attempts must never replace the authored starting diagram.
   try {
     const key = getQuestionCanvasKey(type, index);
     workspaceStorage.removeItem(key);

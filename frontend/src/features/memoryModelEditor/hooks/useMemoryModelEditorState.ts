@@ -50,7 +50,7 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     initialUIData.questionView = "question";
     initialUIData.activeTab = "question";
     initialUIData.isInfoPanelOpen = true;
-    initialUIData.sandboxMode = false;
+    if (linkedQuestion.type !== "study") initialUIData.sandboxMode = false;
     initialUIData.submissionResults = null;
   }
 
@@ -83,7 +83,7 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     number | null
   >(initialUIData.questionIndex);
   const [selectedQuestionType, setSelectedQuestionType] = useState<
-    "test" | "practice" | "prep" | "experiment" | null
+    "test" | "practice" | "prep" | "experiment" | "study" | null
   >(initialUIData.questionType);
   const [submissionResults, setSubmissionResults] = useState<SubmissionResult | null>(
     initialUIData.submissionResults

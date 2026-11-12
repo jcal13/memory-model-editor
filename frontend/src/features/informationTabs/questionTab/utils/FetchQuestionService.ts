@@ -12,7 +12,7 @@ const API_URL =
  */
 export async function fetchQuestion<T = any>(
   id: number,
-  type: "test" | "practice" | "prep" | "experiment",
+  type: "test" | "practice" | "prep" | "experiment" | "study",
 ): Promise<T> {
   try {
     const response = await axios.get(
@@ -31,7 +31,7 @@ export async function fetchQuestion<T = any>(
  * Fetches all question IDs with their topics for a given type
  */
 export async function fetchQuestionTopics(
-  type: "test" | "practice" | "prep" | "experiment",
+  type: "test" | "practice" | "prep" | "experiment" | "study",
 ): Promise<{ id: number; topics: string[] | null }[]> {
   try {
     const response = await axios.get(`${API_URL}/questions/${type}questions/topics`);
@@ -50,7 +50,7 @@ export async function fetchQuestionTopics(
  * @returns Promise with question count
  */
 export async function fetchQuestionCount(
-  type: "test" | "practice" | "prep" | "experiment",
+  type: "test" | "practice" | "prep" | "experiment" | "study",
 ): Promise<number> {
   try {
     const url = `${API_URL}/questions/${type}questions`;

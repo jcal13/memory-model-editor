@@ -12,7 +12,7 @@ interface QuestionSelectorProps {
   icon?: string;
   subtitle?: string;
   helpText?: string;
-  categoryType?: "practice" | "test" | "prep" | "experiment" | "stepbystep";
+  categoryType?: "practice" | "test" | "prep" | "experiment" | "study" | "stepbystep";
 }
 
 export default function QuestionSelector({

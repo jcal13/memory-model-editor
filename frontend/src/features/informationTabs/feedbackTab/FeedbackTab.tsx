@@ -1,3 +1,4 @@
+import { studyTaskLabel } from "../questionTab/utils/studyTasks";
 import {
   SubmissionResult,
   CanvasElement,
@@ -14,7 +15,7 @@ interface FeedbackTabProps {
   submissionResults: SubmissionResult | null;
   questionSelected: boolean;
   questionIndex: number | null;
-  questionType: "test" | "practice" | "prep" | "experiment" | null;
+  questionType: "test" | "practice" | "prep" | "experiment" | "study" | null;
   masterErrorList: MasterErrorList;
   elements: CanvasElement[];
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
@@ -43,7 +44,7 @@ export default function FeedbackTab({
     let questionName = "";
     if (questionType && questionIndex !== null) {
       const typeLabel = questionType === "test" ? "Test" : questionType === "prep" ? "CSC148 Prep" : questionType === "experiment" ? "Experiment" : "Practice";
-      questionName = ` - ${typeLabel} Question ${questionIndex}`;
+      questionName = questionType === "study" ? ` - ${studyTaskLabel(questionIndex)}` : ` - ${typeLabel} Question ${questionIndex}`;
     }
 
     return <h1 className={styles.title}>Feedback{questionName}</h1>;

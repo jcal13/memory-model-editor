@@ -394,3 +394,40 @@ describe("attribute reference feedback across object models", () => {
     })]);
   });
 });
+
+
+describe("invalid list reference feedback", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.DATABASE_URL = "postgres://example.test/memory-model-editor";
+  });
+
+  it.each([null, 999])("identifies each unset or dangling list entry (%s) separately", async target => {
+    const answer = practiceQuestions.find(q => q.id === 14)!.answer;
+    mockQuery.mockResolvedValue({ rows: [{ answer }] });
+    const result = await validateAnswer([
+      { type: ".frame", name: "__main__", id: null, order: 1, value: { lst: 10, lst2: null } },
+      { type: "list", id: 10, value: [target, target, target, target] },
+    ], 14, "practice");
+    const errors = result.errors.filter(e => e.type === ErrorType.INVALID_REFERENCE);
+    expect(errors.map(e => e.message)).toEqual([
+      ...[0, 1, 2, 3].map(i => `The entry at lst[${i}] is missing a valid reference. Connect it to the appropriate object.`),
+      'Variable "lst2" in __main__ is missing a valid reference',
+    ]);
+    expect(errors.slice(0, 4).map(e => e.path)).toEqual(
+      [0, 1, 2, 3].map(i => `function "__main__" → var "lst"→[${i}]→`)
+    );
+  });
+
+  it("preserves the full index path for nested lists", async () => {
+    const answer = practiceQuestions.find(q => q.id === 3)!.answer;
+    mockQuery.mockResolvedValue({ rows: [{ answer }] });
+    const model = JSON.parse(JSON.stringify(answer));
+    model.find((b: any) => b.id === 2).value = [null];
+    const result = await validateAnswer(model, 3, "practice");
+    expect(result.errors).toContainEqual(expect.objectContaining({
+      type: ErrorType.INVALID_REFERENCE,
+      message: "The entry at b[0][0][0] is missing a valid reference. Connect it to the appropriate object.",
+    }));
+  });
+});

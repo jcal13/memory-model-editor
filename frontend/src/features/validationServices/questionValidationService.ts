@@ -9,7 +9,7 @@ const SUBMIT_ENDPOINT = "/canvasEditor/submit";
 const SUBMIT_AT_LINE_ENDPOINT = "/canvasEditor/submitAtLine";
 
 // Types
-export type QuestionType = "test" | "practice" | "prep" | "experiment";
+export type QuestionType = "test" | "practice" | "prep" | "experiment" | "study";
 
 export interface SubmissionPayload {
   model: ReturnType<typeof buildJSONFromElements>;

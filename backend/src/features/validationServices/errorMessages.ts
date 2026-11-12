@@ -4,7 +4,7 @@
  * All user-facing error messages are defined here as functions.
  * To customize any message, edit the corresponding function below.
  */
-const cleanLocation = (loc: string) => loc.replace(/:+$/, "");
+const cleanLocation = (loc: string) => loc.replace(/:\s*(?=\[)/g, "").replace(/\s*→\s*(?=\[)/g, "").replace(/:+$/, "");
 
 export const ERROR_MESSAGES = {
 
@@ -35,6 +35,9 @@ export const ERROR_MESSAGES = {
   unmapped_variable: (varName: string, frameName: string) =>
     `Variable "${varName}" in ${frameName} is missing a valid reference`,
 
+  unmapped_index: (path: string) =>
+    `The entry at ${path} is missing a valid reference. Connect it to the appropriate object.`,
+
   unmapped_attribute: (attributePath: string, objectName: string) =>
     `Attribute "${attributePath}" on the ${objectName} object is missing a valid reference`,
 
@@ -56,19 +59,17 @@ export const ERROR_MESSAGES = {
   object_incorrectly_connected: (loc: string) =>
     `At ${cleanLocation(loc)}: object is incorrectly or incompletely connected`,
 
-  // Pattern: "At a: expected 5, but got 3"
+  // Describe the value using the variable/index path, not internal object IDs.
   value_mismatch: (loc: string, expected: string, got: string) =>
-    `At ${cleanLocation(loc)}: expected ${expected}, but got ${got}`,
+    `The value at ${cleanLocation(loc)} should be ${expected}, but your diagram shows ${got}.`,
 
   // Array / list / tuple errors
 
-  // Pattern: "Missing element: list[0] id=5"
-  missing_element_at_index: (path: string, index: number, id: number) =>
-    `Missing element: ${path}[${index}] id=${id}`,
+  missing_element_at_index: (loc: string, index: number, type: string, expected: number, actual: number) =>
+    `The ${type} at ${cleanLocation(loc)} is missing an entry at index ${index}. It should contain ${expected} entries, but your diagram has ${actual}.`,
 
-  // Pattern: "Unexpected element: list[0] id=7"
-  unexpected_element_at_index: (path: string, index: number, id: number) =>
-    `Unexpected element: ${path}[${index}] id=${id}`,
+  unexpected_element_at_index: (loc: string, index: number, type: string, expected: number, actual: number) =>
+    `The ${type} at ${cleanLocation(loc)} has an extra entry at index ${index}. It should contain ${expected} ${expected === 1 ? "entry" : "entries"}, but your diagram has ${actual}.`,
 
   // Set errors
 

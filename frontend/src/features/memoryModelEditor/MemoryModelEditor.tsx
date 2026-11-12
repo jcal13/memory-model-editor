@@ -1,3 +1,5 @@
+import { centerStudyObjects } from "./utils/studyLayout";
+import { createElementsByIdMap } from "../canvas/utils/canvasReferences";
 import { uiScale } from "../shared/uiScale";
 import { maxInformationWidth, DEFAULT_INFO_PANEL_WIDTH, MIN_INFO_PANEL_WIDTH, MIN_PALETTE_WIDTH, DEFAULT_PALETTE_WIDTH, MAX_INFO_PANEL_VIEWPORT_RATIO, RESIZE_HANDLE_SIZE } from "./utils/panelSizing";
 import { normalizeQuestionCanvasData } from "./utils/questionFrames";
@@ -161,7 +163,17 @@ export default function MemoryModelEditor({
     ids: number[],
     classes: string[]
   ) => {
-    const restoredElements = spreadOverlappingElements(elements);
+    const svg = refs.mainContainerRef.current?.querySelector<SVGSVGElement>('[data-testid="canvas"]');
+    const isStudyDiagram = state.selectedQuestionType === "study" && elements.some(el => el.kind.name !== "function");
+    const restoredElements = isStudyDiagram && svg
+      ? centerStudyObjects(elements, svg, {
+          visualStyle: state.visualStyle,
+          pythonTutorReferenceArrows: state.pythonTutorReferenceArrows,
+          pythonTutorStandalonePrimitives: state.pythonTutorStandalonePrimitives,
+          elementsById: createElementsByIdMap(elements),
+          renderMode: "canvas",
+        })
+      : spreadOverlappingElements(elements);
 
     const baselineState = {
       elements: restoredElements,

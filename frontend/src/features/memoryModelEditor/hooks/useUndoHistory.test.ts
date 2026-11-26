@@ -29,6 +29,73 @@ describe("useUndoHistory", () => {
     expect(result.current.ids).toEqual([id]);
   });
 
+  it("keeps redo when the canvas auto-adjusts a restored state (regression)", () => {
+    // After Undo the canvas may nudge boxes back inside a narrower canvas.
+    // That nudge used to be recorded as a new step, wiping the redo stack and
+    // leaving Undo bouncing between two states forever.
+    const { result } = renderUndoHistory();
+    const box = (x: number, value: any[]) =>
+      ({ boxId: 1, id: 1, kind: { name: "list", value }, x, y: 0 }) as any;
+    const s0 = { elements: [box(600, [])], ids: [1], classes: [] };
+    const s1 = { elements: [box(600, [1])], ids: [1], classes: [] };
+    const s2 = { elements: [box(600, [1, 2])], ids: [1], classes: [] };
+    act(() => result.current.clearHistory(s0));
+    act(() => result.current.recordState(s1));
+    act(() => result.current.recordState(s2));
+
+    act(() => result.current.undo());
+    act(() => result.current.recordState({ ...s1, elements: [box(230, [1])] })); // auto clamp
+    act(() => result.current.undo());
+    act(() => result.current.recordState({ ...s0, elements: [box(230, [])] })); // auto clamp
+
+    expect(result.current.canUndo).toBe(false); // greyed out at the start
+    expect(result.current.canRedo).toBe(true);
+    act(() => result.current.redo());
+    act(() => result.current.redo());
+    expect(result.current.elements[0].kind.value).toEqual([1, 2]);
+    expect(result.current.canRedo).toBe(false);
+  });
+
+  it("folds the canvas's nudge right after an edit into that edit (regression: undo jitter)", () => {
+    jest.useFakeTimers();
+    try {
+      const { result } = renderUndoHistory();
+      const box = (x: number) => ({ boxId: 1, id: 1, kind: { name: "list", value: [] }, x, y: 0 }) as any;
+      act(() => result.current.clearHistory({ elements: [], ids: [], classes: [] }));
+      act(() => result.current.recordState({ elements: [box(296)], ids: [1], classes: [] })); // drop
+      act(() => result.current.recordState({ elements: [box(319)], ids: [1], classes: [] })); // auto clamp
+      act(() => result.current.undo());
+      expect(result.current.elements).toEqual([]); // one Undo removes the box
+
+      // A deliberate move later is still its own step.
+      act(() => result.current.redo());
+      jest.setSystemTime(Date.now() + 2000);
+      act(() => result.current.recordState({ elements: [box(400)], ids: [1], classes: [] }));
+      act(() => result.current.undo());
+      expect(result.current.elements[0].x).toBe(319);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("still discards redo for a real edit after an undo", () => {
+    jest.useFakeTimers();
+    try {
+      const { result } = renderUndoHistory();
+      const st = (v: any[]) => ({ elements: [{ boxId: 1, id: 1, kind: { name: "list", value: v }, x: 0, y: 0 }], ids: [1], classes: [] }) as any;
+      act(() => result.current.clearHistory(st([])));
+      act(() => result.current.recordState(st([1])));
+      act(() => result.current.undo());
+      act(() => { jest.advanceTimersByTime(1000); });
+      jest.setSystemTime(Date.now() + 1000);
+      act(() => result.current.recordState(st([9])));
+      expect(result.current.canRedo).toBe(false);
+      expect(result.current.canUndo).toBe(true);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it("undoes newly added boxes one by one", () => {
     const { result } = renderUndoHistory();
 

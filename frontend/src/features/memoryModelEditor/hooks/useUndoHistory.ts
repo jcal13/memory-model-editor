@@ -18,12 +18,36 @@ interface UndoHistoryReturn {
 }
 
 const MAX_HISTORY_SIZE = 50;
+/**
+ * After Undo/Redo the canvas may adjust the restored state on its own (e.g.
+ * clamping boxes into a narrower canvas, ResizeObserver-debounced). Changes in
+ * this window are folded into the restored entry instead of becoming a new
+ * step, which would otherwise discard the redo stack.
+ */
+const RESTORE_SETTLE_MS = 500;
+/**
+ * The canvas also nudges a box right after an edit (e.g. clamping a dropped
+ * box away from the call stack). A position-only change this soon after a
+ * recorded step belongs to that step; recording it separately made Undo
+ * appear to do nothing and then jitter as the canvas re-applied the nudge.
+ */
+const AUTO_ADJUST_MS = 300;
 const HISTORY_STORAGE_KEY = "canvas_undo_history";
 const HISTORY_INDEX_STORAGE_KEY = "canvas_undo_history_index";
 
 const normalizeElements = (elements: CanvasElement[]) =>
   // Validation/feedback annotations are derived state, not user edits.
   elements.map(({ color, invalidated, errors, ...rest }) => rest);
+
+const withoutPositions = (state: CanvasState) =>
+  JSON.stringify({
+    elements: normalizeElements(state.elements).map(({ x, y, ...rest }) => rest),
+    ids: state.ids,
+    classes: state.classes,
+  });
+
+const sameIgnoringPositions = (a: CanvasState, b: CanvasState) =>
+  withoutPositions(a) === withoutPositions(b);
 
 export function useUndoHistory(
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>,
@@ -49,7 +73,13 @@ export function useUndoHistory(
 
   const [history, setHistory] = useState<CanvasState[]>(initialHistory);
   const [historyIndex, setHistoryIndex] = useState(initialIndex);
-  const isUndoRedoing = useRef(false);
+  const settleUntil = useRef(0);
+  const lastRecordAt = useRef(0);
+  // Live index for recordState (its closure can be a render behind).
+  const indexRef = useRef(historyIndex);
+  indexRef.current = historyIndex;
+  const historyRef = useRef(history);
+  historyRef.current = history;
 
   // Save history to localStorage whenever it changes
   useEffect(() => {
@@ -62,20 +92,46 @@ export function useUndoHistory(
   }, [history, historyIndex]);
 
   const recordState = useCallback((state: CanvasState) => {
-    // Don't record while we're undoing/redoing to prevent recursion
-    if (isUndoRedoing.current) return;
-    
+    const index = indexRef.current;
+
+    // Deep clone the state to prevent mutations
+    const clonedState: CanvasState = {
+      elements: JSON.parse(JSON.stringify(state.elements)),
+      ids: [...state.ids],
+      classes: [...state.classes],
+    };
+
+    if (Date.now() < settleUntil.current) {
+      const restored = historyRef.current[index];
+      if (restored && sameIgnoringPositions(restored, clonedState)) {
+        // The canvas re-positioned boxes of a just-restored state (e.g. to
+        // fit a narrower canvas): update that entry in place.
+        setHistory((prev) =>
+          prev[index] ? prev.map((entry, i) => (i === index ? clonedState : entry)) : prev
+        );
+        return;
+      }
+      settleUntil.current = 0; // anything else is a real edit
+    }
+
+    if (Date.now() - lastRecordAt.current < AUTO_ADJUST_MS) {
+      const latest = historyRef.current[index];
+      if (
+        latest &&
+        index === historyRef.current.length - 1 &&
+        sameIgnoringPositions(latest, clonedState)
+      ) {
+        setHistory((prev) =>
+          prev[index] ? prev.map((entry, i) => (i === index ? clonedState : entry)) : prev
+        );
+        return;
+      }
+    }
+
     setHistory((prev) => {
       // If we're in the middle of history (after undo), discard future states
-      const currentHistory = prev.slice(0, historyIndex + 1);
-    
-      // Deep clone the state to prevent mutations
-      const clonedState: CanvasState = {
-        elements: JSON.parse(JSON.stringify(state.elements)),
-        ids: [...state.ids],
-        classes: [...state.classes],
-      };
-    
+      const currentHistory = prev.slice(0, index + 1);
+
       // Add new state
       const lastState = currentHistory[currentHistory.length - 1];
     
@@ -91,6 +147,7 @@ export function useUndoHistory(
       }
     
       const updatedHistory = [...currentHistory, clonedState];
+      lastRecordAt.current = Date.now();
     
       // Limit history size
       if (updatedHistory.length > MAX_HISTORY_SIZE) {
@@ -103,13 +160,13 @@ export function useUndoHistory(
       setHistoryIndex(updatedHistory.length - 1);
       return updatedHistory;
     });
-  }, [historyIndex]);
+  }, []);
 
   const undo = useCallback(() => {
     // Need at least 2 states in history to undo (index 1 to go back to index 0)
     if (historyIndex < 1) return;
     
-    isUndoRedoing.current = true;
+    settleUntil.current = Date.now() + RESTORE_SETTLE_MS;
 
     const previousIndex = historyIndex - 1;
     const previousState = history[previousIndex];
@@ -124,17 +181,13 @@ export function useUndoHistory(
       setHistoryIndex(previousIndex);
     }
 
-    // Use setTimeout to ensure state updates complete before allowing new recordings
-    setTimeout(() => {
-      isUndoRedoing.current = false;
-    }, 0);
   }, [history, historyIndex, setElements, setElementIds, setElementClasses]);
 
   const redo = useCallback(() => {
     // Can redo if we're not at the end of history
     if (historyIndex >= history.length - 1) return;
 
-    isUndoRedoing.current = true;
+    settleUntil.current = Date.now() + RESTORE_SETTLE_MS;
 
     const nextIndex = historyIndex + 1;
     const nextState = history[nextIndex];
@@ -149,10 +202,6 @@ export function useUndoHistory(
       setHistoryIndex(nextIndex);
     }
 
-    // Use setTimeout to ensure state updates complete before allowing new recordings
-    setTimeout(() => {
-      isUndoRedoing.current = false;
-    }, 0);
   }, [history, historyIndex, setElements, setElementIds, setElementClasses]);
 
   const clearHistory = useCallback((baselineState?: CanvasState) => {

@@ -23,6 +23,7 @@ export function useUILocalStorage(state: UIState): void {
     state.pythonTutorReferenceArrows,
     state.pythonTutorStandalonePrimitives,
     state.questionAtBottom,
+    state.textView,
     state.showLinkedListView,
     state.structurePanelCollapsed,
     state.structurePanelHeight,

@@ -100,6 +100,10 @@ interface PaletteProps {
   onShowLinkedListViewChange?: (value: boolean) => void;
   fontScale?: number;
   onFontScaleChange?: (delta: number) => void;
+  /** Enter / Space on a palette box adds it at the next free spot. */
+  onAddBox?: (boxType: BoxTypeName) => void;
+  textView?: boolean;
+  onTextViewChange?: (value: boolean) => void;
 }
 
 // Extract TabButton component inline
@@ -113,7 +117,8 @@ const TabButton: React.FC<{
     type="button"
     className={`${styles.tabBtn} ${isActive ? styles.active : ""}`}
     onClick={() => onClick(tab)}
-    aria-pressed={isActive}
+    role="tab"
+    aria-selected={isActive}
   >
     <span className={styles.tabLabel}>{label}</span>
   </button>
@@ -171,6 +176,9 @@ export default function Palette({
   onShowLinkedListViewChange,
   fontScale,
   onFontScaleChange,
+  onAddBox,
+  textView,
+  onTextViewChange,
 }: PaletteProps) {
   const allBoxes = TAB_BOX_MAPPING[activeTab];
 
@@ -241,7 +249,7 @@ export default function Palette({
                 Palette
                 <HelpIcon
                   title="Palette"
-                  text="Drag a box onto the canvas to add it to your memory model. Use the tabs on the left to filter by category, and click a box's own ? for what it represents."
+                  text="Drag a box onto the canvas to add it to your memory model (or focus it and press Enter). Use the tabs on the left to filter by category, and click a box's own ? for what it represents."
                 />
               </h3>
               <div
@@ -258,6 +266,7 @@ export default function Palette({
                       <PaletteBox
                         boxType={boxType}
                         visualStyle={visualStyle}
+                        onActivate={onAddBox}
                       />
                       <span className={styles.paletteBoxHelpSlot}>
                         <HelpIcon
@@ -322,6 +331,8 @@ export default function Palette({
             onShowLinkedListViewChange={onShowLinkedListViewChange}
             fontScale={fontScale}
             onFontScaleChange={onFontScaleChange}
+            textView={textView}
+            onTextViewChange={onTextViewChange}
           />
         </div>
       </div>

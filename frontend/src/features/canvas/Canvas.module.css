@@ -1,5 +1,14 @@
+/* Canvas plus the optional Text view strip beside it. */
+.canvasRow {
+  display: flex;
+  height: 100%;
+  min-width: 0;
+}
+
 /* Canvas wrapper - centers and styles the main canvas area */
 .canvasWrapper {
+  flex: 1 1 auto;
+  min-width: 0;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -86,4 +95,16 @@
   top: 0;
   left: 0;
   z-index: 9999;
+}
+
+/* Keyboard focus on a box (see useCanvasKeyboard). Mouse focus shows only
+   the usual selection outline. */
+.canvas :global(g[data-canvas-box-id]:focus) {
+  outline: none;
+}
+
+.canvas :global(g[data-canvas-box-id]:focus-visible) {
+  outline: 3px solid var(--border-focus, #3b82f6);
+  outline-offset: 4px;
+  border-radius: 6px;
 }

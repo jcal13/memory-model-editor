@@ -145,14 +145,23 @@ export default function ErrorListDisplay({
             );
 
             return (
+              // Focusable so keyboard and screen reader users can reach each
+              // issue (and get the same canvas highlight as hovering). The
+              // label makes VoiceOver read the whole issue as one item.
               <li
                 key={index}
                 className={styles.errorItem}
+                tabIndex={0}
+                aria-label={`${errorType}: ${displayMessage}${
+                  item.error.field ? `. Field: ${item.error.field}` : ""
+                }`}
                 onMouseEnter={() => handleErrorHover(item.error, true)}
                 onMouseLeave={() => handleErrorHover(item.error, false)}
+                onFocus={() => handleErrorHover(item.error, true)}
+                onBlur={() => handleErrorHover(item.error, false)}
               >
                 <div className={styles.errorHeader}>
-                  <span className={styles.errorIcon}>⚠</span>
+                  <span className={styles.errorIcon} aria-hidden="true">⚠</span>
                   <span className={styles.errorType}>{errorType}</span>
                 </div>
                 <div className={styles.errorMessage}>{displayMessage}</div>

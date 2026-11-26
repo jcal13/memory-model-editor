@@ -82,3 +82,17 @@ html { zoom: var(--ui-scale); }
   --help-backdrop-blur: 4px;
   --help-shadow: 0 16px 48px #0f172a33;
 }
+
+/* Respect the OS "reduce motion" setting everywhere (tutorial spotlight and
+   card, panel slides, zoom and theme fades). Things still change, instantly. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}

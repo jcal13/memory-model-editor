@@ -15,6 +15,8 @@ import PanelRail, { RailButton } from "./components/PanelToggleButtons";
 import BottomQuestionDock from "./components/BottomQuestionDock";
 import PanelCollapseHandle from "./components/PanelCollapseHandle";
 import HelpIcon from "../shared/components/HelpIcon";
+import LiveAnnouncer, { announce } from "../a11y/announcer";
+import { describeSubmission } from "../canvas/utils/modelText";
 import styles from "./MemoryModelEditor.module.css";
 
 import {
@@ -91,11 +93,20 @@ export default function MemoryModelEditor({
   };
 
   // Initialize undo history
-  const { canUndo, canRedo, undo, redo, recordState, clearHistory } = useUndoHistory(
+  const { canUndo, canRedo, undo: undoChange, redo: redoChange, recordState, clearHistory } = useUndoHistory(
     state.setElements,
     state.setElementIds,
     state.setElementClasses
   );
+  // Say "Undo" / "Redo" before the canvas announces what changed.
+  const undo = useCallback(() => {
+    if (canUndo) announce("Undo");
+    undoChange();
+  }, [canUndo, undoChange]);
+  const redo = useCallback(() => {
+    if (canRedo) announce("Redo");
+    redoChange();
+  }, [canRedo, redoChange]);
 
   // Track previous state for recording changes
   const prevStateRef = useRef({
@@ -110,6 +121,23 @@ export default function MemoryModelEditor({
     },
     []
   );
+
+  // Palette Enter / Space: the canvas hands over its keyboard "add" function.
+  const keyboardAddRef = useRef<((boxType: string) => void) | null>(null);
+  const handleKeyboardAddReady = useCallback((add: (boxType: string) => void) => {
+    keyboardAddRef.current = add;
+  }, []);
+  const addBoxFromPalette = useCallback((boxType: BoxTypeName) => {
+    keyboardAddRef.current?.(boxType);
+  }, []);
+
+  // Read Submit feedback in the live region (not results restored on load).
+  const announcedResults = useRef(state.submissionResults);
+  useEffect(() => {
+    if (announcedResults.current === state.submissionResults) return;
+    announcedResults.current = state.submissionResults;
+    if (state.submissionResults) announce(describeSubmission(state.submissionResults));
+  }, [state.submissionResults]);
 
   // Record state changes for undo functionality
   useEffect(() => {
@@ -378,6 +406,7 @@ export default function MemoryModelEditor({
     pythonTutorReferenceArrows: state.pythonTutorReferenceArrows,
     pythonTutorStandalonePrimitives: state.pythonTutorStandalonePrimitives,
     questionAtBottom: state.questionAtBottom,
+    textView: state.textView,
     showLinkedListView: state.showLinkedListView,
     structurePanelCollapsed: state.structurePanelCollapsed,
     structurePanelHeight: state.structurePanelHeight,
@@ -613,6 +642,7 @@ export default function MemoryModelEditor({
 
   return (
     <div className={`${styles.editorContainer} ${isTutorial() ? "tutorial-workspace" : ""}`}>
+      <LiveAnnouncer />
       {!state.isPaletteOpen && (
         <PanelRail side="left" label="Palette" shortcut="[" onExpand={() => state.setIsPaletteOpen(true)}>
           <RailButton title="Undo" onClick={undo} disabled={!canUndo}>
@@ -684,6 +714,9 @@ export default function MemoryModelEditor({
                 onShowLinkedListViewChange={state.setShowLinkedListView}
                 fontScale={fontScale}
                 onFontScaleChange={adjustFontScale}
+                onAddBox={addBoxFromPalette}
+                textView={state.textView}
+                onTextViewChange={state.setTextView}
               />
             </div>
           </div>
@@ -723,6 +756,8 @@ export default function MemoryModelEditor({
               pythonTutorStandalonePrimitives={
                 state.pythonTutorStandalonePrimitives
               }
+              textView={state.textView}
+              onKeyboardAddReady={handleKeyboardAddReady}
               questionFunctionNames={
                 effectiveSandboxMode && currentQuestionData
                   ? getQuestionFunctionNames(currentQuestionData)

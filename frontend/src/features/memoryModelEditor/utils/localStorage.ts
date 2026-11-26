@@ -31,6 +31,7 @@ const DEFAULT_UI_STATE = {
   visualStyle: "memoryviz" as VisualStyle,
   pythonTutorReferenceArrows: false,
   questionAtBottom: true,
+  textView: false,
   pythonTutorStandalonePrimitives: false,
   showLinkedListView: false,
   structurePanelCollapsed: false,
@@ -79,6 +80,7 @@ export interface UIState {
   visualStyle?: VisualStyle;
   pythonTutorReferenceArrows?: boolean;
   questionAtBottom?: boolean;
+  textView?: boolean;
   pythonTutorStandalonePrimitives?: boolean;
   showLinkedListView?: boolean;
   structurePanelCollapsed?: boolean;
@@ -150,6 +152,7 @@ export function loadInitialUIData(): UIState {
     // Stored as `questionPanel` ("bottom" | "side"); bottom unless chosen
     // otherwise. An older boolean `questionAtBottom` is ignored on purpose.
     const questionAtBottom = parsed?.questionPanel !== "side";
+    const textView = parsed?.textView === true;
 
     const showLinkedListView = parsed?.showLinkedListView === true;
     const structurePanelCollapsed = parsed?.structurePanelCollapsed === true;
@@ -193,6 +196,7 @@ export function loadInitialUIData(): UIState {
       pythonTutorReferenceArrows,
       pythonTutorStandalonePrimitives,
       questionAtBottom,
+      textView,
       showLinkedListView,
       questionView,
       isInfoPanelOpen,

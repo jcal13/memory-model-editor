@@ -35,6 +35,8 @@ interface CanvasControlsProps {
   onFontScaleChange?: (delta: number) => void;
   showLinkedListView?: boolean;
   onShowLinkedListViewChange?: (value: boolean) => void;
+  textView?: boolean;
+  onTextViewChange?: (value: boolean) => void;
 }
 
 type ControlTab = "actions" | "view" | "settings";
@@ -55,7 +57,8 @@ const TabButton: React.FC<{
     type="button"
     className={`${styles.tabBtn} ${isActive ? styles.active : ""}`}
     onClick={() => onClick(tab)}
-    aria-pressed={isActive}
+    role="tab"
+    aria-selected={isActive}
   >
     <span className={styles.tabLabel}>{label}</span>
   </button>
@@ -86,6 +89,8 @@ export default function CanvasControls({
   onFontScaleChange,
   showLinkedListView = false,
   onShowLinkedListViewChange,
+  textView = false,
+  onTextViewChange,
 }: CanvasControlsProps) {
   const { theme, toggleTheme } = useTheme();
   const isDarkMode = theme === 'dark';
@@ -108,7 +113,7 @@ export default function CanvasControls({
       <div className={styles.tabBody} role="tabpanel">
         <h3 className={styles.title}>
           Canvas Controls
-          <HelpIcon title="Canvas Controls" text="Tools for your canvas: Actions to undo/clear/export, View to zoom, and Settings to change modes and visual style." />
+          <HelpIcon title="Canvas Controls" text="Tools for your canvas: Actions to undo/clear/export, View to zoom or show the text view, and Settings to change modes and visual style." />
         </h3>
 
         {/* Actions Tab */}
@@ -203,6 +208,30 @@ export default function CanvasControls({
                 </div>
               </>
             )}
+
+            {onTextViewChange && (
+              <div className={styles.controlItem}>
+                <span className={styles.labelGroup}>
+                  <label className={styles.controlLabel} htmlFor="text-view-toggle">
+                    Text View
+                  </label>
+                  <HelpIcon
+                    title="Text View"
+                    text="Shows your memory model as text next to the canvas: each frame's variables and each object's contents, kept in sync as you edit. Click a line to jump to that box. Screen readers can always read this outline, even when it is hidden."
+                  />
+                </span>
+                <button
+                  id="text-view-toggle"
+                  type="button"
+                  role="switch"
+                  aria-checked={textView}
+                  onClick={() => onTextViewChange(!textView)}
+                  className={`${styles.toggle} ${textView ? styles.toggleActive : ""}`}
+                >
+                  <span className={styles.toggleThumb} />
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -222,6 +251,7 @@ export default function CanvasControls({
                   type="button"
                   role="switch"
                   aria-checked={isSandboxMode}
+                  aria-label="Practice mode (off: Test mode)"
                   onClick={onModeToggle}
                   className={`${styles.toggle} ${isSandboxMode ? styles.toggleActive : ""}`}
                 >

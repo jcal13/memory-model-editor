@@ -36,6 +36,10 @@ import { findOrphanedGeneratedPrimitiveIds } from "../editors/utils/pythonTutorI
 import ReferenceArrows from "./components/ReferenceArrows";
 import { inlineEditingEnabled } from "../inlineEditing/enabled";
 import { useInlineEditing } from "../inlineEditing/useInlineEditing";
+import { useCanvasKeyboard } from "./hooks/useCanvasKeyboard";
+import { useKeyboardAdd } from "./hooks/useKeyboardAdd";
+import ModelTextView from "./components/ModelTextView";
+import { useAnnounceChanges } from "../a11y/useAnnounceChanges";
 
 const MemoCanvasBox = memo(CanvasBox);
 
@@ -184,6 +188,8 @@ interface CanvasProps {
   canManageFunctions?: boolean;
   onClear: () => void;
   onEditorOpenerReady?: (openEditor: (element: CanvasElement) => void) => void;
+  /** Receives a function that adds a box at the next free spot and focuses it. */
+  onKeyboardAddReady?: (add: (boxType: string) => void) => void;
   scale?: number;
   onScaleChange?: (scale: number) => void;
   editorScale?: number;
@@ -191,6 +197,8 @@ interface CanvasProps {
   visualStyle?: VisualStyle;
   pythonTutorReferenceArrows?: boolean;
   pythonTutorStandalonePrimitives?: boolean;
+  /** Show the text outline of the model as a panel (it is always there for screen readers). */
+  textView?: boolean;
   isQuestionMode?: boolean;
   preserveCollapsedWorkspace?: boolean;
   workspaceHeightOffset?: number;
@@ -209,12 +217,14 @@ function Canvas({
   canManageClasses,
   canManageFunctions,
   onEditorOpenerReady,
+  onKeyboardAddReady,
   scale: externalScale,
   editorScale = 1,
   questionFunctionNames,
   visualStyle = "memoryviz",
   pythonTutorReferenceArrows = false,
   pythonTutorStandalonePrimitives = false,
+  textView = false,
   isQuestionMode = false,
   preserveCollapsedWorkspace = false,
   workspaceHeightOffset = 0,
@@ -567,6 +577,27 @@ function Canvas({
     [svgRef, addBox]
   );
 
+  // ------------------------------------------------------------ keyboard
+  const keyboardAdd = useKeyboardAdd({
+    svgRef,
+    addBox,
+    inlinePrimitives: useInlinePythonTutorPrimitives,
+    onKeyboardAddReady,
+    // Runs from key handlers, after `keyboard` below exists.
+    onAdded: (boxId) => keyboard.focusNewBox(boxId),
+  });
+  const keyboard = useCanvasKeyboard({
+    enabled: inlineEnabled,
+    svgRef,
+    elements,
+    select: inline.select,
+    editFirstField: inline.editFirstField,
+    moveTo: (boxId, x, y) => positionUpdaterRef.current(boxId)(x, y),
+    editing: inline.editing,
+    openAddPicker: keyboardAdd.openPicker,
+    addSlot: inline.addSlotByBoxId,
+  });
+  useAnnounceChanges(elements, useInlinePythonTutorPrimitives);
 
   const saveElement = useCallback(
     (
@@ -770,6 +801,7 @@ function Canvas({
 
   return (
     <>
+      <div className={styles.canvasRow}>
       <div
         ref={wrapperRef}
         className={styles.canvasWrapper}
@@ -855,6 +887,17 @@ function Canvas({
           />
         </svg>
         {inline.layer}
+        {keyboardAdd.picker}
+      </div>
+      <ModelTextView
+        elements={elements}
+        inlinePrimitives={useInlinePythonTutorPrimitives}
+        visible={textView}
+        onFocusBox={(boxId) => {
+          keyboard.setCurrent(boxId);
+          keyboard.focusBox(boxId);
+        }}
+      />
       </div>
 
       {openEditors.map((openedElement) => {
@@ -980,6 +1023,7 @@ const areEqual = (prev: Readonly<CanvasProps>, next: Readonly<CanvasProps>) => {
     prev.questionFunctionNames === next.questionFunctionNames &&
     prev.visualStyle === next.visualStyle &&
     prev.pythonTutorReferenceArrows === next.pythonTutorReferenceArrows &&
+    prev.textView === next.textView &&
     prev.pythonTutorStandalonePrimitives ===
       next.pythonTutorStandalonePrimitives
   );

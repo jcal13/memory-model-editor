@@ -114,11 +114,10 @@
   z-index: 5;
 }
 
-.canvasHelp {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 5;
+/* Keep the canvas help on the canvas when the Text view strip is shown
+   (same width as .panel in ModelTextView.module.css). */
+.canvasArea:has([data-text-view-visible]) .canvasHelp {
+  right: calc(clamp(200px, 24%, 300px) + 12px);
 }
 
 .infoPanel {

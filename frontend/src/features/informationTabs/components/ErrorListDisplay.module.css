@@ -65,7 +65,13 @@
   cursor: default;
 }
 
-.errorItem:hover {
+.errorItem:focus-visible {
+  outline: 2px solid var(--border-focus, #3b82f6);
+  outline-offset: 2px;
+}
+
+.errorItem:hover,
+.errorItem:focus-visible {
   background-color: #fee2e2;
   border-left-width: 4px;
   box-shadow: 0 2px 8px rgba(220, 38, 38, 0.08);
@@ -147,7 +153,8 @@
   border-left-color: #f87171;
 }
 
-:root[data-theme="dark"] .errorItem:hover {
+:root[data-theme="dark"] .errorItem:hover,
+:root[data-theme="dark"] .errorItem:focus-visible {
   background-color: #5a1010;
   box-shadow: 0 2px 8px rgba(248, 113, 113, 0.2);
 }

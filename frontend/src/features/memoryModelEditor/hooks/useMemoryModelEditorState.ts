@@ -101,6 +101,9 @@ export function useMemoryModelEditorState(sandbox: boolean) {
   const [questionAtBottom, setQuestionAtBottom] = useState<boolean>(
     initialUIData.questionAtBottom ?? true
   );
+  const [textView, setTextView] = useState<boolean>(
+    initialUIData.textView ?? false
+  );
   const [pythonTutorStandalonePrimitives, setPythonTutorStandalonePrimitives] =
     useState<boolean>(initialUIData.pythonTutorStandalonePrimitives ?? false);
   const [showLinkedListView, setShowLinkedListView] = useState<boolean>(
@@ -171,6 +174,8 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     setPythonTutorReferenceArrows,
     questionAtBottom,
     setQuestionAtBottom,
+    textView,
+    setTextView,
     pythonTutorStandalonePrimitives,
     setPythonTutorStandalonePrimitives,
     showLinkedListView,

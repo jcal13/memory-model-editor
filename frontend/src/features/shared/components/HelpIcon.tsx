@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useDialogFocus } from "../../a11y/useDialogFocus";
 import { createPortal } from "react-dom";
 import styles from "./HelpIcon.module.css";
 
@@ -17,6 +18,9 @@ interface HelpIconProps {
  */
 export default function HelpIcon({ text, title, className }: HelpIconProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  // Focus the dialog's Close button, keep Tab inside, return to the "?" after.
+  useDialogFocus(dialogRef, isOpen);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -56,6 +60,7 @@ export default function HelpIcon({ text, title, className }: HelpIconProps) {
             role="presentation"
           >
             <div
+              ref={dialogRef}
               className={styles.dialog}
               role="dialog"
               aria-modal="true"

@@ -22,11 +22,11 @@ function renderControls(
 }
 
 function openSettingsTab() {
-  fireEvent.click(screen.getByRole("button", { name: /settings/i }));
+  fireEvent.click(screen.getByRole("tab", { name: /settings/i }));
 }
 
 function openViewTab() {
-  fireEvent.click(screen.getByRole("button", { name: /^view$/i }));
+  fireEvent.click(screen.getByRole("tab", { name: /^view$/i }));
 }
 
 describe("CanvasControls", () => {

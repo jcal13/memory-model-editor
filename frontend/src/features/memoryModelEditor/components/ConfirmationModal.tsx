@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useDialogFocus } from "../../a11y/useDialogFocus";
 import styles from "./ConfirmationModal.module.css";
 
 interface ConfirmationModalProps {
@@ -25,6 +26,8 @@ export default function ConfirmationModal({
   onCheckboxChange,
 }: ConfirmationModalProps) {
   const [isChecked, setIsChecked] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(dialogRef);
   const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
     // Only close if clicking directly on the backdrop, not on child elements
     if (event.target === event.currentTarget) {
@@ -51,6 +54,7 @@ export default function ConfirmationModal({
 
   return (
     <div
+      ref={dialogRef}
       className={styles.modalContainer}
       onKeyDown={handleKeyDown}
       role="dialog"
@@ -61,7 +65,7 @@ export default function ConfirmationModal({
       <div
         className={styles.backdrop}
         onClick={handleBackdropClick}
-        aria-label="Close modal"
+        aria-hidden="true"
       />
 
       <div className={styles.modal}>
@@ -71,7 +75,7 @@ export default function ConfirmationModal({
           </h2>
         </header>
 
-        <main className={styles.modalContent}>
+        <div className={styles.modalContent}>
           <p id="modal-message" className={styles.modalMessage}>
             {message}
           </p>
@@ -105,7 +109,7 @@ export default function ConfirmationModal({
               {confirmLabel}
             </button>
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );

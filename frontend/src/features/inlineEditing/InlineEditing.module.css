@@ -1,0 +1,275 @@
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  overflow: visible;
+}
+
+.interactive {
+  pointer-events: auto;
+}
+
+/* ---------- Box chrome ---------- */
+
+.boxOutline {
+  position: absolute;
+  border: 1.5px solid var(--accent-blue);
+  border-radius: 6px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-blue) 18%, transparent);
+}
+
+.boxHoverOutline {
+  position: absolute;
+  border: 1px dashed color-mix(in srgb, var(--accent-blue) 55%, transparent);
+  border-radius: 6px;
+}
+
+.connectTarget {
+  position: absolute;
+  border: 2px solid #22c55e;
+  border-radius: 6px;
+  background: color-mix(in srgb, #22c55e 10%, transparent);
+}
+
+.toolbar {
+  position: absolute;
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-secondary, var(--border-primary));
+  box-shadow: var(--shadow-md);
+  transform: translateY(-100%);
+  white-space: nowrap;
+}
+
+.toolButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 24px;
+  min-width: 24px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.toolButton:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.toolButtonActive {
+  background: color-mix(in srgb, var(--accent-blue) 18%, transparent);
+  color: var(--accent-blue);
+}
+
+.toolButtonDanger:hover {
+  background: color-mix(in srgb, var(--accent-red) 15%, transparent);
+  color: var(--accent-red);
+}
+
+.toolDivider {
+  width: 1px;
+  margin: 4px 2px;
+  background: var(--border-primary);
+}
+
+.ghostAdd {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--accent-blue);
+  background: var(--bg-primary);
+  color: var(--accent-blue);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+}
+
+.ghostAdd:hover {
+  border-style: solid;
+  background: var(--accent-blue);
+  color: var(--bg-primary);
+}
+
+/* ---------- Field affordances ---------- */
+
+.fieldHover {
+  position: absolute;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--accent-blue) 12%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--accent-blue) 60%, transparent);
+}
+
+.removeBadge {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  background: var(--accent-red);
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  box-shadow: var(--shadow-sm);
+}
+
+.removeBadge:hover {
+  background: var(--accent-red-hover);
+}
+
+/* ---------- Inline editor ---------- */
+
+.editor {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.input {
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0 4px;
+  border: 2px solid var(--accent-blue);
+  border-radius: 4px;
+  /* Slightly see-through so the drawing underneath stays readable. */
+  background: color-mix(in srgb, var(--bg-primary) 82%, transparent);
+  color: var(--text-primary);
+  font-family: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas, monospace;
+  text-align: center;
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-blue) 25%, transparent);
+}
+
+.inputName {
+  text-align: left;
+  padding-left: 6px;
+}
+
+.inputRef {
+  color: var(--text-id-color);
+}
+
+.inputError {
+  border-color: var(--accent-red);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-red) 25%, transparent);
+}
+
+.chips {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px;
+  width: max-content;
+  max-width: 320px;
+  padding: 4px;
+  border-radius: 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-secondary, var(--border-primary));
+  box-shadow: var(--shadow-md);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 2px 7px;
+  border: 1px solid var(--border-primary);
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas, monospace;
+  cursor: pointer;
+}
+
+.chip:hover,
+.chipActive {
+  border-color: var(--accent-blue);
+  background: color-mix(in srgb, var(--accent-blue) 15%, transparent);
+}
+
+.chipId {
+  color: var(--text-id-color);
+  font-weight: 600;
+}
+
+.chipHint {
+  color: var(--text-tertiary);
+  font-size: 10px;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chipsLabel {
+  width: 100%;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 10px;
+  font-family: inherit;
+}
+
+.error {
+  position: absolute;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--accent-red);
+  color: #fff;
+  font-size: 12px;
+  white-space: nowrap;
+  transform: translate(-50%, 0);
+  box-shadow: var(--shadow-md);
+}
+
+.connectLine {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* The options inside a chip tray (role="listbox"); lays out like the tray. */
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px;
+  width: 100%;
+}
+
+/* Option highlighted with the arrow keys (aria-activedescendant). */
+.chipKeyboard {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 1px;
+  border-color: var(--accent-blue);
+}

@@ -34,6 +34,10 @@ import styles from "./Canvas.module.css";
 import { createElementsByIdMap } from "./utils/canvasReferences";
 import { findOrphanedGeneratedPrimitiveIds } from "../editors/utils/pythonTutorInlinePrimitives";
 import PythonTutorReferenceArrows from "./components/PythonTutorReferenceArrows";
+import { inlineEditingEnabled } from "../inlineEditing/enabled";
+import { useInlineEditing } from "../inlineEditing/useInlineEditing";
+
+const MemoCanvasBox = memo(CanvasBox);
 
 const NEW_BOX_BOUNDARY_DIMENSIONS = {
   width: 200,
@@ -294,7 +298,10 @@ function Canvas({
     [svgRef]
   );
 
-  const functionFrames = elements.filter((el) => el.kind.name === "function");
+  const functionFrames = useMemo(
+    () => elements.filter((el) => el.kind.name === "function"),
+    [elements]
+  );
   const elementsById = useMemo(() => createElementsByIdMap(elements), [elements]);
   const visibleObjects = useMemo(
     () =>
@@ -444,10 +451,40 @@ function Canvas({
     [setElements, constrainCanvasElementPosition],
   );
 
-  const handleCanvasDrop = useCallback(
-    (event: React.DragEvent<SVGSVGElement>) => {
-      event.preventDefault();
-      const boxType = event.dataTransfer.getData("application/box-type");
+  // Late-bound: removeElement is declared further down.
+  const removeElementRef = useRef<(boxId: number) => void>(() => {});
+  const removeElementStable = useCallback(
+    (boxId: number) => removeElementRef.current(boxId),
+    []
+  );
+
+  // Inline editing in every mode and style. `sandbox` is true in Test mode
+  // (no auto ids, no question-based hints) and false in Practice mode.
+  const inlineEnabled = inlineEditingEnabled();
+
+  const inline = useInlineEditing({
+    enabled: inlineEnabled,
+    wrapperRef,
+    elements,
+    setElements,
+    addId,
+    removeId,
+    removeElement: removeElementStable,
+    isProtected: isProtectedMainFrame,
+    questionFunctionNames,
+    reservedFunctionNames: isQuestionMode ? [QUESTION_MAIN_FRAME_NAME] : undefined,
+    canManageFunctions: canManageFunctions ?? sandbox,
+    classes,
+    addClasses,
+    canManageClasses: canManageClasses ?? sandbox,
+    assisted: !sandbox,
+    inlinePrimitives: useInlinePythonTutorPrimitives,
+  });
+  const inlineClick = inline.handleBoxClick;
+
+  /** Add a box of `boxType` at a canvas position; returns its boxId. */
+  const addBox = useCallback(
+    (boxType: string, coords: { x: number; y: number }): number | null => {
       const primitiveBoxTypes = new Set([
         "none",
         "int",
@@ -458,21 +495,23 @@ function Canvas({
       ]);
 
       if (useInlinePythonTutorPrimitives && primitiveBoxTypes.has(boxType)) {
-        return;
+        return null;
       }
 
       const newKind = createNewElement(boxType);
-      if (!newKind) return;
-
-      const svg = svgRef.current;
-      if (!svg) return;
-
-      const coords = screenToCanvas(svg, event.clientX, event.clientY);
-      if (!coords) return;
+      if (!newKind) return null;
 
       const newId =
         sandbox || newKind.name === "function" ? "_" : getNextElementId(ids);
       if (typeof newId === "number") addId(newId);
+
+      if (inlineEnabled) {
+        const newBoxId = getNextBoxId(elements);
+        inline.select(newBoxId);
+        if (newKind.name === "primitive" && newKind.type !== "NoneType" && newKind.type !== "bool") {
+          inline.startEditByBoxId(newBoxId, { type: "value" });
+        }
+      }
 
       setElements((prev) => {
         const newBoxId = getNextBoxId(prev);
@@ -500,17 +539,34 @@ function Canvas({
 
         return [...prev, newElement];
       });
+      return getNextBoxId(elements);
     },
     [
       elements,
       ids,
       sandbox,
-      svgRef,
       setElements,
       addId,
       useInlinePythonTutorPrimitives,
+      inlineEnabled,
+      inline,
+      constrainCanvasElementPosition,
     ]
   );
+
+  const handleCanvasDrop = useCallback(
+    (event: React.DragEvent<SVGSVGElement>) => {
+      event.preventDefault();
+      const boxType = event.dataTransfer.getData("application/box-type");
+      const svg = svgRef.current;
+      if (!svg) return;
+      const coords = screenToCanvas(svg, event.clientX, event.clientY);
+      if (!coords) return;
+      addBox(boxType, coords);
+    },
+    [svgRef, addBox]
+  );
+
 
   const saveElement = useCallback(
     (
@@ -558,17 +614,60 @@ function Canvas({
     [elements, isProtectedMainFrame, setElements, removeId]
   );
 
+
+  removeElementRef.current = removeElement;
+
   const openElementEditor = useCallback(
-    (element: CanvasElement) => {
+    (element: CanvasElement, event?: MouseEvent) => {
       if (useInlinePythonTutorPrimitives && element.kind.name === "primitive") {
+        return;
+      }
+      if (inlineEnabled) {
+        inlineClick(element, event);
         return;
       }
 
       setOpenEditors([element]);
       setSelectedElement(element);
     },
-    [useInlinePythonTutorPrimitives]
+    [useInlinePythonTutorPrimitives, inlineEnabled, inlineClick]
   );
+
+  // Stable per-box callbacks: lets memoized boxes skip redrawing their SVG
+  // when only overlay state (hover, selection) changes.
+  const openEditorRef = useRef(openElementEditor);
+  openEditorRef.current = openElementEditor;
+  const positionUpdaterRef = useRef(createPositionUpdater);
+  positionUpdaterRef.current = createPositionUpdater;
+  const elementsRef = useRef(elements);
+  elementsRef.current = elements;
+  const boxCallbacks = useRef(
+    new Map<
+      number,
+      {
+        open: (target: CanvasElement | null, event?: MouseEvent) => void;
+        move: (x: number, y: number) => void;
+      }
+    >()
+  );
+  const getBoxCallbacks = (boxId: number) => {
+    let cb = boxCallbacks.current.get(boxId);
+    if (!cb) {
+      cb = {
+        open: (target, event) => {
+          const el = target ?? elementsRef.current.find((e) => e.boxId === boxId);
+          if (el) openEditorRef.current(el, event);
+        },
+        move: (x, y) => positionUpdaterRef.current(boxId)(x, y),
+      };
+      boxCallbacks.current.set(boxId, cb);
+    }
+    return cb;
+  };
+  const inlineSelectedFrame =
+    inlineEnabled && inline.selectedElement?.kind.name === "function"
+      ? inline.selectedElement
+      : null;
 
   const closeElementEditor = useCallback((boxId: number) => {
     setOpenEditors((prev) => prev.filter((el) => el.boxId !== boxId));
@@ -674,6 +773,8 @@ function Canvas({
       <div
         ref={wrapperRef}
         className={styles.canvasWrapper}
+        onMouseMove={inlineEnabled ? inline.onWrapperMouseMove : undefined}
+        onMouseLeave={inlineEnabled ? inline.onWrapperMouseLeave : undefined}
         style={{
           overflowX: "hidden",
           overflowY: preserveCollapsedWorkspace ? "auto" : "hidden",
@@ -705,9 +806,14 @@ function Canvas({
           <CallStack
             frames={functionFrames}
             selected={
-              selectedElement?.kind.name === "function" ? selectedElement : null
+              inlineEnabled
+                ? inlineSelectedFrame
+                : selectedElement?.kind.name === "function"
+                ? selectedElement
+                : null
             }
             onSelect={openElementEditor}
+            onFieldPointerDown={inlineEnabled ? inline.claimPointerDown : undefined}
             onReorder={handleCallStackReorder}
             onWidthChange={setCallStackWidth}
             scale={scale}
@@ -722,11 +828,12 @@ function Canvas({
 
           <g>
             {visibleObjects.map((el) => (
-                <CanvasBox
+                <MemoCanvasBox
                   key={el.boxId}
                   element={el}
-                  openInterface={(target) => openElementEditor(target ?? el)}
-                  updatePosition={createPositionUpdater(el.boxId)}
+                  openInterface={getBoxCallbacks(el.boxId).open}
+                  updatePosition={getBoxCallbacks(el.boxId).move}
+                  onFieldPointerDown={inlineEnabled ? inline.claimPointerDown : undefined}
                   invalidated={el.invalidated}
                   callStackWidth={callStackWidth}
                   visualStyle={visualStyle}
@@ -748,6 +855,7 @@ function Canvas({
             elements={elements}
           />
         </svg>
+        {inline.layer}
       </div>
 
       {openEditors.map((openedElement) => {
@@ -795,6 +903,7 @@ function Canvas({
 }
 
 // Helper functions
+
 function createNewElement(boxType: string): BoxType | null {
   switch (boxType) {
     case "none":

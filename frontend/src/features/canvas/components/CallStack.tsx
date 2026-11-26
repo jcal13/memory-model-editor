@@ -36,7 +36,8 @@ const STACK_EDGE_SPACE = 20;
 interface CallStackProps {
   frames: CanvasElement[];
   selected: CanvasElement | null;
-  onSelect: (element: CanvasElement) => void;
+  onSelect: (element: CanvasElement, event?: MouseEvent) => void;
+  onFieldPointerDown?: (element: CanvasElement, event: PointerEvent) => boolean;
   onReorder: (fromIndex: number, toIndex: number) => void;
   onWidthChange?: (width: number) => void;
   onBoundsChange?: (bounds: { top: number; bottom: number }) => void;
@@ -66,6 +67,7 @@ interface LayoutItem {
 }
 
 const MemoizedCanvasBox = React.memo(CanvasBox);
+const NOOP_UPDATE_POSITION = () => {};
 
 /**
  * CallStack component displays function call frames in a vertically scrollable column.
@@ -75,6 +77,7 @@ const CallStack: React.FC<CallStackProps> = ({
   frames,
   selected,
   onSelect,
+  onFieldPointerDown,
   onReorder,
   onWidthChange,
   onBoundsChange,
@@ -363,6 +366,28 @@ const CallStack: React.FC<CallStackProps> = ({
     startScroll: 0,
   });
 
+  // Stable per-frame click handlers so memoized frame boxes don't redraw
+  // whenever the parent re-renders.
+  const onSelectRef = useRef(onSelect);
+  onSelectRef.current = onSelect;
+  const framesRef = useRef(frames);
+  framesRef.current = frames;
+  const frameOpeners = useRef(
+    new Map<number, (target: CanvasElement | null, event?: MouseEvent) => void>()
+  );
+  const getFrameOpener = (boxId: number) => {
+    let fn = frameOpeners.current.get(boxId);
+    if (!fn) {
+      fn = (target, event) => {
+        const frame = framesRef.current.find((f) => f.boxId === boxId);
+        const el = target ?? frame;
+        if (el) onSelectRef.current(el, event);
+      };
+      frameOpeners.current.set(boxId, fn);
+    }
+    return fn;
+  };
+
   const horizontalPadding = maxBoxWidth;
 
   return (
@@ -479,8 +504,9 @@ const CallStack: React.FC<CallStackProps> = ({
 
             <MemoizedCanvasBox
               element={memoizedElements[frame.boxId]}
-              openInterface={(target) => onSelect(target ?? frame)}
-              updatePosition={() => {}}
+              openInterface={getFrameOpener(frame.boxId)}
+              onFieldPointerDown={onFieldPointerDown}
+              updatePosition={NOOP_UPDATE_POSITION}
               onSizeChange={handleBoxSizeChange}
               invalidated={frame.invalidated}
               disableDrag={true}

@@ -13,7 +13,10 @@ export interface CanvasBoxProps {
   element: CanvasElement;
 
   /** Callback to open an interface (e.g., editor) for the given element */
-  openInterface: (element: CanvasElement | null) => void;
+  openInterface: (element: CanvasElement | null, event?: MouseEvent) => void;
+
+  /** Inline editing: return true to claim a pointerdown (no box drag). */
+  onFieldPointerDown?: (element: CanvasElement, event: PointerEvent) => boolean;
 
   /** Callback to update the element's position on the canvas */
   updatePosition: (x: number, y: number) => void;

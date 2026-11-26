@@ -16,6 +16,7 @@ export default function CanvasBox({
   pythonTutorStandalonePrimitives = false,
   elementsById,
   renderMode = "canvas",
+  onFieldPointerDown,
 }: CanvasBoxProps) {
   const { gRef, dragState, dimensions } = useBoxDragState();
 
@@ -34,6 +35,7 @@ export default function CanvasBox({
     pythonTutorStandalonePrimitives,
     elementsById,
     renderMode,
+    onFieldPointerDown,
   });
 
   // Report size changes for parent components (like CallStack)

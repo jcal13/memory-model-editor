@@ -180,6 +180,57 @@ function appendReferenceHitRect(
   rect.setAttribute("data-ref-target-id", `${targetId}`);
 }
 
+/**
+ * Invisible geometry marker for inline editing: tells the canvas overlay where
+ * an editable part of the box is drawn (see features/inlineEditing/fields.ts).
+ */
+function appendEditField(
+  svg: SVGSVGElement,
+  context: RenderContext,
+  field: string,
+  index: number | null,
+  x: number,
+  y: number,
+  width: number,
+  height: number
+): void {
+  if (context.renderMode === "palette") return;
+  const rect = createNode("rect");
+  rect.setAttribute("x", `${x}`);
+  rect.setAttribute("y", `${y}`);
+  rect.setAttribute("width", `${Math.max(1, width)}`);
+  rect.setAttribute("height", `${Math.max(1, height)}`);
+  rect.setAttribute("visibility", "hidden");
+  rect.setAttribute("data-edit-field", field);
+  if (index !== null) rect.setAttribute("data-edit-index", `${index}`);
+  rect.style.pointerEvents = "none";
+  svg.appendChild(rect);
+}
+
+/** Markers for the "title idN" header label: type/name, then the box id. */
+function appendHeaderFields(
+  svg: SVGSVGElement,
+  context: RenderContext,
+  title: string,
+  idLabel: string,
+  width: number
+): void {
+  const titleWidth = measureText(title, LABEL_FONT_SIZE);
+  appendEditField(svg, context, "typeLabel", null, 0, 0, titleWidth + 4, OBJECT_TOP);
+  const idX = 2 + measureText(`${title} `, LABEL_FONT_SIZE);
+  const idWidth = Math.max(measureText(idLabel, LABEL_FONT_SIZE), 26) + 4;
+  appendEditField(
+    svg,
+    context,
+    "boxId",
+    null,
+    Math.min(idX - 2, Math.max(0, width - idWidth)),
+    0,
+    idWidth,
+    OBJECT_TOP
+  );
+}
+
 function measureText(text: string, fontSize: number = 14): number {
   return text.length * fontSize * 0.61;
 }
@@ -394,10 +445,15 @@ function renderFrameBox(
     fill: COLORS.bodyText,
     fontSize: 18,
   });
+  appendEditField(svg, context, "typeLabel", null, 0, 0, measureText(title, 18) + 8, 28);
 
   bodyRows.forEach((row, index) => {
     const rowTop = 28 + index * 40;
     const slotX = leftWidth + 18;
+    if (rows.length > 0) {
+      appendEditField(svg, context, "attrName", index, 0, rowTop + 4, leftWidth + 12, SLOT_HEIGHT);
+      appendEditField(svg, context, "attrRef", index, slotX, rowTop + 2, slotWidth, SLOT_HEIGHT + 4);
+    }
 
     appendText(svg, row.left, 0, rowTop + 18, {
       fill: COLORS.bodyText,
@@ -417,7 +473,10 @@ function renderFrameBox(
   return svg;
 }
 
-function renderPrimitiveBox(element: CanvasElement): SVGSVGElement {
+function renderPrimitiveBox(
+  element: CanvasElement,
+  context: RenderContext = {}
+): SVGSVGElement {
   const primitiveKind = element.kind as PrimitiveKind;
   const title = getPythonTutorDisplayType(element);
   const idLabel = getIdLabel(element);
@@ -439,6 +498,8 @@ function renderPrimitiveBox(element: CanvasElement): SVGSVGElement {
     fill: COLORS.bodyText,
     fontSize: 18,
   });
+  appendHeaderFields(svg, context, title, idLabel, width);
+  appendEditField(svg, context, "value", null, 0, OBJECT_TOP, width, 44);
 
   return svg;
 }
@@ -478,6 +539,7 @@ function renderSequenceBox(
   appendBounds(svg, width, height);
   appendObjectLabel(svg, getPythonTutorDisplayType(element), getIdLabel(element));
   appendObjectShell(svg, width, CELL_HEIGHT);
+  appendHeaderFields(svg, context, getPythonTutorDisplayType(element), getIdLabel(element), width);
 
   if (displays.length === 0) {
     return svg;
@@ -490,6 +552,7 @@ function renderSequenceBox(
     if (index > 0) {
       appendLine(svg, currentX, OBJECT_TOP, currentX, OBJECT_TOP + CELL_HEIGHT);
     }
+    appendEditField(svg, context, "item", index, currentX, OBJECT_TOP, cellWidth, CELL_HEIGHT);
 
     if (hasIndexes) {
       appendText(svg, `${index}`, currentX + 7, OBJECT_TOP + 10, {
@@ -566,11 +629,16 @@ function renderDictBox(
   appendObjectLabel(svg, "dict", getIdLabel(element));
   appendObjectShell(svg, width, Math.max(1, bodyRows.length) * ROW_HEIGHT);
   appendLine(svg, dividerX, OBJECT_TOP, dividerX, height);
+  appendHeaderFields(svg, context, "dict", getIdLabel(element), width);
 
   bodyRows.forEach((row, index) => {
     const rowTop = OBJECT_TOP + index * ROW_HEIGHT;
     if (index > 0) {
       appendLine(svg, 0, rowTop, width, rowTop);
+    }
+    if (rows.length > 0) {
+      appendEditField(svg, context, "dictKey", index, 0, rowTop, leftColumnWidth, ROW_HEIGHT);
+      appendEditField(svg, context, "dictValue", index, rightStart, rowTop, rightColumnWidth, ROW_HEIGHT);
     }
 
     appendDisplayValue(svg, row.left, context, {
@@ -640,11 +708,16 @@ function renderKeyValueObjectBox(
   appendObjectLabel(svg, title, idLabel);
   appendObjectShell(svg, width, Math.max(1, bodyRows.length) * ROW_HEIGHT);
   appendLine(svg, dividerX, OBJECT_TOP, dividerX, height);
+  appendHeaderFields(svg, context, title, idLabel, width);
 
   bodyRows.forEach((row, index) => {
     const rowTop = OBJECT_TOP + index * ROW_HEIGHT;
     if (index > 0) {
       appendLine(svg, 0, rowTop, width, rowTop);
+    }
+    if (rows.length > 0) {
+      appendEditField(svg, context, "attrName", index, 0, rowTop, dividerX, ROW_HEIGHT);
+      appendEditField(svg, context, "attrRef", index, dividerX, rowTop, width - dividerX, ROW_HEIGHT);
     }
 
     appendText(svg, row.left, PADDING_X, rowTop + ROW_HEIGHT / 2, {
@@ -729,7 +802,7 @@ export function createPythonTutorBoxRenderer(
 ): SVGSVGElement {
   switch (element.kind.name) {
     case "primitive":
-      return renderPrimitiveBox(element);
+      return renderPrimitiveBox(element, context);
     case "function":
       return typeof element.id === "number"
         ? renderFunctionObjectBox(
@@ -752,6 +825,6 @@ export function createPythonTutorBoxRenderer(
     case "class":
       return renderClassBox(element as CanvasElement & { kind: ClassKind }, context);
     default:
-      return renderPrimitiveBox(element);
+      return renderPrimitiveBox(element, context);
   }
 }

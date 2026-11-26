@@ -136,12 +136,14 @@ export function useDraggableBox({
   pythonTutorStandalonePrimitives = false,
   elementsById,
   renderMode = "canvas",
+  onFieldPointerDown,
 }: {
   gRef: React.RefObject<SVGGElement | null>;
   element: CanvasElement;
   dimensions: React.MutableRefObject<BoxDimensions>;
   dragState: React.MutableRefObject<DragState>;
-  openInterface: (element: CanvasElement | null) => void;
+  openInterface: (element: CanvasElement | null, event?: MouseEvent) => void;
+  onFieldPointerDown?: (element: CanvasElement, event: PointerEvent) => boolean;
   updatePosition: (x: number, y: number) => void;
   invalidated?: boolean;
   disableDrag?: boolean;
@@ -155,6 +157,9 @@ export function useDraggableBox({
   const livePosRef = useRef({ x: element.x, y: element.y });
   const movedRef = useRef(false);
   const boxSvgRef = useRef<SVGSVGElement | null>(null);
+  // Set when inline editing claims a pointerdown (e.g. drag-to-connect), so
+  // the box itself is not dragged by the mousedown that follows.
+  const claimedRef = useRef(false);
   const CLICK_EPS = 3;
 
   const getSvgPoint = useCallback(
@@ -301,7 +306,13 @@ export function useDraggableBox({
   const handleMouseDown = useCallback(
     (event: MouseEvent | React.MouseEvent) => {
       event.stopPropagation();
-      if (findReferencedElement(event)) {
+      if (claimedRef.current) {
+        claimedRef.current = false;
+        movedRef.current = false;
+        return;
+      }
+      // Inline editing handles reference slots itself (edit / connect).
+      if (!onFieldPointerDown && findReferencedElement(event)) {
         movedRef.current = false;
         return;
       }
@@ -327,6 +338,7 @@ export function useDraggableBox({
       handleMouseUp,
       findReferencedElement,
       dragState,
+      onFieldPointerDown,
     ]
   );
 
@@ -397,11 +409,21 @@ export function useDraggableBox({
     const handleClick = (ev: MouseEvent) => {
       ev.stopPropagation();
       if (movedRef.current) return;
-      const targetElement = findReferencedElement(ev);
-      openInterface(targetElement ?? element);
+      const targetElement = onFieldPointerDown ? null : findReferencedElement(ev);
+      openInterface(targetElement ?? element, ev);
+    };
+
+    const handlePointerDown = (ev: PointerEvent) => {
+      claimedRef.current = false;
+      if (onFieldPointerDown && renderMode === "canvas" && onFieldPointerDown(element, ev)) {
+        claimedRef.current = true;
+        // Keep call-stack frames from starting a reorder drag.
+        ev.stopPropagation();
+      }
     };
 
     const handleOverlayMouseMove = (ev: MouseEvent) => {
+      if (onFieldPointerDown) return; // inline editing sets its own cursor
       const targetElement = findReferencedElement(ev);
       overlay.style.cursor = targetElement
         ? "pointer"
@@ -413,6 +435,7 @@ export function useDraggableBox({
     if (!disableDrag) {
       overlay.addEventListener("mousedown", handleMouseDown as EventListener);
     }
+    overlay.addEventListener("pointerdown", handlePointerDown);
     overlay.addEventListener("click", handleClick);
     overlay.addEventListener("mousemove", handleOverlayMouseMove);
     svgElement.appendChild(overlay);
@@ -424,6 +447,7 @@ export function useDraggableBox({
           handleMouseDown as EventListener
         );
       }
+      overlay.removeEventListener("pointerdown", handlePointerDown);
       overlay.removeEventListener("click", handleClick);
       overlay.removeEventListener("mousemove", handleOverlayMouseMove);
       boxSvgRef.current = null;
@@ -442,5 +466,6 @@ export function useDraggableBox({
     elementsById,
     renderMode,
     findReferencedElement,
+    onFieldPointerDown,
   ]);
 }

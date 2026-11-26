@@ -164,7 +164,21 @@ export function processClassVariables(variables: any[]): Record<string, any> {
  * @returns Object mapping dictionary keys to normalized values
  */
 export function extractDictionary(kind: any): Record<string, any> {
-  if (!kind.pairs || !Array.isArray(kind.pairs)) return {};
+  if (!kind.pairs || !Array.isArray(kind.pairs)) {
+    // DictKind stores its entries as `value: { [keyId]: valueId }`. Blank keys
+    // (whitespace placeholders from "Add Pair") render as unassigned "_" slots.
+    if (!kind.value || typeof kind.value !== "object") return {};
+    const used = new Set<string>();
+    return Object.entries(kind.value).reduce(
+      (acc: Record<string, any>, [rawKey, rawValue]) => {
+        const keyId = normalizeId(toIdNumber(rawKey));
+        const key = makeUniqueKey(String(keyId), used);
+        acc[key] = normalizeId(toIdNumber(rawValue));
+        return acc;
+      },
+      {} as Record<string, any>
+    );
+  }
 
   const used = new Set<string>();
   return kind.pairs.reduce((acc: Record<string, any>, pair: any) => {
@@ -172,4 +186,11 @@ export function extractDictionary(kind: any): Record<string, any> {
     acc[key] = normalizeId(pair.value);
     return acc;
   }, {} as Record<string, any>);
+}
+
+function toIdNumber(raw: unknown): unknown {
+  if (typeof raw === "string" && raw.trim() !== "" && Number.isInteger(Number(raw))) {
+    return Number(raw);
+  }
+  return raw;
 }

@@ -1,3 +1,4 @@
+import { normalizeClassVariable } from "./canvasReferences";
 import { createElementsByIdMap, formatPrimitiveValue, isPrimitiveElement } from "./canvasReferences";
 import {
   BoxTypeName,
@@ -60,7 +61,7 @@ function collectReferencedIds(elements: CanvasElement[]): Set<number> {
         break;
       case "class":
         element.kind.classVariables.forEach((variable) =>
-          addReference(variable.targetId)
+          addReference(normalizeClassVariable(variable).targetId)
         );
         break;
       case "list":

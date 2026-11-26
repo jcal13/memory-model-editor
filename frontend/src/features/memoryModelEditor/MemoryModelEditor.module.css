@@ -109,9 +109,12 @@
 
 .canvasHelp {
   position: absolute;
-  top: 12px;
+  top: 8px;
   right: 12px;
   z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Keep the canvas help on the canvas when the Text view strip is shown

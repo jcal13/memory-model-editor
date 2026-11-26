@@ -30,6 +30,7 @@ const DEFAULT_UI_STATE = {
   sandboxMode: null as boolean | null,
   visualStyle: "memoryviz" as VisualStyle,
   pythonTutorReferenceArrows: false,
+  gridLayout: false,
   questionAtBottom: true,
   textView: false,
   pythonTutorStandalonePrimitives: false,
@@ -79,6 +80,7 @@ export interface UIState {
   sandboxMode: boolean | null;
   visualStyle?: VisualStyle;
   pythonTutorReferenceArrows?: boolean;
+  gridLayout?: boolean;
   questionAtBottom?: boolean;
   textView?: boolean;
   pythonTutorStandalonePrimitives?: boolean;
@@ -149,6 +151,7 @@ export function loadInitialUIData(): UIState {
       parsed?.pythonTutorReferenceArrows === true;
     const pythonTutorStandalonePrimitives =
       parsed?.pythonTutorStandalonePrimitives === true;
+    const gridLayout = parsed?.gridLayout === true;
     // Stored as `questionPanel` ("bottom" | "side"); bottom unless chosen
     // otherwise. An older boolean `questionAtBottom` is ignored on purpose.
     const questionAtBottom = parsed?.questionPanel !== "side";
@@ -195,6 +198,7 @@ export function loadInitialUIData(): UIState {
       visualStyle,
       pythonTutorReferenceArrows,
       pythonTutorStandalonePrimitives,
+      gridLayout,
       questionAtBottom,
       textView,
       showLinkedListView,

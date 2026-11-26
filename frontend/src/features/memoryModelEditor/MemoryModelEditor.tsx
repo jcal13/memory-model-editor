@@ -13,6 +13,7 @@ import ConfirmationModal from "./components/ConfirmationModal";
 import InformationTabs from "../informationTabs/InformationTabs";
 import PanelRail, { RailButton } from "./components/PanelToggleButtons";
 import BottomQuestionDock from "./components/BottomQuestionDock";
+import CanvasToolbar from "./components/CanvasToolbar";
 import PanelCollapseHandle from "./components/PanelCollapseHandle";
 import HelpIcon from "../shared/components/HelpIcon";
 import LiveAnnouncer, { announce } from "../a11y/announcer";
@@ -405,6 +406,7 @@ export default function MemoryModelEditor({
     visualStyle: state.visualStyle,
     pythonTutorReferenceArrows: state.pythonTutorReferenceArrows,
     pythonTutorStandalonePrimitives: state.pythonTutorStandalonePrimitives,
+    gridLayout: state.gridLayout,
     questionAtBottom: state.questionAtBottom,
     textView: state.textView,
     showLinkedListView: state.showLinkedListView,
@@ -705,6 +707,8 @@ export default function MemoryModelEditor({
                 pythonTutorStandalonePrimitives={
                   state.pythonTutorStandalonePrimitives
                 }
+                gridLayout={state.gridLayout}
+                onGridLayoutChange={state.setGridLayout}
                 questionAtBottom={state.questionAtBottom}
                 onQuestionAtBottomChange={state.setQuestionAtBottom}
                 onPythonTutorStandalonePrimitivesChange={
@@ -756,6 +760,7 @@ export default function MemoryModelEditor({
               pythonTutorStandalonePrimitives={
                 state.pythonTutorStandalonePrimitives
               }
+              gridLayout={state.gridLayout}
               textView={state.textView}
               onKeyboardAddReady={handleKeyboardAddReady}
               questionFunctionNames={
@@ -776,6 +781,12 @@ export default function MemoryModelEditor({
               }
             />
             <div className={styles.canvasHelp}>
+              <CanvasToolbar
+                scale={canvasScale}
+                onScaleChange={setCanvasScale}
+                gridLayout={state.gridLayout}
+                onGridLayoutChange={state.setGridLayout}
+              />
               <HelpIcon
                 title="Canvas"
                 text="This is your workspace for building the memory model. Drag boxes in from the Palette, click a box to edit its values, and set a reference by picking another box's id in the field editor."

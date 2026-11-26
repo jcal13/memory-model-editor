@@ -37,6 +37,7 @@ import ReferenceArrows from "./components/ReferenceArrows";
 import { inlineEditingEnabled } from "../inlineEditing/enabled";
 import { useInlineEditing } from "../inlineEditing/useInlineEditing";
 import { useCanvasKeyboard } from "./hooks/useCanvasKeyboard";
+import { useGridLayout } from "./hooks/useGridLayout";
 import { useKeyboardAdd } from "./hooks/useKeyboardAdd";
 import ModelTextView from "./components/ModelTextView";
 import { useAnnounceChanges } from "../a11y/useAnnounceChanges";
@@ -197,6 +198,8 @@ interface CanvasProps {
   visualStyle?: VisualStyle;
   pythonTutorReferenceArrows?: boolean;
   pythonTutorStandalonePrimitives?: boolean;
+  /** Snap object boxes to a grid (see hooks/useGridLayout). */
+  gridLayout?: boolean;
   /** Show the text outline of the model as a panel (it is always there for screen readers). */
   textView?: boolean;
   isQuestionMode?: boolean;
@@ -219,11 +222,13 @@ function Canvas({
   onEditorOpenerReady,
   onKeyboardAddReady,
   scale: externalScale,
+  onScaleChange,
   editorScale = 1,
   questionFunctionNames,
   visualStyle = "memoryviz",
   pythonTutorReferenceArrows = false,
   pythonTutorStandalonePrimitives = false,
+  gridLayout = false,
   textView = false,
   isQuestionMode = false,
   preserveCollapsedWorkspace = false,
@@ -578,8 +583,19 @@ function Canvas({
   );
 
   // ------------------------------------------------------------ keyboard
+  const grid = useGridLayout({
+    enabled: gridLayout,
+    objects: visibleObjects,
+    setElements,
+    svgRef,
+    callStackWidth,
+    scale,
+    onScaleChange,
+  });
   const keyboardAdd = useKeyboardAdd({
     svgRef,
+    gridLayout,
+    firstFreeCell: grid.firstFreeCenter,
     addBox,
     inlinePrimitives: useInlinePythonTutorPrimitives,
     onKeyboardAddReady,
@@ -593,6 +609,7 @@ function Canvas({
     select: inline.select,
     editFirstField: inline.editFirstField,
     moveTo: (boxId, x, y) => positionUpdaterRef.current(boxId)(x, y),
+    gridMove: grid.move,
     editing: inline.editing,
     openAddPicker: keyboardAdd.openPicker,
     addSlot: inline.addSlotByBoxId,
@@ -1023,6 +1040,7 @@ const areEqual = (prev: Readonly<CanvasProps>, next: Readonly<CanvasProps>) => {
     prev.questionFunctionNames === next.questionFunctionNames &&
     prev.visualStyle === next.visualStyle &&
     prev.pythonTutorReferenceArrows === next.pythonTutorReferenceArrows &&
+    prev.gridLayout === next.gridLayout &&
     prev.textView === next.textView &&
     prev.pythonTutorStandalonePrimitives ===
       next.pythonTutorStandalonePrimitives

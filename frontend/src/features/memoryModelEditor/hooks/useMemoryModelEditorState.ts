@@ -98,6 +98,9 @@ export function useMemoryModelEditorState(sandbox: boolean) {
   );
   const [pythonTutorReferenceArrows, setPythonTutorReferenceArrows] =
     useState<boolean>(initialUIData.pythonTutorReferenceArrows ?? false);
+  const [gridLayout, setGridLayout] = useState<boolean>(
+    initialUIData.gridLayout ?? false
+  );
   const [questionAtBottom, setQuestionAtBottom] = useState<boolean>(
     initialUIData.questionAtBottom ?? true
   );
@@ -172,6 +175,8 @@ export function useMemoryModelEditorState(sandbox: boolean) {
     setVisualStyle,
     pythonTutorReferenceArrows,
     setPythonTutorReferenceArrows,
+    gridLayout,
+    setGridLayout,
     questionAtBottom,
     setQuestionAtBottom,
     textView,

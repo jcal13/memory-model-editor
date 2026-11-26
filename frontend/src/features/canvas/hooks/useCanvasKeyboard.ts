@@ -17,6 +17,8 @@ type Options = {
   editFirstField: (boxId: number) => void;
   /** Move an object box to an absolute canvas position. */
   moveTo: (boxId: number, x: number, y: number) => void;
+  /** Grid layout: move one cell instead; returns true when it handled the key. */
+  gridMove?: (boxId: number, dx: number, dy: number) => boolean;
   /** Whether an inline edit is open (keys then belong to the input). */
   editing: boolean;
   /** Open the "add object" picker. */
@@ -157,6 +159,7 @@ export function useCanvasKeyboard(opts: Options) {
       e.preventDefault();
       const el = optsRef.current.elements.find((x) => x.boxId === boxId);
       if (!el || el.kind.name === "function") return; // Frames sit in the call stack.
+      if (optsRef.current.gridMove?.(boxId, d[0], d[1])) return;
       const step = e.shiftKey ? ARROW_STEP_LARGE : ARROW_STEP;
       optsRef.current.moveTo(boxId, el.x + d[0] * step, el.y + d[1] * step);
     };

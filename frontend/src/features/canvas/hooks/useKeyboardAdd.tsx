@@ -11,16 +11,20 @@ const PRIMITIVE_CHOICES = ["int", "float", "str", "bool", "none"];
 /**
  * Adding a box without the mouse: `N` opens the "Add object" picker, and the
  * palette's Enter/Space go through the same path. A new box goes to the first
- * first clear spot right of the call stack.
+ * free grid cell (Grid Layout) or the first clear spot right of the call stack.
  */
 export function useKeyboardAdd({
   svgRef,
+  gridLayout,
+  firstFreeCell,
   addBox,
   inlinePrimitives,
   onKeyboardAddReady,
   onAdded,
 }: {
   svgRef: React.RefObject<SVGSVGElement | null>;
+  gridLayout: boolean;
+  firstFreeCell: () => Point | null;
   /** Adds a box of this palette type at canvas coordinates; its boxId, or null. */
   addBox: (boxType: string, coords: Point) => number | null;
   inlinePrimitives: boolean;
@@ -37,8 +41,8 @@ export function useKeyboardAdd({
     setOpen(false);
     const svg = svgRef.current;
     if (!svg) return;
-    const spot = findFreeSpot(svg);
-    const coords = spot && screenToCanvas(svg, spot.x, spot.y);
+    const spot = gridLayout ? null : findFreeSpot(svg);
+    const coords = firstFreeCell() ?? (spot && screenToCanvas(svg, spot.x, spot.y));
     if (!coords) return;
     const boxId = addBox(boxType, coords);
     if (boxId !== null) onAdded(boxId);

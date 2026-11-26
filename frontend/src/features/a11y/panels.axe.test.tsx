@@ -43,7 +43,7 @@ describe("axe: panels", () => {
           onModeToggle={jest.fn()} onClear={jest.fn()} onUndo={jest.fn()} onRedo={jest.fn()}
           onScaleChange={jest.fn()} onEditorScaleChange={jest.fn()} onFontScaleChange={jest.fn()}
           onVisualStyleChange={jest.fn()} onPythonTutorReferenceArrowsChange={jest.fn()}
-          onQuestionAtBottomChange={jest.fn()}
+          onGridLayoutChange={jest.fn()} onQuestionAtBottomChange={jest.fn()}
           onShowLinkedListViewChange={jest.fn()} onTextViewChange={jest.fn()}
         />
       </ThemeProvider>

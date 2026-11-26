@@ -27,6 +27,8 @@ interface CanvasControlsProps {
   onVisualStyleChange?: (style: VisualStyle) => void;
   pythonTutorReferenceArrows?: boolean;
   onPythonTutorReferenceArrowsChange?: (value: boolean) => void;
+  gridLayout?: boolean;
+  onGridLayoutChange?: (value: boolean) => void;
   questionAtBottom?: boolean;
   onQuestionAtBottomChange?: (value: boolean) => void;
   pythonTutorStandalonePrimitives?: boolean;
@@ -81,6 +83,8 @@ export default function CanvasControls({
   onVisualStyleChange,
   pythonTutorReferenceArrows = false,
   onPythonTutorReferenceArrowsChange,
+  gridLayout = false,
+  onGridLayoutChange,
   questionAtBottom = false,
   onQuestionAtBottomChange,
   pythonTutorStandalonePrimitives = false,
@@ -386,6 +390,29 @@ export default function CanvasControls({
                 </div>
               )}
 
+            {onGridLayoutChange && (
+              <div className={styles.controlItem}>
+                <span className={styles.labelGroup}>
+                  <label className={styles.controlLabel} htmlFor="grid-layout-toggle">
+                    Grid Layout
+                  </label>
+                  <HelpIcon
+                    title="Grid Layout"
+                    text="Lines objects up in a grid next to the call stack. Dragged boxes snap to the nearest cell, arrow keys move the focused box one cell (swapping with its neighbour), and new objects fill the first empty cell."
+                  />
+                </span>
+                <button
+                  id="grid-layout-toggle"
+                  type="button"
+                  role="switch"
+                  aria-checked={gridLayout}
+                  onClick={() => onGridLayoutChange(!gridLayout)}
+                  className={`${styles.toggle} ${gridLayout ? styles.toggleActive : ""}`}
+                >
+                  <span className={styles.toggleThumb} />
+                </button>
+              </div>
+            )}
 
             {onQuestionAtBottomChange && (
               <div className={styles.controlItem}>

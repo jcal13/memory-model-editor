@@ -1,47 +1,111 @@
-.toggleButton {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 24px;
-  height: 60px;
+/* ---------- Collapsed panel rail ---------- */
+
+.rail {
+  flex-shrink: 0;
+  width: 34px;
+  margin: var(--workspace-edge-space, 8px) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  box-sizing: border-box;
+  border-radius: 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+}
+
+.railLeft {
+  margin-left: var(--workspace-edge-space, 8px);
+  margin-right: 6px;
+}
+
+.railRight {
+  margin-left: 6px;
+  margin-right: var(--workspace-edge-space, 8px);
+}
+
+.railExpand,
+.railButton {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid #e2e8f0;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: inherit;
   cursor: pointer;
-  z-index: 9998;
-  transition: all 160ms ease;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-  color: #94a3b8;
 }
 
-.toggleButton:hover {
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  color: #3b82f6;
-  width: 28px;
+.railExpand:hover,
+.railButton:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--accent-blue);
 }
 
-.toggleButton:active {
-  background: #f8fafc;
-  transform: translateY(-50%) scale(0.98);
+.railButton:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
-.toggleButton svg {
-  flex-shrink: 0;
-  width: 16px;
-  height: 16px;
+.railLabel {
+  writing-mode: vertical-rl;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-tertiary, var(--text-secondary));
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 
-.leftToggle {
-  left: 0;
-  border-left: none;
-  border-radius: 0 6px 6px 0;
+.railLeft .railLabel {
+  transform: rotate(180deg);
 }
 
-.rightToggle {
-  right: 0;
-  border-right: none;
-  border-radius: 6px 0 0 6px;
+.railLabel:hover {
+  color: var(--accent-blue);
+}
+
+.railActions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: auto;
+}
+
+/* ---------- Collapse button on a panel's resize divider ---------- */
+
+.collapseHandle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 36px;
+  padding: 0;
+  border-radius: 9px;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 120ms ease, color 120ms ease;
+}
+
+.collapseHandle:hover,
+.collapseHandle:focus-visible {
+  opacity: 1;
+  color: var(--accent-blue);
 }

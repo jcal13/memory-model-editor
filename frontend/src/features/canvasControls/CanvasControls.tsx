@@ -27,6 +27,8 @@ interface CanvasControlsProps {
   onVisualStyleChange?: (style: VisualStyle) => void;
   pythonTutorReferenceArrows?: boolean;
   onPythonTutorReferenceArrowsChange?: (value: boolean) => void;
+  questionAtBottom?: boolean;
+  onQuestionAtBottomChange?: (value: boolean) => void;
   pythonTutorStandalonePrimitives?: boolean;
   onPythonTutorStandalonePrimitivesChange?: (value: boolean) => void;
   fontScale?: number;
@@ -76,6 +78,8 @@ export default function CanvasControls({
   onVisualStyleChange,
   pythonTutorReferenceArrows = false,
   onPythonTutorReferenceArrowsChange,
+  questionAtBottom = false,
+  onQuestionAtBottomChange,
   pythonTutorStandalonePrimitives = false,
   onPythonTutorStandalonePrimitivesChange,
   fontScale = 1,
@@ -351,6 +355,31 @@ export default function CanvasControls({
                   </button>
                 </div>
               )}
+
+
+            {onQuestionAtBottomChange && (
+              <div className={styles.controlItem}>
+                <span className={styles.labelGroup}>
+                  <label className={styles.controlLabel} htmlFor="question-at-bottom-toggle">
+                    Question at Bottom
+                  </label>
+                  <HelpIcon
+                    title="Question at Bottom"
+                    text="On by default: the question and feedback sit under the canvas, side by side, so the canvas gets the full width. Drag the bar above them to resize; ] hides them. Turn off to put them in a panel on the right."
+                  />
+                </span>
+                <button
+                  id="question-at-bottom-toggle"
+                  type="button"
+                  role="switch"
+                  aria-checked={questionAtBottom}
+                  onClick={() => onQuestionAtBottomChange(!questionAtBottom)}
+                  className={`${styles.toggle} ${questionAtBottom ? styles.toggleActive : ""}`}
+                >
+                  <span className={styles.toggleThumb} />
+                </button>
+              </div>
+            )}
 
             {onShowLinkedListViewChange && (
               <>

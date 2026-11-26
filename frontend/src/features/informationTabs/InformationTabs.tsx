@@ -33,6 +33,8 @@ interface InformationTabsProps {
   tabScrollPositions: Record<Tab, number>;
   setTabScrollPositions: React.Dispatch<React.SetStateAction<Record<Tab, number>>>;
   fontScale?: number;
+  /** "row": question and feedback side by side (question docked at the bottom). */
+  layout?: "column" | "row";
 }
 
 export default function InformationTabs({
@@ -61,7 +63,9 @@ export default function InformationTabs({
   tabScrollPositions,
   setTabScrollPositions,
   fontScale = 1,
+  layout = "column",
 }: InformationTabsProps) {
+  const row = layout === "row";
   const tabBodyRef = useRef<HTMLDivElement>(null);
   const { topHeight, handleMouseDown, containerRef } = useResizable({
     initialTopPercent: 60,
@@ -116,12 +120,12 @@ export default function InformationTabs({
   };
 
   return (
-    <div className={styles.containerWrapper}>
-      <div className={styles.container} ref={containerRef}>
+    <div className={`${styles.containerWrapper} ${row ? styles.rowWrapper : ""}`}>
+      <div className={`${styles.container} ${row ? styles.rowLayout : ""}`} ref={containerRef}>
         <div
           className={styles.questionPanel}
           ref={tabBodyRef}
-          style={questionSelected ? { height: `${topHeight}%` } : undefined}
+          style={questionSelected && !row ? { height: `${topHeight}%` } : undefined}
         >
           <QuestionTab
             linkedQuestion={linkedQuestion}
@@ -146,15 +150,19 @@ export default function InformationTabs({
 
         {questionSelected && (
           <>
-            <div
-              className={styles.resizeDivider}
-              onMouseDown={handleMouseDown}
-              role="separator"
-              aria-orientation="horizontal"
-            />
+            {row ? (
+              <div className={styles.rowGap} />
+            ) : (
+              <div
+                className={styles.resizeDivider}
+                onMouseDown={handleMouseDown}
+                role="separator"
+                aria-orientation="horizontal"
+              />
+            )}
             <div
               data-tour="feedback" className={styles.feedbackPanel}
-              style={{ height: `${100 - topHeight}%` }}
+              style={row ? undefined : { height: `${100 - topHeight}%` }}
             >
               <FeedbackTab
                 submissionResults={submissionResults}

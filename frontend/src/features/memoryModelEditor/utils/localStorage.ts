@@ -10,7 +10,7 @@ import {
 
 // Storage keys
 const CANVAS_STORAGE_KEY = "canvas_key";
-const UI_STORAGE_KEY = "canvas_ui_state_v3";
+export const UI_STORAGE_KEY = "canvas_ui_state_v3";
 
 const QUESTION_CANVAS_PREFIX = "question_canvas_";
 const DO_NOT_REMIND_KEY = "do_not_remind_canvas_clear";
@@ -30,6 +30,7 @@ const DEFAULT_UI_STATE = {
   sandboxMode: null as boolean | null,
   visualStyle: "memoryviz" as VisualStyle,
   pythonTutorReferenceArrows: false,
+  questionAtBottom: true,
   pythonTutorStandalonePrimitives: false,
   showLinkedListView: false,
   structurePanelCollapsed: false,
@@ -77,6 +78,7 @@ export interface UIState {
   sandboxMode: boolean | null;
   visualStyle?: VisualStyle;
   pythonTutorReferenceArrows?: boolean;
+  questionAtBottom?: boolean;
   pythonTutorStandalonePrimitives?: boolean;
   showLinkedListView?: boolean;
   structurePanelCollapsed?: boolean;
@@ -145,6 +147,9 @@ export function loadInitialUIData(): UIState {
       parsed?.pythonTutorReferenceArrows === true;
     const pythonTutorStandalonePrimitives =
       parsed?.pythonTutorStandalonePrimitives === true;
+    // Stored as `questionPanel` ("bottom" | "side"); bottom unless chosen
+    // otherwise. An older boolean `questionAtBottom` is ignored on purpose.
+    const questionAtBottom = parsed?.questionPanel !== "side";
 
     const showLinkedListView = parsed?.showLinkedListView === true;
     const structurePanelCollapsed = parsed?.structurePanelCollapsed === true;
@@ -187,6 +192,7 @@ export function loadInitialUIData(): UIState {
       visualStyle,
       pythonTutorReferenceArrows,
       pythonTutorStandalonePrimitives,
+      questionAtBottom,
       showLinkedListView,
       questionView,
       isInfoPanelOpen,
@@ -234,7 +240,11 @@ export function saveCanvasData(data: CanvasData): void {
  */
 export function saveUIState(state: UIState): void {
   try {
-    workspaceStorage.setItem(UI_STORAGE_KEY, JSON.stringify(state));
+    const { questionAtBottom, ...rest } = state;
+    workspaceStorage.setItem(
+      UI_STORAGE_KEY,
+      JSON.stringify({ ...rest, questionPanel: questionAtBottom === false ? "side" : "bottom" })
+    );
   } catch (error) {
     console.warn("Failed to save UI state to localStorage:", error);
   }

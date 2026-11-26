@@ -188,3 +188,30 @@
   text-align: center;
   user-select: none;
 }
+
+/* Question docked under the canvas: question and feedback side by side. */
+.rowWrapper {
+  height: 100%;
+  padding: 0;
+}
+
+.rowLayout {
+  flex-direction: row;
+}
+
+.rowLayout .questionPanel {
+  flex: 3 1 0;
+  height: auto;
+  min-width: 0;
+}
+
+.rowLayout .feedbackPanel {
+  flex: 2 1 0;
+  height: auto;
+  min-width: 0;
+}
+
+.rowGap {
+  width: 8px;
+  flex-shrink: 0;
+}

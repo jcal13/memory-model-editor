@@ -92,6 +92,8 @@ interface PaletteProps {
   onVisualStyleChange?: (style: VisualStyle) => void;
   pythonTutorReferenceArrows?: boolean;
   onPythonTutorReferenceArrowsChange?: (value: boolean) => void;
+  questionAtBottom?: boolean;
+  onQuestionAtBottomChange?: (value: boolean) => void;
   pythonTutorStandalonePrimitives?: boolean;
   onPythonTutorStandalonePrimitivesChange?: (value: boolean) => void;
   showLinkedListView?: boolean;
@@ -161,6 +163,8 @@ export default function Palette({
   onVisualStyleChange,
   pythonTutorReferenceArrows = false,
   onPythonTutorReferenceArrowsChange,
+  questionAtBottom = false,
+  onQuestionAtBottomChange,
   pythonTutorStandalonePrimitives = false,
   onPythonTutorStandalonePrimitivesChange,
   showLinkedListView = false,
@@ -308,6 +312,8 @@ export default function Palette({
             onPythonTutorReferenceArrowsChange={
               onPythonTutorReferenceArrowsChange
             }
+            questionAtBottom={questionAtBottom}
+            onQuestionAtBottomChange={onQuestionAtBottomChange}
             pythonTutorStandalonePrimitives={pythonTutorStandalonePrimitives}
             onPythonTutorStandalonePrimitivesChange={
               onPythonTutorStandalonePrimitivesChange

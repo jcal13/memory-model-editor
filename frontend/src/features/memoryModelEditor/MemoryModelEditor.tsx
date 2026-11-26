@@ -11,7 +11,9 @@ import StructurePanel from "../canvas/components/StructurePanel";
 import Palette from "../palette/Palette";
 import ConfirmationModal from "./components/ConfirmationModal";
 import InformationTabs from "../informationTabs/InformationTabs";
-import PanelToggleButtons from "./components/PanelToggleButtons";
+import PanelRail, { RailButton } from "./components/PanelToggleButtons";
+import BottomQuestionDock from "./components/BottomQuestionDock";
+import PanelCollapseHandle from "./components/PanelCollapseHandle";
 import HelpIcon from "../shared/components/HelpIcon";
 import styles from "./MemoryModelEditor.module.css";
 
@@ -375,6 +377,7 @@ export default function MemoryModelEditor({
     visualStyle: state.visualStyle,
     pythonTutorReferenceArrows: state.pythonTutorReferenceArrows,
     pythonTutorStandalonePrimitives: state.pythonTutorStandalonePrimitives,
+    questionAtBottom: state.questionAtBottom,
     showLinkedListView: state.showLinkedListView,
     structurePanelCollapsed: state.structurePanelCollapsed,
     structurePanelHeight: state.structurePanelHeight,
@@ -541,14 +544,85 @@ export default function MemoryModelEditor({
     };
   }, [refs.mainContainerRef, state.setInfoPanelWidth]);
 
+  // Global shortcuts (see docs/keyboard-shortcuts.md), ignored while typing:
+  //   [ / ]          hide or show the palette / question panel
+  //   Cmd/Ctrl+Z     undo;  Shift+Cmd/Ctrl+Z or Ctrl+Y  redo
+  const setPaletteOpen = state.setIsPaletteOpen;
+  const setInfoOpen = state.setIsInfoPanelOpen;
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t?.closest?.("input, textarea, select, [contenteditable='true']")) return;
+      const mod = e.metaKey || e.ctrlKey;
+      const key = e.key.toLowerCase();
+      if (mod && !e.altKey && (key === "z" || (key === "y" && e.ctrlKey))) {
+        e.preventDefault();
+        if (key === "y" || e.shiftKey) redo();
+        else undo();
+        return;
+      }
+      if (mod || e.altKey || (e.key !== "[" && e.key !== "]")) return;
+      e.preventDefault();
+      if (e.key === "[") setPaletteOpen((open) => !open);
+      else setInfoOpen((open) => !open);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [setPaletteOpen, setInfoOpen, undo, redo]);
+
+  const canvasColumnRef = useRef<HTMLDivElement>(null);
+  const informationTabs = (layout: "column" | "row") => (
+      <InformationTabs
+        layout={layout}
+        linkedQuestion={state.linkedQuestion}
+        onQuestionLinkConsumed={() => state.setLinkedQuestion(null)}
+        submissionResults={state.submissionResults}
+        questionSelected={state.selectedQuestionIndex !== null}
+        questionIndex={state.selectedQuestionIndex}
+        setQuestionIndex={state.setSelectedQuestionIndex}
+        questionType={state.selectedQuestionType}
+        setQuestionType={state.setSelectedQuestionType}
+        questionView={state.questionView}
+        setQuestionView={state.setQuestionView}
+        onSubmit={isTutorial() ? async () => {
+          const checkedKey = tutorialModelKey;
+          setTutorialCheckedModel(null);
+          const correct = await handleCanvasSubmit();
+          setTutorialCheckedModel(checkedKey);
+          return correct;
+        } : handleCanvasSubmit}
+        onSubmitAtLine={isTutorial() ? async (line, iteration) => {
+          setTutorialCheckedModel(null);
+          return handleCanvasSubmitAtLine(line, iteration);
+        } : handleCanvasSubmitAtLine}
+        setSubmissionResults={state.setSubmissionResults}
+        onClearCanvas={clearCanvas}
+        onRestoreCanvas={restoreCanvas}
+        currentCanvasState={currentCanvasState}
+        masterErrorList={masterErrorList}
+        elements={state.elements}
+        setElements={state.setElements}
+        onOpenEditor={openEditor || (() => {})}
+        isSandboxMode={state.isSandboxMode}
+        onQuestionDataChange={setCurrentQuestionData}
+        tabScrollPositions={state.tabScrollPositions}
+        setTabScrollPositions={state.setTabScrollPositions}
+        fontScale={fontScale}
+      />
+  );
+
   return (
     <div className={`${styles.editorContainer} ${isTutorial() ? "tutorial-workspace" : ""}`}>
-      <PanelToggleButtons
-        isPaletteOpen={state.isPaletteOpen}
-        isInfoPanelOpen={state.isInfoPanelOpen}
-        onTogglePalette={() => state.setIsPaletteOpen((prev) => !prev)}
-        onToggleInfoPanel={() => state.setIsInfoPanelOpen((prev) => !prev)}
-      />
+      {!state.isPaletteOpen && (
+        <PanelRail side="left" label="Palette" shortcut="[" onExpand={() => state.setIsPaletteOpen(true)}>
+          <RailButton title="Undo" onClick={undo} disabled={!canUndo}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+          </RailButton>
+          <RailButton title="Redo" onClick={redo} disabled={!canRedo}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg>
+          </RailButton>
+        </PanelRail>
+      )}
 
       {state.isPaletteOpen && (
         <>
@@ -601,6 +675,8 @@ export default function MemoryModelEditor({
                 pythonTutorStandalonePrimitives={
                   state.pythonTutorStandalonePrimitives
                 }
+                questionAtBottom={state.questionAtBottom}
+                onQuestionAtBottomChange={state.setQuestionAtBottom}
                 onPythonTutorStandalonePrimitivesChange={
                   state.setPythonTutorStandalonePrimitives
                 }
@@ -615,12 +691,14 @@ export default function MemoryModelEditor({
           <div
             className={styles.resizeDivider}
             onMouseDown={() => setIsResizingPalette(true)}
-          />
+          >
+            <PanelCollapseHandle direction="left" label="Hide palette ([)" onCollapse={() => state.setIsPaletteOpen(false)} />
+          </div>
         </>
       )}
 
       <div data-tour="main-container" ref={refs.mainContainerRef} className={styles.mainContainer}>
-        <div data-tour="canvas-column" className={styles.canvasColumn}>
+        <div data-tour="canvas-column" ref={canvasColumnRef} className={styles.canvasColumn}>
           <div data-tour="canvas" className={styles.canvasArea}>
             <Canvas
               key={state.canvasResetKey}
@@ -651,7 +729,10 @@ export default function MemoryModelEditor({
                   : undefined
               }
               isQuestionMode={isTutorial() || state.selectedQuestionIndex !== null}
-              preserveCollapsedWorkspace={state.showLinkedListView}
+              // With the question docked below, its drag bar already sets the
+              // canvas height; keeping a hidden scroll area for the Linked List
+              // panel there only left blank space under the call stack.
+              preserveCollapsedWorkspace={state.showLinkedListView && !state.questionAtBottom}
               workspaceHeightOffset={
                 state.showLinkedListView && !state.structurePanelCollapsed
                   ? state.structurePanelHeight +
@@ -667,6 +748,16 @@ export default function MemoryModelEditor({
             </div>
           </div>
 
+          {state.questionAtBottom && (
+            <BottomQuestionDock
+              open={state.isInfoPanelOpen}
+              onOpenChange={state.setIsInfoPanelOpen}
+              columnRef={canvasColumnRef}
+            >
+              {informationTabs("row")}
+            </BottomQuestionDock>
+          )}
+
           <StructurePanel
             enabled={state.showLinkedListView}
             elements={state.elements}
@@ -681,12 +772,14 @@ export default function MemoryModelEditor({
           )}
         </div>
 
-        {state.isInfoPanelOpen && (
+        {state.isInfoPanelOpen && !state.questionAtBottom && (
           <>
             <div
               className={styles.resizeDivider}
               onMouseDown={() => state.setIsResizingInfoPanel(true)}
-            />
+            >
+              <PanelCollapseHandle direction="right" label="Hide question (])" onCollapse={() => state.setIsInfoPanelOpen(false)} />
+            </div>
 
             <div
               data-tour="info-panel" className={`${styles.infoPanel} ${
@@ -703,44 +796,13 @@ export default function MemoryModelEditor({
                 )}px`,
               }}
             >
-              <InformationTabs
-                linkedQuestion={state.linkedQuestion}
-                onQuestionLinkConsumed={() => state.setLinkedQuestion(null)}
-                submissionResults={state.submissionResults}
-                questionSelected={state.selectedQuestionIndex !== null}
-                questionIndex={state.selectedQuestionIndex}
-                setQuestionIndex={state.setSelectedQuestionIndex}
-                questionType={state.selectedQuestionType}
-                setQuestionType={state.setSelectedQuestionType}
-                questionView={state.questionView}
-                setQuestionView={state.setQuestionView}
-                onSubmit={isTutorial() ? async () => {
-                  const checkedKey = tutorialModelKey;
-                  setTutorialCheckedModel(null);
-                  const correct = await handleCanvasSubmit();
-                  setTutorialCheckedModel(checkedKey);
-                  return correct;
-                } : handleCanvasSubmit}
-                onSubmitAtLine={isTutorial() ? async (line, iteration) => {
-                  setTutorialCheckedModel(null);
-                  return handleCanvasSubmitAtLine(line, iteration);
-                } : handleCanvasSubmitAtLine}
-                setSubmissionResults={state.setSubmissionResults}
-                onClearCanvas={clearCanvas}
-                onRestoreCanvas={restoreCanvas}
-                currentCanvasState={currentCanvasState}
-                masterErrorList={masterErrorList}
-                elements={state.elements}
-                setElements={state.setElements}
-                onOpenEditor={openEditor || (() => {})}
-                isSandboxMode={state.isSandboxMode}
-                onQuestionDataChange={setCurrentQuestionData}
-                tabScrollPositions={state.tabScrollPositions}
-                setTabScrollPositions={state.setTabScrollPositions}
-                fontScale={fontScale}
-              />
+              {informationTabs("column")}
             </div>
           </>
+        )}
+
+        {!state.isInfoPanelOpen && !state.questionAtBottom && (
+          <PanelRail side="right" label="Question" shortcut="]" onExpand={() => state.setIsInfoPanelOpen(true)} />
         )}
       </div>
 

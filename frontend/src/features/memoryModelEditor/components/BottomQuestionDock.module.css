@@ -1,0 +1,103 @@
+.divider {
+  position: relative;
+  flex-shrink: 0;
+  height: var(--resize-handle-width, 8px);
+  cursor: row-resize;
+  user-select: none;
+  transition: background-color 0.15s ease;
+}
+
+.divider:hover {
+  background: var(--bg-hover);
+}
+
+.divider::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 3px;
+  border-radius: 2px;
+  background: transparent;
+  transition: background 0.15s ease;
+}
+
+.divider:hover::before {
+  background: var(--accent-blue);
+}
+
+.collapse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 18px;
+  padding: 0;
+  border-radius: 9px;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  opacity: 0.55;
+}
+
+/* Chevrons point down (hide) / up (show). */
+.collapse svg {
+  transform: rotate(90deg);
+}
+
+.collapse:hover,
+.collapse:focus-visible {
+  opacity: 1;
+  color: var(--accent-blue);
+}
+
+.dock {
+  flex-shrink: 0;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+}
+
+.collapsedBar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 30px;
+  margin-top: 6px;
+  border-radius: 10px;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  color: var(--text-tertiary, var(--text-secondary));
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.collapsedBar svg {
+  transform: rotate(90deg);
+}
+
+.collapsedBar:hover {
+  color: var(--accent-blue);
+}
+
+.collapsedBar kbd {
+  font-size: 10px;
+  letter-spacing: 0;
+  padding: 0 4px;
+  border-radius: 4px;
+  border: 1px solid var(--border-primary);
+}

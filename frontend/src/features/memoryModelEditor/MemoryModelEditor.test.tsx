@@ -1,6 +1,7 @@
 import React from "react";
 import { fireEvent, render } from "@testing-library/react";
 import MemoryModelEditor from "./MemoryModelEditor";
+import { UI_STORAGE_KEY } from "./utils/localStorage";
 
 jest.mock("../canvas/Canvas", () => ({
   __esModule: true,
@@ -25,6 +26,8 @@ jest.mock("../informationTabs/InformationTabs", () => ({
 jest.mock("./components/PanelToggleButtons", () => ({
   __esModule: true,
   default: () => null,
+  RailButton: () => null,
+  Chevron: () => null,
 }));
 
 jest.mock("./hooks/useResponsivePanels", () => ({
@@ -72,6 +75,8 @@ describe("MemoryModelEditor info panel resizing", () => {
 
   beforeEach(() => {
     localStorage.clear();
+    // These tests cover the right-side panel; the default is the bottom dock.
+    localStorage.setItem(UI_STORAGE_KEY, JSON.stringify({ questionPanel: "side" }));
     containerWidth = 1200;
     innerWidthDescriptor = Object.getOwnPropertyDescriptor(window, "innerWidth");
     Object.defineProperty(window, "innerWidth", {

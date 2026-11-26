@@ -134,6 +134,21 @@
   outline-offset: 2px;
 }
 
+/* The demo has buttons on both sides ("Exit demo", "Show guide"). */
+.titleRowDemo {
+  grid-template-columns: 6.5rem minmax(0, 1fr) 6.5rem;
+}
+
+.titleRowDemo .backBtn {
+  white-space: nowrap;
+}
+
+.guideBtn {
+  grid-column: 3;
+  justify-self: end;
+  white-space: nowrap;
+}
+
 .questionArea {
   max-width: 750px;
   margin: 0 auto;

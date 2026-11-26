@@ -106,6 +106,9 @@
   min-height: 0;
   box-sizing: border-box;
   transition: background-color 200ms ease, border-color 200ms ease;
+  /* Room for the round Help button fixed in the bottom-right corner, so the
+     last feedback action can scroll clear of it. */
+  padding-bottom: 58px;
 }
 
 .resizeDivider {

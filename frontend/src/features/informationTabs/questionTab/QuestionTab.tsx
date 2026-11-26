@@ -1,6 +1,7 @@
 import { studyTaskLabel } from "./utils/studyTasks";
 import { isTutorial, exitTutorial } from "../../tutorial/tutorialStorage";
 import { workspaceStorage } from "../../tutorial/tutorialStorage";
+import { GuideToggleButton } from "../../tutorial/guideToggle";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import {
@@ -945,7 +946,7 @@ export default function QuestionTab({
   return (
     <>
       <div className={styles.wrapper}>
-        <div className={styles.titleRow}>
+        <div className={`${styles.titleRow} ${isTutorial() ? styles.titleRowDemo : ""}`}>
           {(view === "list" ||
             view === "question" ||
             view === "stepbystep") && (
@@ -963,6 +964,7 @@ export default function QuestionTab({
               {isTutorial() ? "← Exit demo" : "← Back"}
             </button>
           )}
+          {isTutorial() && <GuideToggleButton className={`${styles.backBtn} ${styles.guideBtn}`} />}
           <div className={styles.titleStack}>
             <h1 className={styles.title}>{getHeading()}</h1>
             {view === "question" &&

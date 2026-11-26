@@ -79,6 +79,9 @@ html { zoom: var(--ui-scale); }
   --help-lesson-padding: var(--help-preferred-lesson-padding);
   --tutorial-dock-layer: 100002;
   --tutorial-help-layer: 100003;
+  /* Modal dialogs and help popups sit above every tutorial layer, so the
+     guide card never hides a dialog's buttons. */
+  --dialog-layer: 100004;
   --help-backdrop-blur: 4px;
   --help-shadow: 0 16px 48px #0f172a33;
 }

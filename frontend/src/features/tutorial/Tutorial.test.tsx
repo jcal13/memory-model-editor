@@ -1,6 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import Tutorial, { nextAction } from './Tutorial';
+import type { ComponentProps } from 'react';
+import TutorialOnly, { nextAction } from './Tutorial';
+import { GuideToggleButton } from './guideToggle';
+// The Show/Hide guide button is rendered by the question panel header.
+const Tutorial = (props: ComponentProps<typeof TutorialOnly>) => <><TutorialOnly {...props}/><GuideToggleButton/></>;
 import { normalizeTutorialUrl, workspaceStorage } from './tutorialStorage';
 import { CanvasElement } from '../shared/types';
 const model = (): CanvasElement[] => [
@@ -23,7 +27,7 @@ test('hide and resume preserve the exact lesson even while the model changes',()
  const {rerender}=render(<Tutorial elements={[]} correct={false}/>);
  fireEvent.click(screen.getByRole('button',{name:'Hide guide'}));
  rerender(<Tutorial elements={m} correct={false}/>);
- fireEvent.click(screen.getByRole('button',{name:'Resume guide'}));
+ fireEvent.click(screen.getByRole('button',{name:'Show guide'}));
  expect(screen.getByRole('dialog',{name:'Build your first memory model'})).toBeInTheDocument();
  expect(window.location.search).toBe('?tutorial=1');
 });
@@ -33,7 +37,7 @@ test('finish keeps the tutorial exercise open and guide can be reopened',()=>{
  fireEvent.click(screen.getByRole('button',{name:'Finish'}));
  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
  expect(window.location.search).toBe('?tutorial=1');
- fireEvent.click(screen.getByRole('button',{name:'Resume guide'}));
+ fireEvent.click(screen.getByRole('button',{name:'Show guide'}));
  expect(screen.getByRole('dialog',{name:'You’ve built your first model'})).toBeInTheDocument();
 });
 test('progress follows references, handles undo, and never assumes id1 means value5',()=>{
@@ -55,7 +59,7 @@ test('completed actions advance instructions automatically',()=>{
 test('guidance and resume controls are unavailable on other questions',()=>{
  render(<Tutorial elements={model()} correct={false} demoActive={false}/>);
  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
- expect(screen.queryByRole('button',{name:/Resume guide|Hide guide/})).not.toBeInTheDocument();
+ expect(screen.queryByRole('button',{name:/Show guide|Hide guide/})).not.toBeInTheDocument();
  expect(screen.getByRole('button',{name:'Help and guide'})).toBeInTheDocument();
 });
 test('native drag removes all dimming until the drop completes',()=>{
@@ -88,7 +92,7 @@ test('welcome resumes at step one and only one Hide control exists',()=>{
  render(<Tutorial elements={[]} correct={false}/>);
  expect(screen.queryByRole('button',{name:'Hide'})).not.toBeInTheDocument();
  fireEvent.click(screen.getByRole('button',{name:'Hide guide'}));
- fireEvent.click(screen.getByRole('button',{name:'Resume guide'}));
+ fireEvent.click(screen.getByRole('button',{name:'Show guide'}));
  expect(screen.getByRole('dialog',{name:'Build your first memory model'})).toBeInTheDocument();
 });
 

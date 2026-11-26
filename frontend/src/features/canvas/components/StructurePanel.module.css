@@ -54,6 +54,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 6px 12px;
+  /* Keep the collapse button clear of the round Help button fixed in the
+     bottom-right corner (the header sits there when the panel is collapsed). */
+  padding-right: 60px;
   border-bottom: 1px solid var(--border-secondary);
 }
 

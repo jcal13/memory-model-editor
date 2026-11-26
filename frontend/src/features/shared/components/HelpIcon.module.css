@@ -33,7 +33,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 99999;
+  z-index: var(--dialog-layer, 100004);
   display: flex;
   align-items: center;
   justify-content: center;

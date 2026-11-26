@@ -575,6 +575,13 @@ export default function MemoryModelEditor({
     };
   }, [refs.mainContainerRef, state.setInfoPanelWidth]);
 
+  // The tutorial builds each object before naming it (Python's order), so in
+  // Python Tutor style the demo always draws primitives as their own boxes.
+  // The saved setting is untouched and its toggle is hidden during the demo.
+  const tutorialDemo = isDemoQuestion(state.selectedQuestionIndex, state.selectedQuestionType, state.questionView);
+  const standalonePrimitives =
+    state.pythonTutorStandalonePrimitives || (tutorialDemo && state.visualStyle === "pythonTutor");
+
   // Global shortcuts (see docs/keyboard-shortcuts.md), ignored while typing:
   //   [ / ]          hide or show the palette / question panel
   //   Cmd/Ctrl+Z     undo;  Shift+Cmd/Ctrl+Z or Ctrl+Y  redo
@@ -704,15 +711,13 @@ export default function MemoryModelEditor({
                 onPythonTutorReferenceArrowsChange={
                   state.setPythonTutorReferenceArrows
                 }
-                pythonTutorStandalonePrimitives={
-                  state.pythonTutorStandalonePrimitives
-                }
                 gridLayout={state.gridLayout}
                 onGridLayoutChange={state.setGridLayout}
                 questionAtBottom={state.questionAtBottom}
                 onQuestionAtBottomChange={state.setQuestionAtBottom}
+                pythonTutorStandalonePrimitives={standalonePrimitives}
                 onPythonTutorStandalonePrimitivesChange={
-                  state.setPythonTutorStandalonePrimitives
+                  tutorialDemo ? undefined : state.setPythonTutorStandalonePrimitives
                 }
                 showLinkedListView={state.showLinkedListView}
                 onShowLinkedListViewChange={state.setShowLinkedListView}
@@ -757,9 +762,7 @@ export default function MemoryModelEditor({
               editorScale={editorScale}
               visualStyle={state.visualStyle}
               pythonTutorReferenceArrows={state.pythonTutorReferenceArrows}
-              pythonTutorStandalonePrimitives={
-                state.pythonTutorStandalonePrimitives
-              }
+              pythonTutorStandalonePrimitives={standalonePrimitives}
               gridLayout={state.gridLayout}
               textView={state.textView}
               onKeyboardAddReady={handleKeyboardAddReady}
@@ -852,7 +855,7 @@ export default function MemoryModelEditor({
         )}
       </div>
 
-      <Tutorial submissionFailed={tutorialCheckedModel === tutorialModelKey && state.submissionResults?.correct === false} demoActive={isDemoQuestion(state.selectedQuestionIndex, state.selectedQuestionType, state.questionView)} elements={state.elements} correct={tutorialCheckedModel === tutorialModelKey && state.submissionResults?.correct === true} />
+      <Tutorial submissionFailed={tutorialCheckedModel === tutorialModelKey && state.submissionResults?.correct === false} demoActive={tutorialDemo} mainFrameLabel={state.visualStyle === "pythonTutor" ? "the Global frame" : undefined} elements={state.elements} correct={tutorialCheckedModel === tutorialModelKey && state.submissionResults?.correct === true} />
 
       {state.showClearCanvasModal && (
         <ConfirmationModal

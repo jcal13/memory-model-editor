@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { inlineEditingEnabled } from "../inlineEditing/enabled";
 
 function Icon({ kind }: { kind: "compass" | "book" | "box" | "link" | "check" | "sliders" }) {
   const paths: Record<string, ReactNode> = {
@@ -13,6 +14,7 @@ function Icon({ kind }: { kind: "compass" | "book" | "box" | "link" | "check" | 
 }
 
 export default function HelpContent({ onStart }: { onStart: () => void }) {
+  const inline = inlineEditingEnabled();
   return <>
     <p className="help-intro">Learn to turn Python code into a picture of memory.</p>
     <button className="tutorial-launch" onClick={onStart}>
@@ -28,19 +30,38 @@ export default function HelpContent({ onStart }: { onStart: () => void }) {
     </section>
     <section className="help-lesson">
       <span className="help-icon help-violet"><Icon kind="box"/></span>
-      <div><h2>2. Add and edit objects</h2><p>Drag an <b>int</b> from the left palette onto the canvas. Click the box and enter <b>5</b> in its value field.</p><span className="help-tip">Drag to place · Click to edit · Changes save automatically</span></div>
+      <div><h2>2. Add and edit objects</h2>{inline
+        ? <><p>Drag an <b>int</b> from the left palette onto the canvas, type <b>5</b>, and press Enter. To change a value later, click it right in the box.</p><span className="help-tip">Drag to place · Click any part of a box to edit it · Changes save automatically</span></>
+        : <><p>Drag an <b>int</b> from the left palette onto the canvas. Click the box and enter <b>5</b> in its value field.</p><span className="help-tip">Drag to place · Click to edit · Changes save automatically</span></>}</div>
     </section>
     <section className="help-lesson">
       <span className="help-icon help-amber"><Icon kind="link"/></span>
-      <div><h2>3. Connect variables to objects</h2><p>Open <code>__main__</code>, choose <b>Add Variable</b>, and name it <b>a</b>. Use its ID selector to choose the object containing 5.</p><div className="help-memory" aria-label="Variable a references object ID 1, an integer with value 5"><span className="help-variable">a <small>variable</small></span><span aria-hidden="true">→</span><span className="help-object"><span><b>id1</b><b>int</b></span><strong>5</strong></span></div><span className="help-tip">An ID identifies an object. It is different from the object’s value.</span></div>
+      <div><h2>3. Connect variables to objects</h2>{inline
+        ? <p>Hover <code>__main__</code> and click the <b>+</b> on its bottom edge. Type <b>a</b>, press Enter, then type the ID of the object containing 5 (or drag from the ID slot onto that object).</p>
+        : <p>Open <code>__main__</code>, choose <b>Add Variable</b>, and name it <b>a</b>. Use its ID selector to choose the object containing 5.</p>}<div className="help-memory" aria-label="Variable a references object ID 1, an integer with value 5"><span className="help-variable">a <small>variable</small></span><span aria-hidden="true">→</span><span className="help-object"><span><b>id1</b><b>int</b></span><strong>5</strong></span></div><span className="help-tip">An ID identifies an object. It is different from the object’s value.</span></div>
     </section>
     <section className="help-lesson">
       <span className="help-icon help-green"><Icon kind="check"/></span>
       <div><h2>4. Check and learn</h2><p>Click <b>Submit</b>, read the feedback below the question, then revise your model. Highlighted line numbers let you check an earlier point in the code.</p></div>
     </section>
+    <section className="help-lesson">
+      <span className="help-icon help-blue"><Icon kind="sliders"/></span>
+      <div><h2>Keyboard shortcuts</h2>
+        <ul className="help-keys">
+          <li><kbd>[</kbd> / <kbd>]</kbd> hide or show the palette / question panel</li>
+          <li><kbd>⌘/Ctrl</kbd>+<kbd>Z</kbd> undo · <kbd>⇧</kbd>+<kbd>⌘/Ctrl</kbd>+<kbd>Z</kbd> redo</li>
+          {inline && <li>Click any value, name, type or ID to edit it · <kbd>Enter</kbd> save · <kbd>Tab</kbd> next field · <kbd>Esc</kbd> cancel</li>}
+          {inline && <li><kbd>N</kbd> add an object (pick a type with the arrow keys or its letter), or focus a palette box and press <kbd>Enter</kbd></li>}
+          {inline && <li><kbd>Tab</kbd> moves between boxes · arrow keys move the focused box (<kbd>⇧</kbd> for bigger steps) · <kbd>Enter</kbd> edits it · <kbd>+</kbd> adds a variable, element or pair</li>}
+          {inline && <li><kbd>Delete</kbd> removes the selected box · <kbd>⇧</kbd>+<kbd>Delete</kbd> (or <kbd>⇧</kbd>+<kbd>⌘/Ctrl</kbd>+<kbd>⌫</kbd>) while editing a slot removes that slot</li>}
+          {inline && <li>In an ID or type list, <kbd>↑</kbd> / <kbd>↓</kbd> choose a suggestion and <kbd>Enter</kbd> picks it</li>}
+          <li>Canvas Controls → View → <b>Text View</b> shows your model as text (screen readers can always read it)</li>
+        </ul>
+      </div>
+    </section>
     <section className="help-lesson help-tools">
       <span className="help-icon help-blue"><Icon kind="sliders"/></span>
-      <div><h2>Make room to think</h2><p>Drag the panel divider to widen the question. Use <b>Undo / Redo</b> for small changes, <b>Reset</b> for a fresh attempt, and <b>Download</b> to export your model.</p><p className="help-tip">During the demo: Hide / Resume guide pauses the instructions. Finish leaves the demo open; Exit tutorial restores your regular workspace.</p></div>
+      <div><h2>Make room to think</h2><p>Drag the panel divider to widen the question. Use <b>Undo / Redo</b> for small changes, <b>Reset</b> for a fresh attempt, and <b>Download</b> to export your model.</p><p className="help-tip">During the demo: Hide / Show guide (top of the question panel) pauses the instructions. Finish leaves the demo open; Exit demo restores your regular workspace.</p></div>
     </section>
   </>;
 }

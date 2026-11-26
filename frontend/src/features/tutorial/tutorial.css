@@ -77,3 +77,5 @@
   --help-lesson-padding: clamp(var(--workspace-gap), calc(2dvh / var(--ui-scale, 1)), var(--help-preferred-lesson-padding));
 }
 .tutorial-help-shell .tutorial-launch { padding: var(--help-lesson-padding); }
+.help-keys { margin: 4px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.9; }
+.help-keys kbd { display: inline-block; min-width: 1.4em; padding: 0 5px; border: 1px solid #cbd5e0; border-bottom-width: 2px; border-radius: 4px; background: #f7fafc; color: #2d3748; font: 600 11px/1.6 ui-monospace, Menlo, monospace; text-align: center; }

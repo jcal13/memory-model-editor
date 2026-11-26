@@ -3,11 +3,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { CanvasElement } from "../shared/types";
 import { hasAssignment } from "./tutorialModel";
-import { exitTutorial, isTutorial, startTutorial, workspaceStorage } from "./tutorialStorage";
+import { isTutorial, startTutorial, workspaceStorage } from "./tutorialStorage";
 import { lessonTarget, targetBounds, placeCard } from "./tutorialTargets";
 import { assignmentRepair } from "./tutorialRepair";
 import HelpContent from "./HelpContent";
 import { questionTypes } from "../informationTabs/questionTab/utils/questionLinks";
+import { inlineEditingEnabled } from "../inlineEditing/enabled";
+import { setGuideToggle } from "./guideToggle";
 import "./tutorial.css";
 
 // Beamer+ pattern: declarative steps, measured targets, and a transparent spotlight.
@@ -19,8 +21,28 @@ const steps = [
   { title: "Build b = 4", body: "Drag another int onto the canvas and change its value to 4. In __main__, add variable b and select the ID of the object containing 4. Keep the object containing 5 for a.", target: "" },
   { title: "Build c = 6", body: "Add an integer object containing 6. Add c to __main__ and reference that object’s ID. Keep a pointing to 5 and b pointing to 4.", target: "" },
   { title: "Submit and read the feedback", body: "Click Submit to check your model. If you followed the previous steps, your model should pass. We’ll look at the result in the Feedback panel next.", target: '[data-tour="submit"]' },
-  { title: "You’ve built your first model", body: "You added objects, edited values, connected references, and checked your answer. Finish closes the guide and leaves you here to explore. Resume guide and Help remain in the bottom-right corner; Exit tutorial returns to your regular workspace.", target: "" },
+  { title: "You’ve built your first model", body: "You added objects, edited values, connected references, and checked your answer. Finish closes the guide and leaves you here to explore. Show guide and Exit demo stay at the top of the question panel, and Help is the ? in the bottom-right corner. Exit demo returns to your regular workspace.", target: "" },
 ];
+
+/** How to do a repair step by editing directly on the canvas. */
+export function inlineHint(step: number, elements: CanvasElement[]): string {
+  if (step < 2 || step > 5) return "";
+  const repair = assignmentRepair(step, elements);
+  if (/already points/.test(repair.text) || /Restore the __main__/.test(repair.text)) return "";
+  if (repair.reference) {
+    // The variable exists already: only its ID needs changing, not a new row.
+    if (/existing variable/.test(repair.text))
+      return "Tip: click the variable's ID slot in __main__ (or press Enter, then Tab), type the ID, and press Enter. Dragging from the slot onto the object works too.";
+    // Teach typing the ID first, then offer dragging as the alternative.
+    if (step === 4)
+      return "Tip: __main__ is selected, so press + (or hover it and click the + at its bottom), type b, press Enter, then type the ID. Or, instead of typing the ID, drag from the empty id_ slot onto the object.";
+    if (step === 5)
+      return "Tip: this time try dragging: add c with + (__main__ is selected), press Enter, then drag from its empty id_ slot onto the object containing 6. Typing the ID works too.";
+    return "Tip: __main__ is selected, so press + (or hover it and click the + at its bottom), type the name, press Enter, then type the ID. Click an ID to change it.";
+  }
+  if (repair.target) return "Tip: click the value inside the object, type, and press Enter.";
+  return "Tip: drag an int from the palette (or press N, then I), type its value, and press Enter.";
+}
 
 export function nextAction(elements: CanvasElement[], correct: boolean) {
   const integers = elements.filter(e => !e.invalidated && e.kind.name === "primitive" && e.kind.type === "int");
@@ -32,7 +54,7 @@ export function nextAction(elements: CanvasElement[], correct: boolean) {
   return correct ? 7 : 6;
 }
 
-export default function Tutorial({ elements, correct, submissionFailed = false, demoActive = isTutorial() }: { elements: CanvasElement[]; correct: boolean; submissionFailed?: boolean; demoActive?: boolean }) {
+export default function Tutorial({ elements, correct, submissionFailed = false, demoActive = isTutorial(), mainFrameLabel }: { elements: CanvasElement[]; correct: boolean; submissionFailed?: boolean; demoActive?: boolean; /** How the main frame is labelled on screen, e.g. "the Global frame" in Python Tutor style. */ mainFrameLabel?: string }) {
   const active = demoActive;
   const action = nextAction(elements, correct);
   const [step, setStep] = useState(() => active && workspaceStorage.getItem("started") === "true" ? Math.min(action, 6) : 0);
@@ -62,13 +84,44 @@ export default function Tutorial({ elements, correct, submissionFailed = false, 
     : step === 1 && hasInteger
     ? "You already added an integer object to the canvas. This step is complete; you do not need to drag another box. Click Next to review setting its value."
     : step >= 2 && step <= 5
-    ? assignmentRepair(step, elements).text
+    ? [assignmentRepair(step, elements).text, inlineEditingEnabled() ? inlineHint(step, elements) : ""].filter(Boolean).join(" ")
+    : step === 1 && inlineEditingEnabled()
+    ? "Drag the int box from the palette onto the middle canvas, or press N and then I to add one from the keyboard. An integer box represents an object in memory."
     : current.body;
+  const shownInstruction = mainFrameLabel
+    ? instruction.replace(/the __main__ frame/g, mainFrameLabel).replace(/__main__/g, mainFrameLabel)
+    : instruction;
   const editing = elements.find(e => e.boxId === editingId);
   const context = editing?.kind.name === "primitive"
     ? `You are editing object ID ${editing.id}, currently containing ${editing.kind.value}. ${Number(editing.kind.value) === 4 ? "Keep this value for b." : Number(editing.kind.value) === 5 ? "Keep this value for a." : Number(editing.kind.value) === 6 ? "Keep this value for c." : "Set its value for the assignment you are building."}`
     : null;
   const showGuide = useCallback((visible: boolean) => { setGuidance(visible); if (active) workspaceStorage.setItem("guidance", visible ? "shown" : "hidden"); }, [active]);
+  // The Show/Hide guide button lives in the question panel header (next to
+  // "Exit demo"), so the corner only holds the round Help button.
+  useEffect(() => {
+    if (!active || !isTutorial()) { setGuideToggle(null); return; }
+    setGuideToggle({ visible: guidance, toggle: () => showGuide(!guidance) });
+    return () => setGuideToggle(null);
+  }, [active, guidance, showGuide]);
+  // When the task becomes "add the variable", put keyboard focus on __main__
+  // (which selects it), so "+" adds the row straight away. Only on that change,
+  // and never while the student is typing in a field.
+  const mainFrame = elements.find(e => e.kind.name === "function" && e.kind.functionName === "__main__");
+  const addingVariable = active && guidance && !help && !showingFeedback && inlineEditingEnabled()
+    && (step === 3 || ((step === 4 || step === 5) && assignmentRepair(step, elements).reference));
+  const mainBoxId = mainFrame?.boxId;
+  useEffect(() => {
+    if (!addingVariable || mainBoxId === undefined) return;
+    const timer = window.setTimeout(() => {
+      const busy = document.activeElement?.closest?.("input, textarea, select, [contenteditable='true'], [role='dialog']");
+      if (busy) return;
+      const frame = document.querySelector<SVGGElement>(`g[data-canvas-box-id="${mainBoxId}"]`);
+      if (!frame) return;
+      frame.setAttribute("tabindex", "0");
+      frame.focus({ preventScroll: true });
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [addingVariable, step, mainBoxId]);
   // Hidden guidance preserves its exact lesson, even if students explore meanwhile.
   // Back remains usable until another task is completed or undone.
   useEffect(() => {
@@ -154,14 +207,13 @@ export default function Tutorial({ elements, correct, submissionFailed = false, 
 
   return createPortal(<>
     <div className="tutorial-dock">
-      {isTutorial() && <>{active && <button onClick={() => { showGuide(!guidance); }}>{guidance ? "Hide guide" : "Resume guide"}</button>}<button onClick={exitTutorial}>Exit tutorial</button></>}
       <button className="tutorial-help-button" aria-label="Help and guide" title="Help and guide" onClick={() => setHelp(true)}>?</button>
     </div>
     {active && guidance && !help && <div className="tutorial-layer">
       {!draggingBox && (rect ? <div className="tutorial-spotlight" style={rect}/> : (step === 0 || step === 7) ? <div className="tutorial-dim"/> : null)}
       <div ref={card} className="tutorial-card" style={{...position, pointerEvents: interacting ? "none" : "auto", opacity: draggingBox ? 0 : 1}} role="dialog" aria-label={current.title}>
         <div className="tutorial-heading"><span>Step {step+1} of {steps.length}</span></div>
-        <h2>{current.title}</h2><p>{instruction}</p>
+        <h2>{current.title}</h2><p>{shownInstruction}</p>
         {context && step > 0 && step < 7 && <p className="tutorial-note" role="status">{context}</p>}
         <div className="tutorial-actions"><button disabled={step===0} onClick={() => setStep(s=>s-1)}>Back</button><button className="tutorial-primary" disabled={step > 0 && step >= action && step < 7} onClick={() => { if (step===7) showGuide(false); else setStep(Math.min(step+1,7)); }}>{step===7 ? "Finish" : "Next"}</button></div>
       </div>

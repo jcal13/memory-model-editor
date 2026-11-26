@@ -316,10 +316,11 @@ export default function CanvasControls({
                 </div>
               )}
 
-            {visualStyle === "pythonTutor" &&
-              onPythonTutorReferenceArrowsChange && (
+            {onPythonTutorReferenceArrowsChange && (
                 <div
-                  className={`${styles.controlItem} ${styles.nestedControlItem}`}
+                  className={`${styles.controlItem} ${
+                    visualStyle === "pythonTutor" ? styles.nestedControlItem : ""
+                  }`}
                 >
                   <span className={styles.labelGroup}>
                     <label
@@ -328,7 +329,9 @@ export default function CanvasControls({
                     >
                       Reference Arrows
                     </label>
-                    <HelpIcon title="Reference Arrows" text="Draws arrows from variables and containers to the objects they reference, instead of just showing the referenced ID." />
+                    <HelpIcon title="Reference Arrows" text={visualStyle === "pythonTutor"
+                      ? "Draws arrows from variables and containers to the objects they reference, instead of just showing the referenced ID."
+                      : "Draws an arrow from every ID slot to the object with that ID. The IDs stay visible; the arrows make the references easier to follow."} />
                   </span>
                   <button
                     id="python-tutor-reference-arrows-toggle"

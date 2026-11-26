@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { render, waitFor } from "@testing-library/react";
-import PythonTutorReferenceArrows from "./PythonTutorReferenceArrows";
+import ReferenceArrows from "./ReferenceArrows";
 
 class ResizeObserverMock {
   observe() {}
@@ -46,7 +46,7 @@ function Harness({
         data-canvas-render-mode="canvas"
       />
       <circle data-ref-source-target-id="2" />
-      <PythonTutorReferenceArrows
+      <ReferenceArrows
         svgRef={svgRef}
         enabled={enabled}
         includePrimitiveTargets={includePrimitiveTargets}
@@ -77,7 +77,7 @@ function parseCubicPath(pathData: string) {
   };
 }
 
-describe("PythonTutorReferenceArrows", () => {
+describe("ReferenceArrows", () => {
   beforeAll(() => {
     (global as typeof globalThis).ResizeObserver =
       ResizeObserverMock as unknown as typeof ResizeObserver;

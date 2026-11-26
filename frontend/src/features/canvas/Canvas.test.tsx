@@ -16,7 +16,7 @@ jest.mock("./components/CallStack", () => ({
   default: () => <g data-testid="call-stack-layer" />,
 }));
 
-jest.mock("./components/PythonTutorReferenceArrows", () => ({
+jest.mock("./components/ReferenceArrows", () => ({
   __esModule: true,
   default: ({ enabled }: { enabled: boolean }) =>
     enabled ? <g data-testid="arrow-overlay-layer" /> : null,

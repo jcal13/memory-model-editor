@@ -34,11 +34,11 @@ describe("CanvasControls", () => {
     localStorage.clear();
   });
 
-  it("shows the reference arrows toggle only in Python Tutor mode", () => {
+  it("shows reference arrows in both styles, standalone primitives only in Python Tutor mode", () => {
     const { rerender } = renderControls();
     openSettingsTab();
 
-    expect(screen.queryByText("Reference Arrows")).not.toBeInTheDocument();
+    expect(screen.getByText("Reference Arrows")).toBeInTheDocument();
     expect(screen.queryByText("Standalone Primitives")).not.toBeInTheDocument();
 
     rerender(
@@ -200,5 +200,14 @@ describe("CanvasControls help icons", () => {
       screen.getByText(/exported on a white background/i)
     ).toBeInTheDocument();
     expect(darkModeSwitch).toHaveAttribute("aria-checked", "false");
+  });
+
+  it("toggles reference arrows in MemoryViz style too", () => {
+    const handleReferenceArrowChange = jest.fn();
+    renderControls({ onPythonTutorReferenceArrowsChange: handleReferenceArrowChange });
+    openSettingsTab();
+    const controlRow = screen.getByText("Reference Arrows").closest("div");
+    fireEvent.click(within(controlRow as HTMLElement).getByRole("switch"));
+    expect(handleReferenceArrowChange).toHaveBeenCalledWith(true);
   });
 });

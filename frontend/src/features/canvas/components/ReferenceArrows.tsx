@@ -1,11 +1,19 @@
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { CanvasElement } from "../../shared/types";
+import { drawnRect, findBoxGroup, isRefField, readBoxGeometry } from "../../inlineEditing/fields";
+import { getSlotTarget } from "../../inlineEditing/kindUpdates";
 
-interface PythonTutorReferenceArrowsProps {
+interface ReferenceArrowsProps {
   svgRef: React.RefObject<SVGSVGElement | null>;
   enabled: boolean;
   includePrimitiveTargets?: boolean;
   elements: CanvasElement[];
+  /**
+   * Where arrows start. "markers": the dots the Python Tutor renderer draws in
+   * each slot. "slots": the id slots of MemoryViz boxes (found from the
+   * rendered text), so arrows can be shown alongside the ids in that style.
+   */
+  sources?: "markers" | "slots";
 }
 
 interface Point {
@@ -187,9 +195,91 @@ function areArrowPathsEqual(current: ArrowPath[], next: ArrowPath[]): boolean {
   );
 }
 
+/** The drawn box (not the padded hit area) of each object, by id. */
+function collectDrawnTargets(svg: SVGSVGElement, elements: CanvasElement[]): Map<number, Rect> {
+  const targets = new Map<number, Rect>();
+  elements.forEach((element) => {
+    if (element.kind.name === "function" || typeof element.id !== "number") return;
+    const boxSvg = findBoxGroup(svg, element.boxId)?.querySelector("svg");
+    if (!boxSvg) return;
+    const r = drawnRect(boxSvg, 1);
+    const rect = rectToSvgRect(svg, new DOMRect(r.left, r.top, r.width, r.height));
+    if (rect) targets.set(element.id, rect);
+  });
+  return targets;
+}
+
+/**
+ * MemoryViz arrows leave the slot from its side and enter the target's side at
+ * mid-height, curving horizontally. Coming in from below (the generic
+ * perimeter rule) cut through the boxes stacked between slot and target.
+ */
+export function sideArrowPath(slot: Rect, target: Rect): string {
+  const sx = slot.x + slot.width / 2;
+  const sy = slot.y + slot.height / 2;
+  const inside =
+    sx >= target.x && sx <= target.x + target.width && sy >= target.y && sy <= target.y + target.height;
+  if (inside) return selfArrowPath(slot, target);
+  const slotMid = slot.x + slot.width / 2;
+  const targetMid = target.x + target.width / 2;
+  const toRight = targetMid >= slotMid;
+  const start = { x: toRight ? slot.x + slot.width : slot.x, y: slot.y + slot.height / 2 };
+  const end = { x: toRight ? target.x : target.x + target.width, y: target.y + target.height / 2 };
+  const dir = toRight ? 1 : -1;
+  const reach = Math.max(36, Math.abs(end.x - start.x) * 0.5, Math.abs(end.y - start.y) * 0.15);
+  return `M ${start.x} ${start.y} C ${start.x + dir * reach} ${start.y}, ${end.x - dir * reach} ${end.y}, ${end.x} ${end.y}`;
+}
+
+/**
+ * A slot pointing at its own box: leave the slot's right side, loop out past
+ * the box's right edge and over its top, and come down into the top edge
+ * near the right corner, instead of a stub cutting through the box. A box
+ * at the top of the canvas gets the loop under its bottom edge instead.
+ */
+export function selfArrowPath(slot: Rect, target: Rect): string {
+  const gap = 18;
+  const right = target.x + target.width;
+  const above = target.y - gap * 1.5 > 0;
+  const edge = above ? target.y : target.y + target.height;
+  const out = above ? -gap : gap;
+  const start = { x: slot.x + slot.width, y: slot.y + slot.height / 2 };
+  const loop = { x: right + gap, y: edge + out };
+  const end = { x: right - Math.min(24, target.width * 0.2), y: edge };
+  return (
+    `M ${start.x} ${start.y} ` +
+    `C ${right + gap * 1.6} ${start.y}, ${loop.x + gap * 0.4} ${loop.y}, ${loop.x} ${loop.y} ` +
+    `C ${loop.x - gap * 0.6} ${loop.y}, ${end.x} ${loop.y}, ${end.x} ${end.y}`
+  );
+}
+
+function collectSlotArrowPaths(
+  svg: SVGSVGElement,
+  elements: CanvasElement[]
+): ArrowPath[] {
+  const targetsById = collectDrawnTargets(svg, elements);
+  return elements.flatMap((element) => {
+    const group = findBoxGroup(svg, element.boxId);
+    const geom = group && readBoxGeometry(element, group);
+    if (!geom) return [];
+    return geom.fields.flatMap((field, index) => {
+      if (!isRefField(field.ref)) return [];
+      const target = Number(getSlotTarget(element.kind, field.ref));
+      const targetRect = Number.isInteger(target) ? targetsById.get(target) : undefined;
+      const slot = rectToSvgRect(
+        svg,
+        new DOMRect(field.rect.left, field.rect.top, field.rect.width, field.rect.height)
+      );
+      if (!targetRect || !slot) return [];
+      return [{ key: `${element.boxId}-${index}-${target}`, d: sideArrowPath(slot, targetRect) }];
+    });
+  });
+}
+
 function collectArrowPaths(
   svg: SVGSVGElement,
-  includePrimitiveTargets: boolean
+  includePrimitiveTargets: boolean,
+  sources: "markers" | "slots" = "markers",
+  elements: CanvasElement[] = []
 ): ArrowPath[] {
   const targetNodes = Array.from(
     svg.querySelectorAll<SVGGElement>(
@@ -215,6 +305,8 @@ function collectArrowPaths(
 
     targetsById.set(targetId, rect);
   });
+
+  if (sources === "slots") return collectSlotArrowPaths(svg, elements);
 
   const sourceNodes = Array.from(
     svg.querySelectorAll<SVGCircleElement>("[data-ref-source-target-id]")
@@ -255,12 +347,15 @@ function collectArrowPaths(
   });
 }
 
-export default function PythonTutorReferenceArrows({
+export default function ReferenceArrows({
   svgRef,
   enabled,
   includePrimitiveTargets = false,
   elements,
-}: PythonTutorReferenceArrowsProps) {
+  sources = "markers",
+}: ReferenceArrowsProps) {
+  const elementsRef = useRef(elements);
+  elementsRef.current = elements;
   const rawMarkerId = useId();
   const markerId = useMemo(
     () => `python-tutor-reference-arrow-${rawMarkerId.replace(/:/g, "")}`,
@@ -276,11 +371,11 @@ export default function PythonTutorReferenceArrows({
       return;
     }
 
-    const nextArrows = collectArrowPaths(svg, includePrimitiveTargets);
+    const nextArrows = collectArrowPaths(svg, includePrimitiveTargets, sources, elementsRef.current);
     setArrows((current) =>
       areArrowPathsEqual(current, nextArrows) ? current : nextArrows
     );
-  }, [enabled, includePrimitiveTargets, svgRef]);
+  }, [enabled, includePrimitiveTargets, sources, svgRef]);
 
   const scheduleRecompute = useCallback(() => {
     if (!enabled) return;

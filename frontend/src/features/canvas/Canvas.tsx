@@ -33,7 +33,7 @@ import {
 import styles from "./Canvas.module.css";
 import { createElementsByIdMap } from "./utils/canvasReferences";
 import { findOrphanedGeneratedPrimitiveIds } from "../editors/utils/pythonTutorInlinePrimitives";
-import PythonTutorReferenceArrows from "./components/PythonTutorReferenceArrows";
+import ReferenceArrows from "./components/ReferenceArrows";
 import { inlineEditingEnabled } from "../inlineEditing/enabled";
 import { useInlineEditing } from "../inlineEditing/useInlineEditing";
 
@@ -846,12 +846,11 @@ function Canvas({
               ))}
           </g>
 
-          <PythonTutorReferenceArrows
+          <ReferenceArrows
             svgRef={svgRef}
-            enabled={
-              visualStyle === "pythonTutor" && pythonTutorReferenceArrows
-            }
-            includePrimitiveTargets={pythonTutorStandalonePrimitives}
+            enabled={pythonTutorReferenceArrows}
+            includePrimitiveTargets={visualStyle !== "pythonTutor" || pythonTutorStandalonePrimitives}
+            sources={visualStyle === "pythonTutor" ? "markers" : "slots"}
             elements={elements}
           />
         </svg>
